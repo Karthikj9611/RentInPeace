@@ -332,10 +332,11 @@ ul{list-style:none}
 .prop-grid{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:0;
+  gap:10px;
 }
 .prop-grid.list-view{
   grid-template-columns:1fr 1fr;
+  gap:10px;
 }
 @media(max-width:768px){
   .prop-grid.list-view{
@@ -344,10 +345,8 @@ ul{list-style:none}
 }
 .prop-card{
   background:var(--bg);
-  border-radius:0;
-  border:none;
-  border-right:1px solid var(--border);
-  border-bottom:1px solid var(--border);
+  border-radius:10px;
+  border:1px solid var(--border);
   overflow:visible;
   cursor:pointer;
   transition:box-shadow .15s;
