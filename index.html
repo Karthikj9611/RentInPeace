@@ -600,6 +600,55 @@ ul{list-style:none}
 }
 .panel-backdrop.open{display:block}
 
+/* ─── Menu Panel (right slide-out) ──────────────── */
+.menu-panel{
+  position:fixed;top:0;right:0;bottom:0;z-index:250;
+  width:300px;background:var(--bg);
+  border-left:1px solid var(--border);
+  display:flex;flex-direction:column;
+  transform:translateX(100%);
+  transition:transform .25s ease;
+  box-shadow:-4px 0 24px rgba(0,0,0,.08);
+}
+.menu-panel.open{transform:translateX(0)}
+.menu-panel-header{
+  padding:18px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.menu-user-row{display:flex;align-items:center;gap:10px}
+.menu-avatar{
+  width:38px;height:38px;border-radius:50%;
+  background:var(--brand-light);color:var(--brand);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:600;flex-shrink:0;
+}
+.menu-user-name{font-size:14px;font-weight:600}
+.menu-user-sub{font-size:11.5px;color:var(--text-3);margin-top:1px}
+.menu-list{flex:1;overflow-y:auto;padding:10px 8px}
+.menu-section-label{
+  font-size:11px;font-weight:600;color:var(--text-3);
+  text-transform:uppercase;letter-spacing:.04em;
+  padding:14px 12px 6px;
+}
+.menu-item{
+  display:flex;align-items:center;gap:14px;
+  padding:11px 12px;border-radius:10px;
+  font-size:13.5px;font-weight:500;color:var(--text);
+  cursor:pointer;transition:background .12s;
+}
+.menu-item:hover{background:var(--bg-2)}
+.menu-item svg{width:19px;height:19px;stroke:var(--text-2);fill:none;stroke-width:1.7;flex-shrink:0}
+.menu-item-badge{
+  margin-left:auto;background:var(--brand-light);color:var(--brand);
+  font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;
+}
+.menu-divider{height:1px;background:var(--border);margin:8px 4px}
+.menu-panel-footer{
+  padding:14px 20px;border-top:1px solid var(--border);
+  font-size:11px;color:var(--text-3);flex-shrink:0;
+}
+
 /* ─── Add Listing Modal ────────────────────────── */
 .add-modal-overlay{
   position:fixed;inset:0;z-index:350;
@@ -650,6 +699,7 @@ ul{list-style:none}
   .prop-grid{grid-template-columns:1fr 1fr;gap:10px;padding:0 12px}
   .shortlist-btn span.shortlist-txt{display:none}
   .shortlist-panel{width:100%}
+  .menu-panel{width:100%}
   .bottom-nav{
     display:flex;
     position:fixed;bottom:0;left:0;right:0;z-index:110;
@@ -734,7 +784,7 @@ ul{list-style:none}
       <span class="shortlist-txt">Shortlisted</span>
       <span class="shortlist-badge" id="shortlistCount">0</span>
     </button>
-    <div class="icon-btn" onclick="toggleShortlistPanel()" aria-label="Menu" title="Menu">
+    <div class="icon-btn" onclick="toggleMenuPanel()" aria-label="Menu" title="Menu">
       <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </div>
   </div>
@@ -1190,6 +1240,58 @@ ul{list-style:none}
   </div>
 </div>
 
+<!-- ─── Menu Panel ─────────────────────────────── -->
+<div class="panel-backdrop" id="menuBackdrop" onclick="toggleMenuPanel()"></div>
+<aside class="menu-panel" id="menuPanel" aria-label="Main menu">
+  <div class="menu-panel-header">
+    <div class="menu-user-row">
+      <div class="menu-avatar">G</div>
+      <div>
+        <div class="menu-user-name">Guest</div>
+        <div class="menu-user-sub">Log in to manage listings</div>
+      </div>
+    </div>
+    <button class="panel-close" onclick="toggleMenuPanel()" aria-label="Close menu">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="menu-list">
+    <div class="menu-item" onclick="showToast('Login coming soon')">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+      Log in / Sign up
+    </div>
+    <div class="menu-item" onclick="showToast('No new notifications')">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      Notifications
+      <span class="menu-item-badge" id="menuNotifCount">2</span>
+    </div>
+    <div class="menu-divider"></div>
+    <div class="menu-section-label">Manage</div>
+    <div class="menu-item" onclick="toggleMenuPanel(); openAddModal();">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Post a Property
+    </div>
+    <div class="menu-divider"></div>
+    <div class="menu-section-label">Account</div>
+    <div class="menu-item" onclick="showToast('Refer a friend and earn rewards — coming soon')">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L9 9l-7 1 5 5-1.5 7L12 18l6.5 4L17 15l5-5-7-1z"/></svg>
+      Refer &amp; Earn
+      <span class="menu-item-badge">New</span>
+    </div>
+    <div class="menu-divider"></div>
+    <div class="menu-section-label">Support</div>
+    <div class="menu-item" onclick="showToast('Help & Support coming soon')">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 1 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12" y2="17"/></svg>
+      Help &amp; Support
+    </div>
+    <div class="menu-item" onclick="showToast('Quatar — find your next home in Bengaluru')">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="8"/></svg>
+      About Quatar
+    </div>
+  </div>
+  <div class="menu-panel-footer">Quatar · v1.0</div>
+</aside>
+
 <!-- ─── Shortlist Panel ─────────────────────────── -->
 <div class="panel-backdrop" id="panelBackdrop" onclick="toggleShortlistPanel()"></div>
 <aside class="shortlist-panel" id="shortlistPanel" aria-label="Shortlisted properties">
@@ -1530,6 +1632,7 @@ function updateShortlistCount() {
   const n = shortlisted.size;
   document.getElementById('shortlistCount').textContent = n;
   document.getElementById('panelCount').textContent = n;
+  document.getElementById('menuShortlistCount').textContent = n;
 }
 
 function renderShortlistPanel() {
@@ -1571,6 +1674,14 @@ function removeShortlist(id) {
 function toggleShortlistPanel() {
   const panel = document.getElementById('shortlistPanel');
   const backdrop = document.getElementById('panelBackdrop');
+  panel.classList.toggle('open');
+  backdrop.classList.toggle('open');
+  document.body.style.overflow = panel.classList.contains('open') ? 'hidden' : '';
+}
+
+function toggleMenuPanel() {
+  const panel = document.getElementById('menuPanel');
+  const backdrop = document.getElementById('menuBackdrop');
   panel.classList.toggle('open');
   backdrop.classList.toggle('open');
   document.body.style.overflow = panel.classList.contains('open') ? 'hidden' : '';
@@ -1880,6 +1991,7 @@ document.addEventListener('keydown', e => {
     closeAddModal();
     document.getElementById('filterPanel').classList.remove('open');
     if (document.getElementById('shortlistPanel').classList.contains('open')) toggleShortlistPanel();
+    if (document.getElementById('menuPanel').classList.contains('open')) toggleMenuPanel();
   }
 });
 
