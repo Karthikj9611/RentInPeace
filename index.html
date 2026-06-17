@@ -335,7 +335,12 @@ ul{list-style:none}
   gap:0;
 }
 .prop-grid.list-view{
-  grid-template-columns:1fr;
+  grid-template-columns:1fr 1fr;
+}
+@media(max-width:768px){
+  .prop-grid.list-view{
+    grid-template-columns:1fr;
+  }
 }
 .prop-card{
   background:var(--bg);
@@ -649,6 +654,32 @@ ul{list-style:none}
 @media(min-width:641px){
   .bottom-nav{display:none}
 }
+
+/* ─── Card image slider ─────────────────────────── */
+.img-slides{position:relative;width:100%;height:100%;overflow:hidden}
+.img-slide{position:absolute;inset:0;opacity:0;transition:opacity .3s;background-size:cover;background-position:center}
+.img-slide.active{opacity:1}
+.slide-prev,.slide-next{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(255,255,255,.85);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  z-index:3;opacity:0;transition:opacity .15s;
+}
+.prop-img:hover .slide-prev,.prop-img:hover .slide-next{opacity:1}
+.slide-prev{left:8px}.slide-next{right:36px}
+.slide-prev svg,.slide-next svg{width:14px;height:14px;stroke:var(--text);fill:none;stroke-width:2.5}
+.slide-dots{
+  position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
+  display:flex;gap:4px;z-index:3;
+}
+.slide-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:rgba(255,255,255,.55);border:none;cursor:pointer;padding:0;
+  transition:background .15s;
+}
+.slide-dot.active{background:#fff}
+
 </style>
 </head>
 <body>
@@ -691,7 +722,6 @@ ul{list-style:none}
     <div class="icon-btn" onclick="toggleShortlistPanel()" aria-label="Menu" title="Menu">
       <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </div>
-    <div class="avatar" title="Profile" onclick="showToast('Profile coming soon')">KR</div>
   </div>
 </nav>
 
@@ -1167,18 +1197,18 @@ ul{list-style:none}
    DATA
 ═══════════════════════════════════════════════ */
 const PROPERTIES = [
-  {id:1,type:'Rent',title:'Studio — Prestige Shantiniketan',location:'Whitefield',price:18000,deposit:36000,bhk:'Studio',furnishing:'Fully Furnished',floor:'4th of 14',bathrooms:1,lift:true,carpark:false,bikepark:true,facing:'East',amenities:['CCTV','Power backup'],tenant:'Any',promoted:true,posted:'2 days ago',desc:'Compact studio with modern interiors. Walking distance to ITPL. Ideal for working professionals.'},
-  {id:2,type:'Rent',title:'1 BHK — Koramangala 6th Block',location:'Koramangala',price:22000,deposit:44000,bhk:'1 BHK',furnishing:'Semi-Furnished',floor:'2nd of 5',bathrooms:1,lift:false,carpark:false,bikepark:true,facing:'North',amenities:['Security'],tenant:'Bachelor',promoted:false,posted:'5 days ago',desc:'Bright 1 BHK in the heart of Koramangala. Close to restaurants, cafes and co-working spaces.'},
-  {id:3,type:'Lease',title:'2 BHK — Brigade Metropolis',location:'Indiranagar',price:35000,deposit:70000,bhk:'2 BHK',furnishing:'Furnished',floor:'7th of 12',bathrooms:2,lift:true,carpark:true,bikepark:true,facing:'South',amenities:['Gym','Swimming pool','Security','Power backup'],tenant:'Family',promoted:true,posted:'1 day ago',desc:'Premium 2 BHK in Brigade Metropolis with club house access. Gated community with 24/7 security.'},
-  {id:4,type:'PG',title:'PG — HSR Layout Sector 2',location:'HSR Layout',price:8500,deposit:17000,bhk:'Studio',furnishing:'Furnished',floor:'1st of 3',bathrooms:1,lift:false,carpark:false,bikepark:true,facing:'West',amenities:['Meals included','Laundry','Wi-Fi'],tenant:'Female only',promoted:false,posted:'3 days ago',desc:'Girls-only PG with home-cooked meals twice a day. Peaceful neighborhood, excellent connectivity.'},
-  {id:5,type:'Rent',title:'3 BHK Villa — Sarjapur Road',location:'Sarjapur',price:45000,deposit:90000,bhk:'3 BHK',furnishing:'Furnished',floor:'G+1',bathrooms:3,lift:false,carpark:true,bikepark:true,facing:'North-East',amenities:['Garden','Power backup','Security'],tenant:'Family',promoted:false,posted:'1 week ago',desc:'Spacious independent villa with private garden. Children-friendly area near international schools.'},
-  {id:6,type:'Rent',title:'Studio — Electronic City Phase 1',location:'Electronic City',price:12000,deposit:24000,bhk:'Studio',furnishing:'Semi-Furnished',floor:'3rd of 8',bathrooms:1,lift:true,carpark:false,bikepark:true,facing:'South',amenities:['Power backup','Security'],tenant:'Bachelor',promoted:false,posted:'4 days ago',desc:'Affordable studio near Electronics City IT corridor. Excellent connectivity to Hosur Road.'},
-  {id:7,type:'Rent',title:'2 BHK — Bellandur Gate',location:'Bellandur',price:28000,deposit:56000,bhk:'2 BHK',furnishing:'Semi-Furnished',floor:'5th of 10',bathrooms:2,lift:true,carpark:true,bikepark:false,facing:'East',amenities:['Gym','CCTV','Power backup'],tenant:'Any',promoted:true,posted:'6 hours ago',desc:'Modern 2 BHK close to Outer Ring Road. Easy access to Ecospace, RMZ and Prestige tech parks.'},
-  {id:8,type:'Lease',title:'1 BHK — JP Nagar 7th Phase',location:'JP Nagar',price:16000,deposit:32000,bhk:'1 BHK',furnishing:'Unfurnished',floor:'Ground',bathrooms:1,lift:false,carpark:false,bikepark:true,facing:'North',amenities:['Garden'],tenant:'Family',promoted:false,posted:'2 weeks ago',desc:'Quiet 1 BHK on ground floor with independent entrance. Good water supply, peaceful locality.'},
-  {id:9,type:'PG',title:'PG — BTM Layout 2nd Stage',location:'BTM Layout',price:7200,deposit:14400,bhk:'Studio',furnishing:'Furnished',floor:'2nd of 4',bathrooms:1,lift:false,carpark:false,bikepark:true,facing:'West',amenities:['Wi-Fi','Laundry','CCTV'],tenant:'Bachelor',promoted:false,posted:'3 days ago',desc:'Affordable PG for male bachelors. AC rooms, high-speed Wi-Fi, attached bath. Near metro station.'},
-  {id:10,type:'Rent',title:'4 BHK — Hebbal Lake View',location:'Hebbal',price:65000,deposit:130000,bhk:'4 BHK',furnishing:'Furnished',floor:'10th of 18',bathrooms:4,lift:true,carpark:true,bikepark:true,facing:'North',amenities:['Gym','Swimming pool','Garden','Power backup','Security','CCTV'],tenant:'Family',promoted:true,posted:'Today',desc:'Luxury lake-view apartment with panoramic views of Hebbal lake. Premium gated complex.'},
-  {id:11,type:'Lease',title:'3 BHK — Marathahalli Bridge',location:'Marathahalli',price:38000,deposit:76000,bhk:'3 BHK',furnishing:'Semi-Furnished',floor:'6th of 14',bathrooms:3,lift:true,carpark:true,bikepark:true,facing:'South',amenities:['Power backup','Security','CCTV'],tenant:'Any',promoted:false,posted:'5 days ago',desc:'Spacious 3 BHK in a well-maintained complex. Walking distance from Marathahalli Metro station.'},
-  {id:12,type:'Rent',title:'1 BHK — Yelahanka New Town',location:'Yelahanka',price:13000,deposit:26000,bhk:'1 BHK',furnishing:'Unfurnished',floor:'1st of 4',bathrooms:1,lift:false,carpark:false,bikepark:true,facing:'East',amenities:['CCTV'],tenant:'Any',promoted:false,posted:'1 week ago',desc:'Budget-friendly 1 BHK near Yelahanka new town. Good connectivity to airport and north Bangalore.'},
+  {id:1,type:'Rent',title:'Studio — Prestige Shantiniketan',location:'Whitefield',price:18000,deposit:36000,bhk:'Studio',furnishing:'Fully Furnished',floor:'4th of 14',bathrooms:1,lift:true,carpark:false,bikepark:true,facing:'East',amenities:['CCTV','Power backup'],tenant:'Any',promoted:true,posted:'2 days ago',desc:'Compact studio with modern interiors. Walking distance to ITPL. Ideal for working professionals.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'],},
+  {id:2,type:'Rent',title:'1 BHK — Koramangala 6th Block',location:'Koramangala',price:22000,deposit:44000,bhk:'1 BHK',furnishing:'Semi-Furnished',floor:'2nd of 5',bathrooms:1,lift:false,carpark:false,bikepark:true,facing:'North',amenities:['Security'],tenant:'Bachelor',promoted:false,posted:'5 days ago',desc:'Bright 1 BHK in the heart of Koramangala. Close to restaurants, cafes and co-working spaces.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'],},
+  {id:3,type:'Lease',title:'2 BHK — Brigade Metropolis',location:'Indiranagar',price:35000,deposit:70000,bhk:'2 BHK',furnishing:'Furnished',floor:'7th of 12',bathrooms:2,lift:true,carpark:true,bikepark:true,facing:'South',amenities:['Gym','Swimming pool','Security','Power backup'],tenant:'Family',promoted:true,posted:'1 day ago',desc:'Premium 2 BHK in Brigade Metropolis with club house access. Gated community with 24/7 security.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'],},
+  {id:4,type:'PG',title:'PG — HSR Layout Sector 2',location:'HSR Layout',price:8500,deposit:17000,bhk:'Studio',furnishing:'Furnished',floor:'1st of 3',bathrooms:1,lift:false,carpark:false,bikepark:true,facing:'West',amenities:['Meals included','Laundry','Wi-Fi'],tenant:'Female only',promoted:false,posted:'3 days ago',desc:'Girls-only PG with home-cooked meals twice a day. Peaceful neighborhood, excellent connectivity.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'],},
+  {id:5,type:'Rent',title:'3 BHK Villa — Sarjapur Road',location:'Sarjapur',price:45000,deposit:90000,bhk:'3 BHK',furnishing:'Furnished',floor:'G+1',bathrooms:3,lift:false,carpark:true,bikepark:true,facing:'North-East',amenities:['Garden','Power backup','Security'],tenant:'Family',promoted:false,posted:'1 week ago',desc:'Spacious independent villa with private garden. Children-friendly area near international schools.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'],},
+  {id:6,type:'Rent',title:'Studio — Electronic City Phase 1',location:'Electronic City',price:12000,deposit:24000,bhk:'Studio',furnishing:'Semi-Furnished',floor:'3rd of 8',bathrooms:1,lift:true,carpark:false,bikepark:true,facing:'South',amenities:['Power backup','Security'],tenant:'Bachelor',promoted:false,posted:'4 days ago',desc:'Affordable studio near Electronics City IT corridor. Excellent connectivity to Hosur Road.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'],},
+  {id:7,type:'Rent',title:'2 BHK — Bellandur Gate',location:'Bellandur',price:28000,deposit:56000,bhk:'2 BHK',furnishing:'Semi-Furnished',floor:'5th of 10',bathrooms:2,lift:true,carpark:true,bikepark:false,facing:'East',amenities:['Gym','CCTV','Power backup'],tenant:'Any',promoted:true,posted:'6 hours ago',desc:'Modern 2 BHK close to Outer Ring Road. Easy access to Ecospace, RMZ and Prestige tech parks.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'],},
+  {id:8,type:'Lease',title:'1 BHK — JP Nagar 7th Phase',location:'JP Nagar',price:16000,deposit:32000,bhk:'1 BHK',furnishing:'Unfurnished',floor:'Ground',bathrooms:1,lift:false,carpark:false,bikepark:true,facing:'North',amenities:['Garden'],tenant:'Family',promoted:false,posted:'2 weeks ago',desc:'Quiet 1 BHK on ground floor with independent entrance. Good water supply, peaceful locality.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'],},
+  {id:9,type:'PG',title:'PG — BTM Layout 2nd Stage',location:'BTM Layout',price:7200,deposit:14400,bhk:'Studio',furnishing:'Furnished',floor:'2nd of 4',bathrooms:1,lift:false,carpark:false,bikepark:true,facing:'West',amenities:['Wi-Fi','Laundry','CCTV'],tenant:'Bachelor',promoted:false,posted:'3 days ago',desc:'Affordable PG for male bachelors. AC rooms, high-speed Wi-Fi, attached bath. Near metro station.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'],},
+  {id:10,type:'Rent',title:'4 BHK — Hebbal Lake View',location:'Hebbal',price:65000,deposit:130000,bhk:'4 BHK',furnishing:'Furnished',floor:'10th of 18',bathrooms:4,lift:true,carpark:true,bikepark:true,facing:'North',amenities:['Gym','Swimming pool','Garden','Power backup','Security','CCTV'],tenant:'Family',promoted:true,posted:'Today',desc:'Luxury lake-view apartment with panoramic views of Hebbal lake. Premium gated complex.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'],},
+  {id:11,type:'Lease',title:'3 BHK — Marathahalli Bridge',location:'Marathahalli',price:38000,deposit:76000,bhk:'3 BHK',furnishing:'Semi-Furnished',floor:'6th of 14',bathrooms:3,lift:true,carpark:true,bikepark:true,facing:'South',amenities:['Power backup','Security','CCTV'],tenant:'Any',promoted:false,posted:'5 days ago',desc:'Spacious 3 BHK in a well-maintained complex. Walking distance from Marathahalli Metro station.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'],},
+  {id:12,type:'Rent',title:'1 BHK — Yelahanka New Town',location:'Yelahanka',price:13000,deposit:26000,bhk:'1 BHK',furnishing:'Unfurnished',floor:'1st of 4',bathrooms:1,lift:false,carpark:false,bikepark:true,facing:'East',amenities:['CCTV'],tenant:'Any',promoted:false,posted:'1 week ago',desc:'Budget-friendly 1 BHK near Yelahanka new town. Good connectivity to airport and north Bangalore.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'],},
 ];
 
 /* ═══════════════════════════════════════════════
@@ -1213,6 +1243,25 @@ function getFiltered() {
   return list;
 }
 
+function injectPaginationDividers(arr) {
+  let html = '';
+  arr.forEach((p, i) => {
+    html += cardHTML(p);
+    if ((i + 1) % 4 === 0 && i !== arr.length - 1) {
+      html += `<div style="grid-column:1/-1;display:flex;align-items:center;gap:12px;padding:14px 20px;background:var(--bg-2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+        <span style="font-size:11px;font-weight:600;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap">More listings below</span>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>`;
+    }
+  });
+  return html;
+}
+
+let promotedPage = 0;
+let normalPage = 0;
+const PAGE_SIZE = 4;
+
 function renderCards() {
   const empty = document.getElementById('emptyState');
   const list = getFiltered();
@@ -1239,7 +1288,10 @@ function renderCards() {
 
   if (promoted.length > 0) {
     document.getElementById('promotedDivider').style.display = '';
-    pg.innerHTML = promoted.map(p => cardHTML(p)).join('');
+    promotedPage = Math.min(promotedPage, Math.floor((promoted.length - 1) / PAGE_SIZE));
+    const slice = promoted.slice(promotedPage * PAGE_SIZE, (promotedPage + 1) * PAGE_SIZE);
+    pg.innerHTML = slice.map(p => cardHTML(p)).join('') +
+      paginationHTML('promoted', promotedPage, promoted.length);
   } else {
     document.getElementById('promotedDivider').style.display = 'none';
     pg.innerHTML = '';
@@ -1247,11 +1299,97 @@ function renderCards() {
 
   if (normal.length > 0) {
     document.getElementById('normalDivider').style.display = '';
-    ng.innerHTML = normal.map(p => cardHTML(p)).join('');
+    normalPage = Math.min(normalPage, Math.floor((normal.length - 1) / PAGE_SIZE));
+    const slice = normal.slice(normalPage * PAGE_SIZE, (normalPage + 1) * PAGE_SIZE);
+    ng.innerHTML = slice.map(p => cardHTML(p)).join('') +
+      paginationHTML('normal', normalPage, normal.length);
   } else {
     document.getElementById('normalDivider').style.display = 'none';
     ng.innerHTML = '';
   }
+}
+
+function paginationHTML(section, page, total) {
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  if (totalPages <= 1) return '';
+  const start = page * PAGE_SIZE + 1;
+  const end = Math.min((page + 1) * PAGE_SIZE, total);
+  return `
+    <div style="grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-top:1px solid var(--border);background:var(--bg)">
+      <button onclick="changePage('${section}',-1)"
+        style="display:flex;align-items:center;gap:6px;padding:7px 16px;border-radius:8px;border:1.5px solid var(--border-2);background:var(--bg);font-size:13px;font-weight:500;color:${page===0?'var(--text-3)':'var(--text)'};cursor:${page===0?'default':'pointer'}"
+        ${page===0?'disabled':''}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        Prev
+      </button>
+      <span style="font-size:12px;color:var(--text-3)">${start}–${end} of ${total}</span>
+      <button onclick="changePage('${section}',1)"
+        style="display:flex;align-items:center;gap:6px;padding:7px 16px;border-radius:8px;border:1.5px solid var(--border-2);background:var(--bg);font-size:13px;font-weight:500;color:${page>=totalPages-1?'var(--text-3)':'var(--text)'};cursor:${page>=totalPages-1?'default':'pointer'}"
+        ${page>=totalPages-1?'disabled':''}>
+        Next
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>`;
+}
+
+function changePage(section, dir) {
+  const list = getFiltered();
+  const promoted = list.filter(p => p.promoted);
+  const normal = list.filter(p => !p.promoted);
+  if (section === 'promoted') {
+    const max = Math.ceil(promoted.length / PAGE_SIZE) - 1;
+    promotedPage = Math.max(0, Math.min(promotedPage + dir, max));
+  } else {
+    const max = Math.ceil(normal.length / PAGE_SIZE) - 1;
+    normalPage = Math.max(0, Math.min(normalPage + dir, max));
+  }
+  renderCards();
+  // scroll to the section top
+  const el = document.getElementById(section === 'promoted' ? 'promotedDivider' : 'normalDivider');
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function resetPages() {
+  promotedPage = 0;
+  normalPage = 0;
+}
+
+function buildImgSlider(p, fg) {
+  const imgs = (p.images && p.images.length) ? p.images : [];
+  if (imgs.length === 0) {
+    return `<div class="prop-img-placeholder"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="${fg}" opacity=".3"/><polyline points="9 22 9 12 15 12 15 22" stroke="${fg}" opacity=".3"/></svg></div>`;
+  }
+  const uid = 'sl' + p.id;
+  const slides = imgs.map((url, i) =>
+    `<div class="img-slide${i===0?' active':''}" style="background-image:url('${url}')"></div>`
+  ).join('');
+  const dots = imgs.length > 1 ? `<div class="slide-dots">${imgs.map((_,i)=>
+    `<button class="slide-dot${i===0?' active':''}" onclick="event.stopPropagation();slideGo('${uid}',${i})"></button>`
+  ).join('')}</div>` : '';
+  const arrows = imgs.length > 1 ? `
+    <button class="slide-prev" onclick="event.stopPropagation();slideStep('${uid}',-1)">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <button class="slide-next" onclick="event.stopPropagation();slideStep('${uid}',1)">
+      <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>` : '';
+  return `<div class="img-slides" id="${uid}">${slides}${arrows}${dots}</div>`;
+}
+
+function slideGo(uid, idx) {
+  const c = document.getElementById(uid);
+  if (!c) return;
+  c.querySelectorAll('.img-slide').forEach((s,i) => s.classList.toggle('active', i===idx));
+  c.querySelectorAll('.slide-dot').forEach((d,i) => d.classList.toggle('active', i===idx));
+}
+
+function slideStep(uid, dir) {
+  const c = document.getElementById(uid);
+  if (!c) return;
+  const slides = c.querySelectorAll('.img-slide');
+  let cur = [...slides].findIndex(s => s.classList.contains('active'));
+  const next = (cur + dir + slides.length) % slides.length;
+  slideGo(uid, next);
 }
 
 function cardHTML(p) {
@@ -1260,10 +1398,8 @@ function cardHTML(p) {
   const [bg, fg] = (colors[p.type]||'#f0f0f0:#333').split(':');
   const listClass = isListView ? ' list-view' : '';
   return `<div class="prop-card${listClass}" onclick="openDetail(${p.id})">
-    <div class="prop-img" style="background:${bg}">
-      <div class="prop-img-placeholder">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="${fg}" opacity=".3"/><polyline points="9 22 9 12 15 12 15 22" stroke="${fg}" opacity=".3"/></svg>
-      </div>
+    <div class="prop-img" style="background:${bg}" data-idx="0">
+      ${buildImgSlider(p, fg)}
       ${p.promoted ? '<span class="prop-badge-promoted">Promoted</span>' : ''}
       <span class="prop-badge-type badge-${p.type.toLowerCase()}">${p.type}</span>
       <div class="prop-heart${liked?' liked':''}" onclick="event.stopPropagation();toggleShortlist(${p.id},this)" aria-label="${liked?'Remove from':'Add to'} shortlist">
