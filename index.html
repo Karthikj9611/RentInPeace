@@ -670,18 +670,20 @@ ul{list-style:none}
 .img-slides{position:relative;width:100%;height:100%;overflow:hidden}
 .img-slide{position:absolute;inset:0;opacity:0;transition:opacity .3s;background-size:cover;background-position:center}
 .img-slide.active{opacity:1}
-.slide-prev,.slide-next{
-  position:absolute;top:50%;transform:translateY(-50%);
-  width:28px;height:28px;border-radius:50%;
-  background:rgba(255,255,255,.85);border:none;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
+.slide-arrows{
+  position:absolute;bottom:18px;left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:10px;
   z-index:3;opacity:0;transition:opacity .15s;
 }
-.prop-img:hover .slide-prev,.prop-img:hover .slide-next{opacity:1}
-.slide-prev{left:8px}.slide-next{right:36px}
+.prop-img:hover .slide-arrows{opacity:1}
+.slide-prev,.slide-next{
+  width:26px;height:26px;border-radius:50%;
+  background:rgba(255,255,255,.85);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
 .slide-prev svg,.slide-next svg{width:14px;height:14px;stroke:var(--text);fill:none;stroke-width:2.5}
 .slide-dots{
-  position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
+  position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
   display:flex;gap:4px;z-index:3;
 }
 .slide-dot{
@@ -1236,7 +1238,6 @@ const PROPERTIES = [
   {id:25,type:'Rent',title:'Studio — Demo Listing 25',location:'Hebbal',price:40000,deposit:80000,bhk:'Studio',furnishing:'Fully Furnished',floor:'6th of 10',bathrooms:1,lift:false,carpark:false,bikepark:true,facing:'West',amenities:['Wi-Fi'],tenant:'Any',promoted:false,posted:'4 days ago',desc:'Demo listing added temporarily to test pagination.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600']},
   {id:26,type:'Rent',title:'1 BHK — Demo Listing 26',location:'Marathahalli',price:41200,deposit:82400,bhk:'1 BHK',furnishing:'Semi-Furnished',floor:'7th of 10',bathrooms:1,lift:false,carpark:false,bikepark:true,facing:'West',amenities:['Wi-Fi'],tenant:'Any',promoted:false,posted:'5 days ago',desc:'Demo listing added temporarily to test pagination.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600']},
   {id:27,type:'Rent',title:'2 BHK — Demo Listing 27',location:'Yelahanka',price:42400,deposit:84800,bhk:'2 BHK',furnishing:'Unfurnished',floor:'8th of 10',bathrooms:1,lift:false,carpark:false,bikepark:true,facing:'West',amenities:['Wi-Fi'],tenant:'Any',promoted:false,posted:'6 days ago',desc:'Demo listing added temporarily to test pagination.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600']},
-  /* END TEMP DEMO DATA */
 ];
 
 /* ═══════════════════════════════════════════════
@@ -1440,12 +1441,14 @@ function buildImgSlider(p, fg) {
     `<button class="slide-dot${i===0?' active':''}" onclick="event.stopPropagation();slideGo('${uid}',${i})"></button>`
   ).join('')}</div>` : '';
   const arrows = imgs.length > 1 ? `
-    <button class="slide-prev" onclick="event.stopPropagation();slideStep('${uid}',-1)">
-      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-    </button>
-    <button class="slide-next" onclick="event.stopPropagation();slideStep('${uid}',1)">
-      <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-    </button>` : '';
+    <div class="slide-arrows">
+      <button class="slide-prev" onclick="event.stopPropagation();slideStep('${uid}',-1)">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button class="slide-next" onclick="event.stopPropagation();slideStep('${uid}',1)">
+        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>` : '';
   return `<div class="img-slides" id="${uid}">${slides}${arrows}${dots}</div>`;
 }
 
