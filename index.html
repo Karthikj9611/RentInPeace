@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>RentInBangalore — Find Your Home</title>
+<title>Quatar</title>
 <meta name="description" content="Rent, lease or find PG accommodation in Bangalore. Browse thousands of verified listings." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -660,7 +660,7 @@ ul{list-style:none}
       <path d="M4 12L14 3L24 12V24C24 24.55 23.55 25 23 25H17V19H11V25H5C4.45 25 4 24.55 4 24V12Z" stroke="#E03A52" stroke-width="1.8" fill="none"/>
       <circle cx="14" cy="14" r="2.5" fill="#E03A52"/>
     </svg>
-    RentInBangalore
+    Quatar
   </div>
 
   <div class="nav-tabs" role="tablist">
@@ -775,10 +775,6 @@ ul{list-style:none}
     </div>
   </div>
   <div class="filterbar-actions">
-    <button class="f-action-btn" onclick="toggleSort()" aria-label="Sort listings">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-      Sort
-    </button>
     <button class="f-action-btn" onclick="toggleFilters()" aria-label="Open filters">
       <svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
       Filters
@@ -816,7 +812,7 @@ ul{list-style:none}
     </div>
   </div>
   <div class="fp-group" style="min-width:180px">
-    <div class="fp-label">Max rent (₹/mo)</div>
+    <div class="fp-label">Max rent (₹/ Month)</div>
     <div class="fp-range">
       <input type="range" min="5000" max="100000" step="1000" value="50000" id="priceRange" oninput="updatePriceLabel(this.value)" />
       <div class="fp-range-labels"><span>₹5k</span><span id="priceLabel">₹50k</span><span>₹1L</span></div>
@@ -841,7 +837,7 @@ ul{list-style:none}
 <!-- ─── Main Content ────────────────────────────── -->
 <main class="main">
   <div class="results-header">
-    <div class="results-count"><strong id="resultCount">12</strong> properties found in Bangalore</div>
+    <div class="results-count"><strong id="resultCount">12</strong> <strong>Properties found</strong></div>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="view-toggle">
         <button class="view-btn active" onclick="setView('grid',this)" aria-label="Grid view">
@@ -868,7 +864,7 @@ ul{list-style:none}
   <div id="normalSection">
     <div class="section-divider" id="normalDivider" style="display:none">
       <div class="section-divider-inner">
-        <span class="section-divider-label">All listings</span>
+        <span class="section-divider-label promoted-label">All listings</span>
       </div>
     </div>
     <div class="prop-grid" id="normalGrid"></div>
@@ -953,7 +949,6 @@ ul{list-style:none}
     <div class="add-modal-header" style="background:linear-gradient(135deg,var(--brand) 0%,var(--brand-hover) 100%);padding:24px 28px;margin-bottom:0;position:relative;flex-shrink:0">
       <div>
         <div class="add-modal-title" style="color:#fff">List your property</div>
-        <p style="font-size:12px;color:rgba(255,255,255,.85);margin-top:2px">Fill in the details — your property will appear on our listings.</p>
       </div>
       <button class="modal-close" style="position:static;background:rgba(255,255,255,.18);color:#fff;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center" onclick="closeAddModal()" aria-label="Close">
         <svg viewBox="0 0 24 24" aria-hidden="true" stroke="#fff"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -968,7 +963,7 @@ ul{list-style:none}
       <div class="form-group">
         <label class="form-label">Status <span style="color:var(--brand)">*</span></label>
         <select class="form-select" id="f-type" onchange="onFTypeChange(this.value)">
-          <option value="Rent">For Rent</option><option value="Lease">For Lease</option><option value="PG">PG / Co-living</option>
+          <option value="Rent">Rent</option><option value="Lease">Lease</option><option value="PG">PG / Co-living</option>
         </select>
       </div>
       <div class="form-group">
@@ -977,29 +972,27 @@ ul{list-style:none}
           <option>Owner</option><option>Agent</option><option>Builder</option>
         </select>
       </div>
-      <div class="form-group">
-        <label class="form-label">City</label>
-        <input class="form-input" type="text" id="f-city" value="Bengaluru" />
-      </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Title / Society name</label>
-      <input class="form-input" type="text" id="f-title" placeholder="e.g. Prestige Shantiniketan, Whitefield" />
-    </div>
+    
 
     <!-- ===== 2. LOCATION ===== -->
     <div class="lm-section">📍 Location</div>
     <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
-      <div class="form-group" style="grid-column:span 2">
-        <label class="form-label">Location / Area <span style="color:var(--brand)">*</span></label>
+      <div class="form-group">
+      <label class="form-label">Property name</label>
+      <input class="form-input" type="text" id="f-title" placeholder="e.g. Prestige Shantiniketan, Whitefield" />
+    </div>
+	  <div class="form-group">
+        <label class="form-label">Area <span style="color:var(--brand)">*</span></label>
         <input class="form-input" type="text" id="f-location" placeholder="e.g. Koramangala 6th Block" />
       </div>
+	  
       <div class="form-group">
-        <label class="form-label">Floor</label>
-        <input class="form-input" type="text" id="f-floor" placeholder="e.g. 3rd of 10" />
+        <label class="form-label">City</label>
+        <input class="form-input" type="text" id="f-city" value="Bengaluru" />
       </div>
       <div class="form-group" style="grid-column:span 3">
-        <label class="form-label">Full address (optional)</label>
+        <label class="form-label">Building Live Address</label>
         <div style="display:flex;gap:7px;align-items:flex-start">
           <textarea class="form-input" id="f-fullAddress" rows="2" placeholder="House No., Building Name, Street, Landmark, Pincode" style="flex:1;min-width:0;resize:vertical"></textarea>
           <button type="button" onclick="fCaptureLocation()"
@@ -1025,8 +1018,9 @@ ul{list-style:none}
     <div class="lm-section">💰 Pricing</div>
     <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
       <div class="form-group"><label class="form-label" id="f-rentLabel">Monthly rent (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-rent" placeholder="e.g. 22000" min="0" max="9999999" /></div>
-      <div class="form-group" id="f-depositWrap"><label class="form-label">Security deposit (₹)</label><input class="form-input" type="number" id="f-deposit" placeholder="e.g. 44000" min="0" max="9999999" /></div>
-      <div class="form-group">
+      <div class="form-group" id="f-depositWrap"><label class="form-label">Security deposit (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-deposit" placeholder="e.g. 44000" min="0" max="9999999" /></div>
+      <div class="form-group" id="f-leaseAmt"><label class="form-label">Lease Amount (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-deposit" placeholder="e.g. 44000" min="0" max="9999999" /></div>
+	  <div class="form-group">
         <label class="form-label" style="display:flex;align-items:center;gap:6px;margin-top:18px">
           <input type="checkbox" id="f-negotiable" /> Price negotiable
         </label>
@@ -1040,7 +1034,28 @@ ul{list-style:none}
       <div class="form-group">
         <label class="form-label">BHK</label>
         <select class="form-select" id="f-bhk">
-          <option>Studio</option><option>1 BHK</option><option>2 BHK</option><option>3 BHK</option><option>4 BHK</option>
+          <option>1 RK</option><option>1 BHK</option><option>2 BHK</option><option>3 BHK</option><option>4 BHK</option>
+        </select>
+      </div>
+	  
+	  <div class="form-group">
+        <label class="form-label">Bike Parking</label>
+        <select class="form-select" id="f-bikepark">
+          <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
+        </select>
+      </div>
+	  
+	  <div class="form-group">
+        <label class="form-label">Car Parking</label>
+        <select class="form-select" id="f-carpark">
+          <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
+        </select>
+      </div>
+	  
+      <div class="form-group">
+        <label class="form-label">Floor</label>
+        <select class="form-select" id="f-floor">
+          <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
         </select>
       </div>
       <div class="form-group">
@@ -1072,16 +1087,6 @@ ul{list-style:none}
       <div class="form-group">
         <label class="form-label" style="display:flex;align-items:center;gap:6px">
           <input type="checkbox" id="f-lift" /> Lift available
-        </label>
-      </div>
-      <div class="form-group">
-        <label class="form-label" style="display:flex;align-items:center;gap:6px">
-          <input type="checkbox" id="f-carpark" /> Car parking
-        </label>
-      </div>
-      <div class="form-group">
-        <label class="form-label" style="display:flex;align-items:center;gap:6px">
-          <input type="checkbox" id="f-bikepark" /> Bike parking
         </label>
       </div>
     </div>
@@ -1266,12 +1271,12 @@ function cardHTML(p) {
       </div>
     </div>
     <div class="prop-body">
-      <div class="prop-price">₹${p.price.toLocaleString('en-IN')}<span class="prop-price-unit">/mo</span></div>
       <div class="prop-title" title="${p.title}">${p.title}</div>
       <div class="prop-loc">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         ${p.location}
       </div>
+	  <div>₹${p.price.toLocaleString('en-IN')}<span class="prop-price-unit"> / Month</span></div>
       <div class="prop-tags">
         <span class="prop-tag">${p.bhk}</span>
         <span class="prop-tag">${p.furnishing}</span>
@@ -1279,7 +1284,7 @@ function cardHTML(p) {
         ${p.carpark ? '<span class="prop-tag">Car park</span>' : ''}
       </div>
       <div class="prop-footer">
-        <button class="prop-contact-btn" onclick="event.stopPropagation();showToast('Contact info shown to verified users')">Contact owner</button>
+        <button class="prop-contact-btn" onclick="event.stopPropagation();showToast('Contact info shown to verified users')">Contact</button>
         <span class="prop-posted">${p.posted}</span>
       </div>
     </div>
@@ -1323,7 +1328,7 @@ function renderShortlistPanel() {
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       </div>
       <div class="panel-item-info">
-        <div class="panel-item-price">₹${p.price.toLocaleString('en-IN')}/mo</div>
+        <div class="panel-item-price">₹${p.price.toLocaleString('en-IN')}/ Month</div>
         <div class="panel-item-title">${p.title}</div>
         <div class="panel-item-loc">${p.location}</div>
       </div>
@@ -1460,7 +1465,7 @@ function openDetail(id) {
   document.getElementById('modalBody').innerHTML = `
     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
       <div>
-        <div class="modal-price">₹${p.price.toLocaleString('en-IN')} <span>/month</span></div>
+        <div class="modal-price">₹${p.price.toLocaleString('en-IN')} <span>/ Month</span></div>
         <div class="modal-title">${p.title}</div>
         <div class="modal-loc">
           <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -1493,7 +1498,7 @@ function openDetail(id) {
     <div style="font-size:11px;color:var(--text-3)">Posted ${p.posted}</div>
     <div class="modal-actions">
       <button class="modal-btn-secondary" onclick="toggleShortlistFromModal(${p.id})" id="modal-save-btn">${liked?'♥ Saved':'♡ Save'}</button>
-      <button class="modal-btn-primary" onclick="showToast('Contact shown to verified users')">Contact owner</button>
+      <button class="modal-btn-primary" onclick="showToast('Contact shown to verified users')">Contact</button>
     </div>
   `;
   document.getElementById('detailModal').classList.add('open');
