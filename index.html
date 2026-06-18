@@ -2152,6 +2152,10 @@ function toggleShortlist(id, el) {
   }
   updateShortlistCount();
   renderShortlistPanel();
+  const saveBtn = document.getElementById('modal-save-btn');
+  if (saveBtn && saveBtn.dataset.propId == id) {
+    saveBtn.textContent = shortlisted.has(id) ? '♥ Saved' : '♡ Save';
+  }
 }
 
 function updateShortlistCount() {
@@ -2190,7 +2194,7 @@ function removeShortlist(id) {
   shortlisted.delete(id);
   const hearts = document.querySelectorAll('.prop-heart');
   hearts.forEach(h => {
-    if (h.onclick && h.onclick.toString().includes(id)) h.classList.remove('liked');
+    if (h.onclick && h.onclick.toString().includes(`toggleShortlist(${id},`)) h.classList.remove('liked');
   });
   updateShortlistCount();
   renderShortlistPanel();
@@ -2391,6 +2395,7 @@ function toggleShortlistPanel() {
   panel.classList.toggle('open');
   backdrop.classList.toggle('open');
   document.body.style.overflow = panel.classList.contains('open') ? 'hidden' : '';
+  if (panel.classList.contains('open')) renderShortlistPanel();
 }
 
 function toggleMenuPanel() {
@@ -2543,7 +2548,7 @@ function openDetail(id) {
     <div class="modal-divider"></div>
     <div style="font-size:11px;color:var(--text-3)">Posted ${p.posted}</div>
     <div class="modal-actions">
-      <button class="modal-btn-secondary" onclick="toggleShortlistFromModal(${p.id})" id="modal-save-btn">${liked?'♥ Saved':'♡ Save'}</button>
+      <button class="modal-btn-secondary" onclick="toggleShortlistFromModal(${p.id})" id="modal-save-btn" data-prop-id="${p.id}">${liked?'♥ Saved':'♡ Save'}</button>
       <button class="modal-btn-primary" onclick="showToast('Contact shown to verified users')">Contact</button>
     </div>
   `;
