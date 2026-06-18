@@ -629,10 +629,11 @@ ul{list-style:none}
   display:flex;align-items:center;gap:14px;
   padding:8px 8px 8px 18px;
   box-shadow:0 8px 28px rgba(0,0,0,.25);
-  transition:transform .25s ease;
+  transition:transform .25s ease,visibility .25s ease;
+  visibility:hidden;
   max-width:calc(100vw - 32px);
 }
-.compare-bar.show{transform:translateX(-50%) translateY(0)}
+.compare-bar.show{transform:translateX(-50%) translateY(0);visibility:visible}
 .compare-bar-thumbs{display:flex;align-items:center}
 .compare-bar-thumb{
   width:30px;height:30px;border-radius:50%;
