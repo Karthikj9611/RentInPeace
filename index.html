@@ -933,6 +933,114 @@ ul{list-style:none}
 .about-link svg{width:15px;height:15px;stroke:var(--text-3);fill:none;stroke-width:2}
 .form-submit:hover{background:var(--brand-hover)}
 
+/* ─── Amenities multi-select dropdown ──────────── */
+.am-dd{position:relative}
+.am-dd-trigger{
+  width:100%;border:1.5px solid var(--border-2);border-radius:9px;
+  padding:9px 12px;font-size:13px;color:var(--text-2);background:var(--bg);
+  outline:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  transition:border-color .12s;
+}
+.am-dd-trigger:hover,.am-dd.open .am-dd-trigger{border-color:var(--brand)}
+.am-dd-trigger svg{width:15px;height:15px;stroke:var(--text-3);fill:none;stroke-width:2;flex-shrink:0;transition:transform .15s}
+.am-dd.open .am-dd-trigger svg{transform:rotate(180deg)}
+.am-dd-count{
+  background:var(--brand);color:#fff;font-size:11px;font-weight:700;
+  border-radius:99px;padding:1px 7px;min-width:18px;text-align:center;margin-right:4px;
+}
+.am-dd-panel{
+  display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:20;
+  background:var(--bg);border:1.5px solid var(--border-2);border-radius:var(--radius);
+  box-shadow:var(--shadow-md);padding:10px;max-height:280px;overflow-y:auto;
+}
+.am-dd.open .am-dd-panel{display:block}
+.am-dd-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+.am-dd-actions{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 2px 8px;margin-bottom:6px;
+  border-bottom:1px solid var(--border);
+}
+.am-dd-action-btn{
+  font-size:11.5px;font-weight:600;color:var(--brand);
+  background:none;border:none;cursor:pointer;padding:2px 4px;border-radius:5px;
+  transition:background .1s;
+}
+.am-dd-action-btn:hover{background:var(--brand-light)}
+.am-dd-action-clear{color:var(--text-3)}
+.am-dd-action-clear:hover{background:var(--bg-3);color:var(--text-2)}
+.am-dd-item{
+  display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:7px;
+  font-size:12.5px;font-weight:500;color:var(--text);cursor:pointer;transition:background .1s;
+}
+.am-dd-item:hover{background:var(--bg-2)}
+.am-dd-item input{width:15px;height:15px;flex-shrink:0;cursor:pointer;accent-color:var(--brand)}
+.am-dd-item input[type="number"]{width:48px;padding:3px 6px;font-size:11px;border-radius:7px;border:1px solid var(--border-2);accent-color:initial;margin-left:auto;flex-shrink:0}
+.form-label-hint{
+  display:inline-block;font-size:11px;color:var(--text-3);cursor:help;
+  vertical-align:middle;margin-left:3px;line-height:1;
+  position:relative;
+}
+.form-label-hint:hover::after{
+  content:attr(title);
+  position:fixed;transform:translateX(-50%);margin-top:4px;
+  background:var(--text);color:#fff;
+  font-size:11px;font-weight:400;line-height:1.45;
+  padding:6px 10px;border-radius:7px;
+  max-width:220px;white-space:normal;text-align:left;
+  z-index:500;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.18);
+}
+.am-selected-box{
+  border:1.5px dashed var(--border-2);border-radius:var(--radius);
+  padding:10px 12px;margin-top:8px;min-height:42px;
+  display:flex;flex-wrap:wrap;gap:7px;align-items:flex-start;
+}
+.am-tag{
+  display:flex;align-items:center;gap:6px;
+  background:var(--brand-light);color:var(--brand);
+  border:1px solid #f5c0c8;border-radius:99px;
+  padding:5px 6px 5px 12px;font-size:12px;font-weight:600;white-space:nowrap;
+}
+.am-tag-remove{
+  width:17px;height:17px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(224,58,82,.14);color:var(--brand);cursor:pointer;
+  font-size:11px;line-height:1;border:none;
+}
+.am-tag-remove:hover{background:var(--brand);color:#fff}
+.am-selected-empty{font-size:12px;color:var(--text-3)}
+
+/* ─── Image upload row & thumbnails ────────────── */
+.img-row{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.img-url-input{
+  width:100%;padding:9px 12px;border:1.5px solid var(--border-2);border-radius:9px;
+  font-size:12.5px;font-family:inherit;color:var(--text);background:var(--bg);
+  outline:none;resize:vertical;transition:border-color .12s;
+}
+.img-url-input:focus{border-color:var(--brand)}
+.img-btns{display:flex;gap:8px;flex-wrap:wrap}
+.img-btn-add{
+  padding:9px 16px;border-radius:9px;border:none;
+  background:var(--brand);color:#fff;font-size:12px;font-weight:700;
+  font-family:inherit;cursor:pointer;transition:background .15s;
+}
+.img-btn-add:hover{background:var(--brand-hover)}
+.img-btn-sec{
+  padding:9px 14px;border-radius:9px;border:1.5px solid var(--border-2);
+  background:var(--bg);color:var(--text-2);font-size:12px;font-weight:600;
+  font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:6px;
+  transition:border-color .12s;
+}
+.img-btn-sec:hover{border-color:var(--text)}
+.img-thumb-grid{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px}
+.img-thumb{position:relative;width:72px;height:72px;border-radius:9px;overflow:hidden;border:1.5px solid var(--border-2);flex-shrink:0}
+.img-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.img-thumb-del{
+  position:absolute;top:3px;right:3px;width:18px;height:18px;
+  background:rgba(0,0,0,.65);color:#fff;border:none;border-radius:50%;
+  font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;
+}
+.img-hint{font-size:11px;color:var(--text-3);margin-bottom:6px}
+
 /* ─── Mobile bottom nav ────────────────────────── */
 @media(max-width:640px){
   .nav-tabs{display:none}
@@ -1344,6 +1452,14 @@ ul{list-style:none}
         </div>
         <div id="f-locStatus" style="font-size:11px;color:var(--text-2);min-height:14px;margin-top:2px">Live auto-fills from GPS</div>
       </div>
+      <div class="form-group">
+        <label class="form-label">Latitude / Longitude (auto)</label>
+        <input class="form-input" type="text" id="f-latLngDisplay" placeholder="12.9716° N, 77.5946° E or auto-detected" readonly />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Google Maps link (optional)</label>
+        <input class="form-input" type="url" id="f-googleMapsLink" placeholder="https://maps.app.goo.gl/..." />
+      </div>
     </div>
     <input type="hidden" id="f-latitude"/><input type="hidden" id="f-longitude"/>
 
@@ -1353,25 +1469,51 @@ ul{list-style:none}
       <div class="form-group"><label class="form-label">Owner name <span style="color:var(--brand)">*</span></label><input class="form-input" type="text" id="f-ownerName" placeholder="e.g. Ramesh Kumar"/></div>
       <div class="form-group"><label class="form-label">Phone number <span style="color:var(--brand)">*</span></label><input class="form-input" type="tel" id="f-ownerPhone" placeholder="e.g. 9876543210"/></div>
       <div class="form-group"><label class="form-label">Email (optional)</label><input class="form-input" type="email" id="f-ownerEmail" placeholder="owner@example.com"/></div>
+      <div class="form-group"><label class="form-label">Alternate number</label><input class="form-input" type="tel" id="f-ownerAltPhone" placeholder="optional"/></div>
+      <div class="form-group">
+        <label class="form-label">Preferred contact time</label>
+        <select class="form-select" id="f-contactTime"><option>Any</option><option>Morning</option><option>Afternoon</option><option>Evening</option></select>
+      </div>
+      <div class="form-group" style="grid-column:span 3">
+        <label class="form-label">Owner address (optional)</label>
+        <textarea class="form-input" id="f-ownerAddress" rows="2" placeholder="Street, city, pincode (optional)" style="resize:vertical"></textarea>
+      </div>
     </div>
 
     <!-- ===== 4. PRICING ===== -->
+    <div id="addPricingSection">
     <div class="lm-section">💰 Pricing</div>
     <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
       <div class="form-group"><label class="form-label" id="f-rentLabel">Monthly rent (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-rent" placeholder="e.g. 22000" min="0" max="9999999" /></div>
       <div class="form-group" id="f-depositWrap"><label class="form-label">Security deposit (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-deposit" placeholder="e.g. 44000" min="0" max="9999999" /></div>
-      <div class="form-group" id="f-leaseAmt"><label class="form-label">Lease Amount (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-deposit" placeholder="e.g. 44000" min="0" max="9999999" /></div>
+      <div class="form-group"><label class="form-label">Maintenance (₹/mo)</label><input class="form-input" type="number" id="f-maintenance" placeholder="e.g. 2000" /></div>
+      <div class="form-group"><label class="form-label">Annual rent escalation (%)</label><input class="form-input" type="number" step="0.5" id="f-escalation" placeholder="e.g. 5" /></div>
+      <div class="form-group">
+        <label class="form-label">Electricity included?</label>
+        <select class="form-select" id="f-electricityIncluded"><option>No</option><option>Yes</option><option>Shared meter</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Water / borewell charges</label>
+        <select class="form-select" id="f-waterCharge"><option>Included</option><option>Separate</option><option>Tanker</option></select>
+      </div>
 	  <div class="form-group">
         <label class="form-label" style="display:flex;align-items:center;gap:6px;margin-top:18px">
           <input type="checkbox" id="f-negotiable" /> Price negotiable
         </label>
       </div>
     </div>
+    </div>
 
     <!-- ===== 5. PROPERTY DETAILS ===== -->
     <div id="addPropDetailsSection">
     <div class="lm-section">🏢 Property Details</div>
     <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="form-group">
+        <label class="form-label">Property type</label>
+        <select class="form-select" id="f-propertyType">
+          <option>Apartment</option><option>Independent House</option><option>Villa</option><option>Studio</option>
+        </select>
+      </div>
       <div class="form-group">
         <label class="form-label">BHK</label>
         <select class="form-select" id="f-bhk">
@@ -1394,10 +1536,12 @@ ul{list-style:none}
       </div>
 	  
       <div class="form-group">
-        <label class="form-label">Floor</label>
-        <select class="form-select" id="f-floor">
-          <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
-        </select>
+        <label class="form-label">Floor (out of total)</label>
+        <input class="form-input" type="text" id="f-floor" placeholder="e.g. 3rd / 10 floors" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Area (sqft)</label>
+        <input class="form-input" type="number" id="f-area" placeholder="e.g. 1250" />
       </div>
       <div class="form-group">
         <label class="form-label">Bathrooms</label>
@@ -1412,7 +1556,13 @@ ul{list-style:none}
       <div class="form-group">
         <label class="form-label">Facing</label>
         <select class="form-select" id="f-facing">
-          <option>North</option><option>South</option><option>East</option><option>West</option><option>North-East</option><option>North-West</option>
+          <option>North</option><option>South</option><option>East</option><option>West</option><option>North-East</option><option>North-West</option><option>South-East</option><option>South-West</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Age of property</label>
+        <select class="form-select" id="f-age">
+          <option value="">Select</option><option>New (0–2 yrs)</option><option>3–5 yrs</option><option>6–10 yrs</option><option>10+ yrs</option>
         </select>
       </div>
       <div class="form-group">
@@ -1424,26 +1574,52 @@ ul{list-style:none}
         <input class="form-input" type="date" id="f-avail" />
       </div>
     </div>
-    <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
-      <div class="form-group">
-        <label class="form-label" style="display:flex;align-items:center;gap:6px">
-          <input type="checkbox" id="f-lift" /> Lift available
-        </label>
-      </div>
-    </div>
     </div>
 
     <!-- ===== 6. AMENITIES ===== -->
     <div id="addAmenitiesSection">
     <div class="lm-section">✨ Amenities</div>
-    <div class="form-row" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:12px">
-      <label class="form-label" style="display:flex;align-items:center;gap:6px;font-weight:500"><input type="checkbox" id="am-wifi"/> Wi-Fi</label>
-      <label class="form-label" style="display:flex;align-items:center;gap:6px;font-weight:500"><input type="checkbox" id="am-gym"/> Gym / Pool</label>
-      <label class="form-label" style="display:flex;align-items:center;gap:6px;font-weight:500"><input type="checkbox" id="am-security"/> Security / CCTV</label>
-      <label class="form-label" style="display:flex;align-items:center;gap:6px;font-weight:500"><input type="checkbox" id="am-power"/> Power backup</label>
-      <label class="form-label" style="display:flex;align-items:center;gap:6px;font-weight:500"><input type="checkbox" id="am-garden"/> Garden</label>
-      <label class="form-label" style="display:flex;align-items:center;gap:6px;font-weight:500"><input type="checkbox" id="am-laundry"/> Laundry</label>
-      <label class="form-label" style="display:flex;align-items:center;gap:6px;font-weight:500"><input type="checkbox" id="am-meals"/> Meals included</label>
+    <div class="form-group">
+      <label class="form-label">Select amenities</label>
+      <div class="am-dd" id="amDropdown">
+        <button type="button" class="am-dd-trigger" onclick="toggleAmDropdown(event)">
+          <span><span class="am-dd-count" id="amDdCount" style="display:none">0</span><span id="amDdLabel">Choose amenities…</span></span>
+          <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="am-dd-panel" id="amDdPanel">
+          <div class="am-dd-actions">
+            <button type="button" class="am-dd-action-btn" onclick="amSelectAll()">Select all</button>
+            <button type="button" class="am-dd-action-btn am-dd-action-clear" onclick="amClearAll()">Clear all</button>
+          </div>
+          <div class="am-dd-grid">
+            <label class="am-dd-item"><input type="checkbox" id="am-wifi" onchange="onAmCheck()"/> Wi-Fi</label>
+            <label class="am-dd-item"><input type="checkbox" id="am-ac" onchange="onAmCheck()"/> AC <input type="number" id="f-acUnits" placeholder="units" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-washing" onchange="onAmCheck()"/> Washing machine</label>
+            <label class="am-dd-item"><input type="checkbox" id="am-fridge" onchange="onAmCheck()"/> Refrigerator</label>
+            <label class="am-dd-item"><input type="checkbox" id="am-microwave" onchange="onAmCheck()"/> Microwave / Oven</label>
+            <label class="am-dd-item"><input type="checkbox" id="am-geyser" onchange="onAmCheck()"/> Geyser / Water heater</label>
+            <label class="am-dd-item"><input type="checkbox" id="am-wardrobe" onchange="onAmCheck()"/> Wardrobe / Cupboards</label>
+            <label class="am-dd-item"><input type="checkbox" id="am-bed" onchange="onAmCheck()"/> Bed &amp; mattress</label>
+            <label class="am-dd-item"><input type="checkbox" id="am-sofa" onchange="onAmCheck()"/> Sofa / Seating</label>
+            <label class="am-dd-item"><input type="checkbox" id="am-lift" onchange="onAmCheck()"/> Lift / Elevator</label>
+            <label class="am-dd-item"><input type="checkbox" id="am-balcony" onchange="onAmCheck()"/> Balcony / Terrace</label>
+            <label class="am-dd-item"><input type="checkbox" id="am-gym" onchange="onAmCheck()"/> Gym / Pool</label>
+            <label class="am-dd-item"><input type="checkbox" id="am-security" onchange="onAmCheck()"/> Security / CCTV</label>
+            <label class="am-dd-item"><input type="checkbox" id="am-power" onchange="onAmCheck()"/> Power backup</label>
+            <label class="am-dd-item"><input type="checkbox" id="am-garden" onchange="onAmCheck()"/> Garden</label>
+            <label class="am-dd-item"><input type="checkbox" id="am-laundry" onchange="onAmCheck()"/> Laundry</label>
+            <label class="am-dd-item"><input type="checkbox" id="am-meals" onchange="onAmCheck()"/> Meals included</label>
+            <label class="am-dd-item"><input type="checkbox" id="am-pipedgas" onchange="onAmCheck()"/> Piped gas connection</label>
+            <label class="am-dd-item"><input type="checkbox" id="am-ro" onchange="onAmCheck()"/> RO water filter</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Selected amenities</label>
+      <div class="am-selected-box" id="amSelectedBox">
+        <span class="am-selected-empty" id="amSelectedEmpty">No amenities selected yet</span>
+      </div>
     </div>
     <div class="form-group">
       <label class="form-label">Additional amenities (comma-separated)</label>
@@ -1451,9 +1627,50 @@ ul{list-style:none}
     </div>
     </div>
 
-    <!-- ===== 7. PG-ONLY FIELDS ===== -->
+    <!-- ===== 7. STATUS-SPECIFIC SECTIONS ===== -->
+
+    <!-- FOR RENT extras -->
+    <div id="addRentSection">
+      <div class="lm-section">📅 Availability &amp; Terms</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-noticePeriod"><option value="">Select</option><option>15 Days</option><option>1 Month</option><option>2 Months</option><option>3 Months</option></select></div>
+        <div class="form-group"><label class="form-label">Lease duration</label><select class="form-select" id="f-leaseDuration"><option value="">Any</option><option>6 Months</option><option>11 Months</option><option>12 Months</option><option>24+ Months</option></select></div>
+      </div>
+      <div class="lm-section">⚖️ Tenant Rules</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Pets allowed</label><select class="form-select" id="f-petsAllowed"><option value="">Select</option><option>Yes</option><option>No</option><option>Restricted</option></select></div>
+        <div class="form-group"><label class="form-label">Non-veg allowed</label><select class="form-select" id="f-nonVegAllowed"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
+        <div class="form-group"><label class="form-label">Piped gas</label><select class="form-select" id="f-pipedGas"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
+      </div>
+    </div>
+
+    <!-- LEASE extras -->
+    <div id="addLeaseSection" style="display:none">
+      <div class="lm-section">💼 Lease Pricing</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Lease amount (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-leaseAmount" placeholder="e.g. 2500000" /></div>
+        <div class="form-group"><label class="form-label">Monthly rent (₹) <span class="form-label-hint" title="Optional recurring rent on top of the lease corpus — most lease agreements set this to ₹0">ⓘ</span></label><input class="form-input" type="number" id="f-leaseMonthlyRent" placeholder="e.g. 0 (leave blank if none)" /></div>
+        <div class="form-group"><label class="form-label">Maintenance (₹/mo)</label><input class="form-input" type="number" id="f-leaseMaintenance" placeholder="e.g. 2000" /></div>
+      </div>
+      <div class="lm-section">📋 Lease Terms</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Lease duration</label><select class="form-select" id="f-leaseDurationVal"><option value="">Select</option><option>1 Year</option><option>2 Years</option><option>3 Years</option><option>5 Years</option><option>9 Years</option><option>15 Years</option><option>30 Years</option></select></div>
+        <div class="form-group"><label class="form-label">Lease type</label><select class="form-select" id="f-leaseType"><option value="">Select</option><option>Residential</option><option>Commercial</option><option>Industrial</option><option>Mixed Use</option></select></div>
+        <div class="form-group"><label class="form-label">Lock-in period</label><select class="form-select" id="f-lockInPeriod"><option value="">None</option><option>1 Year</option><option>2 Years</option><option>3 Years</option></select></div>
+        <div class="form-group"><label class="form-label">Available from</label><select class="form-select" id="f-leaseAvailableFrom"><option value="">Immediate</option><option>Within 15 Days</option><option>Within 1 Month</option><option>Within 2 Months</option></select></div>
+        <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-leaseNoticePeriod"><option value="">Select</option><option>1 Month</option><option>2 Months</option><option>3 Months</option></select></div>
+        <div class="form-group"><label class="form-label">Rent escalation</label><select class="form-select" id="f-rentEscalation"><option value="">None</option><option>5% per year</option><option>10% per year</option><option>15% per year</option></select></div>
+      </div>
+      <div class="lm-section">⚖️ House Rules</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Pets allowed</label><select class="form-select" id="f-leasePets"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
+        <div class="form-group"><label class="form-label">Non-veg allowed</label><select class="form-select" id="f-leaseNonVeg"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
+      </div>
+    </div>
+
+    <!-- ===== 7b. PG-ONLY FIELDS ===== -->
     <div id="addPgSection" style="display:none">
-      <div class="lm-section">🛏 PG Details</div>
+      <div class="lm-section">🛏 Room Details</div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
         <div class="form-group">
           <label class="form-label">Gender preference</label>
@@ -1463,22 +1680,56 @@ ul{list-style:none}
           <label class="form-label">Room type</label>
           <select class="form-select" id="f-pgRoomType"><option>Single</option><option>Double Sharing</option><option>Triple Sharing</option><option>Dormitory</option></select>
         </div>
+        <div class="form-group"><label class="form-label">Attached bathroom</label><select class="form-select" id="f-pgBathroom"><option>Yes</option><option>Shared</option></select></div>
+        <div class="form-group"><label class="form-label">Occupancy available</label><input class="form-input" type="number" id="f-pgOccupancy" placeholder="e.g. 2" /></div>
+        <div class="form-group"><label class="form-label">Total beds</label><input class="form-input" type="number" id="f-pgTotalBeds" placeholder="e.g. 20" /></div>
+        <div class="form-group"><label class="form-label">Meals cost (₹/mo)</label><input class="form-input" type="number" id="f-pgMealsCost" placeholder="e.g. 3000" /></div>
+        <div class="form-group"><label class="form-label">Room furnishing</label><select class="form-select" id="f-pgRoomFurnishing"><option value="">Select</option><option>Fully Furnished</option><option>Semi-Furnished</option><option>Unfurnished</option></select></div>
+        <div class="form-group"><label class="form-label">Kitchen access</label><select class="form-select" id="f-pgKitchenAccess"><option value="">Select</option><option>Shared Kitchen</option><option>No Kitchen</option><option>Private Kitchen</option></select></div>
+      </div>
+      <div class="lm-section">📅 Availability &amp; Terms</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Available from</label><select class="form-select" id="f-pgAvailableFrom"><option value="">Immediate</option><option>Within 15 Days</option><option>Within 1 Month</option><option>Within 2 Months</option><option>Within 3 Months</option></select></div>
+        <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-pgNotice"><option value="">Select</option><option>15 Days</option><option>1 Month</option><option>2 Months</option><option>3 Months</option></select></div>
+      </div>
+      <div class="lm-section">🍽 Meals &amp; Rules</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
         <div class="form-group">
           <label class="form-label">Meals included</label>
-          <select class="form-select" id="f-pgMeals"><option>No Meals</option><option>Breakfast Only</option><option>Lunch + Dinner</option><option>All 3 Meals</option></select>
+          <select class="form-select" id="f-pgMeals"><option value="">Select</option><option>No Meals</option><option>Breakfast Only</option><option>Dinner Only</option><option>Lunch + Dinner</option><option>All 3 Meals</option><option>On Request</option></select>
         </div>
+        <div class="form-group"><label class="form-label">Food type</label><select class="form-select" id="f-pgFoodType"><option value="">Select</option><option>Veg Only</option><option>Veg + Non-veg</option></select></div>
+        <div class="form-group"><label class="form-label">Gate closing time</label><select class="form-select" id="f-pgGateTime"><option value="">No Curfew</option><option>9 PM</option><option>10 PM</option><option>11 PM</option></select></div>
+        <div class="form-group"><label class="form-label">Visitor policy</label><select class="form-select" id="f-pgVisitorPolicy"><option value="">Select</option><option>Allowed</option><option>Lobby Only</option><option>Not Allowed</option></select></div>
+        <div class="form-group"><label class="form-label">Non-veg allowed</label><select class="form-select" id="f-pgNonVeg"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
+        <div class="form-group"><label class="form-label">Pets allowed</label><select class="form-select" id="f-pgPets"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
       </div>
     </div>
 
     <!-- ===== 8. MEDIA & DESCRIPTION ===== -->
     <div class="lm-section">📸 Media &amp; Description</div>
     <div class="form-group">
+      <label class="form-label">Video tour URL (optional)</label>
+      <input class="form-input" type="url" id="f-videoUrl" placeholder="https://youtube.com/..." />
+    </div>
+    <div class="form-group">
       <label class="form-label">Description (optional)</label>
       <textarea class="form-input" id="f-desc" rows="3" placeholder="Describe the property, nearby landmarks, special features…" style="resize:vertical"></textarea>
     </div>
     <div class="form-group">
-      <label class="form-label">Image URLs (one per line or comma-separated, optional)</label>
-      <textarea class="form-input" id="f-images" rows="2" placeholder="https://example.com/photo1.jpg" style="resize:vertical"></textarea>
+      <label class="form-label">Property images (optional)</label>
+      <div class="img-row">
+        <textarea class="img-url-input" id="f-imgUrlInput" rows="2" placeholder="Paste image URLs, one per line or comma-separated…"></textarea>
+        <div class="img-btns">
+          <button type="button" class="img-btn-add" onclick="addImageFromUrl()">+ Add URL(s)</button>
+          <button type="button" class="img-btn-sec" onclick="document.getElementById('f-imgFileInput').click()">📁 Upload</button>
+          <button type="button" class="img-btn-sec" onclick="document.getElementById('f-imgCameraInput').click()">📷 Camera</button>
+        </div>
+        <input type="file" id="f-imgFileInput" accept="image/*" multiple style="display:none" onchange="addImagesFromFiles(this)"/>
+        <input type="file" id="f-imgCameraInput" accept="image/*" capture="environment" style="display:none" onchange="addImagesFromFiles(this)"/>
+      </div>
+      <div class="img-thumb-grid" id="fImgGrid"></div>
+      <div class="img-hint" id="fImgHint">No images added yet.</div>
     </div>
 
     <button class="form-submit" onclick="submitListing()">Submit listing</button>
@@ -2673,14 +2924,151 @@ function closeAboutModal() {
   document.body.style.overflow = '';
 }
 
+/* ═══════════════════════════════════════════════
+   AMENITIES MULTI-SELECT DROPDOWN
+═══════════════════════════════════════════════ */
+const AM_LIST = [
+  ['am-wifi', 'Wi-Fi'],
+  ['am-ac', 'AC'],
+  ['am-washing', 'Washing machine'],
+  ['am-fridge', 'Refrigerator'],
+  ['am-microwave', 'Microwave / Oven'],
+  ['am-geyser', 'Geyser / Water heater'],
+  ['am-wardrobe', 'Wardrobe / Cupboards'],
+  ['am-bed', 'Bed & mattress'],
+  ['am-sofa', 'Sofa / Seating'],
+  ['am-lift', 'Lift / Elevator'],
+  ['am-balcony', 'Balcony / Terrace'],
+  ['am-gym', 'Gym / Pool'],
+  ['am-security', 'Security / CCTV'],
+  ['am-power', 'Power backup'],
+  ['am-garden', 'Garden'],
+  ['am-laundry', 'Laundry'],
+  ['am-meals', 'Meals included'],
+  ['am-pipedgas', 'Piped gas connection'],
+  ['am-ro', 'RO water filter'],
+];
+
+function toggleAmDropdown(e) {
+  e.stopPropagation();
+  document.getElementById('amDropdown').classList.toggle('open');
+}
+
+function amSelectAll() {
+  AM_LIST.forEach(([id]) => { const cb = document.getElementById(id); if (cb) cb.checked = true; });
+  renderAmSelected();
+}
+
+function amClearAll() {
+  AM_LIST.forEach(([id]) => { const cb = document.getElementById(id); if (cb) cb.checked = false; });
+  const acUnits = document.getElementById('f-acUnits');
+  if (acUnits) acUnits.value = '';
+  renderAmSelected();
+}
+
+function onAmCheck() {
+  renderAmSelected();
+}
+
+function amRemove(id) {
+  const cb = document.getElementById(id);
+  if (cb) cb.checked = false;
+  if (id === 'am-ac') document.getElementById('f-acUnits').value = '';
+  renderAmSelected();
+}
+
+function renderAmSelected() {
+  const box = document.getElementById('amSelectedBox');
+  const empty = document.getElementById('amSelectedEmpty');
+  const ddLabel = document.getElementById('amDdLabel');
+  const ddCount = document.getElementById('amDdCount');
+
+  const selected = AM_LIST.filter(([id]) => document.getElementById(id).checked);
+
+  box.querySelectorAll('.am-tag').forEach(t => t.remove());
+  if (!selected.length) {
+    empty.style.display = '';
+  } else {
+    empty.style.display = 'none';
+    selected.forEach(([id, label]) => {
+      let text = label;
+      if (id === 'am-ac') {
+        const units = document.getElementById('f-acUnits').value.trim();
+        if (units) text += ' (' + units + ')';
+      }
+      const tag = document.createElement('span');
+      tag.className = 'am-tag';
+      tag.innerHTML = '<span>' + text + '</span><button type="button" class="am-tag-remove" aria-label="Remove">✕</button>';
+      tag.querySelector('.am-tag-remove').onclick = function() { amRemove(id); };
+      box.appendChild(tag);
+    });
+  }
+
+  ddLabel.textContent = selected.length ? selected.length + ' selected' : 'Choose amenities…';
+  ddCount.style.display = selected.length ? '' : 'none';
+  ddCount.textContent = selected.length;
+}
+
+document.getElementById('f-acUnits').addEventListener('click', e => e.stopPropagation());
+document.getElementById('f-acUnits').addEventListener('input', renderAmSelected);
+
+document.addEventListener('click', function(e) {
+  const dd = document.getElementById('amDropdown');
+  if (dd.classList.contains('open') && !dd.contains(e.target)) {
+    dd.classList.remove('open');
+  }
+});
+
+/* ═══════════════════════════════════════════════
+   PROPERTY IMAGES (URL paste / file upload / camera)
+═══════════════════════════════════════════════ */
+let fImages = [];
+function renderFImages() {
+  const grid = document.getElementById('fImgGrid');
+  const hint = document.getElementById('fImgHint');
+  grid.innerHTML = fImages.map((src, i) =>
+    '<div class="img-thumb"><img src="' + src + '" alt="img"/><button type="button" class="img-thumb-del" onclick="removeFImage(' + i + ')">✕</button></div>'
+  ).join('');
+  hint.style.display = fImages.length ? 'none' : 'block';
+}
+function removeFImage(i) {
+  fImages.splice(i, 1);
+  renderFImages();
+}
+function addImageFromUrl() {
+  const ta = document.getElementById('f-imgUrlInput');
+  ta.value.split(/[\n,]+/).map(s => s.trim()).filter(s => s.indexOf('http') === 0).forEach(u => {
+    if (fImages.indexOf(u) < 0) fImages.push(u);
+  });
+  ta.value = '';
+  renderFImages();
+}
+function addImagesFromFiles(input) {
+  const files = Array.from(input.files || []);
+  input.value = '';
+  if (!files.length) return;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      fImages.push(e.target.result);
+      renderFImages();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 function onFTypeChange(val) {
   const isPG = val === 'PG';
+  const isLease = val === 'Lease';
   document.getElementById('addPgSection').style.display = isPG ? '' : 'none';
+  document.getElementById('addRentSection').style.display = (!isPG && !isLease) ? '' : 'none';
+  document.getElementById('addLeaseSection').style.display = isLease ? '' : 'none';
   document.getElementById('addPropDetailsSection').style.display = isPG ? 'none' : '';
   document.getElementById('addAmenitiesSection').style.display = isPG ? 'none' : '';
+  document.getElementById('addPricingSection').style.display = isLease ? 'none' : '';
   document.getElementById('f-depositWrap').style.display = isPG ? 'none' : '';
   const lbl = document.getElementById('f-rentLabel');
-  if (lbl) lbl.innerHTML = (val === 'For Rent' || val === 'Rent') ? 'Monthly rent (₹) <span style="color:var(--brand)">*</span>' : val === 'Lease' ? 'Token rent (₹) <span style="color:var(--brand)">*</span>' : 'Monthly charge (₹) <span style="color:var(--brand)">*</span>';
+  if (lbl) lbl.innerHTML = (val === 'For Rent' || val === 'Rent') ? 'Monthly rent (₹) <span style="color:var(--brand)">*</span>' : isLease ? 'Token rent (₹) <span style="color:var(--brand)">*</span>' : 'Monthly charge (₹) <span style="color:var(--brand)">*</span>';
 }
 
 function fCaptureLocation() {
@@ -2692,6 +3080,7 @@ function fCaptureLocation() {
     const lat = pos.coords.latitude, lon = pos.coords.longitude;
     document.getElementById('f-latitude').value = lat;
     document.getElementById('f-longitude').value = lon;
+    document.getElementById('f-latLngDisplay').value = lat.toFixed(6) + '° N, ' + lon.toFixed(6) + '° E';
     btnTxt.textContent = 'OK';
     fetch('https://nominatim.openstreetmap.org/reverse?lat=' + lat + '&lon=' + lon + '&format=json&accept-language=en')
       .then(r => r.json())
@@ -2713,19 +3102,17 @@ function submitListing() {
     return;
   }
 
-  const amenities = [];
-  if (document.getElementById('am-wifi').checked) amenities.push('Wi-Fi');
-  if (document.getElementById('am-gym').checked) amenities.push('Gym / Pool');
-  if (document.getElementById('am-security').checked) amenities.push('Security / CCTV');
-  if (document.getElementById('am-power').checked) amenities.push('Power backup');
-  if (document.getElementById('am-garden').checked) amenities.push('Garden');
-  if (document.getElementById('am-laundry').checked) amenities.push('Laundry');
-  if (document.getElementById('am-meals').checked) amenities.push('Meals included');
-  const extra = document.getElementById('f-amenities-extra').value.trim();
+  function gv(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+  function gb(id) { const el = document.getElementById(id); return el ? el.checked : false; }
+
+  const amenities = AM_LIST.filter(([id]) => gb(id)).map(([id, label]) => {
+    if (id === 'am-ac' && gv('f-acUnits')) return label + ' (' + gv('f-acUnits') + ')';
+    return label;
+  });
+  const extra = gv('f-amenities-extra');
   if (extra) extra.split(',').map(s => s.trim()).filter(Boolean).forEach(a => amenities.push(a));
 
-  const images = document.getElementById('f-images').value
-    .split(/[\n,]+/).map(s => s.trim()).filter(s => s.indexOf('http') === 0);
+  const images = fImages.slice();
 
   const typeRaw = document.getElementById('f-type').value;
   const type = typeRaw === 'Rent' ? 'Rent' : typeRaw; // matches PROPERTIES type values: Rent / Lease / PG
@@ -2738,11 +3125,18 @@ function submitListing() {
     location: loc,
     price: parseInt(rent) || 0,
     deposit: parseInt(document.getElementById('f-deposit').value) || 0,
+    maintenance: parseFloat(gv('f-maintenance')) || null,
+    escalation: parseFloat(gv('f-escalation')) || null,
+    electricityIncluded: gv('f-electricityIncluded') || null,
+    waterCharge: gv('f-waterCharge') || null,
+    propertyType: type === 'PG' ? null : gv('f-propertyType'),
     bhk: type === 'PG' ? 'Studio' : document.getElementById('f-bhk').value,
+    area: type === 'PG' ? null : gv('f-area'),
     furnishing: document.getElementById('f-furnishing').value,
     floor: document.getElementById('f-floor').value || 'G',
+    age: type === 'PG' ? null : gv('f-age'),
     bathrooms: type === 'PG' ? 1 : (parseInt(document.getElementById('f-baths').value) || 1),
-    lift: type === 'PG' ? false : document.getElementById('f-lift').checked,
+    lift: type === 'PG' ? false : gb('am-lift'),
     carpark: type === 'PG' ? false : document.getElementById('f-carpark').checked,
     bikepark: type === 'PG' ? false : document.getElementById('f-bikepark').checked,
     facing: type === 'PG' ? 'North' : document.getElementById('f-facing').value,
@@ -2751,25 +3145,66 @@ function submitListing() {
     promoted: false,
     posted: 'Just now',
     desc: document.getElementById('f-desc').value.trim(),
+    videoUrl: gv('f-videoUrl') || null,
     city: document.getElementById('f-city').value.trim() || 'Bengaluru',
     listedBy: document.getElementById('f-listedBy').value,
     fullAddress: document.getElementById('f-fullAddress').value.trim(),
+    googleMapsLink: gv('f-googleMapsLink') || null,
     latitude: parseFloat(document.getElementById('f-latitude').value) || null,
     longitude: parseFloat(document.getElementById('f-longitude').value) || null,
     ownerName: ownerName,
     ownerPhone: ownerPhone,
     ownerEmail: document.getElementById('f-ownerEmail').value.trim(),
+    ownerAltPhone: gv('f-ownerAltPhone') || null,
+    ownerAddress: gv('f-ownerAddress') || null,
+    contactTime: gv('f-contactTime') || null,
     negotiable: document.getElementById('f-negotiable').checked,
     availableFrom: document.getElementById('f-avail').value || null,
     images: images,
   };
+
+  if (type === 'For Rent' || type === 'Rent') {
+    newProp.noticePeriod = gv('f-noticePeriod') || null;
+    newProp.leaseDuration = gv('f-leaseDuration') || null;
+    newProp.petsAllowed = gv('f-petsAllowed') || null;
+    newProp.nonVegAllowed = gv('f-nonVegAllowed') || null;
+    newProp.pipedGas = gv('f-pipedGas') || null;
+  }
+  if (type === 'Lease') {
+    newProp.leaseAmount = parseFloat(gv('f-leaseAmount')) || null;
+    newProp.leaseMonthlyRent = parseFloat(gv('f-leaseMonthlyRent')) || null;
+    newProp.leaseMaintenance = parseFloat(gv('f-leaseMaintenance')) || null;
+    newProp.leaseDurationVal = gv('f-leaseDurationVal') || null;
+    newProp.leaseType = gv('f-leaseType') || null;
+    newProp.lockInPeriod = gv('f-lockInPeriod') || null;
+    newProp.leaseAvailFrom = gv('f-leaseAvailableFrom') || null;
+    newProp.leaseNotice = gv('f-leaseNoticePeriod') || null;
+    newProp.rentEscalation = gv('f-rentEscalation') || null;
+    newProp.leasePets = gv('f-leasePets') || null;
+    newProp.leaseNonVeg = gv('f-leaseNonVeg') || null;
+  }
   if (type === 'PG') {
     newProp.pgGender = document.getElementById('f-pgGender').value;
     newProp.pgRoomType = document.getElementById('f-pgRoomType').value;
+    newProp.pgBathroom = gv('f-pgBathroom') || null;
+    newProp.pgOccupancy = gv('f-pgOccupancy') || null;
+    newProp.pgTotalBeds = gv('f-pgTotalBeds') || null;
+    newProp.pgMealsCost = parseFloat(gv('f-pgMealsCost')) || null;
+    newProp.pgRoomFurnishing = gv('f-pgRoomFurnishing') || null;
+    newProp.pgKitchenAccess = gv('f-pgKitchenAccess') || null;
+    newProp.pgAvailableFrom = gv('f-pgAvailableFrom') || null;
+    newProp.pgNotice = gv('f-pgNotice') || null;
     newProp.pgMeals = document.getElementById('f-pgMeals').value;
+    newProp.pgFoodType = gv('f-pgFoodType') || null;
+    newProp.pgGateTime = gv('f-pgGateTime') || null;
+    newProp.pgVisitorPolicy = gv('f-pgVisitorPolicy') || null;
+    newProp.pgNonVeg = gv('f-pgNonVeg') || null;
+    newProp.pgPets = gv('f-pgPets') || null;
   }
 
   PROPERTIES.unshift(newProp);
+  fImages = [];
+  renderFImages();
   closeAddModal();
   renderCards();
   showToast('Listing submitted successfully!');
