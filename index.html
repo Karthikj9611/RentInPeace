@@ -585,27 +585,10 @@ ul{list-style:none}
   padding:40px 20px;text-align:center;
   font-size:13px;color:var(--text-3);
 }
-.panel-item{
-  display:flex;gap:12px;padding:10px;border-radius:10px;
-  border:1px solid var(--border);margin-bottom:8px;
-  align-items:flex-start;
-}
-.panel-item-img{
-  width:60px;height:60px;border-radius:8px;background:var(--bg-3);
-  flex-shrink:0;display:flex;align-items:center;justify-content:center;
-}
-.panel-item-img svg{width:22px;height:22px;stroke:var(--border-2);fill:none;stroke-width:1.4}
-.panel-item-info{flex:1;min-width:0}
-.panel-item-price{font-size:14px;font-weight:600}
-.panel-item-title{font-size:12px;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
-.panel-item-loc{font-size:11px;color:var(--text-3);margin-top:2px}
-.panel-item-remove{
-  width:24px;height:24px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;color:var(--text-3);flex-shrink:0;
-}
-.panel-item-remove:hover{background:var(--bg-2);color:var(--brand)}
-.panel-item-remove svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.panel-list .prop-card{width:100%;height:auto;margin-bottom:12px;border-radius:14px;overflow:hidden}
+.panel-list .prop-img{height:160px}
+.panel-list .prop-body{flex:0 0 auto}
+.panel-list .prop-footer{margin-top:12px}
 
 /* ─── FAB ──────────────────────────────────────── */
 .fab{
@@ -2174,21 +2157,10 @@ function renderShortlistPanel() {
   list.innerHTML = [...shortlisted].map(id => {
     const p = PROPERTIES.find(x => x.id === id);
     if (!p) return '';
-    return `<div class="panel-item">
-      <div class="panel-item-img">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      </div>
-      <div class="panel-item-info">
-        <div class="panel-item-price">₹${p.price.toLocaleString('en-IN')}/ Month</div>
-        <div class="panel-item-title">${p.title}</div>
-        <div class="panel-item-loc">${p.location}</div>
-      </div>
-      <div class="panel-item-remove" onclick="removeShortlist(${id})" title="Remove">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </div>
-    </div>`;
+    return cardHTML(p);
   }).join('');
 }
+
 
 function removeShortlist(id) {
   shortlisted.delete(id);
@@ -2395,6 +2367,7 @@ function toggleShortlistPanel() {
   panel.classList.toggle('open');
   backdrop.classList.toggle('open');
   document.body.style.overflow = panel.classList.contains('open') ? 'hidden' : '';
+
   if (panel.classList.contains('open')) renderShortlistPanel();
 }
 
