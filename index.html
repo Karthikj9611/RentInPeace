@@ -811,6 +811,90 @@ ul{list-style:none}
   font-size:11px;color:var(--text-3);flex-shrink:0;
 }
 
+/* ─── Premium Services Section ─────────────────── */
+.services-section{
+  padding:8px 24px 32px;
+  background:var(--bg);
+  border-top:1px solid var(--border);
+  margin-top:-60px;
+}
+.services-head{max-width:680px;margin:0 auto 6px;text-align:center}
+.services-title{font-size:30px;font-weight:800;color:var(--text);letter-spacing:-.3px}
+.services-title span{color:var(--brand)}
+.services-sub{font-size:14.5px;color:var(--text-2);margin-top:8px;line-height:1.6}
+.services-hint{
+  text-align:center;font-size:12.5px;color:var(--text-3);
+  margin:18px 0 16px;font-weight:500;
+}
+.services-scroll-wrap{position:relative;max-width:1280px;margin:0 auto}
+.services-scroll{
+  display:flex;gap:16px;overflow-x:auto;scroll-behavior:smooth;
+  padding:4px 4px 10px;-ms-overflow-style:none;scrollbar-width:none;
+}
+.services-scroll::-webkit-scrollbar{display:none}
+.service-card{
+  position:relative;flex:0 0 auto;width:200px;height:280px;
+  border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;
+  background:var(--bg-3);box-shadow:var(--shadow);
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.service-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
+.service-card img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  transition:transform .3s ease;
+}
+.service-card:hover img{transform:scale(1.05)}
+.service-card-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to top, rgba(0,0,0,.82) 0%, rgba(0,0,0,.45) 38%, rgba(0,0,0,0) 62%);
+}
+.service-card-icon{
+  position:absolute;top:10px;right:10px;width:34px;height:34px;
+  border-radius:9px;background:rgba(255,255,255,.18);
+  backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;
+  font-size:16px;
+}
+.service-card-content{position:absolute;left:0;right:0;bottom:0;padding:14px}
+.service-card-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(255,255,255,.16);backdrop-filter:blur(6px);
+  color:#fff;font-size:9.5px;font-weight:800;letter-spacing:.6px;
+  text-transform:uppercase;padding:4px 8px;border-radius:99px;margin-bottom:8px;
+}
+.service-card-title{color:#fff;font-size:15px;font-weight:700;line-height:1.25;margin-bottom:4px}
+.service-card-desc{color:rgba(255,255,255,.85);font-size:11.5px;line-height:1.4}
+.services-arrow{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:36px;height:36px;border-radius:50%;
+  background:var(--bg);border:1px solid var(--border-2);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  box-shadow:var(--shadow-md);z-index:5;color:var(--text);
+  transition:background .15s;
+}
+.services-arrow:hover{background:var(--bg-2)}
+.services-arrow svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2}
+.services-arrow.prev{left:-6px}
+.services-arrow.next{right:-6px}
+@media (max-width:680px){
+  .services-section{padding:8px 16px 24px;margin-top:-60px}
+  .services-title{font-size:23px}
+  .services-sub{font-size:13px}
+  .service-card{width:160px;height:240px}
+  .services-arrow{display:none}
+}
+
+/* ─── Service Request Modal ────────────────────── */
+.svc-modal-img{
+  height:120px;border-radius:var(--radius-lg);overflow:hidden;
+  margin-bottom:16px;position:relative;
+}
+.svc-modal-img img{width:100%;height:100%;object-fit:cover}
+.svc-modal-img-label{
+  position:absolute;left:12px;bottom:10px;color:#fff;
+  font-size:15px;font-weight:700;
+  text-shadow:0 1px 6px rgba(0,0,0,.5);
+}
+
 /* ─── Add Listing Modal ────────────────────────── */
 .add-modal-overlay{
   position:fixed;inset:0;z-index:350;
@@ -1400,6 +1484,134 @@ ul{list-style:none}
     <p>Try adjusting your search or filters to find something nearby.</p>
   </div>
 </main>
+
+<!-- ─── Premium Services Section ────────────────── -->
+<section class="services-section" aria-label="Our premium services">
+  <div class="services-head">
+    <div class="services-title">Our <span>Premium Services</span></div>
+    <p class="services-sub">From home repairs to digital solutions — one call gets it all done in Bangalore</p>
+  </div>
+  <p class="services-hint">👆 Tap a service you're interested in, then contact us below</p>
+
+  <div class="services-scroll-wrap">
+    <button class="services-arrow prev" onclick="scrollServices(-1)" aria-label="Scroll left">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div class="services-scroll" id="servicesScroll">
+
+      <div class="service-card" onclick="openServiceModal('Website &amp; App Development','DIGITAL','💻','https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=420&q=70')">
+        <img src="https://raygun.com/blog/wp-content/uploads/2014/06/Anthony-Acosta.jpg" alt="Website and App Development" loading="lazy" />
+        <div class="service-card-overlay"></div>
+        <div class="service-card-icon">💻</div>
+        <div class="service-card-content">
+          <span class="service-card-badge">⚡ Digital</span>
+          <div class="service-card-title">Website &amp; App Development</div>
+          <div class="service-card-desc">Custom websites and mobile apps built for your business growth</div>
+        </div>
+      </div>
+
+      <div class="service-card" onclick="openServiceModal('Rental Agreement','LEGAL','📋','https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=420&q=70')">
+        <img src="https://thumbs.dreamstime.com/z/rental-agreement-form-signing-hand-keys-pen-43559993.jpg" alt="Rental Agreement drafting" loading="lazy" />
+        <div class="service-card-overlay"></div>
+        <div class="service-card-icon">📋</div>
+        <div class="service-card-content">
+          <span class="service-card-badge">📄 Legal</span>
+          <div class="service-card-title">Rental Agreement</div>
+          <div class="service-card-desc">Legally drafted rental agreements &amp; documentation — fast &amp; affordable</div>
+        </div>
+      </div>
+
+      <div class="service-card" onclick="openServiceModal('Building Painter','HOME CARE','🎨','https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=420&q=70')">
+        <img src="https://c8.alamy.com/comp/BE355K/indian-construction-worker-painting-a-wall-in-an-industrial-plant-BE355K.jpg" alt="Building Painter at work" loading="lazy" />
+        <div class="service-card-overlay"></div>
+        <div class="service-card-icon">🎨</div>
+        <div class="service-card-content">
+          <span class="service-card-badge">🏠 Home care</span>
+          <div class="service-card-title">Building Painter</div>
+          <div class="service-card-desc">Interior &amp; exterior painting for homes and offices — flawless finish</div>
+        </div>
+      </div>
+
+      <div class="service-card" onclick="openServiceModal('Plumbing','REPAIRS','🔧','https://images.unsplash.com/photo-1581094288338-2314dddb7ece?w=420&q=70')">
+        <img src="https://images.unsplash.com/photo-1581094288338-2314dddb7ece?w=420&q=70" alt="Plumbing repair work" loading="lazy" />
+        <div class="service-card-overlay"></div>
+        <div class="service-card-icon">🔧</div>
+        <div class="service-card-content">
+          <span class="service-card-badge">🛠 Repairs</span>
+          <div class="service-card-title">Plumbing</div>
+          <div class="service-card-desc">Repairs, installations &amp; pipe work by certified plumbing experts</div>
+        </div>
+      </div>
+
+      <div class="service-card" onclick="openServiceModal('Transportation','LOGISTICS','🚚','https://images.unsplash.com/photo-1601584115197-04ecc0da31d4?w=420&q=70')">
+        <img src="https://moveadvisor.com/move/wp-content/uploads/2023/02/loading-a-moving-truck.jpg" alt="Transportation and logistics" loading="lazy" />
+        <div class="service-card-overlay"></div>
+        <div class="service-card-icon">🚚</div>
+        <div class="service-card-content">
+          <span class="service-card-badge">📦 Logistics</span>
+          <div class="service-card-title">Transportation</div>
+          <div class="service-card-desc">Safe, on-time moving &amp; shifting services across Bangalore</div>
+        </div>
+      </div>
+
+      <div class="service-card" onclick="openServiceModal('Electrician','ELECTRICAL','⚡','https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=420&q=70')">
+        <img src="https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=420&q=70" alt="Electrician at work" loading="lazy" />
+        <div class="service-card-overlay"></div>
+        <div class="service-card-icon">⚡</div>
+        <div class="service-card-content">
+          <span class="service-card-badge">⚡ Electrical</span>
+          <div class="service-card-title">Electrician</div>
+          <div class="service-card-desc">Wiring, fittings &amp; electrical repairs at your door, same day</div>
+        </div>
+      </div>
+
+    </div>
+    <button class="services-arrow next" onclick="scrollServices(1)" aria-label="Scroll right">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+</section>
+
+<!-- ─── Service Request Modal ───────────────────── -->
+<div class="add-modal-overlay" id="serviceModal" role="dialog" aria-modal="true" aria-label="Request a service">
+  <div class="add-modal" id="serviceModalBox" style="max-width:440px">
+    <div class="add-modal-header">
+      <div class="add-modal-title">Request a Service</div>
+      <button class="modal-close" style="position:static" onclick="closeServiceModal()" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="svc-modal-img">
+      <img id="svcModalImg" src="" alt="" />
+      <div class="svc-modal-img-label" id="svcModalLabel"></div>
+    </div>
+
+    <form onsubmit="submitServiceRequest(event)">
+      <div class="form-group">
+        <label class="form-label">Service</label>
+        <input class="form-input" id="svc-service" type="text" readonly style="background:var(--bg-2);color:var(--text-2)" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your name</label>
+        <input class="form-input" id="svc-name" type="text" placeholder="Enter your full name" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone number</label>
+        <input class="form-input" id="svc-phone" type="tel" placeholder="10-digit mobile number" pattern="[0-9]{10}" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Area / Locality</label>
+        <input class="form-input" id="svc-area" type="text" placeholder="e.g. Indiranagar, Bangalore" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tell us what you need (optional)</label>
+        <textarea class="form-input" id="svc-notes" rows="3" placeholder="Briefly describe your requirement…" style="resize:vertical"></textarea>
+      </div>
+      <button type="submit" class="form-submit">Send Request</button>
+    </form>
+  </div>
+</div>
 
 <!-- ─── FAB: Add listing ────────────────────────── -->
 <button class="fab" onclick="openAddModal()" aria-label="Add a listing" title="List your property">
@@ -2989,6 +3201,37 @@ function openHelpModal() {
   document.getElementById('helpModal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
+function scrollServices(dir) {
+  const el = document.getElementById('servicesScroll');
+  const cardWidth = el.querySelector('.service-card')?.offsetWidth || 200;
+  el.scrollBy({ left: dir * (cardWidth + 16) * 2, behavior: 'smooth' });
+}
+function openServiceModal(name, category, icon, imgUrl) {
+  document.getElementById('svc-service').value = name;
+  document.getElementById('svcModalImg').src = imgUrl;
+  document.getElementById('svcModalImg').alt = name;
+  document.getElementById('svcModalLabel').textContent = icon + '  ' + name;
+  document.getElementById('svc-name').value = '';
+  document.getElementById('svc-phone').value = '';
+  document.getElementById('svc-area').value = '';
+  document.getElementById('svc-notes').value = '';
+  document.getElementById('serviceModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeServiceModal() {
+  document.getElementById('serviceModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function submitServiceRequest(e) {
+  e.preventDefault();
+  const service = document.getElementById('svc-service').value;
+  closeServiceModal();
+  showToast('Request sent for "' + service + '" — we\'ll call you shortly!');
+}
+document.getElementById('serviceModal').addEventListener('click', function(e) {
+  if (e.target === this) closeServiceModal();
+});
+
 function closeHelpModal() {
   document.getElementById('helpModal').classList.remove('open');
   document.body.style.overflow = '';
