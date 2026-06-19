@@ -954,7 +954,7 @@ ul{list-style:none}
   box-shadow:var(--shadow-md);padding:10px;max-height:280px;overflow-y:auto;
 }
 .am-dd.open .am-dd-panel{display:block}
-.am-dd-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+.am-dd-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0}
 .am-dd-actions{
   display:flex;align-items:center;justify-content:space-between;
   padding:0 2px 8px;margin-bottom:6px;
@@ -969,12 +969,14 @@ ul{list-style:none}
 .am-dd-action-clear{color:var(--text-3)}
 .am-dd-action-clear:hover{background:var(--bg-3);color:var(--text-2)}
 .am-dd-item{
-  display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:7px;
+  display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:0;
   font-size:12.5px;font-weight:500;color:var(--text);cursor:pointer;transition:background .1s;
+  border-bottom:1px solid var(--border);
 }
+.am-dd-item:last-child{border-bottom:none}
 .am-dd-item:hover{background:var(--bg-2)}
 .am-dd-item input{width:15px;height:15px;flex-shrink:0;cursor:pointer;accent-color:var(--brand)}
-.am-dd-item input[type="number"]{width:48px;padding:3px 6px;font-size:11px;border-radius:7px;border:1px solid var(--border-2);accent-color:initial;margin-left:auto;flex-shrink:0}
+.am-dd-item input[type="number"]{width:72px;flex:0 0 72px;padding:5px 8px;font-size:12.5px;border-radius:7px;border:1px solid var(--border-2);accent-color:initial;text-align:center;margin-left:auto}
 .form-label-hint{
   display:inline-block;font-size:11px;color:var(--text-3);cursor:help;
   vertical-align:middle;margin-left:3px;line-height:1;
@@ -992,13 +994,14 @@ ul{list-style:none}
 .am-selected-box{
   border:1.5px dashed var(--border-2);border-radius:var(--radius);
   padding:10px 12px;margin-top:8px;min-height:42px;
-  display:flex;flex-wrap:wrap;gap:7px;align-items:flex-start;
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;align-items:start;
 }
 .am-tag{
-  display:flex;align-items:center;gap:6px;
+  display:flex;align-items:center;justify-content:space-between;gap:6px;
   background:var(--brand-light);color:var(--brand);
   border:1px solid #f5c0c8;border-radius:99px;
   padding:5px 6px 5px 12px;font-size:12px;font-weight:600;white-space:nowrap;
+  overflow:hidden;
 }
 .am-tag-remove{
   width:17px;height:17px;border-radius:50%;flex-shrink:0;
@@ -1007,7 +1010,7 @@ ul{list-style:none}
   font-size:11px;line-height:1;border:none;
 }
 .am-tag-remove:hover{background:var(--brand);color:#fff}
-.am-selected-empty{font-size:12px;color:var(--text-3)}
+.am-selected-empty{font-size:12px;color:var(--text-3);grid-column:1/-1}
 
 /* ─── Image upload row & thumbnails ────────────── */
 .img-row{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
@@ -1497,9 +1500,8 @@ ul{list-style:none}
         <select class="form-select" id="f-waterCharge"><option>Included</option><option>Separate</option><option>Tanker</option></select>
       </div>
 	  <div class="form-group">
-        <label class="form-label" style="display:flex;align-items:center;gap:6px;margin-top:18px">
-          <input type="checkbox" id="f-negotiable" /> Price negotiable
-        </label>
+        <label class="form-label">Price negotiable</label>
+        <select class="form-select" id="f-negotiable"><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select>
       </div>
     </div>
     </div>
@@ -1592,25 +1594,25 @@ ul{list-style:none}
             <button type="button" class="am-dd-action-btn am-dd-action-clear" onclick="amClearAll()">Clear all</button>
           </div>
           <div class="am-dd-grid">
-            <label class="am-dd-item"><input type="checkbox" id="am-wifi" onchange="onAmCheck()"/> Wi-Fi</label>
-            <label class="am-dd-item"><input type="checkbox" id="am-ac" onchange="onAmCheck()"/> AC <input type="number" id="f-acUnits" placeholder="units" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-washing" onchange="onAmCheck()"/> Washing machine</label>
-            <label class="am-dd-item"><input type="checkbox" id="am-fridge" onchange="onAmCheck()"/> Refrigerator</label>
-            <label class="am-dd-item"><input type="checkbox" id="am-microwave" onchange="onAmCheck()"/> Microwave / Oven</label>
-            <label class="am-dd-item"><input type="checkbox" id="am-geyser" onchange="onAmCheck()"/> Geyser / Water heater</label>
-            <label class="am-dd-item"><input type="checkbox" id="am-wardrobe" onchange="onAmCheck()"/> Wardrobe / Cupboards</label>
-            <label class="am-dd-item"><input type="checkbox" id="am-bed" onchange="onAmCheck()"/> Bed &amp; mattress</label>
-            <label class="am-dd-item"><input type="checkbox" id="am-sofa" onchange="onAmCheck()"/> Sofa / Seating</label>
-            <label class="am-dd-item"><input type="checkbox" id="am-lift" onchange="onAmCheck()"/> Lift / Elevator</label>
-            <label class="am-dd-item"><input type="checkbox" id="am-balcony" onchange="onAmCheck()"/> Balcony / Terrace</label>
-            <label class="am-dd-item"><input type="checkbox" id="am-gym" onchange="onAmCheck()"/> Gym / Pool</label>
-            <label class="am-dd-item"><input type="checkbox" id="am-security" onchange="onAmCheck()"/> Security / CCTV</label>
-            <label class="am-dd-item"><input type="checkbox" id="am-power" onchange="onAmCheck()"/> Power backup</label>
-            <label class="am-dd-item"><input type="checkbox" id="am-garden" onchange="onAmCheck()"/> Garden</label>
-            <label class="am-dd-item"><input type="checkbox" id="am-laundry" onchange="onAmCheck()"/> Laundry</label>
-            <label class="am-dd-item"><input type="checkbox" id="am-meals" onchange="onAmCheck()"/> Meals included</label>
-            <label class="am-dd-item"><input type="checkbox" id="am-pipedgas" onchange="onAmCheck()"/> Piped gas connection</label>
-            <label class="am-dd-item"><input type="checkbox" id="am-ro" onchange="onAmCheck()"/> RO water filter</label>
+            <label class="am-dd-item"><input type="checkbox" id="am-wifi" onchange="onAmCheck()"/> Wi-Fi <input type="number" id="f-wifiUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-ac" onchange="onAmCheck()"/> AC <input type="number" id="f-acUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-washing" onchange="onAmCheck()"/> Washing machine <input type="number" id="f-washingUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-fridge" onchange="onAmCheck()"/> Refrigerator <input type="number" id="f-fridgeUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-microwave" onchange="onAmCheck()"/> Microwave / Oven <input type="number" id="f-microwaveUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-geyser" onchange="onAmCheck()"/> Geyser / Water heater <input type="number" id="f-geyserUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-wardrobe" onchange="onAmCheck()"/> Wardrobe / Cupboards <input type="number" id="f-wardrobeUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-bed" onchange="onAmCheck()"/> Bed &amp; mattress <input type="number" id="f-bedUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-sofa" onchange="onAmCheck()"/> Sofa / Seating <input type="number" id="f-sofaUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-lift" onchange="onAmCheck()"/> Lift / Elevator <input type="number" id="f-liftUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-balcony" onchange="onAmCheck()"/> Balcony / Terrace <input type="number" id="f-balconyUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-gym" onchange="onAmCheck()"/> Gym / Pool <input type="number" id="f-gymUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-security" onchange="onAmCheck()"/> Security / CCTV <input type="number" id="f-securityUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-power" onchange="onAmCheck()"/> Power backup <input type="number" id="f-powerUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-garden" onchange="onAmCheck()"/> Garden <input type="number" id="f-gardenUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-laundry" onchange="onAmCheck()"/> Laundry <input type="number" id="f-laundryUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-meals" onchange="onAmCheck()"/> Meals included <input type="number" id="f-mealsUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-pipedgas" onchange="onAmCheck()"/> Piped gas connection <input type="number" id="f-pipedgasUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-ro" onchange="onAmCheck()"/> RO water filter <input type="number" id="f-roUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
           </div>
         </div>
       </div>
@@ -2804,7 +2806,20 @@ function toggleShortlistFromModal(id) {
 /* ═══════════════════════════════════════════════
    ADD LISTING MODAL
 ═══════════════════════════════════════════════ */
+function resetListingForm() {
+  // Reset all standard inputs/selects/textareas inside the modal
+  document.querySelectorAll('#addModal input:not([type="checkbox"]), #addModal select, #addModal textarea').forEach(el => { el.value = ''; });
+  // Uncheck all checkboxes (amenities + misc toggles)
+  document.querySelectorAll('#addModal input[type="checkbox"]').forEach(el => { el.checked = false; });
+  // Clear amenity unit qty fields and re-render
+  amClearAll();
+  // Reset image previews
+  fImages = [];
+  renderFImages();
+}
+
 function openAddModal() {
+  resetListingForm();
   document.getElementById('addModal').classList.add('open');
   document.body.style.overflow = 'hidden';
   onFTypeChange(document.getElementById('f-type').value);
@@ -2928,25 +2943,25 @@ function closeAboutModal() {
    AMENITIES MULTI-SELECT DROPDOWN
 ═══════════════════════════════════════════════ */
 const AM_LIST = [
-  ['am-wifi', 'Wi-Fi'],
-  ['am-ac', 'AC'],
-  ['am-washing', 'Washing machine'],
-  ['am-fridge', 'Refrigerator'],
-  ['am-microwave', 'Microwave / Oven'],
-  ['am-geyser', 'Geyser / Water heater'],
-  ['am-wardrobe', 'Wardrobe / Cupboards'],
-  ['am-bed', 'Bed & mattress'],
-  ['am-sofa', 'Sofa / Seating'],
-  ['am-lift', 'Lift / Elevator'],
-  ['am-balcony', 'Balcony / Terrace'],
-  ['am-gym', 'Gym / Pool'],
-  ['am-security', 'Security / CCTV'],
-  ['am-power', 'Power backup'],
-  ['am-garden', 'Garden'],
-  ['am-laundry', 'Laundry'],
-  ['am-meals', 'Meals included'],
-  ['am-pipedgas', 'Piped gas connection'],
-  ['am-ro', 'RO water filter'],
+  ['am-wifi',     'Wi-Fi',                  'f-wifiUnits'],
+  ['am-ac',       'AC',                     'f-acUnits'],
+  ['am-washing',  'Washing machine',        'f-washingUnits'],
+  ['am-fridge',   'Refrigerator',           'f-fridgeUnits'],
+  ['am-microwave','Microwave / Oven',       'f-microwaveUnits'],
+  ['am-geyser',   'Geyser / Water heater',  'f-geyserUnits'],
+  ['am-wardrobe', 'Wardrobe / Cupboards',   'f-wardrobeUnits'],
+  ['am-bed',      'Bed & mattress',         'f-bedUnits'],
+  ['am-sofa',     'Sofa / Seating',         'f-sofaUnits'],
+  ['am-lift',     'Lift / Elevator',        'f-liftUnits'],
+  ['am-balcony',  'Balcony / Terrace',      'f-balconyUnits'],
+  ['am-gym',      'Gym / Pool',             'f-gymUnits'],
+  ['am-security', 'Security / CCTV',        'f-securityUnits'],
+  ['am-power',    'Power backup',           'f-powerUnits'],
+  ['am-garden',   'Garden',                 'f-gardenUnits'],
+  ['am-laundry',  'Laundry',                'f-laundryUnits'],
+  ['am-meals',    'Meals included',         'f-mealsUnits'],
+  ['am-pipedgas', 'Piped gas connection',   'f-pipedgasUnits'],
+  ['am-ro',       'RO water filter',        'f-roUnits'],
 ];
 
 function toggleAmDropdown(e) {
@@ -2960,9 +2975,10 @@ function amSelectAll() {
 }
 
 function amClearAll() {
-  AM_LIST.forEach(([id]) => { const cb = document.getElementById(id); if (cb) cb.checked = false; });
-  const acUnits = document.getElementById('f-acUnits');
-  if (acUnits) acUnits.value = '';
+  AM_LIST.forEach(([id, , unitId]) => {
+    const cb = document.getElementById(id); if (cb) cb.checked = false;
+    if (unitId) { const u = document.getElementById(unitId); if (u) u.value = ''; }
+  });
   renderAmSelected();
 }
 
@@ -2973,7 +2989,8 @@ function onAmCheck() {
 function amRemove(id) {
   const cb = document.getElementById(id);
   if (cb) cb.checked = false;
-  if (id === 'am-ac') document.getElementById('f-acUnits').value = '';
+  const entry = AM_LIST.find(([eid]) => eid === id);
+  if (entry && entry[2]) { const u = document.getElementById(entry[2]); if (u) u.value = ''; }
   renderAmSelected();
 }
 
@@ -2990,11 +3007,12 @@ function renderAmSelected() {
     empty.style.display = '';
   } else {
     empty.style.display = 'none';
-    selected.forEach(([id, label]) => {
+    selected.forEach(([id, label, unitId]) => {
       let text = label;
-      if (id === 'am-ac') {
-        const units = document.getElementById('f-acUnits').value.trim();
-        if (units) text += ' (' + units + ')';
+      if (unitId) {
+        const u = document.getElementById(unitId);
+        const qty = u ? u.value.trim() : '';
+        text += ' ×' + (qty && parseInt(qty) > 0 ? qty : '1');
       }
       const tag = document.createElement('span');
       tag.className = 'am-tag';
@@ -3009,8 +3027,13 @@ function renderAmSelected() {
   ddCount.textContent = selected.length;
 }
 
-document.getElementById('f-acUnits').addEventListener('click', e => e.stopPropagation());
-document.getElementById('f-acUnits').addEventListener('input', renderAmSelected);
+AM_LIST.forEach(([, , unitId]) => {
+  if (!unitId) return;
+  const el = document.getElementById(unitId);
+  if (!el) return;
+  el.addEventListener('click', e => e.stopPropagation());
+  el.addEventListener('input', renderAmSelected);
+});
 
 document.addEventListener('click', function(e) {
   const dd = document.getElementById('amDropdown');
@@ -3105,8 +3128,11 @@ function submitListing() {
   function gv(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
   function gb(id) { const el = document.getElementById(id); return el ? el.checked : false; }
 
-  const amenities = AM_LIST.filter(([id]) => gb(id)).map(([id, label]) => {
-    if (id === 'am-ac' && gv('f-acUnits')) return label + ' (' + gv('f-acUnits') + ')';
+  const amenities = AM_LIST.filter(([id]) => gb(id)).map(([id, label, unitId]) => {
+    if (unitId) {
+      const qty = parseInt(gv(unitId)) || 1;
+      return qty > 1 ? label + ' ×' + qty : label;
+    }
     return label;
   });
   const extra = gv('f-amenities-extra');
@@ -3158,7 +3184,7 @@ function submitListing() {
     ownerAltPhone: gv('f-ownerAltPhone') || null,
     ownerAddress: gv('f-ownerAddress') || null,
     contactTime: gv('f-contactTime') || null,
-    negotiable: document.getElementById('f-negotiable').checked,
+    negotiable: gv('f-negotiable') || null,
     availableFrom: document.getElementById('f-avail').value || null,
     images: images,
   };
