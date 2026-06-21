@@ -534,69 +534,243 @@ ul{list-style:none}
 /* ─── Property Detail Modal ────────────────────── */
 .modal-overlay{
   position:fixed;inset:0;z-index:300;
-  background:rgba(0,0,0,.4);
+  background:rgba(20,16,17,.55);
   display:none;align-items:center;justify-content:center;
   padding:16px;
+  backdrop-filter:blur(2px);
 }
 .modal-overlay.open{display:flex}
 .modal{
   background:var(--bg);border-radius:var(--radius-xl);
-  width:100%;max-width:680px;max-height:90vh;
+  width:100%;max-width:720px;max-height:92vh;
   overflow-y:auto;
-  animation:modalIn .2s ease;
+  animation:modalIn .22s cubic-bezier(.2,.7,.3,1);
   position:relative;
+  box-shadow:0 24px 70px rgba(0,0,0,.28);
 }
-@keyframes modalIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+@keyframes modalIn{from{opacity:0;transform:scale(.96) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
+
+/* ── Hero gallery ── */
 .modal-img{
-  height:240px;background:var(--bg-3);
+  height:280px;background:var(--bg-3);
   display:flex;align-items:center;justify-content:center;
-  position:relative;flex-shrink:0;
+  position:relative;flex-shrink:0;overflow:hidden;
+  border-radius:var(--radius-xl) var(--radius-xl) 0 0;
 }
 .modal-img svg{width:56px;height:56px;stroke:var(--border-2);fill:none;stroke-width:1.2}
-.modal-close{
-  position:absolute;top:12px;right:12px;
+.modal-img .img-slide{border-radius:0;cursor:zoom-in}
+/* Modal gallery arrows: always visible (unlike card hover-only arrows), centered vertically */
+.modal-img .slide-arrows{
+  position:absolute;top:50%;left:0;right:0;bottom:auto;transform:translateY(-50%);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 12px;gap:0;opacity:1;z-index:3;
+  pointer-events:none;
+}
+.modal-img .slide-prev,.modal-img .slide-next{
   width:38px;height:38px;border-radius:50%;
-  background:var(--brand-light);
+  background:rgba(255,255,255,.92);box-shadow:0 2px 8px rgba(0,0,0,.18);
+  transition:background .15s,transform .15s;
+  pointer-events:auto;
+}
+.modal-img .slide-prev:hover,.modal-img .slide-next:hover{background:#fff;transform:scale(1.07)}
+.modal-img .slide-prev svg,.modal-img .slide-next svg{width:18px;height:18px;stroke-width:2.4}
+.modal-img .slide-dots{bottom:14px}
+.modal-img-typebadge{
+  position:absolute;top:14px;left:14px;z-index:2;
+  padding:5px 13px;border-radius:99px;font-size:11px;font-weight:700;
+  letter-spacing:.02em;color:var(--text);
+  box-shadow:0 2px 8px rgba(0,0,0,.12);
+}
+.modal-img-counter{
+  position:absolute;bottom:14px;right:14px;z-index:2;
+  background:rgba(0,0,0,.55);color:#fff;font-size:11px;font-weight:600;
+  padding:4px 10px;border-radius:99px;letter-spacing:.02em;
+}
+.modal-close{
+  position:absolute;top:12px;right:12px;z-index:3;
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(255,255,255,.92);
   display:flex;align-items:center;justify-content:center;
-  cursor:pointer;border:1.5px solid #f5c0c8;
+  cursor:pointer;border:1.5px solid rgba(255,255,255,.5);
   transition:background .15s,border-color .15s,transform .15s;
-  flex-shrink:0;
+  flex-shrink:0;backdrop-filter:blur(4px);
 }
 .modal-close:hover{background:var(--brand);border-color:var(--brand);transform:scale(1.06)}
 .modal-close svg{width:18px;height:18px;stroke:var(--brand);fill:none;stroke-width:2.2;transition:stroke .15s}
 .modal-close:hover svg{stroke:#fff}
-.modal-body{padding:20px 24px 28px}
-.modal-price{font-size:24px;font-weight:700;color:var(--text)}
-.modal-price span{font-size:14px;font-weight:400;color:var(--text-3)}
-.modal-title{font-size:15px;color:var(--text-2);margin-top:4px}
-.modal-loc{display:flex;align-items:center;gap:4px;font-size:13px;color:var(--text-3);margin-top:5px}
+.modal-body{padding:22px 24px 28px}
+
+/* ── Header ── */
+.modal-price{font-size:26px;font-weight:700;color:var(--text);letter-spacing:-.01em}
+.modal-price span{font-size:13px;font-weight:500;color:var(--text-3)}
+.modal-title{font-size:16px;font-weight:600;color:var(--text);margin-top:5px}
+.modal-loc{display:flex;align-items:center;gap:4px;font-size:13px;color:var(--text-3);margin-top:6px}
 .modal-loc svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
-.modal-divider{height:1px;background:var(--border);margin:18px 0}
-.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.modal-field{display:flex;flex-direction:column;gap:3px}
-.modal-field-label{font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.04em}
-.modal-field-value{font-size:14px;font-weight:500;color:var(--text)}
-.modal-amenities{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+
+/* ── Signature: quick-fact strip ── */
+.modal-factstrip{
+  display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;
+  margin-top:16px;padding-bottom:2px;
+}
+.modal-factstrip::-webkit-scrollbar{display:none}
+.modal-fact{
+  flex-shrink:0;display:flex;flex-direction:column;gap:4px;
+  background:var(--bg-2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:10px 14px;min-width:84px;
+}
+.modal-fact svg{width:16px;height:16px;stroke:var(--brand);fill:none;stroke-width:1.8}
+.modal-fact-val{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap}
+.modal-fact-lbl{font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.03em;white-space:nowrap}
+
+.modal-divider{height:1px;background:var(--border);margin:20px 0}
+
+/* ── Section headers ── */
+.modal-section-head{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:13px;
+}
+.modal-section-head svg{width:16px;height:16px;stroke:var(--brand);fill:none;stroke-width:1.8;flex-shrink:0}
+.modal-section-title{font-size:12.5px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.04em}
+
+/* ── Field grid (every field always shown; empty = muted dash) ── */
+.modal-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:1px;
+  background:var(--border);border:1px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;
+}
+.modal-field{
+  display:flex;flex-direction:column;gap:3px;
+  background:var(--bg);padding:10px 14px;
+}
+.modal-field-filler{background:var(--bg)}
+.modal-field-label{font-size:10.5px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.04em}
+.modal-field-value{font-size:13.5px;font-weight:500;color:var(--text)}
+.modal-field-value.empty{color:var(--text-3);font-weight:400}
+
+.modal-amenities{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}
 .modal-amenity{
   display:flex;align-items:center;gap:5px;
-  font-size:12px;color:var(--text-2);
-  background:var(--bg-2);padding:5px 10px;border-radius:7px;
+  font-size:12px;font-weight:500;color:var(--text-2);
+  background:var(--bg-2);border:1px solid var(--border);padding:6px 11px;border-radius:99px;
 }
-.modal-amenity svg{width:14px;height:14px;stroke:var(--brand);fill:none;stroke-width:2}
-.modal-desc{font-size:13px;color:var(--text-2);line-height:1.7;margin-top:8px}
-.modal-actions{display:flex;gap:10px;margin-top:20px}
+.modal-amenity svg{width:13px;height:13px;stroke:var(--brand);fill:none;stroke-width:2.2}
+.modal-empty-note{font-size:12.5px;color:var(--text-3);font-style:italic}
+.modal-desc{font-size:13.5px;color:var(--text-2);line-height:1.75}
+
+.modal-link-card{
+  display:flex;align-items:center;gap:10px;
+  background:var(--brand-light);border:1px solid #f5c0c8;
+  border-radius:var(--radius);padding:11px 14px;
+  font-size:13px;font-weight:600;color:var(--brand);
+  margin-top:10px;transition:background .12s;
+}
+.modal-link-card:hover{background:#fde3e8}
+.modal-link-card svg{width:16px;height:16px;stroke:var(--brand);fill:none;stroke-width:2;flex-shrink:0}
+.modal-link-card-empty{
+  background:var(--bg-2);border-color:var(--border);
+  color:var(--text-3);font-weight:500;font-style:italic;cursor:default;
+}
+.modal-link-card-empty svg{stroke:var(--text-3)}
+.modal-link-card-empty:hover{background:var(--bg-2)}
+
+/* ── Contact card ── */
+.modal-contact-card{
+  background:var(--bg-2);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:16px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.modal-contact-row{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px}
+.modal-contact-row + .modal-contact-row{border-top:1px solid var(--border);padding-top:10px}
+.modal-contact-label{color:var(--text-3);font-weight:500;display:flex;align-items:center;gap:7px}
+.modal-contact-label svg{width:14px;height:14px;stroke:var(--text-3);fill:none;stroke-width:1.8;flex-shrink:0}
+.modal-contact-value{color:var(--text);font-weight:600;text-align:right}
+.modal-contact-value.empty{color:var(--text-3);font-weight:400}
+
+.modal-posted{
+  display:flex;align-items:center;gap:6px;
+  font-size:11.5px;color:var(--text-3);margin-top:18px;
+}
+.modal-posted svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8}
+
+.modal-actions{display:flex;gap:10px;margin-top:18px}
 .modal-btn-primary{
-  flex:1;padding:12px;border-radius:10px;
+  flex:1;padding:13px;border-radius:11px;
   background:var(--brand);color:#fff;font-size:14px;font-weight:600;
-  border:none;cursor:pointer;transition:background .12s;
+  border:none;cursor:pointer;transition:background .12s,transform .1s;
 }
 .modal-btn-primary:hover{background:var(--brand-hover)}
+.modal-btn-primary:active{transform:scale(.98)}
 .modal-btn-secondary{
-  flex:1;padding:12px;border-radius:10px;
+  flex:1;padding:13px;border-radius:11px;
   background:var(--bg);color:var(--text);font-size:14px;font-weight:600;
-  border:1.5px solid var(--border-2);cursor:pointer;transition:background .12s;
+  border:1.5px solid var(--border-2);cursor:pointer;transition:background .12s,transform .1s;
 }
 .modal-btn-secondary:hover{background:var(--bg-2)}
+.modal-btn-secondary:active{transform:scale(.98)}
+
+@media (max-width:520px){
+  .modal-grid{grid-template-columns:1fr}
+  .modal-img{height:220px}
+}
+
+/* ─── Lightbox (full-image viewer) ─────────────── */
+.lightbox-overlay{
+  position:fixed;inset:0;z-index:400;
+  background:rgba(0,0,0,.92);
+  display:none;align-items:center;justify-content:center;
+  padding:24px;
+}
+.lightbox-overlay.open{display:flex}
+.lightbox-stage{
+  position:relative;width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+}
+.lightbox-img{
+  max-width:100%;max-height:100%;
+  object-fit:contain;border-radius:6px;
+  animation:lightboxIn .18s ease;
+  user-select:none;
+}
+@keyframes lightboxIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
+.lightbox-close{
+  position:absolute;top:18px;right:18px;z-index:5;
+  width:42px;height:42px;border-radius:50%;
+  background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:background .15s,transform .15s;
+}
+.lightbox-close:hover{background:rgba(255,255,255,.22);transform:scale(1.06)}
+.lightbox-close svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.2}
+.lightbox-prev,.lightbox-next{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:5;
+  width:48px;height:48px;border-radius:50%;
+  background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:background .15s,transform .15s;
+}
+.lightbox-prev{left:18px}
+.lightbox-next{right:18px}
+.lightbox-prev:hover,.lightbox-next:hover{background:rgba(255,255,255,.22);transform:translateY(-50%) scale(1.07)}
+.lightbox-prev svg,.lightbox-next svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2.2}
+.lightbox-counter{
+  position:absolute;bottom:18px;left:50%;transform:translateX(-50%);z-index:5;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+  color:#fff;font-size:12.5px;font-weight:600;padding:6px 16px;border-radius:99px;
+}
+.lightbox-thumbs{
+  position:absolute;bottom:54px;left:50%;transform:translateX(-50%);z-index:5;
+  display:flex;gap:7px;max-width:90vw;overflow-x:auto;padding:2px;
+}
+.lightbox-thumb{
+  width:48px;height:36px;border-radius:5px;flex-shrink:0;
+  background-size:cover;background-position:center;cursor:pointer;
+  border:2px solid transparent;opacity:.55;transition:opacity .15s,border-color .15s;
+}
+.lightbox-thumb.active{opacity:1;border-color:#fff}
+@media (max-width:600px){
+  .lightbox-prev,.lightbox-next{width:40px;height:40px}
+  .lightbox-thumbs{display:none}
+}
 
 /* ─── Shortlist Panel ──────────────────────────── */
 .shortlist-panel{
@@ -1201,7 +1375,8 @@ ul{list-style:none}
 
 /* ─── Card image slider ─────────────────────────── */
 .img-slides{position:relative;width:100%;height:100%;overflow:hidden}
-.img-slide{position:absolute;inset:0;opacity:0;transition:opacity .3s;background-size:cover;background-position:center}
+.img-slide{position:absolute;inset:0;opacity:0;transition:opacity .3s;background-size:cover;background-position:center;pointer-events:none}
+.img-slide.active{pointer-events:auto}
 .img-slide.active{opacity:1}
 .slide-arrows{
   position:absolute;bottom:18px;left:50%;transform:translateX(-50%);
@@ -1677,6 +1852,24 @@ ul{list-style:none}
       </button>
     </div>
     <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- ─── Lightbox (full-image viewer) ───────────────────────── -->
+<div class="lightbox-overlay" id="lightboxOverlay" role="dialog" aria-modal="true" aria-label="Image viewer">
+  <div class="lightbox-stage">
+    <img class="lightbox-img" id="lightboxImg" src="" alt="Property photo" />
+    <button class="lightbox-close" onclick="closeLightbox()" aria-label="Close image viewer">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <button class="lightbox-prev" id="lightboxPrev" onclick="lightboxStep(-1)" aria-label="Previous photo">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <button class="lightbox-next" id="lightboxNext" onclick="lightboxStep(1)" aria-label="Next photo">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <div class="lightbox-counter" id="lightboxCounter"></div>
+    <div class="lightbox-thumbs" id="lightboxThumbs"></div>
   </div>
 </div>
 
@@ -2609,6 +2802,48 @@ function slideStep(uid, dir) {
   slideGo(uid, next);
 }
 
+/* ═══════════════════════════════════════════════
+   LIGHTBOX (full-image viewer)
+═══════════════════════════════════════════════ */
+let lightboxImgs = [];
+let lightboxIdx = 0;
+
+function openLightbox(propId, idx) {
+  const p = PROPERTIES.find(x => x.id === propId);
+  if (!p || !p.images || !p.images.length) return;
+  lightboxImgs = p.images;
+  lightboxIdx = idx || 0;
+  renderLightbox();
+  document.getElementById('lightboxOverlay').classList.add('open');
+}
+
+function closeLightbox() {
+  document.getElementById('lightboxOverlay').classList.remove('open');
+}
+
+function lightboxStep(dir) {
+  if (!lightboxImgs.length) return;
+  lightboxIdx = (lightboxIdx + dir + lightboxImgs.length) % lightboxImgs.length;
+  renderLightbox();
+}
+
+function lightboxGo(idx) {
+  lightboxIdx = idx;
+  renderLightbox();
+}
+
+function renderLightbox() {
+  if (!lightboxImgs.length) return;
+  document.getElementById('lightboxImg').src = lightboxImgs[lightboxIdx];
+  document.getElementById('lightboxCounter').textContent = (lightboxIdx + 1) + ' / ' + lightboxImgs.length;
+  const multi = lightboxImgs.length > 1;
+  document.getElementById('lightboxPrev').style.display = multi ? 'flex' : 'none';
+  document.getElementById('lightboxNext').style.display = multi ? 'flex' : 'none';
+  document.getElementById('lightboxThumbs').innerHTML = multi
+    ? lightboxImgs.map((url, i) => `<div class="lightbox-thumb${i===lightboxIdx?' active':''}" style="background-image:url('${url}')" onclick="lightboxGo(${i})"></div>`).join('')
+    : '';
+}
+
 function cardHTML(p) {
   const liked = shortlisted.has(p.id);
   const compared = compareSet.has(p.id);
@@ -3019,45 +3254,229 @@ function openDetail(id) {
   if (!p) return;
   const liked = shortlisted.has(p.id);
   const colors = {Rent:'#e8f5ee',Lease:'#dde9fa',PG:'#eee8fa'};
-  document.getElementById('modalImg').style.background = colors[p.type] || '#f0f0f0';
+
+  // ── Hero gallery (reuses the same slider pattern as the listing cards) ──
+  const imgs = (p.images && p.images.length) ? p.images : [];
+  const uid = 'modalSlide' + p.id;
+  let galleryHtml;
+  if (imgs.length === 0) {
+    galleryHtml = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`;
+  } else {
+    const slides = imgs.map((url, i) => `<div class="img-slide${i===0?' active':''}" style="background-image:url('${url}')" onclick="event.stopPropagation();openLightbox(${p.id},${i})"></div>`).join('');
+    const dots = imgs.length > 1 ? `<div class="slide-dots">${imgs.map((_,i)=>`<button class="slide-dot${i===0?' active':''}" onclick="event.stopPropagation();slideGo('${uid}',${i})"></button>`).join('')}</div>` : '';
+    const arrows = imgs.length > 1 ? `
+      <div class="slide-arrows">
+        <button class="slide-prev" onclick="event.stopPropagation();slideStep('${uid}',-1)"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <button class="slide-next" onclick="event.stopPropagation();slideStep('${uid}',1)"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
+      </div>` : '';
+    galleryHtml = `<div id="${uid}" style="position:absolute;inset:0">${slides}</div>${arrows}${dots}`;
+  }
+  const modalImgEl = document.getElementById('modalImg');
+  modalImgEl.style.background = imgs.length ? 'var(--bg-3)' : (colors[p.type] || '#f0f0f0');
+  modalImgEl.innerHTML = `
+    <span class="modal-img-typebadge" style="background:${colors[p.type] || '#eee'}">${p.type || '—'}</span>
+    ${galleryHtml}
+    ${imgs.length > 1 ? `<span class="modal-img-counter">${imgs.length} photos</span>` : ''}
+    <button class="modal-close" onclick="closeDetail()" aria-label="Close details">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  `;
+
+  // ── helpers ──
+  // Every field always renders. Missing values show a muted em dash instead of being hidden.
+  function mf(label, value) {
+    const has = !(value === null || value === undefined || value === '');
+    return `<div class="modal-field"><div class="modal-field-label">${label}</div><div class="modal-field-value${has?'':' empty'}">${has ? value : '—'}</div></div>`;
+  }
+  function cf(icon, label, value) {
+    const has = !(value === null || value === undefined || value === '');
+    return `<div class="modal-contact-row"><div class="modal-contact-label">${icon}${label}</div><div class="modal-contact-value${has?'':' empty'}">${has ? value : '—'}</div></div>`;
+  }
+  function money(v) {
+    if (v === null || v === undefined || v === '') return '';
+    const n = Number(v);
+    return isNaN(n) ? v : '₹' + n.toLocaleString('en-IN');
+  }
+  function section(icon, title, fieldsHtml) {
+    return `<div class="modal-divider"></div>
+      <div class="modal-section-head">${icon}<div class="modal-section-title">${title}</div></div>
+      <div class="modal-grid">${fieldsHtml.join('')}${fieldsHtml.length % 2 ? '<div class="modal-field modal-field-filler"></div>' : ''}</div>`;
+  }
+  const I = {
+    home:'<svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+    cash:'<svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg>',
+    doc:'<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+    bed:'<svg viewBox="0 0 24 24"><path d="M2 9v9M2 11h20v7M2 4v5M22 11V9a2 2 0 0 0-2-2H6"/></svg>',
+    pin:'<svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+    user:'<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+    phone:'<svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+    mail:'<svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><polyline points="22 6 12 13 2 6"/></svg>',
+    clock:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+  };
+
+  // ── Quick-fact strip (signature element) ──
+  const facts = [
+    {icon:I.cash, val: p.price ? '₹'+p.price.toLocaleString('en-IN') : '—', lbl:'Rent / mo'},
+    {icon:I.bed, val: p.bhk || '—', lbl:'BHK'},
+    {icon:I.home, val: p.area ? p.area+' sqft' : '—', lbl:'Area'},
+    {icon:I.doc, val: p.furnishing || '—', lbl:'Furnishing'},
+    {icon:I.cash, val: p.deposit ? '₹'+p.deposit.toLocaleString('en-IN') : '—', lbl:'Deposit'},
+  ];
+  const factStripHtml = facts.map(f => `<div class="modal-fact">${f.icon}<div class="modal-fact-val">${f.val}</div><div class="modal-fact-lbl">${f.lbl}</div></div>`).join('');
+
+  // ── Core fields (common to all types) ──
+  const coreFields = [
+    mf('Property type', p.propertyType),
+    mf('BHK', p.bhk),
+    mf('Furnishing', p.furnishing),
+    mf('Floor', p.floor),
+    mf('Built-up area', p.area ? p.area + ' sq.ft' : ''),
+    mf('Bathrooms', p.bathrooms),
+    mf('Facing', p.facing),
+    mf('Age of property', p.age),
+    mf('Lift', p.lift !== undefined ? (p.lift ? 'Yes' : 'No') : ''),
+    mf('Car parking', p.carpark !== undefined ? (p.carpark ? 'Yes' : 'No') : ''),
+    mf('Bike parking', p.bikepark !== undefined ? (p.bikepark ? 'Yes' : 'No') : ''),
+    mf('Tenant preferred', p.tenant),
+    mf('Available from', p.availableFrom),
+  ];
+
+  // ── Pricing fields ──
+  const pricingFields = [
+    mf('Deposit', money(p.deposit)),
+    mf('Maintenance', p.maintenance ? money(p.maintenance) + '/mo' : ''),
+    mf('Annual rent escalation', p.escalation ? p.escalation + '%' : ''),
+    mf('Electricity included', p.electricityIncluded),
+    mf('Water charge', p.waterCharge),
+    mf('Negotiable', p.negotiable ? (p.negotiable === 'yes' ? 'Yes' : 'No') : ''),
+  ];
+
+  // ── Rent-specific ──
+  const rentFields = [
+    mf('Notice period', p.noticePeriod),
+    mf('Lease duration', p.leaseDuration),
+    mf('Pets allowed', p.petsAllowed),
+    mf('Non-veg allowed', p.nonVegAllowed),
+    mf('Piped gas', p.pipedGas),
+  ];
+
+  // ── Lease-specific ──
+  const leaseFields = [
+    mf('Lease amount', money(p.leaseAmount)),
+    mf('Monthly rent (on lease)', p.leaseMonthlyRent ? money(p.leaseMonthlyRent) : ''),
+    mf('Maintenance', p.leaseMaintenance ? money(p.leaseMaintenance) + '/mo' : ''),
+    mf('Lease duration', p.leaseDurationVal),
+    mf('Lease type', p.leaseType),
+    mf('Lock-in period', p.lockInPeriod),
+    mf('Available from', p.leaseAvailFrom),
+    mf('Notice period', p.leaseNotice),
+    mf('Rent escalation', p.rentEscalation),
+    mf('Pets allowed', p.leasePets),
+    mf('Non-veg allowed', p.leaseNonVeg),
+  ];
+
+  // ── PG-specific ──
+  const pgFields = [
+    mf('Gender', p.pgGender),
+    mf('Room type', p.pgRoomType),
+    mf('Attached bathroom', p.pgBathroom),
+    mf('Occupancy available', p.pgOccupancy),
+    mf('Total beds', p.pgTotalBeds),
+    mf('Meals cost', p.pgMealsCost ? money(p.pgMealsCost) + '/mo' : ''),
+    mf('Room furnishing', p.pgRoomFurnishing),
+    mf('Kitchen access', p.pgKitchenAccess),
+    mf('Available from', p.pgAvailableFrom),
+    mf('Notice period', p.pgNotice),
+    mf('Meals', p.pgMeals),
+    mf('Food type', p.pgFoodType),
+    mf('Gate closing time', p.pgGateTime),
+    mf('Visitor policy', p.pgVisitorPolicy),
+    mf('Non-veg allowed', p.pgNonVeg),
+    mf('Pets allowed', p.pgPets),
+  ];
+  // If type is unset/unknown on old demo data, still show all three so nothing silently disappears
+  const typeSectionsHtml = [
+    section(I.cash, 'Rent terms', rentFields),
+    section(I.doc, 'Lease terms', leaseFields),
+    section(I.bed, 'PG details', pgFields),
+  ];
+  const activeTypeSection = p.type === 'Rent' ? typeSectionsHtml[0] : p.type === 'Lease' ? typeSectionsHtml[1] : p.type === 'PG' ? typeSectionsHtml[2] : '';
+
+  // ── Location fields ──
+  const locationFields = [
+    mf('City', p.city),
+    mf('Full address', p.fullAddress),
+    mf('Coordinates', (p.latitude && p.longitude) ? p.latitude.toFixed(6) + '° N, ' + p.longitude.toFixed(6) + '° E' : ''),
+  ];
+  const mapsLinkHtml = p.googleMapsLink
+    ? `<a href="${p.googleMapsLink}" target="_blank" rel="noopener" class="modal-link-card">
+        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        View on Google Maps →
+      </a>`
+    : `<div class="modal-link-card modal-link-card-empty">
+        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        No Google Maps link provided
+      </div>`;
+
+  // ── Owner / contact fields ──
+  const contactRows = [
+    cf(I.user, 'Listed by', p.listedBy),
+    cf(I.user, 'Owner name', p.ownerName),
+    cf(I.phone, 'Phone', p.ownerPhone),
+    cf(I.mail, 'Email', p.ownerEmail),
+    cf(I.phone, 'Alternate number', p.ownerAltPhone),
+    cf(I.clock, 'Best time to contact', p.contactTime),
+    cf(I.pin, 'Owner address', p.ownerAddress),
+  ].join('');
 
   document.getElementById('modalBody').innerHTML = `
     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
       <div>
-        <div class="modal-price">₹${p.price.toLocaleString('en-IN')} <span>/ Month</span></div>
+        <div class="modal-price">${p.price ? '₹'+p.price.toLocaleString('en-IN') : '—'} <span>/ Month</span></div>
         <div class="modal-title" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-          <span>${p.title}</span>
+          <span>${p.title || 'Untitled listing'}</span>
           ${p.verified ? `<span class="prop-verified-badge" title="Verified listing"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1l3.2 1.6 3.5.4 1.6 3.2 2.7 2.4-.6 3.6 1 3.4-2.7 2.4-1.6 3.2-3.5.4-3.2 1.6-3.2-1.6-3.5-.4-1.6-3.2-2.7-2.4.6-3.6-1-3.4 2.7-2.4 1.6-3.2 3.5-.4z"/><path d="M9 12.5l2 2 4-4.5" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Verified</span>` : ''}
         </div>
         <div class="modal-loc">
-          <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          ${p.location}
+          ${I.pin}
+          ${p.location || '—'}
         </div>
       </div>
-      <div>
-        <span style="background:${colors[p.type]};padding:4px 12px;border-radius:99px;font-size:11px;font-weight:700">${p.type}</span>
-      </div>
     </div>
+
+    <div class="modal-factstrip">${factStripHtml}</div>
+
     <div class="modal-divider"></div>
+    <div class="modal-section-head">${I.home}<div class="modal-section-title">Property details</div></div>
     <div class="modal-grid">
-      <div class="modal-field"><div class="modal-field-label">BHK</div><div class="modal-field-value">${p.bhk}</div></div>
-      <div class="modal-field"><div class="modal-field-label">Furnishing</div><div class="modal-field-value">${p.furnishing}</div></div>
-      <div class="modal-field"><div class="modal-field-label">Floor</div><div class="modal-field-value">${p.floor}</div></div>
-      <div class="modal-field"><div class="modal-field-label">Bathrooms</div><div class="modal-field-value">${p.bathrooms}</div></div>
-      <div class="modal-field"><div class="modal-field-label">Facing</div><div class="modal-field-value">${p.facing}</div></div>
-      <div class="modal-field"><div class="modal-field-label">Deposit</div><div class="modal-field-value">₹${p.deposit.toLocaleString('en-IN')}</div></div>
-      <div class="modal-field"><div class="modal-field-label">Lift</div><div class="modal-field-value">${p.lift ? 'Yes' : 'No'}</div></div>
-      <div class="modal-field"><div class="modal-field-label">Tenant</div><div class="modal-field-value">${p.tenant}</div></div>
-      ${p.carpark ? '<div class="modal-field"><div class="modal-field-label">Parking</div><div class="modal-field-value">Car + Bike</div></div>' : ''}
+      ${coreFields.join('')}${coreFields.length % 2 ? '<div class="modal-field modal-field-filler"></div>' : ''}
     </div>
+
+    ${section(I.cash, 'Pricing details', pricingFields)}
+    ${activeTypeSection}
+
     <div class="modal-divider"></div>
-    <div class="modal-field-label">Amenities</div>
+    <div class="modal-section-head">${I.doc}<div class="modal-section-title">Amenities</div></div>
     <div class="modal-amenities">
-      ${p.amenities.map(a => `<div class="modal-amenity"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>${a}</div>`).join('')}
+      ${(p.amenities && p.amenities.length) ? p.amenities.map(a => `<div class="modal-amenity"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>${a}</div>`).join('') : '<div class="modal-empty-note">No amenities listed</div>'}
     </div>
-    ${p.desc ? `<div class="modal-divider"></div><div class="modal-field-label">About this property</div><div class="modal-desc">${p.desc}</div>` : ''}
+
     <div class="modal-divider"></div>
-    <div style="font-size:11px;color:var(--text-3)">Posted ${p.posted}</div>
+    <div class="modal-section-head">${I.doc}<div class="modal-section-title">About this property</div></div>
+    <div class="modal-desc">${p.desc || '<span class="modal-empty-note">No description provided</span>'}</div>
+
+    ${p.videoUrl
+      ? `<a href="${p.videoUrl}" target="_blank" rel="noopener" class="modal-link-card"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Watch property video</a>`
+      : `<div class="modal-link-card modal-link-card-empty"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>No property video added</div>`}
+
+    ${section(I.pin, 'Location', locationFields)}
+    ${mapsLinkHtml}
+
+    <div class="modal-divider"></div>
+    <div class="modal-section-head">${I.user}<div class="modal-section-title">Contact details</div></div>
+    <div class="modal-contact-card">${contactRows}</div>
+
+    <div class="modal-posted">${I.clock}Posted ${p.posted || '—'}</div>
     <div class="modal-actions">
       <button class="modal-btn-secondary" onclick="toggleShortlistFromModal(${p.id})" id="modal-save-btn" data-prop-id="${p.id}">${liked?'♥ Saved':'♡ Save'}</button>
       <button class="modal-btn-primary" onclick="showToast('Contact shown to verified users')">Contact</button>
@@ -3592,6 +4011,11 @@ function showToast(msg) {
    KEYBOARD & CLOSE
 ═══════════════════════════════════════════════ */
 document.addEventListener('keydown', e => {
+  if (document.getElementById('lightboxOverlay').classList.contains('open')) {
+    if (e.key === 'Escape') { closeLightbox(); return; }
+    if (e.key === 'ArrowLeft') { lightboxStep(-1); return; }
+    if (e.key === 'ArrowRight') { lightboxStep(1); return; }
+  }
   if (e.key === 'Escape') {
     closeDetail();
     closeSort();
@@ -3608,6 +4032,9 @@ document.addEventListener('keydown', e => {
   }
 });
 
+document.getElementById('lightboxOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeLightbox();
+});
 document.getElementById('detailModal').addEventListener('click', function(e) {
   if (e.target === this) closeDetail();
 });
