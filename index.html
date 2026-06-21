@@ -707,6 +707,25 @@ ul{list-style:none}
 }
 .modal-btn-secondary:hover{background:var(--bg-2)}
 .modal-btn-secondary:active{transform:scale(.98)}
+.modal-actions-row{display:flex;gap:10px;margin-top:10px}
+.modal-btn-whatsapp{
+  flex:1;padding:13px;border-radius:11px;
+  background:#25D366;color:#fff;font-size:14px;font-weight:600;
+  border:none;cursor:pointer;transition:background .12s,transform .1s;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+}
+.modal-btn-whatsapp:hover{background:#1ebe5a}
+.modal-btn-whatsapp:active{transform:scale(.98)}
+.modal-btn-whatsapp svg{width:16px;height:16px;flex-shrink:0}
+.modal-btn-outline{
+  flex:1;padding:13px;border-radius:11px;
+  background:var(--bg);color:var(--text);font-size:14px;font-weight:600;
+  border:1.5px solid var(--border-2);cursor:pointer;transition:background .12s,transform .1s;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+}
+.modal-btn-outline:hover{background:var(--bg-2)}
+.modal-btn-outline:active{transform:scale(.98)}
+.modal-btn-outline svg{width:16px;height:16px;stroke:var(--text-2);fill:none;stroke-width:1.8;flex-shrink:0}
 
 @media (max-width:520px){
   .modal-grid{grid-template-columns:1fr}
@@ -1870,6 +1889,41 @@ ul{list-style:none}
     </button>
     <div class="lightbox-counter" id="lightboxCounter"></div>
     <div class="lightbox-thumbs" id="lightboxThumbs"></div>
+  </div>
+</div>
+
+<!-- ─── Schedule a Visit Modal ───────────────────────── -->
+<div class="add-modal-overlay" id="scheduleModal" role="dialog" aria-modal="true" aria-label="Schedule a visit">
+  <div class="add-modal" id="scheduleModalBox" style="max-width:400px">
+    <div class="add-modal-header">
+      <div class="add-modal-title">Schedule a visit</div>
+      <button class="modal-close" style="position:static" onclick="closeScheduleModal()" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div id="scheduleModalSubtitle" style="font-size:13px;color:var(--text-2);margin-bottom:16px"></div>
+	
+    <div class="form-group">
+      <label class="form-label">Your name</label>
+      <input class="form-input" type="text" id="sched-name" placeholder="e.g. Priya Sharma" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Your phone</label>
+      <input class="form-input" type="tel" id="sched-phone" placeholder="e.g. 9876543210" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Preferred date <span style="color:var(--brand)">*</span></label>
+      <input class="form-input" type="date" id="sched-date" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Preferred time <span style="color:var(--brand)">*</span></label>
+      <input class="form-input" type="time" id="sched-time" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Note (optional)</label>
+      <textarea class="form-input" id="sched-note" rows="2" placeholder="Anything the owner should know…" style="resize:vertical"></textarea>
+    </div>
+    <button class="form-submit" id="scheduleSubmitBtn" onclick="submitScheduleVisit()">Request visit</button>
   </div>
 </div>
 
@@ -3478,8 +3532,21 @@ function openDetail(id) {
 
     <div class="modal-posted">${I.clock}Posted ${p.posted || '—'}</div>
     <div class="modal-actions">
-      <button class="modal-btn-secondary" onclick="toggleShortlistFromModal(${p.id})" id="modal-save-btn" data-prop-id="${p.id}">${liked?'♥ Saved':'♡ Save'}</button>
-      <button class="modal-btn-primary" onclick="showToast('Contact shown to verified users')">Contact</button>
+	<button class="modal-btn-primary" onclick="showToast('Contact shown to verified users')">Contact</button>
+      
+	  <button class="modal-btn-whatsapp" onclick="openWhatsApp(${p.id})">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg>
+        WhatsApp
+      </button>
+      
+    </div>
+    <div class="modal-actions-row">
+	<button class="modal-btn-secondary" onclick="toggleShortlistFromModal(${p.id})" id="modal-save-btn" data-prop-id="${p.id}">${liked?'♥ Saved':'♡ Save'}</button>
+      <button class="modal-btn-outline" onclick="openScheduleModal(${p.id})">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Schedule visit
+      </button>
+      
     </div>
   `;
   document.getElementById('detailModal').classList.add('open');
@@ -3505,6 +3572,67 @@ function toggleShortlistFromModal(id) {
   updateShortlistCount();
   renderShortlistPanel();
   renderCards();
+}
+
+/* ═══════════════════════════════════════════════
+   SCHEDULE A VISIT
+═══════════════════════════════════════════════ */
+let scheduleForPropId = null;
+
+function openScheduleModal(propId) {
+  const p = PROPERTIES.find(x => x.id === propId);
+  if (!p) return;
+  scheduleForPropId = propId;
+  document.getElementById('scheduleModalSubtitle').textContent = p.title + ' · ' + p.location;
+  // reset fields
+  document.getElementById('sched-date').value = '';
+  document.getElementById('sched-time').value = '';
+  document.getElementById('sched-name').value = '';
+  document.getElementById('sched-phone').value = '';
+  document.getElementById('sched-note').value = '';
+  // default the date picker's minimum to today so past dates can't be picked
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('sched-date').min = today;
+  document.getElementById('scheduleModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeScheduleModal() {
+  document.getElementById('scheduleModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function submitScheduleVisit() {
+  const date = document.getElementById('sched-date').value;
+  const time = document.getElementById('sched-time').value;
+  if (!date || !time) {
+    showToast('Please pick a date and time for your visit');
+    return;
+  }
+  const p = PROPERTIES.find(x => x.id === scheduleForPropId);
+  const dateObj = new Date(date + 'T' + time);
+  const dateLabel = dateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+  const timeLabel = dateObj.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' });
+  closeScheduleModal();
+  showToast(`Visit requested for ${dateLabel}, ${timeLabel}${p ? ' — ' + p.title : ''}`);
+}
+
+/* ═══════════════════════════════════════════════
+   WHATSAPP CONTACT
+═══════════════════════════════════════════════ */
+function openWhatsApp(propId) {
+  const p = PROPERTIES.find(x => x.id === propId);
+  if (!p) return;
+  const rawPhone = (p.ownerPhone || '').replace(/\D/g, '');
+  if (!rawPhone) {
+    showToast('Owner has not added a WhatsApp number for this listing');
+    return;
+  }
+  // assume 10-digit Indian mobile numbers; prefix country code if not already present
+  const phone = rawPhone.length === 10 ? '91' + rawPhone : rawPhone;
+  const msg = `Hi, I'm interested in "${p.title}" (${p.location}) listed on Quatar. Is it still available?`;
+  const url = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(msg);
+  window.open(url, '_blank', 'noopener');
 }
 
 /* ═══════════════════════════════════════════════
@@ -4026,6 +4154,7 @@ document.addEventListener('keydown', e => {
     closeHelpModal();
     closeAboutModal();
     closeCompareModal();
+    closeScheduleModal();
     document.getElementById('filterPanel').classList.remove('open');
     if (document.getElementById('shortlistPanel').classList.contains('open')) toggleShortlistPanel();
     if (document.getElementById('menuPanel').classList.contains('open')) toggleMenuPanel();
@@ -4037,6 +4166,9 @@ document.getElementById('lightboxOverlay').addEventListener('click', function(e)
 });
 document.getElementById('detailModal').addEventListener('click', function(e) {
   if (e.target === this) closeDetail();
+});
+document.getElementById('scheduleModal').addEventListener('click', function(e) {
+  if (e.target === this) closeScheduleModal();
 });
 document.getElementById('addModal').addEventListener('click', function(e) {
   if (e.target === this) closeAddModal();
