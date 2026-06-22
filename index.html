@@ -486,40 +486,32 @@ ul{list-style:none}
   padding:3px 9px;border-radius:99px;border:1px solid var(--border);
 }
 .prop-footer{
-  display:flex;align-items:center;justify-content:space-between;
+  display:flex;flex-direction:column;gap:8px;
   margin-top:auto;padding-top:10px;border-top:1px solid var(--border);
-  gap:6px;flex-wrap:wrap;
 }
-.prop-posted{font-size:11px;color:var(--text-3);margin-left:auto;flex-shrink:0}
-.prop-compare-pill{
-  display:flex;align-items:center;gap:5px;flex-shrink:0;
-  font-size:11px;font-weight:500;color:var(--text-2);
-  padding:5px 10px 5px 8px;border-radius:99px;
-  border:1.5px solid var(--border-2);cursor:pointer;
+.prop-posted{font-size:11px;color:var(--text-3);text-align:right}
+.prop-action-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
+}
+.prop-action-btn{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  padding:7px 4px;border-radius:9px;
+  border:1.5px solid var(--border-2);background:var(--bg);
+  color:var(--text-2);cursor:pointer;
   transition:border-color .12s,background .12s,color .12s;
-  user-select:none;
+  user-select:none;min-width:0;
 }
-.prop-compare-pill:hover{border-color:var(--brand);color:var(--brand)}
-.prop-compare-pill.checked{
-  border-color:var(--brand);background:var(--brand-light);color:var(--brand);
-}
-.prop-compare-pill .chk-box{
-  width:14px;height:14px;border-radius:4px;border:1.5px solid var(--border-2);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-  transition:border-color .12s,background .12s;
-}
-.prop-compare-pill.checked .chk-box{background:var(--brand);border-color:var(--brand)}
-.prop-compare-pill .chk-box svg{width:9px;height:9px;stroke:#fff;fill:none;stroke-width:3;opacity:0;transition:opacity .1s}
-.prop-compare-pill.checked .chk-box svg{opacity:1}
-.prop-compare-pill.disabled{opacity:.45;cursor:not-allowed}
-.prop-compare-pill.disabled:hover{border-color:var(--border-2);color:var(--text-2)}
-.prop-contact-btn{
-  font-size:12px;font-weight:600;color:var(--brand);
-  padding:6px 14px;border-radius:7px;
-  border:1.5px solid var(--brand);background:var(--bg);
-  cursor:pointer;transition:background .12s;
-}
-.prop-contact-btn:hover{background:var(--brand-light)}
+.prop-action-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0}
+.prop-action-btn span{font-size:10.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.prop-action-btn:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-light)}
+.prop-action-btn.prop-action-contact{border-color:var(--brand);color:var(--brand)}
+.prop-action-btn.prop-action-contact:hover{background:var(--brand-light)}
+.prop-action-btn.prop-action-whatsapp{color:#25D366;border-color:#bfe8cf}
+.prop-action-btn.prop-action-whatsapp svg{fill:currentColor;stroke:none}
+.prop-action-btn.prop-action-whatsapp:hover{background:#e8faef;border-color:#25D366;color:#1ebe5a}
+.prop-action-btn.prop-action-compare.checked{border-color:var(--brand);color:var(--brand);background:var(--brand-light)}
+.prop-action-btn.prop-action-compare.disabled{opacity:.45;cursor:not-allowed}
+.prop-action-btn.prop-action-compare.disabled:hover{border-color:var(--border-2);color:var(--text-2);background:var(--bg)}
 
 /* ─── Empty state ──────────────────────────────── */
 .empty-state{
@@ -647,11 +639,16 @@ ul{list-style:none}
 .modal-field-value{font-size:13.5px;font-weight:500;color:var(--text)}
 .modal-field-value.empty{color:var(--text-3);font-weight:400}
 
-.modal-amenities{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}
+.modal-amenities{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:2px}
 .modal-amenity{
-  display:flex;align-items:center;gap:5px;
+  display:flex;align-items:center;justify-content:center;gap:5px;
   font-size:12px;font-weight:500;color:var(--text-2);
-  background:var(--bg-2);border:1px solid var(--border);padding:6px 11px;border-radius:99px;
+  background:var(--bg-2);border:1px solid var(--border);padding:7px 10px;border-radius:14px;
+  text-align:center;line-height:1.3;
+}
+.modal-amenity svg{flex-shrink:0}
+@media (max-width:520px){
+  .modal-amenities{grid-template-columns:repeat(2,1fr)}
 }
 .modal-amenity svg{width:13px;height:13px;stroke:var(--brand);fill:none;stroke-width:2.2}
 .modal-empty-note{font-size:12.5px;color:var(--text-3);font-style:italic}
@@ -1372,7 +1369,6 @@ ul{list-style:none}
   .shortlist-panel{width:100%}
   .menu-panel{width:100%}
   .compare-bar{bottom:68px;width:calc(100% - 24px)}
-  .prop-compare-pill .compare-pill-txt{display:none}
   .compare-table th.compare-col,.compare-empty-cell,.compare-add-slot{min-width:140px}
   .bottom-nav{
     display:flex;
@@ -1902,15 +1898,6 @@ ul{list-style:none}
       </button>
     </div>
     <div id="scheduleModalSubtitle" style="font-size:13px;color:var(--text-2);margin-bottom:16px"></div>
-	
-    <div class="form-group">
-      <label class="form-label">Your name</label>
-      <input class="form-input" type="text" id="sched-name" placeholder="e.g. Priya Sharma" />
-    </div>
-    <div class="form-group">
-      <label class="form-label">Your phone</label>
-      <input class="form-input" type="tel" id="sched-phone" placeholder="e.g. 9876543210" />
-    </div>
     <div class="form-group">
       <label class="form-label">Preferred date <span style="color:var(--brand)">*</span></label>
       <input class="form-input" type="date" id="sched-date" />
@@ -1918,6 +1905,14 @@ ul{list-style:none}
     <div class="form-group">
       <label class="form-label">Preferred time <span style="color:var(--brand)">*</span></label>
       <input class="form-input" type="time" id="sched-time" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Your name</label>
+      <input class="form-input" type="text" id="sched-name" placeholder="e.g. Priya Sharma" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Your phone</label>
+      <input class="form-input" type="tel" id="sched-phone" placeholder="e.g. 9876543210" />
     </div>
     <div class="form-group">
       <label class="form-label">Note (optional)</label>
@@ -2596,35 +2591,11 @@ ul{list-style:none}
    DATA
 ═══════════════════════════════════════════════ */
 const PROPERTIES = [
-  {id:1,type:'Rent',verified:true,title:'Studio — Prestige Shantiniketan',location:'Whitefield',price:18000,deposit:36000,bhk:'Studio',furnishing:'Fully Furnished',floor:'4th of 14',bathrooms:1,lift:true,carpark:false,bikepark:true,facing:'East',amenities:['CCTV','Power backup'],tenant:'Any',promoted:true,posted:'2 days ago',desc:'Compact studio with modern interiors. Walking distance to ITPL. Ideal for working professionals.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'],},
-  {id:2,type:'Rent',verified:false,title:'1 BHK — Koramangala 6th Block',location:'Koramangala',price:22000,deposit:44000,bhk:'1 BHK',furnishing:'Semi-Furnished',floor:'2nd of 5',bathrooms:1,lift:false,carpark:false,bikepark:true,facing:'North',amenities:['Security'],tenant:'Bachelor',promoted:false,posted:'5 days ago',desc:'Bright 1 BHK in the heart of Koramangala. Close to restaurants, cafes and co-working spaces.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'],},
-  {id:3,type:'Lease',verified:true,title:'2 BHK — Brigade Metropolis',location:'Indiranagar',price:35000,deposit:70000,bhk:'2 BHK',furnishing:'Furnished',floor:'7th of 12',bathrooms:2,lift:true,carpark:true,bikepark:true,facing:'South',amenities:['Gym','Swimming pool','Security','Power backup'],tenant:'Family',promoted:true,posted:'1 day ago',desc:'Premium 2 BHK in Brigade Metropolis with club house access. Gated community with 24/7 security.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'],},
-  {id:4,type:'PG',verified:true,title:'PG — HSR Layout Sector 2',location:'HSR Layout',price:8500,deposit:17000,bhk:'Studio',furnishing:'Furnished',floor:'1st of 3',bathrooms:1,lift:false,carpark:false,bikepark:true,facing:'West',amenities:['Meals included','Laundry','Wi-Fi'],tenant:'Female only',promoted:false,posted:'3 days ago',desc:'Girls-only PG with home-cooked meals twice a day. Peaceful neighborhood, excellent connectivity.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'],},
-  {id:5,type:'Rent',verified:false,title:'3 BHK Villa — Sarjapur Road',location:'Sarjapur',price:45000,deposit:90000,bhk:'3 BHK',furnishing:'Furnished',floor:'G+1',bathrooms:3,lift:false,carpark:true,bikepark:true,facing:'North-East',amenities:['Garden','Power backup','Security'],tenant:'Family',promoted:false,posted:'1 week ago',desc:'Spacious independent villa with private garden. Children-friendly area near international schools.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'],},
-  {id:6,type:'Rent',verified:false,title:'Studio — Electronic City Phase 1',location:'Electronic City',price:12000,deposit:24000,bhk:'Studio',furnishing:'Semi-Furnished',floor:'3rd of 8',bathrooms:1,lift:true,carpark:false,bikepark:true,facing:'South',amenities:['Power backup','Security'],tenant:'Bachelor',promoted:false,posted:'4 days ago',desc:'Affordable studio near Electronics City IT corridor. Excellent connectivity to Hosur Road.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'],},
-  {id:7,type:'Rent',verified:true,title:'2 BHK — Bellandur Gate',location:'Bellandur',price:28000,deposit:56000,bhk:'2 BHK',furnishing:'Semi-Furnished',floor:'5th of 10',bathrooms:2,lift:true,carpark:true,bikepark:false,facing:'East',amenities:['Gym','CCTV','Power backup'],tenant:'Any',promoted:true,posted:'6 hours ago',desc:'Modern 2 BHK close to Outer Ring Road. Easy access to Ecospace, RMZ and Prestige tech parks.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'],},
-  {id:8,type:'Lease',verified:false,title:'1 BHK — JP Nagar 7th Phase',location:'JP Nagar',price:16000,deposit:32000,bhk:'1 BHK',furnishing:'Unfurnished',floor:'Ground',bathrooms:1,lift:false,carpark:false,bikepark:true,facing:'North',amenities:['Garden'],tenant:'Family',promoted:false,posted:'2 weeks ago',desc:'Quiet 1 BHK on ground floor with independent entrance. Good water supply, peaceful locality.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'],},
-  {id:9,type:'PG',verified:false,title:'PG — BTM Layout 2nd Stage',location:'BTM Layout',price:7200,deposit:14400,bhk:'Studio',furnishing:'Furnished',floor:'2nd of 4',bathrooms:1,lift:false,carpark:false,bikepark:true,facing:'West',amenities:['Wi-Fi','Laundry','CCTV'],tenant:'Bachelor',promoted:false,posted:'3 days ago',desc:'Affordable PG for male bachelors. AC rooms, high-speed Wi-Fi, attached bath. Near metro station.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'],},
-  {id:10,type:'Rent',verified:true,title:'4 BHK — Hebbal Lake View',location:'Hebbal',price:65000,deposit:130000,bhk:'4 BHK',furnishing:'Furnished',floor:'10th of 18',bathrooms:4,lift:true,carpark:true,bikepark:true,facing:'North',amenities:['Gym','Swimming pool','Garden','Power backup','Security','CCTV'],tenant:'Family',promoted:true,posted:'Today',desc:'Luxury lake-view apartment with panoramic views of Hebbal lake. Premium gated complex.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'],},
-  {id:11,type:'Lease',verified:false,title:'3 BHK — Marathahalli Bridge',location:'Marathahalli',price:38000,deposit:76000,bhk:'3 BHK',furnishing:'Semi-Furnished',floor:'6th of 14',bathrooms:3,lift:true,carpark:true,bikepark:true,facing:'South',amenities:['Power backup','Security','CCTV'],tenant:'Any',promoted:false,posted:'5 days ago',desc:'Spacious 3 BHK in a well-maintained complex. Walking distance from Marathahalli Metro station.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'],},
-  {id:12,type:'Rent',verified:false,title:'1 BHK — Yelahanka New Town',location:'Yelahanka',price:13000,deposit:26000,bhk:'1 BHK',furnishing:'Unfurnished',floor:'1st of 4',bathrooms:1,lift:false,carpark:false,bikepark:true,facing:'East',amenities:['CCTV'],tenant:'Any',promoted:false,posted:'1 week ago',desc:'Budget-friendly 1 BHK near Yelahanka new town. Good connectivity to airport and north Bangalore.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'],},
-  /* TEMP DEMO DATA — remove this block once you've seen pagination working */
-  {id:13,type:'Rent',verified:true,title:'1 BHK — Demo Promoted 13',location:'Banashankari',price:34500,deposit:69000,bhk:'1 BHK',furnishing:'Semi-Furnished',floor:'4th of 12',bathrooms:1,lift:true,carpark:false,bikepark:true,facing:'East',amenities:['CCTV','Power backup'],tenant:'Any',promoted:true,posted:'6 days ago',desc:'Demo listing added temporarily to test pagination.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600']},
-  {id:14,type:'Rent',verified:false,title:'2 BHK — Demo Promoted 14',location:'Rajajinagar',price:36000,deposit:72000,bhk:'2 BHK',furnishing:'Unfurnished',floor:'5th of 12',bathrooms:1,lift:true,carpark:false,bikepark:true,facing:'East',amenities:['CCTV','Power backup'],tenant:'Any',promoted:true,posted:'0 days ago',desc:'Demo listing added temporarily to test pagination.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600']},
-  {id:15,type:'Rent',verified:false,title:'3 BHK — Demo Promoted 15',location:'Malleswaram',price:37500,deposit:75000,bhk:'3 BHK',furnishing:'Furnished',floor:'6th of 12',bathrooms:1,lift:true,carpark:false,bikepark:true,facing:'East',amenities:['CCTV','Power backup'],tenant:'Any',promoted:true,posted:'1 days ago',desc:'Demo listing added temporarily to test pagination.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600']},
-  {id:16,type:'Rent',verified:true,title:'Studio — Demo Promoted 16',location:'Whitefield',price:39000,deposit:78000,bhk:'Studio',furnishing:'Fully Furnished',floor:'7th of 12',bathrooms:1,lift:true,carpark:false,bikepark:true,facing:'East',amenities:['CCTV','Power backup'],tenant:'Any',promoted:true,posted:'2 days ago',desc:'Demo listing added temporarily to test pagination.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600']},
-  {id:17,type:'Rent',verified:false,title:'1 BHK — Demo Promoted 17',location:'Koramangala',price:40500,deposit:81000,bhk:'1 BHK',furnishing:'Semi-Furnished',floor:'8th of 12',bathrooms:1,lift:true,carpark:false,bikepark:true,facing:'East',amenities:['CCTV','Power backup'],tenant:'Any',promoted:true,posted:'3 days ago',desc:'Demo listing added temporarily to test pagination.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600']},
-  {id:18,type:'Rent',verified:false,title:'2 BHK — Demo Promoted 18',location:'Indiranagar',price:42000,deposit:84000,bhk:'2 BHK',furnishing:'Unfurnished',floor:'9th of 12',bathrooms:1,lift:true,carpark:false,bikepark:true,facing:'East',amenities:['CCTV','Power backup'],tenant:'Any',promoted:true,posted:'4 days ago',desc:'Demo listing added temporarily to test pagination.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600']},
-  {id:19,type:'Rent',verified:false,title:'3 BHK — Demo Promoted 19',location:'HSR Layout',price:43500,deposit:87000,bhk:'3 BHK',furnishing:'Furnished',floor:'10th of 12',bathrooms:1,lift:true,carpark:false,bikepark:true,facing:'East',amenities:['CCTV','Power backup'],tenant:'Any',promoted:true,posted:'5 days ago',desc:'Demo listing added temporarily to test pagination.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600']},
-  {id:20,type:'Rent',verified:false,title:'Studio — Demo Promoted 20',location:'Sarjapur',price:45000,deposit:90000,bhk:'Studio',furnishing:'Fully Furnished',floor:'1th of 12',bathrooms:1,lift:true,carpark:false,bikepark:true,facing:'East',amenities:['CCTV','Power backup'],tenant:'Any',promoted:true,posted:'6 days ago',desc:'Demo listing added temporarily to test pagination.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600']},
-  {id:21,type:'Rent',verified:false,title:'1 BHK — Demo Promoted 21',location:'Electronic City',price:46500,deposit:93000,bhk:'1 BHK',furnishing:'Semi-Furnished',floor:'2th of 12',bathrooms:1,lift:true,carpark:false,bikepark:true,facing:'East',amenities:['CCTV','Power backup'],tenant:'Any',promoted:true,posted:'0 days ago',desc:'Demo listing added temporarily to test pagination.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600']},
-  {id:22,type:'Rent',verified:false,title:'2 BHK — Demo Promoted 22',location:'Bellandur',price:48000,deposit:96000,bhk:'2 BHK',furnishing:'Unfurnished',floor:'3th of 12',bathrooms:1,lift:true,carpark:false,bikepark:true,facing:'East',amenities:['CCTV','Power backup'],tenant:'Any',promoted:true,posted:'1 days ago',desc:'Demo listing added temporarily to test pagination.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600']},
-  {id:23,type:'Rent',verified:false,title:'2 BHK — Demo Listing 23',location:'JP Nagar',price:37600,deposit:75200,bhk:'2 BHK',furnishing:'Unfurnished',floor:'4th of 10',bathrooms:1,lift:false,carpark:false,bikepark:true,facing:'West',amenities:['Wi-Fi'],tenant:'Any',promoted:false,posted:'2 days ago',desc:'Demo listing added temporarily to test pagination.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600']},
-  {id:24,type:'Rent',verified:false,title:'3 BHK — Demo Listing 24',location:'BTM Layout',price:38800,deposit:77600,bhk:'3 BHK',furnishing:'Furnished',floor:'5th of 10',bathrooms:1,lift:false,carpark:false,bikepark:true,facing:'West',amenities:['Wi-Fi'],tenant:'Any',promoted:false,posted:'3 days ago',desc:'Demo listing added temporarily to test pagination.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600']},
-  {id:25,type:'Rent',verified:false,title:'Studio — Demo Listing 25',location:'Hebbal',price:40000,deposit:80000,bhk:'Studio',furnishing:'Fully Furnished',floor:'6th of 10',bathrooms:1,lift:false,carpark:false,bikepark:true,facing:'West',amenities:['Wi-Fi'],tenant:'Any',promoted:false,posted:'4 days ago',desc:'Demo listing added temporarily to test pagination.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600']},
-  {id:26,type:'Rent',verified:false,title:'1 BHK — Demo Listing 26',location:'Marathahalli',price:41200,deposit:82400,bhk:'1 BHK',furnishing:'Semi-Furnished',floor:'7th of 10',bathrooms:1,lift:false,carpark:false,bikepark:true,facing:'West',amenities:['Wi-Fi'],tenant:'Any',promoted:false,posted:'5 days ago',desc:'Demo listing added temporarily to test pagination.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600']},
-  {id:27,type:'Rent',verified:false,title:'2 BHK — Demo Listing 27',location:'Yelahanka',price:42400,deposit:84800,bhk:'2 BHK',furnishing:'Unfurnished',floor:'8th of 10',bathrooms:1,lift:false,carpark:false,bikepark:true,facing:'West',amenities:['Wi-Fi'],tenant:'Any',promoted:false,posted:'6 days ago',desc:'Demo listing added temporarily to test pagination.',images:['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600','https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600']},
+  {"id":101,"type":"Rent","verified":true,"title":"Sobha Dream Acres, Panathur","location":"Panathur, Near Sobha Dream Acres","price":32000,"deposit":96000,"maintenance":2500,"escalation":5,"electricityIncluded":"No","waterCharge":"Included","propertyType":"Apartment","bhk":"2 BHK","area":"1180","furnishing":"Semi-Furnished","floor":"6th of 14","age":"1-5 Years","bathrooms":2,"lift":true,"carpark":true,"bikepark":true,"facing":"East","amenities":["Wi-Fi","AC ×2","Washing machine","Refrigerator","Wardrobe / Cupboards ×2","Lift / Elevator","Gym / Pool","Security / CCTV","Power backup","RO water filter"],"tenant":"Family","promoted":false,"posted":"Just now","desc":"Spacious 2 BHK in a well-maintained gated community close to ORR and major tech parks. Semi-furnished with modular kitchen, ample natural light, and 24/7 security. Walking distance to schools, supermarkets, and bus stops.","videoUrl":"https://youtube.com/watch?v=demo-rent-101","city":"Bengaluru","listedBy":"Owner","fullAddress":"Block C, Sobha Dream Acres, Panathur Main Road, Bengaluru, 560103","googleMapsLink":"https://maps.app.goo.gl/Panathur2BHKDemo","latitude":12.9395,"longitude":77.6974,"ownerName":"Arvind Rao","ownerPhone":"9845012345","ownerEmail":"arvind.rao@example.com","ownerAltPhone":"9845098765","ownerAddress":"Sobha Dream Acres, Panathur, Bengaluru, 560103","contactTime":"Evening","negotiable":"yes","availableFrom":"2026-07-15","images":["https://images.unsplash.com/photo-1493809842364-78817add7ffb","https://images.unsplash.com/photo-1502672260266-1c1ef2d93688","https://images.unsplash.com/photo-1484154218962-a197022b5858"],"noticePeriod":"1 Month","leaseDuration":"11 Months","petsAllowed":"Restricted","nonVegAllowed":"Yes","pipedGas":"Yes"},
+  {"id":102,"type":"Lease","verified":true,"title":"Prestige Falcon City, Konanakunte","location":"Konanakunte, Kanakapura Road","price":0,"deposit":0,"maintenance":3000,"escalation":null,"electricityIncluded":"Shared meter","waterCharge":"Included","propertyType":"Villa","bhk":"3 BHK","area":"1850","furnishing":"Unfurnished","floor":"G of 2","age":"5-10 Years","bathrooms":3,"lift":false,"carpark":true,"bikepark":true,"facing":"North-East","amenities":["Wardrobe / Cupboards","Balcony / Terrace ×2","Gym / Pool","Security / CCTV","Power backup","Garden","Piped gas connection"],"tenant":"Family","promoted":true,"posted":"Just now","desc":"Premium independent villa available on long-term lease in a gated layout. Private garden, dedicated parking for two cars, and clubhouse access. Ideal for families seeking a long-term residence with low recurring outgoings.","videoUrl":"https://youtube.com/watch?v=demo-lease-102","city":"Bengaluru","listedBy":"Broker","fullAddress":"Villa 47, Prestige Falcon City, Konanakunte Cross, Kanakapura Road, Bengaluru, 560062","googleMapsLink":"https://maps.app.goo.gl/FalconCityVillaDemo","latitude":12.8783,"longitude":77.5497,"ownerName":"Lakshmi Narayanan","ownerPhone":"9900112233","ownerEmail":"lakshmi.n@example.com","ownerAltPhone":"9900445566","ownerAddress":"Prestige Falcon City, Konanakunte, Bengaluru, 560062","contactTime":"Afternoon","negotiable":"no","availableFrom":"2026-08-01","images":["https://images.unsplash.com/photo-1564013799919-ab600027ffc6","https://images.unsplash.com/photo-1576941089067-2de3c901e126","https://images.unsplash.com/photo-1600596542815-ffad4c1539a9"],"leaseAmount":4500000,"leaseMonthlyRent":0,"leaseMaintenance":3000,"leaseDurationVal":"3 Years","leaseType":"Residential","lockInPeriod":"1 Year","leaseAvailFrom":"Within 1 Month","leaseNotice":"2 Months","rentEscalation":"10% per year","leasePets":"Yes","leaseNonVeg":"Yes"},
+  {"id":103,"type":"PG","verified":false,"title":"Zolo Stanza, BTM Layout","location":"BTM Layout 2nd Stage","price":11500,"deposit":11500,"maintenance":null,"escalation":null,"electricityIncluded":"Yes","waterCharge":"Included","propertyType":null,"bhk":"Studio","area":null,"furnishing":"Fully Furnished","floor":"3rd of 4","age":null,"bathrooms":1,"lift":false,"carpark":false,"bikepark":false,"facing":"North","amenities":["Wi-Fi","AC","Washing machine","Refrigerator","Bed & mattress ×2","Security / CCTV","Power backup","Laundry","Meals included","RO water filter"],"tenant":"Female only","promoted":false,"posted":"Just now","desc":"Fully furnished girls' PG with daily housekeeping, 3 meals a day, and high-speed Wi-Fi. Located close to Jayadeva Hospital and Silk Board, with easy access to BTM bus stand and metro connectivity (upcoming).","videoUrl":null,"city":"Bengaluru","listedBy":"Agent","fullAddress":"16th Cross, BTM Layout 2nd Stage, Bengaluru, 560076","googleMapsLink":"https://maps.app.goo.gl/ZoloStanzaBTMDemo","latitude":12.9166,"longitude":77.6101,"ownerName":"Sandeep Gowda","ownerPhone":"8123456789","ownerEmail":"sandeep.gowda@example.com","ownerAltPhone":null,"ownerAddress":"Zolo Stanza, BTM Layout 2nd Stage, Bengaluru, 560076","contactTime":"Any","negotiable":"no","availableFrom":"2026-07-01","images":["https://images.unsplash.com/photo-1505693416388-ac5ce068fe85","https://images.unsplash.com/photo-1522708323590-d24dbb6b0267","https://images.unsplash.com/photo-1540518614846-7eded433c457"],"pgGender":"Girls","pgRoomType":"Double Sharing","pgBathroom":"Shared","pgOccupancy":"2","pgTotalBeds":"24","pgMealsCost":3500,"pgRoomFurnishing":"Fully Furnished","pgKitchenAccess":"Shared Kitchen","pgAvailableFrom":"Immediate","pgNotice":"15 Days","pgMeals":"All 3 Meals","pgFoodType":"Veg + Non-veg","pgGateTime":"10 PM","pgVisitorPolicy":"Lobby Only","pgNonVeg":"No","pgPets":"No"}
 ];
+
 
 /* ═══════════════════════════════════════════════
    STATE
@@ -2936,10 +2907,23 @@ function cardHTML(p) {
         ${p.carpark ? '<span class="prop-tag">Car park</span>' : ''}
       </div>
       <div class="prop-footer">
-        <button class="prop-contact-btn" onclick="event.stopPropagation();showToast('Contact info shown to verified users')">Contact</button>
-        <div class="prop-compare-pill${compared?' checked':''}${compareDisabled?' disabled':''}" onclick="event.stopPropagation();toggleCompare(${p.id},this)" aria-label="${compared?'Remove from':'Add to'} compare" title="${compareDisabled?`You're comparing ${lockedType} properties`:''}">
-          <span class="chk-box"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></span>
-          <span class="compare-pill-txt">Compare</span>
+        <div class="prop-action-grid">
+          <button class="prop-action-btn prop-action-contact" onclick="event.stopPropagation();showToast('Contact info shown to verified users')" aria-label="Contact owner">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span>Contact</span>
+          </button>
+          <button class="prop-action-btn prop-action-whatsapp" onclick="event.stopPropagation();openWhatsApp(${p.id})" aria-label="Contact on WhatsApp">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg>
+            <span>WhatsApp</span>
+          </button>
+          <button class="prop-action-btn" onclick="event.stopPropagation();openScheduleModal(${p.id})" aria-label="Schedule a visit">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span>Visit</span>
+          </button>
+          <button class="prop-action-btn prop-action-compare${compared?' checked':''}${compareDisabled?' disabled':''}" onclick="event.stopPropagation();toggleCompare(${p.id},this)" aria-label="${compared?'Remove from':'Add to'} compare" title="${compareDisabled?`You're comparing ${lockedType} properties`:''}">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Compare</span>
+          </button>
         </div>
         <span class="prop-posted">${p.posted}</span>
       </div>
@@ -3037,7 +3021,7 @@ function toggleCompare(id, el) {
 function updateComparePillStates() {
   const lockedType = getCompareType();
   document.querySelectorAll('.prop-card').forEach(card => {
-    const pill = card.querySelector('.prop-compare-pill');
+    const pill = card.querySelector('.prop-action-compare');
     if (!pill) return;
     const isChecked = pill.classList.contains('checked');
     const onclickStr = pill.getAttribute('onclick') || '';
@@ -3061,14 +3045,14 @@ function getCompareType() {
 function clearCompare() {
   compareSet.clear();
   renderCompareBar();
-  document.querySelectorAll('.prop-compare-pill.checked').forEach(el => el.classList.remove('checked'));
+  document.querySelectorAll('.prop-action-compare.checked').forEach(el => el.classList.remove('checked'));
   updateComparePillStates();
   closeCompareModal();
 }
 
 function removeFromCompare(id) {
   compareSet.delete(id);
-  const pills = document.querySelectorAll('.prop-compare-pill');
+  const pills = document.querySelectorAll('.prop-action-compare');
   pills.forEach(p => {
     if (p.onclick && p.onclick.toString().includes(`toggleCompare(${id}`)) p.classList.remove('checked');
   });
@@ -3532,21 +3516,18 @@ function openDetail(id) {
 
     <div class="modal-posted">${I.clock}Posted ${p.posted || '—'}</div>
     <div class="modal-actions">
-	<button class="modal-btn-primary" onclick="showToast('Contact shown to verified users')">Contact</button>
-      
-	  <button class="modal-btn-whatsapp" onclick="openWhatsApp(${p.id})">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg>
-        WhatsApp
-      </button>
-      
+      <button class="modal-btn-secondary" onclick="toggleShortlistFromModal(${p.id})" id="modal-save-btn" data-prop-id="${p.id}">${liked?'♥ Saved':'♡ Save'}</button>
+      <button class="modal-btn-primary" onclick="showToast('Contact shown to verified users')">Contact</button>
     </div>
     <div class="modal-actions-row">
-	<button class="modal-btn-secondary" onclick="toggleShortlistFromModal(${p.id})" id="modal-save-btn" data-prop-id="${p.id}">${liked?'♥ Saved':'♡ Save'}</button>
       <button class="modal-btn-outline" onclick="openScheduleModal(${p.id})">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         Schedule visit
       </button>
-      
+      <button class="modal-btn-whatsapp" onclick="openWhatsApp(${p.id})">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg>
+        WhatsApp
+      </button>
     </div>
   `;
   document.getElementById('detailModal').classList.add('open');
