@@ -489,6 +489,12 @@ ul{list-style:none}
   display:flex;flex-direction:column;gap:8px;
   margin-top:auto;padding-top:10px;border-top:1px solid var(--border);
 }
+.prop-meta-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.prop-views{
+  display:flex;align-items:center;gap:4px;
+  font-size:11px;color:var(--text-3);
+}
+.prop-views svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0}
 .prop-posted{font-size:11px;color:var(--text-3);text-align:right}
 .prop-action-grid{
   display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
@@ -2597,12 +2603,58 @@ const PROPERTIES = [
 ];
 
 
+/* ─── View counts (persisted) ───────────────────
+   Real per-property view counts, starting at 0.
+   Stored in localStorage so a page refresh reads back
+   the same counts instead of resetting or reseeding. */
+const VIEWS_KEY = 'quatar_property_views';
+let viewCounts = {};
+(function loadViewCounts() {
+  try {
+    viewCounts = JSON.parse(localStorage.getItem(VIEWS_KEY)) || {};
+  } catch (e) {
+    viewCounts = {};
+  }
+})();
+function saveViewCounts() {
+  try {
+    localStorage.setItem(VIEWS_KEY, JSON.stringify(viewCounts));
+  } catch (e) { /* storage unavailable — counts still work for this session */ }
+}
+function getViews(p) {
+  return viewCounts[p.id] || 0;
+}
+function incrementViews(p) {
+  viewCounts[p.id] = getViews(p) + 1;
+  saveViewCounts();
+  return viewCounts[p.id];
+}
+function formatViews(n) {
+  if (n >= 1000) return (n / 1000).toFixed(n >= 10000 ? 0 : 1).replace(/\.0$/, '') + 'k';
+  return String(n);
+}
+
+
 /* ═══════════════════════════════════════════════
    STATE
 ═══════════════════════════════════════════════ */
 let currentTab = 'All';
 let currentSort = 'newest';
-let shortlisted = new Set();
+const SHORTLIST_KEY = 'quatar_shortlisted_properties';
+function loadShortlist() {
+  try {
+    const arr = JSON.parse(localStorage.getItem(SHORTLIST_KEY));
+    return new Set(Array.isArray(arr) ? arr : []);
+  } catch (e) {
+    return new Set();
+  }
+}
+function saveShortlist() {
+  try {
+    localStorage.setItem(SHORTLIST_KEY, JSON.stringify([...shortlisted]));
+  } catch (e) { /* storage unavailable — shortlist still works for this session */ }
+}
+let shortlisted = loadShortlist();
 let compareSet = new Set();
 const COMPARE_MAX = 4;
 let isListView = false;
@@ -2925,7 +2977,13 @@ function cardHTML(p) {
             <span>Compare</span>
           </button>
         </div>
-        <span class="prop-posted">${p.posted}</span>
+        <div class="prop-meta-row">
+          <span class="prop-views" title="${getViews(p).toLocaleString('en-IN')} views">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            ${formatViews(getViews(p))} views
+          </span>
+          <span class="prop-posted">${p.posted}</span>
+        </div>
       </div>
     </div>
   </div>`;
@@ -2944,6 +3002,7 @@ function toggleShortlist(id, el) {
     el.classList.add('liked');
     showToast('Added to shortlist ♥');
   }
+  saveShortlist();
   updateShortlistCount();
   renderShortlistPanel();
   const saveBtn = document.getElementById('modal-save-btn');
@@ -2975,6 +3034,7 @@ function renderShortlistPanel() {
 
 function removeShortlist(id) {
   shortlisted.delete(id);
+  saveShortlist();
   const hearts = document.querySelectorAll('.prop-heart');
   hearts.forEach(h => {
     if (h.onclick && h.onclick.toString().includes(`toggleShortlist(${id},`)) h.classList.remove('liked');
@@ -3290,6 +3350,8 @@ function setView(type, btn) {
 function openDetail(id) {
   const p = PROPERTIES.find(x => x.id === id);
   if (!p) return;
+  incrementViews(p);   // count this open as a view, persisted to storage
+  renderCards();        // reflect the new count on the card grid
   const liked = shortlisted.has(p.id);
   const colors = {Rent:'#e8f5ee',Lease:'#dde9fa',PG:'#eee8fa'};
 
@@ -3550,6 +3612,7 @@ function toggleShortlistFromModal(id) {
     document.getElementById('modal-save-btn').textContent = '♥ Saved';
     showToast('Added to shortlist ♥');
   }
+  saveShortlist();
   updateShortlistCount();
   renderShortlistPanel();
   renderCards();
@@ -4174,6 +4237,8 @@ document.getElementById('aboutModal').addEventListener('click', function(e) {
    INIT
 ═══════════════════════════════════════════════ */
 renderCards();
+updateShortlistCount();
+renderShortlistPanel();
 </script>
 </body>
 </html>
