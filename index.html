@@ -174,99 +174,86 @@ ul{list-style:none}
 .mic-btn:hover svg{stroke:var(--brand)}
 
 /* ─── Filter chips ─────────────────────────────── */
-.filterbar-wrap{
+/* filterbar replaced by .filter-dd-bar — old rules removed */
+
+/* ─── Filter Dropdown Bar ───────────────────────── */
+.filter-dd-bar{
   background:var(--bg);
   border-bottom:1px solid var(--border);
   display:flex;align-items:center;
+  gap:6px;padding:8px 16px;
+  overflow-x:auto;scrollbar-width:none;
+  flex-wrap:nowrap;
 }
-.filterbar{
-  display:flex;align-items:center;
-  gap:0;
-  overflow-x:auto;
-  scrollbar-width:none;
-  padding:0 4px;
-  flex:1;
-  min-width:0;
-}
-.filterbar::-webkit-scrollbar{display:none}
-.f-chip{
-  display:flex;flex-direction:column;align-items:center;gap:3px;
-  padding:8px 12px;
-  font-size:11px;font-weight:500;color:var(--text-2);
+.filter-dd-bar::-webkit-scrollbar{display:none}
+.fd-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  border:1px solid var(--border-2);border-radius:8px;
+  padding:6px 11px;font-size:12px;font-weight:500;
+  color:var(--text-2);background:var(--bg);
   cursor:pointer;white-space:nowrap;flex-shrink:0;
-  border-bottom:2px solid transparent;
-  transition:color .12s;
+  transition:border-color .12s,color .12s,background .12s;
   position:relative;
 }
-.f-chip svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.6}
-.f-chip:hover{color:var(--text)}
-.f-chip.active{color:var(--brand)}
-.f-chip.active svg{stroke:var(--brand)}
-.f-chip.active::after{
-  content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);
-  width:4px;height:4px;border-radius:50%;background:var(--brand);
+.fd-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;transition:transform .15s}
+.fd-btn:hover{border-color:var(--brand);color:var(--brand)}
+.fd-btn.has-sel{background:var(--brand-light);border-color:var(--brand);color:var(--brand)}
+.fd-btn.open{border-color:var(--brand);color:var(--brand)}
+.fd-btn.open svg.chevron{transform:rotate(180deg)}
+.fd-badge{
+  background:var(--brand);color:#fff;border-radius:99px;
+  font-size:10px;font-weight:700;
+  padding:1px 5px;min-width:16px;text-align:center;
 }
-.filterbar-actions{
-  display:flex;align-items:center;gap:8px;
-  padding:0 12px;flex-shrink:0;
-  border-left:1px solid var(--border);
-  height:52px;
+/* Popover */
+.fd-pop{
+  position:fixed;z-index:2000;
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.15);
+  padding:14px 16px;min-width:200px;max-width:320px;
+  display:none;flex-direction:column;gap:10px;
+  animation:fdPop .15s ease;
 }
-.f-action-btn{
-  display:flex;align-items:center;gap:5px;
-  border:1px solid var(--border-2);border-radius:8px;
-  padding:6px 12px;font-size:12px;font-weight:500;
-  color:var(--text);background:var(--bg);
-  cursor:pointer;white-space:nowrap;
-  transition:background .12s,border-color .12s;
-}
-.f-action-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8}
-.f-action-btn:hover{background:var(--bg-2);border-color:var(--border-2)}
-
-/* ─── Filter Panel (slide-down) ─────────────────── */
-.filter-panel{
-  background:var(--bg);
-  border-bottom:1px solid var(--border);
-  padding:16px 20px;
-  display:none;
-  gap:16px;
-  flex-wrap:wrap;
-  animation:slideDown .2s ease;
-}
-.filter-panel.open{display:flex}
-@keyframes slideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-.fp-group{display:flex;flex-direction:column;gap:6px;min-width:130px}
-.fp-label{font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em}
-.fp-options{display:flex;flex-wrap:wrap;gap:6px}
+.fd-pop.open{display:flex}
+.fd-pop.right{left:auto;right:0}
+@keyframes fdPop{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.fd-pop-label{font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.fd-opts{display:flex;flex-wrap:wrap;gap:6px}
 .fp-opt{
-  border:1px solid var(--border-2);border-radius:99px;
-  padding:4px 12px;font-size:12px;color:var(--text-2);
-  cursor:pointer;transition:all .12s;background:var(--bg);
+  border:1px solid var(--border-2);border-radius:7px;
+  padding:5px 12px;font-size:12px;color:var(--text-2);
+  cursor:pointer;transition:all .12s;background:var(--bg);white-space:nowrap;
 }
 .fp-opt:hover{border-color:var(--brand);color:var(--brand)}
 .fp-opt.sel{background:var(--brand);color:#fff;border-color:var(--brand)}
-.fp-range{display:flex;flex-direction:column;gap:8px}
-.fp-range input[type=range]{
-  width:100%;accent-color:var(--brand);
-  height:4px;border-radius:2px;cursor:pointer;
-}
-.fp-range-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--text-3)}
-.fp-apply{
-  margin-top:4px;
-  display:flex;gap:8px;align-items:center;width:100%;justify-content:flex-end;
-}
-.btn-clear{
-  padding:7px 16px;border-radius:8px;font-size:13px;font-weight:500;
-  color:var(--text-2);background:none;border:1px solid var(--border-2);
-  cursor:pointer;
-}
-.btn-apply{
-  padding:7px 20px;border-radius:8px;font-size:13px;font-weight:600;
+/* Range inside popover */
+.fd-range{display:flex;flex-direction:column;gap:6px;padding:2px 0}
+.fd-range input[type=range]{width:100%;accent-color:var(--brand);cursor:pointer}
+.fd-range-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--text-3)}
+/* Pop footer */
+.fd-pop-footer{display:flex;justify-content:space-between;align-items:center;padding-top:6px;border-top:1px solid var(--border);margin-top:2px}
+.fd-clear-btn{font-size:12px;color:var(--text-3);background:none;border:none;cursor:pointer;padding:2px 0}
+.fd-clear-btn:hover{color:var(--brand)}
+.fd-apply-btn{
+  padding:6px 16px;border-radius:7px;font-size:12px;font-weight:600;
   color:#fff;background:var(--brand);border:none;cursor:pointer;
 }
-.btn-apply:hover{background:var(--brand-hover)}
+.fd-apply-btn:hover{background:var(--brand-hover)}
+/* Clear-all + count chip in bar */
+.fd-bar-right{display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;padding-left:8px;border-left:1px solid var(--border)}
+.fd-clear-all{font-size:12px;color:var(--text-3);background:none;border:none;cursor:pointer;white-space:nowrap}
+.fd-clear-all:hover{color:var(--brand)}
+.fd-total-badge{display:none;background:var(--brand);color:#fff;border-radius:99px;font-size:11px;font-weight:700;padding:2px 8px}
+.fd-total-badge.show{display:inline-block}
 
-/* ─── Sort Modal ───────────────────────────────── */
+/* Tab-aware dropdown button visibility */
+.fd-rent,.fd-lease,.fd-pg{display:none}
+.filter-dd-bar.tab-all .fd-rent,
+.filter-dd-bar.tab-all .fd-lease,
+.filter-dd-bar.tab-all .fd-pg{display:inline-flex}
+.filter-dd-bar.tab-rent .fd-rent{display:inline-flex}
+.filter-dd-bar.tab-lease .fd-lease{display:inline-flex}
+.filter-dd-bar.tab-pg .fd-pg{display:inline-flex}
 .sort-modal{
   position:fixed;inset:0;z-index:200;
   display:none;align-items:flex-end;justify-content:center;
@@ -1479,130 +1466,324 @@ ul{list-style:none}
 </div>
 
 <!-- ─── Filter Bar ──────────────────────────────── -->
-<div class="filterbar-wrap">
-  <div class="filterbar" id="filterbar">
-    <div class="f-chip" data-filter="location" onclick="toggleChip(this)" title="Filter by location">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-      Location
-    </div>
-    <div class="f-chip active" data-filter="price" onclick="toggleChip(this)" title="Filter by price">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-      Price
-    </div>
-    <div class="f-chip" data-filter="deposit" onclick="toggleChip(this)" title="Filter by deposit">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-      Deposit
-    </div>
-    <div class="f-chip" data-filter="tenant" onclick="toggleChip(this)" title="Filter by tenant type">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      Tenant
-    </div>
-    <div class="f-chip" data-filter="type" onclick="toggleChip(this)" title="Filter by property type">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      Type
-    </div>
-    <div class="f-chip" data-filter="floor" onclick="toggleChip(this)" title="Filter by floor">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="4" rx="1"/><rect x="3" y="10" width="18" height="4" rx="1"/><rect x="3" y="17" width="18" height="4" rx="1"/></svg>
-      Floor
-    </div>
-    <div class="f-chip" data-filter="lift" onclick="toggleChip(this)" title="Filter by lift availability">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M10 9l2-2 2 2"/><path d="M10 15l2 2 2-2"/></svg>
-      Lift
-    </div>
-    <div class="f-chip" data-filter="furnishing" onclick="toggleChip(this)" title="Filter by furnishing">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 9V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v2"/><path d="M2 11v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v2H6v-2a2 2 0 0 0-4 0z"/><line x1="6" y1="18" x2="6" y2="21"/><line x1="18" y1="18" x2="18" y2="21"/></svg>
-      Furnishing
-    </div>
-    <div class="f-chip" data-filter="bhk" onclick="toggleChip(this)" title="Filter by BHK">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      BHK
-    </div>
-    <div class="f-chip" data-filter="toilet" onclick="toggleChip(this)" title="Filter by toilet">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6 Q9 2 12 2 Q15 2 15 6"/><rect x="6" y="6" width="12" height="8" rx="3"/><path d="M10 14v3"/><path d="M14 14v3"/><rect x="7" y="17" width="10" height="3" rx="1"/></svg>
-      Toilet
-    </div>
-    <div class="f-chip" data-filter="bathrooms" onclick="toggleChip(this)" title="Filter by bathrooms">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M3 12h18v4a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4v-4z"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="7" y1="5" x2="7" y2="12"/></svg>
-      Bathrooms
-    </div>
-    <div class="f-chip" data-filter="bikepark" onclick="toggleChip(this)" title="Filter by bike parking">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6h-3l-3 6h8l-2 5.5"/><path d="M9.5 6H11"/><line x1="5.5" y1="6" x2="8.5" y2="14"/></svg>
-      Bike Park
-    </div>
-    <div class="f-chip" data-filter="carpark" onclick="toggleChip(this)" title="Filter by car parking">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21v-5"/><path d="M8 21v-5"/><path d="M2 11h20"/><path d="M6.5 3l.5 4"/><path d="M17.5 3l-.5 4"/></svg>
-      Car Park
-    </div>
-    <div class="f-chip" data-filter="facing" onclick="toggleChip(this)" title="Filter by facing direction">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
-      Facing
-    </div>
-    <div class="f-chip" data-filter="amenities" onclick="toggleChip(this)" title="Filter by amenities">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-      Amenities
-    </div>
-    <div class="f-chip" data-filter="available" onclick="toggleChip(this)" title="Filter by availability">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg>
-      Available
-    </div>
-  </div>
-  <div class="filterbar-actions">
-    <button class="f-action-btn" onclick="toggleFilters()" aria-label="Open filters">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-      Filters
-    </button>
-  </div>
-</div>
+<!-- ─── Filter Dropdown Bar ──────────────────────── -->
+<div class="filter-dd-bar" id="filterDdBar">
 
-<!-- ─── Filter Panel ─────────────────────────────── -->
-<div class="filter-panel" id="filterPanel">
-  <div class="fp-group">
-    <div class="fp-label">BHK</div>
-    <div class="fp-options">
-      <div class="fp-opt" onclick="toggleOpt(this)">Studio</div>
-      <div class="fp-opt" onclick="toggleOpt(this)">1 BHK</div>
-      <div class="fp-opt" onclick="toggleOpt(this)">2 BHK</div>
-      <div class="fp-opt" onclick="toggleOpt(this)">3 BHK</div>
-      <div class="fp-opt" onclick="toggleOpt(this)">4+ BHK</div>
+  <!-- RENT + LEASE: Property Type -->
+  <div class="fd-btn fd-rent fd-lease" id="fdb-type" onclick="toggleFd('type',this)">
+    Type <span class="fd-badge" id="fdbc-type" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-type" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Property type</div>
+      <div class="fd-opts">
+        <div class="fp-opt" data-filter="propertyType" data-val="Apartment" onclick="toggleOpt(this,'type')">Apartment</div>
+        <div class="fp-opt" data-filter="propertyType" data-val="Independent House" onclick="toggleOpt(this,'type')">Indep. House</div>
+        <div class="fp-opt" data-filter="propertyType" data-val="Villa" onclick="toggleOpt(this,'type')">Villa</div>
+        <div class="fp-opt" data-filter="propertyType" data-val="Row House" onclick="toggleOpt(this,'type')">Row House</div>
+        <div class="fp-opt" data-filter="propertyType" data-val="Studio" onclick="toggleOpt(this,'type')">Studio</div>
+      </div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('type')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('type')">Apply</button>
+      </div>
     </div>
   </div>
-  <div class="fp-group">
-    <div class="fp-label">Furnishing</div>
-    <div class="fp-options">
-      <div class="fp-opt" onclick="toggleOpt(this)">Furnished</div>
-      <div class="fp-opt" onclick="toggleOpt(this)">Semi-Furnished</div>
-      <div class="fp-opt" onclick="toggleOpt(this)">Unfurnished</div>
+
+  <!-- RENT + LEASE: BHK -->
+  <div class="fd-btn fd-rent fd-lease" id="fdb-bhk" onclick="toggleFd('bhk',this)">
+    BHK <span class="fd-badge" id="fdbc-bhk" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-bhk" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">BHK</div>
+      <div class="fd-opts">
+        <div class="fp-opt" data-filter="bhk" data-val="1 RK" onclick="toggleOpt(this,'bhk')">1 RK</div>
+        <div class="fp-opt" data-filter="bhk" data-val="1 BHK" onclick="toggleOpt(this,'bhk')">1 BHK</div>
+        <div class="fp-opt" data-filter="bhk" data-val="2 BHK" onclick="toggleOpt(this,'bhk')">2 BHK</div>
+        <div class="fp-opt" data-filter="bhk" data-val="3 BHK" onclick="toggleOpt(this,'bhk')">3 BHK</div>
+        <div class="fp-opt" data-filter="bhk" data-val="4 BHK" onclick="toggleOpt(this,'bhk')">4+ BHK</div>
+      </div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('bhk')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('bhk')">Apply</button>
+      </div>
     </div>
   </div>
-  <div class="fp-group">
-    <div class="fp-label">Tenant</div>
-    <div class="fp-options">
-      <div class="fp-opt" onclick="toggleOpt(this)">Any</div>
-      <div class="fp-opt" onclick="toggleOpt(this)">Family</div>
-      <div class="fp-opt" onclick="toggleOpt(this)">Bachelor</div>
-      <div class="fp-opt" onclick="toggleOpt(this)">Female only</div>
+
+  <!-- RENT: Max Rent -->
+  <div class="fd-btn fd-rent" id="fdb-rent" onclick="toggleFd('rent',this)">
+    <span id="fdb-rent-label">Rent</span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-rent" onclick="event.stopPropagation()" style="min-width:240px">
+      <div class="fd-pop-label">Max rent / month</div>
+      <div class="fd-range">
+        <input type="range" min="5000" max="150000" step="1000" value="150000" id="rentRange" oninput="updateRentLabel(this.value)"/>
+        <div class="fd-range-labels"><span>₹5k</span><span id="rentRangeLabel" style="color:var(--brand);font-weight:600">Any</span><span>₹1.5L</span></div>
+      </div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('rent')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('rent')">Apply</button>
+      </div>
     </div>
   </div>
-  <div class="fp-group" style="min-width:180px">
-    <div class="fp-label">Max rent (₹/ Month)</div>
-    <div class="fp-range">
-      <input type="range" min="5000" max="100000" step="1000" value="50000" id="priceRange" oninput="updatePriceLabel(this.value)" />
-      <div class="fp-range-labels"><span>₹5k</span><span id="priceLabel">₹50k</span><span>₹1L</span></div>
+
+  <!-- RENT: Deposit -->
+  <div class="fd-btn fd-rent" id="fdb-deposit" onclick="toggleFd('deposit',this)">
+    <span id="fdb-deposit-label">Deposit</span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-deposit" onclick="event.stopPropagation()" style="min-width:240px">
+      <div class="fd-pop-label">Max deposit</div>
+      <div class="fd-range">
+        <input type="range" min="0" max="500000" step="5000" value="500000" id="depositRange" oninput="updateDepositLabel(this.value)"/>
+        <div class="fd-range-labels"><span>₹0</span><span id="depositRangeLabel" style="color:var(--brand);font-weight:600">Any</span><span>₹5L</span></div>
+      </div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('deposit')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('deposit')">Apply</button>
+      </div>
     </div>
   </div>
-  <div class="fp-group">
-    <div class="fp-label">Amenities</div>
-    <div class="fp-options">
-      <div class="fp-opt" onclick="toggleOpt(this)">Gym</div>
-      <div class="fp-opt" onclick="toggleOpt(this)">Swimming pool</div>
-      <div class="fp-opt" onclick="toggleOpt(this)">Security</div>
-      <div class="fp-opt" onclick="toggleOpt(this)">Power backup</div>
-      <div class="fp-opt" onclick="toggleOpt(this)">Garden</div>
+
+  <!-- LEASE: Lease Amount -->
+  <div class="fd-btn fd-lease" id="fdb-lease" onclick="toggleFd('lease',this)">
+    <span id="fdb-lease-label">Lease Amt</span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-lease" onclick="event.stopPropagation()" style="min-width:240px">
+      <div class="fd-pop-label">Max lease amount</div>
+      <div class="fd-range">
+        <input type="range" min="100000" max="10000000" step="100000" value="10000000" id="leaseRange" oninput="updateLeaseLabel(this.value)"/>
+        <div class="fd-range-labels"><span>₹1L</span><span id="leaseRangeLabel" style="color:var(--brand);font-weight:600">Any</span><span>₹1Cr</span></div>
+      </div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('lease')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('lease')">Apply</button>
+      </div>
     </div>
   </div>
-  <div class="fp-apply" style="width:100%">
-    <button class="btn-clear" onclick="clearFilters()">Clear all</button>
-    <button class="btn-apply" onclick="applyFilters()">Show results</button>
+
+  <!-- RENT + LEASE: Furnishing -->
+  <div class="fd-btn fd-rent fd-lease" id="fdb-furnishing" onclick="toggleFd('furnishing',this)">
+    Furnishing <span class="fd-badge" id="fdbc-furnishing" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-furnishing" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Furnishing</div>
+      <div class="fd-opts">
+        <div class="fp-opt" data-filter="furnishing" data-val="Furnished" onclick="toggleOpt(this,'furnishing')">Furnished</div>
+        <div class="fp-opt" data-filter="furnishing" data-val="Semi-Furnished" onclick="toggleOpt(this,'furnishing')">Semi-Furnished</div>
+        <div class="fp-opt" data-filter="furnishing" data-val="Unfurnished" onclick="toggleOpt(this,'furnishing')">Unfurnished</div>
+      </div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('furnishing')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('furnishing')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RENT + LEASE: Tenant -->
+  <div class="fd-btn fd-rent fd-lease" id="fdb-tenant" onclick="toggleFd('tenant',this)">
+    Tenant <span class="fd-badge" id="fdbc-tenant" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-tenant" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Tenant preferred</div>
+      <div class="fd-opts">
+        <div class="fp-opt" data-filter="tenant" data-val="Family" onclick="toggleOpt(this,'tenant')">Family</div>
+        <div class="fp-opt" data-filter="tenant" data-val="Bachelor" onclick="toggleOpt(this,'tenant')">Bachelor</div>
+        <div class="fp-opt" data-filter="tenant" data-val="Female only" onclick="toggleOpt(this,'tenant')">Female only</div>
+        <div class="fp-opt" data-filter="tenant" data-val="Any" onclick="toggleOpt(this,'tenant')">Any</div>
+      </div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('tenant')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('tenant')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RENT + LEASE: Facing -->
+  <div class="fd-btn fd-rent fd-lease" id="fdb-facing" onclick="toggleFd('facing',this)">
+    Facing <span class="fd-badge" id="fdbc-facing" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-facing" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Facing direction</div>
+      <div class="fd-opts">
+        <div class="fp-opt" data-filter="facing" data-val="East" onclick="toggleOpt(this,'facing')">East</div>
+        <div class="fp-opt" data-filter="facing" data-val="West" onclick="toggleOpt(this,'facing')">West</div>
+        <div class="fp-opt" data-filter="facing" data-val="North" onclick="toggleOpt(this,'facing')">North</div>
+        <div class="fp-opt" data-filter="facing" data-val="South" onclick="toggleOpt(this,'facing')">South</div>
+        <div class="fp-opt" data-filter="facing" data-val="North-East" onclick="toggleOpt(this,'facing')">NE</div>
+        <div class="fp-opt" data-filter="facing" data-val="North-West" onclick="toggleOpt(this,'facing')">NW</div>
+        <div class="fp-opt" data-filter="facing" data-val="South-East" onclick="toggleOpt(this,'facing')">SE</div>
+        <div class="fp-opt" data-filter="facing" data-val="South-West" onclick="toggleOpt(this,'facing')">SW</div>
+      </div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('facing')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('facing')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RENT + LEASE: Bathrooms -->
+  <div class="fd-btn fd-rent fd-lease" id="fdb-bathrooms" onclick="toggleFd('bathrooms',this)">
+    Bathrooms <span class="fd-badge" id="fdbc-bathrooms" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-bathrooms" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">No. of bathrooms</div>
+      <div class="fd-opts">
+        <div class="fp-opt" data-filter="bathrooms" data-val="1" onclick="toggleOpt(this,'bathrooms')">1</div>
+        <div class="fp-opt" data-filter="bathrooms" data-val="2" onclick="toggleOpt(this,'bathrooms')">2</div>
+        <div class="fp-opt" data-filter="bathrooms" data-val="3" onclick="toggleOpt(this,'bathrooms')">3</div>
+        <div class="fp-opt" data-filter="bathrooms" data-val="4" onclick="toggleOpt(this,'bathrooms')">4+</div>
+      </div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('bathrooms')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('bathrooms')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RENT + LEASE: Age -->
+  <div class="fd-btn fd-rent fd-lease" id="fdb-age" onclick="toggleFd('age',this)">
+    Age <span class="fd-badge" id="fdbc-age" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-age" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Age of property</div>
+      <div class="fd-opts">
+        <div class="fp-opt" data-filter="age" data-val="Under Construction" onclick="toggleOpt(this,'age')">Under Construction</div>
+        <div class="fp-opt" data-filter="age" data-val="Less than 1 Year" onclick="toggleOpt(this,'age')">&lt;1 Year</div>
+        <div class="fp-opt" data-filter="age" data-val="1-5 Years" onclick="toggleOpt(this,'age')">1–5 Yrs</div>
+        <div class="fp-opt" data-filter="age" data-val="5-10 Years" onclick="toggleOpt(this,'age')">5–10 Yrs</div>
+        <div class="fp-opt" data-filter="age" data-val="10+ Years" onclick="toggleOpt(this,'age')">10+ Yrs</div>
+      </div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('age')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('age')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALL: Amenities -->
+  <div class="fd-btn fd-rent fd-lease fd-pg" id="fdb-amenities" onclick="toggleFd('amenities',this)">
+    Amenities <span class="fd-badge" id="fdbc-amenities" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-amenities" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Amenities</div>
+      <div class="fd-opts">
+        <div class="fp-opt" data-filter="amenities" data-val="Wi-Fi" onclick="toggleOpt(this,'amenities')">Wi-Fi</div>
+        <div class="fp-opt" data-filter="amenities" data-val="AC" onclick="toggleOpt(this,'amenities')">AC</div>
+        <div class="fp-opt" data-filter="amenities" data-val="Gym / Pool" onclick="toggleOpt(this,'amenities')">Gym / Pool</div>
+        <div class="fp-opt" data-filter="amenities" data-val="Security / CCTV" onclick="toggleOpt(this,'amenities')">Security</div>
+        <div class="fp-opt" data-filter="amenities" data-val="Power backup" onclick="toggleOpt(this,'amenities')">Power backup</div>
+        <div class="fp-opt" data-filter="amenities" data-val="Washing machine" onclick="toggleOpt(this,'amenities')">Washing machine</div>
+        <div class="fp-opt" data-filter="amenities" data-val="Parking" onclick="toggleOpt(this,'amenities')">Parking</div>
+        <div class="fp-opt" data-filter="amenities" data-val="Garden" onclick="toggleOpt(this,'amenities')">Garden</div>
+        <div class="fp-opt" data-filter="amenities" data-val="RO water filter" onclick="toggleOpt(this,'amenities')">RO water</div>
+      </div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('amenities')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('amenities')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALL: Lift & Parking -->
+  <div class="fd-btn fd-rent fd-lease fd-pg" id="fdb-facilities" onclick="toggleFd('facilities',this)">
+    Facilities <span class="fd-badge" id="fdbc-facilities" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-facilities" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Lift &amp; parking</div>
+      <div class="fd-opts">
+        <div class="fp-opt" data-filter="lift" data-val="true" onclick="toggleOpt(this,'facilities')">Lift</div>
+        <div class="fp-opt" data-filter="carpark" data-val="true" onclick="toggleOpt(this,'facilities')">Car parking</div>
+        <div class="fp-opt" data-filter="bikepark" data-val="true" onclick="toggleOpt(this,'facilities')">Bike parking</div>
+      </div>
+      <div class="fd-pop-label" style="margin-top:6px">Verification</div>
+      <div class="fd-opts">
+        <div class="fp-opt" data-filter="verified" data-val="true" onclick="toggleOpt(this,'facilities')">✓ Verified only</div>
+      </div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('facilities')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('facilities')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PG: Gender -->
+  <div class="fd-btn fd-pg" id="fdb-pgGender" onclick="toggleFd('pgGender',this)">
+    PG for <span class="fd-badge" id="fdbc-pgGender" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-pgGender" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">PG for</div>
+      <div class="fd-opts">
+        <div class="fp-opt" data-filter="pgGender" data-val="Boys" onclick="toggleOpt(this,'pgGender')">Boys</div>
+        <div class="fp-opt" data-filter="pgGender" data-val="Girls" onclick="toggleOpt(this,'pgGender')">Girls</div>
+        <div class="fp-opt" data-filter="pgGender" data-val="Co-ed" onclick="toggleOpt(this,'pgGender')">Co-ed</div>
+      </div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('pgGender')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('pgGender')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PG: Room type + Meals + Food + Rent -->
+  <div class="fd-btn fd-pg" id="fdb-pgRoom" onclick="toggleFd('pgRoom',this)">
+    Room type <span class="fd-badge" id="fdbc-pgRoom" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-pgRoom" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Room type</div>
+      <div class="fd-opts">
+        <div class="fp-opt" data-filter="pgRoomType" data-val="Single" onclick="toggleOpt(this,'pgRoom')">Single</div>
+        <div class="fp-opt" data-filter="pgRoomType" data-val="Double Sharing" onclick="toggleOpt(this,'pgRoom')">Double sharing</div>
+        <div class="fp-opt" data-filter="pgRoomType" data-val="Triple Sharing" onclick="toggleOpt(this,'pgRoom')">Triple sharing</div>
+        <div class="fp-opt" data-filter="pgRoomType" data-val="Dormitory" onclick="toggleOpt(this,'pgRoom')">Dormitory</div>
+      </div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('pgRoom')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('pgRoom')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="fd-btn fd-pg" id="fdb-pgMeals" onclick="toggleFd('pgMeals',this)">
+    Meals <span class="fd-badge" id="fdbc-pgMeals" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop fd-pop right" id="fdp-pgMeals" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Meals</div>
+      <div class="fd-opts">
+        <div class="fp-opt" data-filter="pgMeals" data-val="All 3 Meals" onclick="toggleOpt(this,'pgMeals')">All 3 meals</div>
+        <div class="fp-opt" data-filter="pgMeals" data-val="Breakfast only" onclick="toggleOpt(this,'pgMeals')">Breakfast only</div>
+        <div class="fp-opt" data-filter="pgMeals" data-val="No meals" onclick="toggleOpt(this,'pgMeals')">No meals</div>
+      </div>
+      <div class="fd-pop-label" style="margin-top:6px">Food type</div>
+      <div class="fd-opts">
+        <div class="fp-opt" data-filter="pgFoodType" data-val="Veg only" onclick="toggleOpt(this,'pgMeals')">Veg only</div>
+        <div class="fp-opt" data-filter="pgFoodType" data-val="Veg + Non-veg" onclick="toggleOpt(this,'pgMeals')">Veg + Non-veg</div>
+      </div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('pgMeals')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('pgMeals')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="fd-btn fd-pg" id="fdb-pgRent" onclick="toggleFd('pgRent',this)">
+    <span id="fdb-pgRent-label">PG Rent</span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop fd-pop right" id="fdp-pgRent" onclick="event.stopPropagation()" style="min-width:240px">
+      <div class="fd-pop-label">Max PG rent / month</div>
+      <div class="fd-range">
+        <input type="range" min="3000" max="30000" step="500" value="30000" id="pgRentRange" oninput="updatePgRentLabel(this.value)"/>
+        <div class="fd-range-labels"><span>₹3k</span><span id="pgRentLabel" style="color:var(--brand);font-weight:600">Any</span><span>₹30k</span></div>
+      </div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('pgRent')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('pgRent')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bar right side: total count + clear all -->
+  <div class="fd-bar-right">
+    <span class="fd-total-badge" id="fdTotalBadge"></span>
+    <button class="fd-clear-all" id="fdClearAll" onclick="clearFilters()" style="display:none">Clear all</button>
   </div>
 </div>
 
@@ -2597,9 +2778,9 @@ ul{list-style:none}
    DATA
 ═══════════════════════════════════════════════ */
 const PROPERTIES = [
-  {"id":101,"type":"Rent","verified":true,"title":"Sobha Dream Acres, Panathur","location":"Panathur, Near Sobha Dream Acres","price":32000,"deposit":96000,"maintenance":2500,"escalation":5,"electricityIncluded":"No","waterCharge":"Included","propertyType":"Apartment","bhk":"2 BHK","area":"1180","furnishing":"Semi-Furnished","floor":"6th of 14","age":"1-5 Years","bathrooms":2,"lift":true,"carpark":true,"bikepark":true,"facing":"East","amenities":["Wi-Fi","AC ×2","Washing machine","Refrigerator","Wardrobe / Cupboards ×2","Lift / Elevator","Gym / Pool","Security / CCTV","Power backup","RO water filter"],"tenant":"Family","promoted":false,"posted":"Just now","desc":"Spacious 2 BHK in a well-maintained gated community close to ORR and major tech parks. Semi-furnished with modular kitchen, ample natural light, and 24/7 security. Walking distance to schools, supermarkets, and bus stops.","videoUrl":"https://youtube.com/watch?v=demo-rent-101","city":"Bengaluru","listedBy":"Owner","fullAddress":"Block C, Sobha Dream Acres, Panathur Main Road, Bengaluru, 560103","googleMapsLink":"https://maps.app.goo.gl/Panathur2BHKDemo","latitude":12.9395,"longitude":77.6974,"ownerName":"Arvind Rao","ownerPhone":"9845012345","ownerEmail":"arvind.rao@example.com","ownerAltPhone":"9845098765","ownerAddress":"Sobha Dream Acres, Panathur, Bengaluru, 560103","contactTime":"Evening","negotiable":"yes","availableFrom":"2026-07-15","images":["https://images.unsplash.com/photo-1493809842364-78817add7ffb","https://images.unsplash.com/photo-1502672260266-1c1ef2d93688","https://images.unsplash.com/photo-1484154218962-a197022b5858"],"noticePeriod":"1 Month","leaseDuration":"11 Months","petsAllowed":"Restricted","nonVegAllowed":"Yes","pipedGas":"Yes"},
-  {"id":102,"type":"Lease","verified":true,"title":"Prestige Falcon City, Konanakunte","location":"Konanakunte, Kanakapura Road","price":0,"deposit":0,"maintenance":3000,"escalation":null,"electricityIncluded":"Shared meter","waterCharge":"Included","propertyType":"Villa","bhk":"3 BHK","area":"1850","furnishing":"Unfurnished","floor":"G of 2","age":"5-10 Years","bathrooms":3,"lift":false,"carpark":true,"bikepark":true,"facing":"North-East","amenities":["Wardrobe / Cupboards","Balcony / Terrace ×2","Gym / Pool","Security / CCTV","Power backup","Garden","Piped gas connection"],"tenant":"Family","promoted":true,"posted":"Just now","desc":"Premium independent villa available on long-term lease in a gated layout. Private garden, dedicated parking for two cars, and clubhouse access. Ideal for families seeking a long-term residence with low recurring outgoings.","videoUrl":"https://youtube.com/watch?v=demo-lease-102","city":"Bengaluru","listedBy":"Broker","fullAddress":"Villa 47, Prestige Falcon City, Konanakunte Cross, Kanakapura Road, Bengaluru, 560062","googleMapsLink":"https://maps.app.goo.gl/FalconCityVillaDemo","latitude":12.8783,"longitude":77.5497,"ownerName":"Lakshmi Narayanan","ownerPhone":"9900112233","ownerEmail":"lakshmi.n@example.com","ownerAltPhone":"9900445566","ownerAddress":"Prestige Falcon City, Konanakunte, Bengaluru, 560062","contactTime":"Afternoon","negotiable":"no","availableFrom":"2026-08-01","images":["https://images.unsplash.com/photo-1564013799919-ab600027ffc6","https://images.unsplash.com/photo-1576941089067-2de3c901e126","https://images.unsplash.com/photo-1600596542815-ffad4c1539a9"],"leaseAmount":4500000,"leaseMonthlyRent":0,"leaseMaintenance":3000,"leaseDurationVal":"3 Years","leaseType":"Residential","lockInPeriod":"1 Year","leaseAvailFrom":"Within 1 Month","leaseNotice":"2 Months","rentEscalation":"10% per year","leasePets":"Yes","leaseNonVeg":"Yes"},
-  {"id":103,"type":"PG","verified":false,"title":"Zolo Stanza, BTM Layout","location":"BTM Layout 2nd Stage","price":11500,"deposit":11500,"maintenance":null,"escalation":null,"electricityIncluded":"Yes","waterCharge":"Included","propertyType":null,"bhk":"Studio","area":null,"furnishing":"Fully Furnished","floor":"3rd of 4","age":null,"bathrooms":1,"lift":false,"carpark":false,"bikepark":false,"facing":"North","amenities":["Wi-Fi","AC","Washing machine","Refrigerator","Bed & mattress ×2","Security / CCTV","Power backup","Laundry","Meals included","RO water filter"],"tenant":"Female only","promoted":false,"posted":"Just now","desc":"Fully furnished girls' PG with daily housekeeping, 3 meals a day, and high-speed Wi-Fi. Located close to Jayadeva Hospital and Silk Board, with easy access to BTM bus stand and metro connectivity (upcoming).","videoUrl":null,"city":"Bengaluru","listedBy":"Agent","fullAddress":"16th Cross, BTM Layout 2nd Stage, Bengaluru, 560076","googleMapsLink":"https://maps.app.goo.gl/ZoloStanzaBTMDemo","latitude":12.9166,"longitude":77.6101,"ownerName":"Sandeep Gowda","ownerPhone":"8123456789","ownerEmail":"sandeep.gowda@example.com","ownerAltPhone":null,"ownerAddress":"Zolo Stanza, BTM Layout 2nd Stage, Bengaluru, 560076","contactTime":"Any","negotiable":"no","availableFrom":"2026-07-01","images":["https://images.unsplash.com/photo-1505693416388-ac5ce068fe85","https://images.unsplash.com/photo-1522708323590-d24dbb6b0267","https://images.unsplash.com/photo-1540518614846-7eded433c457"],"pgGender":"Girls","pgRoomType":"Double Sharing","pgBathroom":"Shared","pgOccupancy":"2","pgTotalBeds":"24","pgMealsCost":3500,"pgRoomFurnishing":"Fully Furnished","pgKitchenAccess":"Shared Kitchen","pgAvailableFrom":"Immediate","pgNotice":"15 Days","pgMeals":"All 3 Meals","pgFoodType":"Veg + Non-veg","pgGateTime":"10 PM","pgVisitorPolicy":"Lobby Only","pgNonVeg":"No","pgPets":"No"}
+  {"id":101,"type":"Rent","verified":true,"title":"Sobha Dream Acres, Panathur","location":"Panathur, Near Sobha Dream Acres","price":32000,"deposit":96000,"maintenance":2500,"escalation":5,"electricityIncluded":"No","waterCharge":"Included","propertyType":"Apartment","bhk":"2 BHK","area":"1180","furnishing":"Semi-Furnished","floor":"6th of 14","age":"1-5 Years","bathrooms":2,"lift":true,"carpark":true,"bikepark":true,"facing":"East","amenities":["Wi-Fi","AC ×2","Washing machine","Refrigerator","Wardrobe / Cupboards ×2","Lift / Elevator","Gym / Pool","Security / CCTV","Power backup","RO water filter"],"tenant":"Family","promoted":false,"posted":"Just now","desc":"Spacious 2 BHK in a well-maintained gated community close to ORR and major tech parks. Semi-furnished with modular kitchen, ample natural light, and 24/7 security. Walking distance to schools, supermarkets, and bus stops.","videoUrl":"https://youtube.com/watch?v=demo-rent-101","city":"Bengaluru","listedBy":"Owner","fullAddress":"Block C, Sobha Dream Acres, Panathur Main Road, Bengaluru, 560103","googleMapsLink":"https://maps.app.goo.gl/Panathur2BHKDemo","latitude":12.9395,"longitude":77.6974,"ownerName":"Arvind Rao","ownerPhone":"9611459960","ownerEmail":"arvind.rao@example.com","ownerAltPhone":"9845098765","ownerAddress":"Sobha Dream Acres, Panathur, Bengaluru, 560103","contactTime":"Evening","negotiable":"yes","availableFrom":"2026-07-15","images":["https://images.unsplash.com/photo-1493809842364-78817add7ffb","https://images.unsplash.com/photo-1502672260266-1c1ef2d93688","https://images.unsplash.com/photo-1484154218962-a197022b5858"],"noticePeriod":"1 Month","leaseDuration":"11 Months","petsAllowed":"Restricted","nonVegAllowed":"Yes","pipedGas":"Yes"},
+  {"id":102,"type":"Lease","verified":true,"title":"Prestige Falcon City, Konanakunte","location":"Konanakunte, Kanakapura Road","price":0,"deposit":0,"maintenance":3000,"escalation":null,"electricityIncluded":"Shared meter","waterCharge":"Included","propertyType":"Villa","bhk":"3 BHK","area":"1850","furnishing":"Unfurnished","floor":"G of 2","age":"5-10 Years","bathrooms":3,"lift":false,"carpark":true,"bikepark":true,"facing":"North-East","amenities":["Wardrobe / Cupboards","Balcony / Terrace ×2","Gym / Pool","Security / CCTV","Power backup","Garden","Piped gas connection"],"tenant":"Family","promoted":true,"posted":"Just now","desc":"Premium independent villa available on long-term lease in a gated layout. Private garden, dedicated parking for two cars, and clubhouse access. Ideal for families seeking a long-term residence with low recurring outgoings.","videoUrl":"https://youtube.com/watch?v=demo-lease-102","city":"Bengaluru","listedBy":"Broker","fullAddress":"Villa 47, Prestige Falcon City, Konanakunte Cross, Kanakapura Road, Bengaluru, 560062","googleMapsLink":"https://maps.app.goo.gl/FalconCityVillaDemo","latitude":12.8783,"longitude":77.5497,"ownerName":"Lakshmi Narayanan","ownerPhone":"9611459960","ownerEmail":"lakshmi.n@example.com","ownerAltPhone":"9900445566","ownerAddress":"Prestige Falcon City, Konanakunte, Bengaluru, 560062","contactTime":"Afternoon","negotiable":"no","availableFrom":"2026-08-01","images":["https://images.unsplash.com/photo-1564013799919-ab600027ffc6","https://images.unsplash.com/photo-1576941089067-2de3c901e126","https://images.unsplash.com/photo-1600596542815-ffad4c1539a9"],"leaseAmount":4500000,"leaseMonthlyRent":0,"leaseMaintenance":3000,"leaseDurationVal":"3 Years","leaseType":"Residential","lockInPeriod":"1 Year","leaseAvailFrom":"Within 1 Month","leaseNotice":"2 Months","rentEscalation":"10% per year","leasePets":"Yes","leaseNonVeg":"Yes"},
+  {"id":103,"type":"PG","verified":false,"title":"Zolo Stanza, BTM Layout","location":"BTM Layout 2nd Stage","price":11500,"deposit":11500,"maintenance":null,"escalation":null,"electricityIncluded":"Yes","waterCharge":"Included","propertyType":null,"bhk":"Studio","area":null,"furnishing":"Fully Furnished","floor":"3rd of 4","age":null,"bathrooms":1,"lift":false,"carpark":false,"bikepark":false,"facing":"North","amenities":["Wi-Fi","AC","Washing machine","Refrigerator","Bed & mattress ×2","Security / CCTV","Power backup","Laundry","Meals included","RO water filter"],"tenant":"Female only","promoted":false,"posted":"Just now","desc":"Fully furnished girls' PG with daily housekeeping, 3 meals a day, and high-speed Wi-Fi. Located close to Jayadeva Hospital and Silk Board, with easy access to BTM bus stand and metro connectivity (upcoming).","videoUrl":null,"city":"Bengaluru","listedBy":"Agent","fullAddress":"16th Cross, BTM Layout 2nd Stage, Bengaluru, 560076","googleMapsLink":"https://maps.app.goo.gl/ZoloStanzaBTMDemo","latitude":12.9166,"longitude":77.6101,"ownerName":"Sandeep Gowda","ownerPhone":"9611459960","ownerEmail":"sandeep.gowda@example.com","ownerAltPhone":null,"ownerAddress":"Zolo Stanza, BTM Layout 2nd Stage, Bengaluru, 560076","contactTime":"Any","negotiable":"no","availableFrom":"2026-07-01","images":["https://images.unsplash.com/photo-1505693416388-ac5ce068fe85","https://images.unsplash.com/photo-1522708323590-d24dbb6b0267","https://images.unsplash.com/photo-1540518614846-7eded433c457"],"pgGender":"Girls","pgRoomType":"Double Sharing","pgBathroom":"Shared","pgOccupancy":"2","pgTotalBeds":"24","pgMealsCost":3500,"pgRoomFurnishing":"Fully Furnished","pgKitchenAccess":"Shared Kitchen","pgAvailableFrom":"Immediate","pgNotice":"15 Days","pgMeals":"All 3 Meals","pgFoodType":"Veg + Non-veg","pgGateTime":"10 PM","pgVisitorPolicy":"Lobby Only","pgNonVeg":"No","pgPets":"No"}
 ];
 
 
@@ -2663,25 +2844,7 @@ let searchQuery = '';
 /* ═══════════════════════════════════════════════
    RENDER
 ═══════════════════════════════════════════════ */
-function getFiltered() {
-  let list = PROPERTIES.filter(p => {
-    if (currentTab !== 'All' && p.type !== currentTab) return false;
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      if (!p.title.toLowerCase().includes(q) &&
-          !p.location.toLowerCase().includes(q) &&
-          !p.bhk.toLowerCase().includes(q)) return false;
-    }
-    return true;
-  });
-
-  if (currentSort === 'price-asc') list.sort((a,b) => a.price - b.price);
-  else if (currentSort === 'price-desc') list.sort((a,b) => b.price - a.price);
-  else if (currentSort === 'promoted') list.sort((a,b) => (b.promoted?1:0) - (a.promoted?1:0));
-  else list.sort((a,b) => a.id - b.id);
-
-  return list;
-}
+/* getFiltered() defined in FILTERS section below */
 
 function injectPaginationDividers(arr) {
   let html = '';
@@ -3258,6 +3421,8 @@ function switchTab(el) {
   el.classList.add('active');
   currentTab = el.dataset.tab;
   syncMobileTab();
+  syncFdBar();
+  closeAllFd();
   renderCards();
 }
 
@@ -3266,6 +3431,8 @@ function switchTabMobile(el) {
   el.classList.add('active');
   currentTab = el.dataset.tab;
   syncDesktopTab();
+  syncFdBar();
+  closeAllFd();
   renderCards();
 }
 
@@ -3289,33 +3456,308 @@ function handleSearch() {
   renderCards();
 }
 
+
 /* ═══════════════════════════════════════════════
-   FILTERS
+   FILTERS — Dropdown system
 ═══════════════════════════════════════════════ */
-function toggleChip(el) { el.classList.toggle('active') }
-function toggleOpt(el) { el.classList.toggle('sel') }
 
-function toggleFilters() {
-  const p = document.getElementById('filterPanel');
-  p.classList.toggle('open');
+/* Map each dropdown id → which data-filter keys live inside it */
+const FD_GROUPS = {
+  type:       ['propertyType'],
+  bhk:        ['bhk'],
+  rent:       [],   // range-only
+  deposit:    [],   // range-only
+  lease:      [],   // range-only
+  furnishing: ['furnishing'],
+  tenant:     ['tenant'],
+  facing:     ['facing'],
+  bathrooms:  ['bathrooms'],
+  age:        ['age'],
+  amenities:  ['amenities'],
+  facilities: ['lift','carpark','bikepark','verified'],
+  pgGender:   ['pgGender'],
+  pgRoom:     ['pgRoomType'],
+  pgMeals:    ['pgMeals','pgFoodType'],
+  pgRent:     [],   // range-only
+};
+
+let openFd = null;
+
+function syncFdBar() {
+  const bar = document.getElementById('filterDdBar');
+  if (!bar) return;
+  bar.classList.remove('tab-all','tab-rent','tab-lease','tab-pg');
+  bar.classList.add('tab-' + currentTab.toLowerCase());
 }
 
-function clearFilters() {
-  document.querySelectorAll('.fp-opt.sel').forEach(o => o.classList.remove('sel'));
-  document.getElementById('priceRange').value = 50000;
-  updatePriceLabel(50000);
+/* Toggle a dropdown open/closed */
+function toggleFd(id, btnEl) {
+  const pop = document.getElementById('fdp-' + id);
+  if (!pop) return;
+  const isOpen = pop.classList.contains('open');
+  closeAllFd();
+  if (!isOpen) {
+    // Move pop to body so it escapes overflow:hidden/auto containers
+    if (pop.parentElement !== document.body) document.body.appendChild(pop);
+
+    const rect = btnEl.getBoundingClientRect();
+    const popW = 240; // min-width estimate; adjust after open
+    let left = rect.left;
+    // If it would overflow right edge, pin to right of button instead
+    if (left + popW > window.innerWidth - 12) left = Math.max(8, rect.right - popW);
+
+    pop.style.top  = (rect.bottom + 6) + 'px';
+    pop.style.left = left + 'px';
+    pop.style.right = '';
+
+    pop.classList.add('open');
+    btnEl.classList.add('open');
+    openFd = id;
+
+    // After render, re-check if it overflows right
+    requestAnimationFrame(() => {
+      const pr = pop.getBoundingClientRect();
+      if (pr.right > window.innerWidth - 8) {
+        pop.style.left = Math.max(8, window.innerWidth - pr.width - 8) + 'px';
+      }
+    });
+  }
 }
 
-function applyFilters() {
-  document.getElementById('filterPanel').classList.remove('open');
-  showToast('Filters applied');
+function closeAllFd() {
+  document.querySelectorAll('.fd-pop.open').forEach(p => p.classList.remove('open'));
+  document.querySelectorAll('.fd-btn.open').forEach(b => b.classList.remove('open'));
+  openFd = null;
+}
+
+/* Toggle a pill option and update its dropdown badge */
+function toggleOpt(el, group) {
+  el.classList.toggle('sel');
+  if (group) refreshFdBtn(group);
+}
+
+/* Refresh a button's badge based on selected opts + range state */
+function refreshFdBtn(id) {
+  const btn  = document.getElementById('fdb-' + id);
+  const badge = document.getElementById('fdbc-' + id);
+  if (!btn) return;
+
+  const keys = FD_GROUPS[id] || [];
+  let selCount = 0;
+  keys.forEach(k => {
+    selCount += document.querySelectorAll(`#fdp-${id} .fp-opt[data-filter="${k}"].sel`).length;
+  });
+
+  // Range-based active check
+  let rangeActive = false;
+  if (id === 'rent') {
+    const r = document.getElementById('rentRange');
+    rangeActive = r && parseInt(r.value) < 150000;
+  } else if (id === 'deposit') {
+    const r = document.getElementById('depositRange');
+    rangeActive = r && parseInt(r.value) < 500000;
+  } else if (id === 'lease') {
+    const r = document.getElementById('leaseRange');
+    rangeActive = r && parseInt(r.value) < 10000000;
+  } else if (id === 'pgRent') {
+    const r = document.getElementById('pgRentRange');
+    rangeActive = r && parseInt(r.value) < 30000;
+  }
+
+  const hasAny = selCount > 0 || rangeActive;
+  btn.classList.toggle('has-sel', hasAny);
+
+  if (badge) {
+    if (selCount > 0) {
+      badge.textContent = selCount;
+      badge.style.display = '';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+  refreshTotalBadge();
+}
+
+function refreshTotalBadge() {
+  const total = document.querySelectorAll('#filterDdBar .fp-opt.sel').length +
+    (document.getElementById('rentRange') && parseInt(document.getElementById('rentRange').value) < 150000 ? 1 : 0) +
+    (document.getElementById('depositRange') && parseInt(document.getElementById('depositRange').value) < 500000 ? 1 : 0) +
+    (document.getElementById('leaseRange') && parseInt(document.getElementById('leaseRange').value) < 10000000 ? 1 : 0) +
+    (document.getElementById('pgRentRange') && parseInt(document.getElementById('pgRentRange').value) < 30000 ? 1 : 0);
+
+  const badge = document.getElementById('fdTotalBadge');
+  const clearBtn = document.getElementById('fdClearAll');
+  if (badge) { badge.textContent = total; badge.classList.toggle('show', total > 0); }
+  if (clearBtn) clearBtn.style.display = total > 0 ? '' : 'none';
+}
+
+/* Apply = close popover and rerender */
+function applyFd(id) {
+  refreshFdBtn(id);
+  closeAllFd();
   renderCards();
 }
 
-function updatePriceLabel(v) {
-  const n = parseInt(v);
-  document.getElementById('priceLabel').textContent = n >= 100000 ? '₹1L' : n >= 1000 ? '₹'+Math.round(n/1000)+'k' : '₹'+n;
+/* Clear a single dropdown */
+function clearFd(id) {
+  const pop = document.getElementById('fdp-' + id);
+  if (pop) pop.querySelectorAll('.fp-opt.sel').forEach(o => o.classList.remove('sel'));
+  if (id === 'rent')    { const r = document.getElementById('rentRange');    if(r){r.value=150000; updateRentLabel(150000);} }
+  if (id === 'deposit') { const r = document.getElementById('depositRange'); if(r){r.value=500000; updateDepositLabel(500000);} }
+  if (id === 'lease')   { const r = document.getElementById('leaseRange');   if(r){r.value=10000000; updateLeaseLabel(10000000);} }
+  if (id === 'pgRent')  { const r = document.getElementById('pgRentRange'); if(r){r.value=30000; updatePgRentLabel(30000);} }
+  refreshFdBtn(id);
+  renderCards();
 }
+
+/* Clear all filters */
+function clearFilters() {
+  document.querySelectorAll('#filterDdBar .fp-opt.sel').forEach(o => o.classList.remove('sel'));
+  const rr = document.getElementById('rentRange');    if(rr){rr.value=150000; updateRentLabel(150000);}
+  const dr = document.getElementById('depositRange'); if(dr){dr.value=500000; updateDepositLabel(500000);}
+  const lr = document.getElementById('leaseRange');   if(lr){lr.value=10000000; updateLeaseLabel(10000000);}
+  const pr = document.getElementById('pgRentRange'); if(pr){pr.value=30000; updatePgRentLabel(30000);}
+  Object.keys(FD_GROUPS).forEach(id => refreshFdBtn(id));
+  closeAllFd();
+  renderCards();
+}
+
+function fmtRupee(n) {
+  if (n >= 10000000) return '₹' + (n/10000000).toFixed(1).replace('.0','') + 'Cr';
+  if (n >= 100000)   return '₹' + (n/100000).toFixed(1).replace('.0','') + 'L';
+  if (n >= 1000)     return '₹' + Math.round(n/1000) + 'k';
+  return '₹' + n;
+}
+function updateRentLabel(v) {
+  const n=parseInt(v), el=document.getElementById('rentRangeLabel');
+  if(el) el.textContent = n>=150000?'Any':fmtRupee(n)+'/mo';
+  const btn=document.getElementById('fdb-rent-label');
+  if(btn) btn.textContent = n>=150000?'Rent':'Rent: ≤'+fmtRupee(n);
+  refreshFdBtn('rent');
+}
+function updateDepositLabel(v) {
+  const n=parseInt(v), el=document.getElementById('depositRangeLabel');
+  if(el) el.textContent = n>=500000?'Any':fmtRupee(n);
+  const btn=document.getElementById('fdb-deposit-label');
+  if(btn) btn.textContent = n>=500000?'Deposit':'Deposit: ≤'+fmtRupee(n);
+  refreshFdBtn('deposit');
+}
+function updateLeaseLabel(v) {
+  const n=parseInt(v), el=document.getElementById('leaseRangeLabel');
+  if(el) el.textContent = n>=10000000?'Any':fmtRupee(n);
+  const btn=document.getElementById('fdb-lease-label');
+  if(btn) btn.textContent = n>=10000000?'Lease Amt':'Lease: ≤'+fmtRupee(n);
+  refreshFdBtn('lease');
+}
+function updatePgRentLabel(v) {
+  const n=parseInt(v), el=document.getElementById('pgRentLabel');
+  if(el) el.textContent = n>=30000?'Any':fmtRupee(n)+'/mo';
+  const btn=document.getElementById('fdb-pgRent-label');
+  if(btn) btn.textContent = n>=30000?'PG Rent':'PG Rent: ≤'+fmtRupee(n);
+  refreshFdBtn('pgRent');
+}
+
+/* Close dropdowns on outside click */
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.fd-btn') && !e.target.closest('.fd-pop')) closeAllFd();
+});
+window.addEventListener('scroll', closeAllFd, true);
+window.addEventListener('resize', closeAllFd);
+
+/* ── Read all active filter state ── */
+function getFilterState() {
+  const state = {};
+  document.querySelectorAll('#filterDdBar .fp-opt.sel').forEach(el => {
+    const key = el.dataset.filter, val = el.dataset.val;
+    if (!key) return;
+    if (!state[key]) state[key] = [];
+    state[key].push(val);
+  });
+  const rr = document.getElementById('rentRange');
+  if (rr && parseInt(rr.value) < 150000) state._maxRent = parseInt(rr.value);
+  const dr = document.getElementById('depositRange');
+  if (dr && parseInt(dr.value) < 500000) state._maxDeposit = parseInt(dr.value);
+  const lr = document.getElementById('leaseRange');
+  if (lr && parseInt(lr.value) < 10000000) state._maxLease = parseInt(lr.value);
+  const pr = document.getElementById('pgRentRange');
+  if (pr && parseInt(pr.value) < 30000) state._maxPgRent = parseInt(pr.value);
+  return state;
+}
+
+function getFiltered() {
+  const fs = getFilterState();
+  const hasFilters = Object.keys(fs).length > 0;
+
+  let list = PROPERTIES.filter(p => {
+    if (currentTab !== 'All' && p.type !== currentTab) return false;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      if (!p.title.toLowerCase().includes(q) &&
+          !p.location.toLowerCase().includes(q) &&
+          !(p.bhk||'').toLowerCase().includes(q)) return false;
+    }
+    if (!hasFilters) return true;
+
+    if (fs.propertyType && !fs.propertyType.includes(p.propertyType)) return false;
+    if (fs.bhk) {
+      const bhkVal = (p.bhk||'').trim();
+      const match = fs.bhk.some(b => b==='4 BHK' ? parseInt(bhkVal)>=4 : bhkVal===b);
+      if (!match) return false;
+    }
+    if (fs.furnishing && !fs.furnishing.includes(p.furnishing)) return false;
+    if (fs.tenant) {
+      if (!fs.tenant.some(t => t==='Any' || p.tenant===t || p.tenant==='Any')) return false;
+    }
+    if (fs.facing && !fs.facing.includes(p.facing)) return false;
+    if (fs.bathrooms) {
+      const baths = parseInt(p.bathrooms)||0;
+      if (!fs.bathrooms.some(b => parseInt(b)===4 ? baths>=4 : baths===parseInt(b))) return false;
+    }
+    if (fs.age && !fs.age.includes(p.age)) return false;
+    if (fs.lift && fs.lift.includes('true') && !p.lift) return false;
+    if (fs.carpark && fs.carpark.includes('true') && !p.carpark) return false;
+    if (fs.bikepark && fs.bikepark.includes('true') && !p.bikepark) return false;
+    if (fs.verified && fs.verified.includes('true') && !p.verified) return false;
+    if (fs.amenities) {
+      const pAm = (p.amenities||[]).join(' ').toLowerCase();
+      if (!fs.amenities.every(a => {
+        if (a==='Parking') return p.carpark||p.bikepark;
+        if (a==='AC') return pAm.includes('ac');
+        if (a==='Gym / Pool') return pAm.includes('gym')||pAm.includes('pool');
+        if (a==='Security / CCTV') return pAm.includes('security')||pAm.includes('cctv');
+        return pAm.includes(a.toLowerCase());
+      })) return false;
+    }
+    if (p.type==='Rent') {
+      if (fs._maxRent!==undefined && p.price>fs._maxRent) return false;
+      if (fs._maxDeposit!==undefined && p.deposit>fs._maxDeposit) return false;
+    }
+    if (p.type==='Lease') {
+      if (fs._maxLease!==undefined && (p.leaseAmount||0)>fs._maxLease) return false;
+    }
+    if (p.type==='PG') {
+      if (fs.pgGender && !fs.pgGender.includes(p.pgGender)) return false;
+      if (fs.pgRoomType && !fs.pgRoomType.includes(p.pgRoomType)) return false;
+      if (fs.pgMeals && !fs.pgMeals.includes(p.pgMeals)) return false;
+      if (fs.pgFoodType && !fs.pgFoodType.includes(p.pgFoodType)) return false;
+      if (fs._maxPgRent!==undefined && p.price>fs._maxPgRent) return false;
+    }
+    return true;
+  });
+
+  if (currentSort==='price-asc') list.sort((a,b)=>a.price-b.price);
+  else if (currentSort==='price-desc') list.sort((a,b)=>b.price-a.price);
+  else if (currentSort==='promoted') list.sort((a,b)=>(b.promoted?1:0)-(a.promoted?1:0));
+  else list.sort((a,b)=>a.id-b.id);
+  return list;
+}
+
+/* stubs so nothing breaks if old references exist */
+function toggleChip(){}
+function toggleFilters(){}
+function applyFilters(){ closeAllFd(); renderCards(); }
+
+
 
 /* ═══════════════════════════════════════════════
    SORT
@@ -3944,6 +4386,9 @@ AM_LIST.forEach(([, , unitId]) => {
 
 /* ── Ad Banner ── */
 document.addEventListener('DOMContentLoaded', function() {
+  syncFdBar();
+  updateRentLabel(150000); updateDepositLabel(500000);
+  updateLeaseLabel(10000000); updatePgRentLabel(30000);
   const track = document.getElementById('adTrack');
   const dots = document.querySelectorAll('#adDots .ad-dot');
   if (!track || !dots.length) return;
