@@ -1189,6 +1189,17 @@ ul{list-style:none}
   cursor:pointer;flex-shrink:0;border:none;
 }
 .refer-copy-btn:hover{background:#fbdde2}
+.refer-reward-badge{
+  display:flex;align-items:flex-start;gap:8px;
+  background:#fffbeb;border:1px solid #fde68a;border-radius:10px;
+  padding:10px 12px;margin-bottom:16px;
+  font-size:12.5px;color:#92400e;font-weight:500;line-height:1.4;
+}
+.refer-tnc{
+  background:var(--brand-light);border:1.5px solid var(--brand);border-radius:10px;
+  padding:12px 14px;margin-bottom:16px;
+  font-size:13px;color:var(--text);line-height:1.6;text-align:center;
+}
 
 /* ─── Help & Support Modal ─────────────────────── */
 .help-search{margin-bottom:18px}
@@ -2557,32 +2568,27 @@ ul{list-style:none}
     </div>
 
     <div class="refer-hero">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L9 9l-7 1 5 5-1.5 7L12 18l6.5 4L17 15l5-5-7-1z"/></svg>
-      <div class="refer-hero-title">Give ₹200, Get ₹200</div>
-      <div class="refer-hero-sub">Invite friends to Quatar. When they list or rent their first property, you both earn rewards.</div>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M19 8l2 2-2 2M21 10h-4"/></svg>
+      <div class="refer-hero-title">Refer a Tenant, Earn &#8377;1,000</div>
+      <div class="refer-hero-sub">Know someone house-hunting in Bengaluru? Send them your link. If they move in through Quatar, you get <b>&#8377;1,000</b> — no paperwork, no hassle.</div>
     </div>
 
     <div class="refer-steps">
       <div class="refer-step">
         <div class="refer-step-num">1</div>
-        <div class="refer-step-text">Share your <b>referral code</b> with friends &amp; family.</div>
+        <div class="refer-step-text"><b>Share</b> your referral link with anyone looking for a rental.</div>
       </div>
       <div class="refer-step">
         <div class="refer-step-num">2</div>
-        <div class="refer-step-text">They sign up and <b>post or book a property</b> using your code.</div>
-      </div>
-      <div class="refer-step">
-        <div class="refer-step-num">3</div>
-        <div class="refer-step-text">You both get <b>₹200 reward credit</b> — simple as that.</div>
+        <div class="refer-step-text">They <b>book &amp; move in</b> via Quatar — you get <b>&#8377;1,000 in your UPI on move-in day</b>. Refer more, earn more — no limit.</div>
       </div>
     </div>
 
-    <div class="refer-code-box">
-      <div class="refer-code" id="referCodeText">QUATAR-GUEST24</div>
-      <button class="refer-copy-btn" onclick="copyReferralCode()">Copy</button>
+    <div class="refer-tnc">
+      <span>Applicable only when the tenant moves in via a <b>commission-based booking</b>. Earn <b style="color:var(--brand)">&#8377;1,000 per successful referral</b>, paid on move-in day — <b>unlimited</b>.</span>
     </div>
 
-    <button class="form-submit" onclick="shareReferralCode()">Share invite link</button>
+    <button class="form-submit" onclick="shareReferralCode()">Share referral link</button>
   </div>
 </div>
 
@@ -2917,16 +2923,6 @@ function renderCards() {
   } else {
     document.getElementById('normalDivider').style.display = 'none';
     ng.innerHTML = '';
-  }
-
-  // ── Deep-link: auto-open property from URL param (once only) ──
-  if (!window._dlHandled) {
-    window._dlHandled = true;
-    const _dlParam = new URLSearchParams(window.location.search).get('property');
-    if (_dlParam) {
-      const _dlProp = PROPERTIES.find(x => String(x.id) === _dlParam);
-      if (_dlProp) openDetail(_dlProp.id);
-    }
   }
 }
 
@@ -4399,7 +4395,7 @@ function copyReferralCode() {
 }
 function shareReferralCode() {
   const code = document.getElementById('referCodeText').textContent.trim();
-  const text = 'Join me on Quatar and find your next home in Bengaluru! Use my code ' + code + ' to get a reward.';
+  const text = 'Looking for a rental in Bengaluru? Check out Quatar — they handle everything from listings to agreements. Use my referral code ' + code + ' when you book. Once you move in, I earn ₹1,000 and you get priority support!';
   if (navigator.share) {
     navigator.share({ title: 'Quatar', text: text }).catch(() => {});
   } else {
@@ -4568,7 +4564,12 @@ AM_LIST.forEach(([, , unitId]) => {
 document.addEventListener('DOMContentLoaded', function() {
   syncFdBar();
 
-  // (deep-link handled inside renderCards after PROPERTIES is ready)
+  // ── Deep-link: auto-open property from URL param ──
+  const _dlParam = new URLSearchParams(window.location.search).get('property');
+  if (_dlParam) {
+    const _dlProp = PROPERTIES.find(x => String(x.id) === _dlParam);
+    if (_dlProp) openPropertyDetail(_dlProp.id);
+  }
 
   const track = document.getElementById('adTrack');
   const dots = document.querySelectorAll('#adDots .ad-dot');
