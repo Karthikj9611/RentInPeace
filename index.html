@@ -30,7 +30,7 @@
   --shadow-md:0 4px 16px rgba(0,0,0,.10);
   --nav-h:60px;
   --filter-h:52px;
-  --search-h:56px;
+  --search-h:64px;
 }
 html{scroll-behavior:smooth}
 body{
@@ -145,6 +145,7 @@ ul{list-style:none}
 
 /* ─── Search bar ───────────────────────────────── */
 .searchbar-wrap{
+  position:sticky;top:var(--nav-h);z-index:99;
   background:var(--bg);
   border-bottom:1px solid var(--border);
   padding:10px 20px;
@@ -178,14 +179,14 @@ ul{list-style:none}
 
 /* ─── Filter Dropdown Bar ───────────────────────── */
 .filter-dd-bar{
+  position:sticky;top:calc(var(--nav-h) + var(--search-h));z-index:98;
   background:var(--bg);
   border-bottom:1px solid var(--border);
   display:flex;align-items:center;
   gap:6px;padding:8px 16px;
-  overflow-x:auto;scrollbar-width:none;
-  flex-wrap:nowrap;
+  flex-wrap:wrap;
+  row-gap:8px;
 }
-.filter-dd-bar::-webkit-scrollbar{display:none}
 .fd-btn{
   display:inline-flex;align-items:center;gap:5px;
   border:1px solid var(--border-2);border-radius:8px;
@@ -3427,12 +3428,33 @@ function toggleMenuPanel() {
 /* ═══════════════════════════════════════════════
    TABS
 ═══════════════════════════════════════════════ */
+/* When switching tabs, any filter dropdown that becomes hidden for the new
+   tab (e.g. "Lease Amt" when moving to the Rent tab) must have its selected
+   options cleared. Otherwise the selection stays active and silently affects
+   results / the total-selected badge while being invisible to the user. */
+function clearFiltersHiddenByTab() {
+  document.querySelectorAll('.fd-btn').forEach(btn => {
+    const tabClass = 'fd-' + currentTab.toLowerCase();
+    const visible = currentTab === 'All' || btn.classList.contains(tabClass);
+    if (visible) return;
+    const id = btn.id.replace(/^fdb-/, '');
+    const pop = document.getElementById('fdp-' + id);
+    if (!pop) return;
+    const hadSel = pop.querySelectorAll('.fp-opt.sel').length > 0;
+    if (hadSel) {
+      pop.querySelectorAll('.fp-opt.sel').forEach(o => o.classList.remove('sel'));
+      refreshFdBtn(id);
+    }
+  });
+}
+
 function switchTab(el) {
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   currentTab = el.dataset.tab;
   syncMobileTab();
   syncFdBar();
+  clearFiltersHiddenByTab();
   closeAllFd();
   renderCards();
 }
@@ -3443,6 +3465,7 @@ function switchTabMobile(el) {
   currentTab = el.dataset.tab;
   syncDesktopTab();
   syncFdBar();
+  clearFiltersHiddenByTab();
   closeAllFd();
   renderCards();
 }
@@ -3839,7 +3862,7 @@ function getFiltered() {
       if (!fs.bathrooms.some(b => parseInt(b)===4 ? baths>=4 : baths===parseInt(b))) return false;
     }
     if (fs.age && !fs.age.includes(p.age)) return false;
-    if (fs.negotiable && p.negotiable && !fs.negotiable.includes(p.negotiable)) return false;
+    if (fs.negotiable && !fs.negotiable.includes(p.negotiable)) return false;
     if (fs._availBucket) {
       const days = fdDaysFromToday(p.availableFrom);
       if (days === null || !fdValueInBuckets(Math.max(days, 0), fs._availBucket)) return false;
@@ -3849,13 +3872,17 @@ function getFiltered() {
     if (fs.bikepark && fs.bikepark.includes('true') && !p.bikepark) return false;
     if (fs.verified && fs.verified.includes('true') && !p.verified) return false;
     if (fs.amenities) {
-      const pAm = (p.amenities||[]).join(' ').toLowerCase();
+      // Match against individual amenity entries (qty suffixes like " ×2" stripped)
+      // rather than a single joined string, so short tokens like "AC" can't
+      // false-positive match inside unrelated words such as "Terrace" or "backup".
+      const pAmList = (p.amenities||[]).map(a => String(a).replace(/\s*×\s*\d+\s*$/, '').trim().toLowerCase());
+      const hasToken = (needle) => pAmList.some(a => a === needle || a.split(/[\s/&]+/).includes(needle));
       if (!fs.amenities.every(a => {
         if (a==='Parking') return p.carpark||p.bikepark;
-        if (a==='AC') return pAm.includes('ac');
-        if (a==='Gym / Pool') return pAm.includes('gym')||pAm.includes('pool');
-        if (a==='Security / CCTV') return pAm.includes('security')||pAm.includes('cctv');
-        return pAm.includes(a.toLowerCase());
+        if (a==='AC') return hasToken('ac');
+        if (a==='Gym / Pool') return hasToken('gym')||hasToken('pool');
+        if (a==='Security / CCTV') return hasToken('security')||hasToken('cctv');
+        return pAmList.includes(a.toLowerCase());
       })) return false;
     }
     if (p.type==='Rent') {
@@ -3867,12 +3894,23 @@ function getFiltered() {
       if (fs._leaseBucket && !fdValueInBuckets(p.leaseAmount||0, fs._leaseBucket)) return false;
       if (fs._maintenanceBucket && !fdValueInBuckets(p.maintenance||p.leaseMaintenance||0, fs._maintenanceBucket)) return false;
     }
-    if (p.type==='PG') {
-      if (fs.pgGender && !fs.pgGender.includes(p.pgGender)) return false;
-      if (fs.pgRoomType && !fs.pgRoomType.includes(p.pgRoomType)) return false;
-      if (fs.pgMeals && !fs.pgMeals.includes(p.pgMeals)) return false;
-      if (fs.pgFoodType && !fs.pgFoodType.includes(p.pgFoodType)) return false;
-      if (fs._pgRentBucket && !fdValueInBuckets(p.price, fs._pgRentBucket)) return false;
+    // PG-only filters must exclude non-PG properties outright (checked unconditionally,
+    // not nested inside an `if (p.type==='PG')` gate, otherwise Rent/Lease rows would
+    // skip the check entirely and incorrectly pass through every PG filter).
+    if (fs.pgGender) {
+      if (p.type!=='PG' || !fs.pgGender.includes(p.pgGender)) return false;
+    }
+    if (fs.pgRoomType) {
+      if (p.type!=='PG' || !fs.pgRoomType.includes(p.pgRoomType)) return false;
+    }
+    if (fs.pgMeals) {
+      if (p.type!=='PG' || !fs.pgMeals.includes(p.pgMeals)) return false;
+    }
+    if (fs.pgFoodType) {
+      if (p.type!=='PG' || !fs.pgFoodType.includes(p.pgFoodType)) return false;
+    }
+    if (fs._pgRentBucket) {
+      if (p.type!=='PG' || !fdValueInBuckets(p.price, fs._pgRentBucket)) return false;
     }
     return true;
   });
