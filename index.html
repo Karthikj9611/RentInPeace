@@ -2918,6 +2918,16 @@ function renderCards() {
     document.getElementById('normalDivider').style.display = 'none';
     ng.innerHTML = '';
   }
+
+  // ── Deep-link: auto-open property from URL param (once only) ──
+  if (!window._dlHandled) {
+    window._dlHandled = true;
+    const _dlParam = new URLSearchParams(window.location.search).get('property');
+    if (_dlParam) {
+      const _dlProp = PROPERTIES.find(x => String(x.id) === _dlParam);
+      if (_dlProp) openDetail(_dlProp.id);
+    }
+  }
 }
 
 function pageNumberButtons(section, page, totalPages) {
@@ -4284,9 +4294,9 @@ function openWhatsApp(propId) {
     showToast('Owner has not added a WhatsApp number for this listing');
     return;
   }
-  // assume 10-digit Indian mobile numbers; prefix country code if not already present
   const phone = rawPhone.length === 10 ? '91' + rawPhone : rawPhone;
-  const msg = `Hi, I'm interested in "${p.title}" (${p.location}) listed on Quatar. Is it still available?`;
+  const propertyUrl = `${window.location.origin}${window.location.pathname}?property=${p.id}`;
+  const msg = `Hi, I'm interested in "${p.title}" (${p.location}) listed on Quatar. Is it still available?\n\nView listing: ${propertyUrl}`;
   const url = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(msg);
   window.open(url, '_blank', 'noopener');
 }
@@ -4557,25 +4567,24 @@ AM_LIST.forEach(([, , unitId]) => {
 /* ── Ad Banner ── */
 document.addEventListener('DOMContentLoaded', function() {
   syncFdBar();
+
+  // (deep-link handled inside renderCards after PROPERTIES is ready)
+
   const track = document.getElementById('adTrack');
   const dots = document.querySelectorAll('#adDots .ad-dot');
   if (!track || !dots.length) return;
   const total = dots.length;
   let cur = 0, timer;
-
   function goTo(n) {
     cur = (n + total) % total;
     track.style.transform = 'translateX(-' + (cur * 100) + '%)';
     dots.forEach((d, i) => d.classList.toggle('active', i === cur));
   }
-
   function start() { timer = setInterval(() => goTo(cur + 1), 3500); }
   function stop()  { clearInterval(timer); }
-
   document.getElementById('adBanner').addEventListener('mouseenter', stop);
   document.getElementById('adBanner').addEventListener('mouseleave', start);
   dots.forEach((d, i) => d.addEventListener('click', e => { e.stopPropagation(); stop(); goTo(i); start(); }));
-
   start();
 });
 
