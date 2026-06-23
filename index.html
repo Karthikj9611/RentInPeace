@@ -1189,27 +1189,78 @@ ul{list-style:none}
   cursor:pointer;flex-shrink:0;border:none;
 }
 .refer-copy-btn:hover{background:#fbdde2}
-.refer-reward-badge{
-  display:flex;align-items:flex-start;gap:8px;
-  background:#fffbeb;border:1px solid #fde68a;border-radius:10px;
-  padding:10px 12px;margin-bottom:16px;
-  font-size:12.5px;color:#92400e;font-weight:500;line-height:1.4;
+
+/* ─── Our Charges Modal ─────────────────────── */
+.charges-hero{
+  text-align:center;padding:20px 10px 16px;
+  background:linear-gradient(135deg,var(--brand-light) 0%,#fff 100%);
+  border-radius:var(--radius-lg);margin-bottom:16px;
 }
-.refer-tnc{
-  background:var(--brand-light);border:1.5px solid var(--brand);border-radius:10px;
-  padding:12px 14px;margin-bottom:16px;
-  font-size:13px;color:var(--text);line-height:1.6;text-align:center;
+.charges-hero svg{width:40px;height:40px;stroke:var(--brand);fill:none;stroke-width:1.5;margin:0 auto 10px;display:block}
+.charges-hero-title{font-size:16px;font-weight:700;color:var(--text)}
+.charges-hero-sub{font-size:12.5px;color:var(--text-2);margin-top:5px;line-height:1.5}
+.charges-total-badge{
+  display:flex;flex-direction:column;align-items:center;
+  background:var(--brand);color:#fff;border-radius:14px;
+  padding:14px 20px;margin-bottom:20px;text-align:center;
+}
+.charges-total-label{font-size:11px;font-weight:600;opacity:.85;text-transform:uppercase;letter-spacing:.05em}
+.charges-total-amount{font-size:26px;font-weight:800;margin:4px 0 2px}
+.charges-total-sub{font-size:11.5px;opacity:.8}
+.charges-steps{display:flex;flex-direction:column;gap:0;margin-bottom:20px}
+.charges-step{display:flex;gap:14px;align-items:flex-start}
+.charges-step-left{display:flex;flex-direction:column;align-items:center;padding-top:2px}
+.charges-step-circle{
+  width:30px;height:30px;border-radius:50%;flex-shrink:0;
+  background:var(--brand);color:#fff;font-size:13px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+.charges-step-line{width:2px;flex:1;background:var(--border-2);margin:6px 0;min-height:30px}
+.charges-step-body{padding-bottom:20px;flex:1}
+.charges-step-tag{
+  display:inline-block;font-size:10.5px;font-weight:700;
+  color:var(--brand);background:var(--brand-light);
+  padding:3px 8px;border-radius:20px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;
+}
+.charges-step-amount{font-size:20px;font-weight:800;color:var(--text);margin-bottom:6px}
+.charges-step-desc{font-size:12.5px;color:var(--text-2);line-height:1.6}
+.charges-includes-title{font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.charges-includes{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.charges-include-item{
+  display:flex;align-items:center;gap:10px;
+  font-size:13px;color:var(--text);
+}
+.charges-include-item svg{width:16px;height:16px;stroke:#16a34a;fill:none;stroke-width:2.5;flex-shrink:0}
+.charges-note{
+  display:flex;align-items:flex-start;gap:7px;
+  background:var(--bg-2);border-radius:8px;
+  padding:10px 12px;margin-bottom:16px;
+  font-size:11.5px;color:var(--text-3);line-height:1.5;
 }
 
 /* ─── Help & Support Modal ─────────────────────── */
-.help-search{margin-bottom:18px}
-.help-cats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.help-search{margin-bottom:14px}
+.help-quick-strip{display:flex;gap:8px;margin-bottom:16px}
+.help-quick-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:9px 6px;border-radius:10px;border:1.5px solid var(--border);
+  font-size:12.5px;font-weight:600;color:var(--text);cursor:pointer;
+  text-decoration:none;transition:border-color .12s,background .12s;
+}
+.help-quick-btn svg{width:15px;height:15px;stroke:var(--brand);fill:none;stroke-width:2;flex-shrink:0}
+.help-quick-btn:hover{border-color:var(--brand);background:var(--brand-light)}
+.help-quick-wa{border-color:#c3efd4}
+.help-quick-wa svg{stroke:#25D366}
+.help-quick-wa:hover{border-color:#25D366;background:#e8faef}
+.help-quick-mail svg{stroke:var(--brand)}
+.help-cats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px}
 .help-cat{
   display:flex;flex-direction:column;align-items:flex-start;gap:8px;
   padding:14px;border:1px solid var(--border);border-radius:var(--radius);
   cursor:pointer;transition:border-color .12s,background .12s;
 }
 .help-cat:hover{border-color:var(--brand);background:var(--brand-light)}
+.help-cat.active{border-color:var(--brand);background:var(--brand-light);}
 .help-cat svg{width:20px;height:20px;stroke:var(--brand);fill:none;stroke-width:1.7}
 .help-cat-label{font-size:12.5px;font-weight:600;color:var(--text)}
 .faq-item{border-bottom:1px solid var(--border)}
@@ -1225,7 +1276,7 @@ ul{list-style:none}
   font-size:12.5px;color:var(--text-2);line-height:1.6;
   max-height:0;overflow:hidden;transition:max-height .2s ease;
 }
-.faq-item.open .faq-a{max-height:200px;padding-bottom:13px}
+.faq-item.open .faq-a{max-height:300px;padding-bottom:13px}
 .help-contact-row{display:flex;gap:10px;margin-top:18px}
 
 /* ─── About Quatar Modal ───────────────────────── */
@@ -2568,27 +2619,118 @@ ul{list-style:none}
     </div>
 
     <div class="refer-hero">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M19 8l2 2-2 2M21 10h-4"/></svg>
-      <div class="refer-hero-title">Refer a Tenant, Earn &#8377;1,000</div>
-      <div class="refer-hero-sub">Know someone house-hunting in Bengaluru? Send them your link. If they move in through Quatar, you get <b>&#8377;1,000</b> — no paperwork, no hassle.</div>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L9 9l-7 1 5 5-1.5 7L12 18l6.5 4L17 15l5-5-7-1z"/></svg>
+      <div class="refer-hero-title">Give ₹200, Get ₹200</div>
+      <div class="refer-hero-sub">Invite friends to Quatar. When they list or rent their first property, you both earn rewards.</div>
     </div>
 
     <div class="refer-steps">
       <div class="refer-step">
         <div class="refer-step-num">1</div>
-        <div class="refer-step-text"><b>Share</b> your referral link with anyone looking for a rental.</div>
+        <div class="refer-step-text">Share your <b>referral code</b> with friends &amp; family.</div>
       </div>
       <div class="refer-step">
         <div class="refer-step-num">2</div>
-        <div class="refer-step-text">They <b>book &amp; move in</b> via Quatar — you get <b>&#8377;1,000 in your UPI on move-in day</b>. Refer more, earn more — no limit.</div>
+        <div class="refer-step-text">They sign up and <b>post or book a property</b> using your code.</div>
+      </div>
+      <div class="refer-step">
+        <div class="refer-step-num">3</div>
+        <div class="refer-step-text">You both get <b>₹200 reward credit</b> — simple as that.</div>
       </div>
     </div>
 
-    <div class="refer-tnc">
-      <span>Applicable only when the tenant moves in via a <b>commission-based booking</b>. Earn <b style="color:var(--brand)">&#8377;1,000 per successful referral</b>, paid on move-in day — <b>unlimited</b>.</span>
+    <div class="refer-code-box">
+      <div class="refer-code" id="referCodeText">QUATAR-GUEST24</div>
+      <button class="refer-copy-btn" onclick="copyReferralCode()">Copy</button>
     </div>
 
-    <button class="form-submit" onclick="shareReferralCode()">Share referral link</button>
+    <button class="form-submit" onclick="shareReferralCode()">Share invite link</button>
+  </div>
+</div>
+
+<!-- ─── Our Charges Modal ────────────────────── -->
+<div class="add-modal-overlay" id="chargesModal" role="dialog" aria-modal="true" aria-label="Our Charges">
+  <div class="add-modal" id="chargesModalBox" style="max-width:460px">
+    <div class="add-modal-header">
+      <div class="add-modal-title">Our Charges</div>
+      <button class="modal-close" style="position:static" onclick="closeChargesModal()" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- Hero -->
+    <div class="charges-hero">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/></svg>
+      <div class="charges-hero-title">One-time Brokerage Fee</div>
+      <div class="charges-hero-sub">We charge a transparent, one-time brokerage of <b>₹4,000 – ₹6,000</b> from the tenant. No recurring fees, no hidden charges.</div>
+    </div>
+
+    <!-- Total badge -->
+    <div class="charges-total-badge">
+      <div class="charges-total-label">Total Brokerage</div>
+      <div class="charges-total-amount">₹4,000 – ₹6,000</div>
+      <div class="charges-total-sub">One-time · Paid in 2 parts</div>
+    </div>
+
+    <!-- Steps -->
+    <div class="charges-steps">
+
+      <div class="charges-step">
+        <div class="charges-step-left">
+          <div class="charges-step-circle">1</div>
+          <div class="charges-step-line"></div>
+        </div>
+        <div class="charges-step-body">
+          <div class="charges-step-tag">Before Property Visit</div>
+          <div class="charges-step-amount">₹2,000</div>
+          <div class="charges-step-desc">Paid upfront before we shortlist and show you <b>4 properties</b> matching your exact requirements — location, budget, BHK, furnishing and more.</div>
+        </div>
+      </div>
+
+      <div class="charges-step">
+        <div class="charges-step-left">
+          <div class="charges-step-circle">2</div>
+        </div>
+        <div class="charges-step-body">
+          <div class="charges-step-tag">On Finalising a House</div>
+          <div class="charges-step-amount">₹2,000 – ₹4,000</div>
+          <div class="charges-step-desc">Paid on the day you like a property and make the <b>advance payment to the owner</b>. This completes the brokerage and we hand over full owner contact &amp; agreement support.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- What you get -->
+    <div class="charges-includes-title">What's included</div>
+    <div class="charges-includes">
+      <div class="charges-include-item">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Personalised shortlist of 4 matching properties
+      </div>
+      <div class="charges-include-item">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Accompanied property visits with our agent
+      </div>
+      <div class="charges-include-item">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Owner negotiation &amp; advance payment assistance
+      </div>
+      <div class="charges-include-item">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Rental agreement drafting &amp; registration support
+      </div>
+      <div class="charges-include-item">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Post move-in support for 30 days
+      </div>
+    </div>
+
+    <div class="charges-note">
+      <svg viewBox="0 0 24 24" width="13" height="13" style="stroke:var(--text-3);fill:none;stroke-width:2;flex-shrink:0;margin-top:2px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span>The ₹2,000 paid upfront is <b>non-refundable</b> once property visits are scheduled. The second part is collected only when you finalise a property.</span>
+    </div>
+
+    <button class="form-submit" onclick="closeChargesModal(); openHelpModal();">Got a question? Contact us</button>
   </div>
 </div>
 
@@ -2609,48 +2751,147 @@ ul{list-style:none}
       </div>
     </div>
 
+    <!-- Quick contact strip -->
+    <div class="help-quick-strip">
+      <a class="help-quick-btn" href="tel:18001234567">
+        <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.8 19.8 0 0 1 1.61 3.4 2 2 0 0 1 3.59 1.22h3a2 2 0 0 1 2 1.72 12.8 12.8 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.78a16 16 0 0 0 6.29 6.29l1.14-1.14a2 2 0 0 1 2.11-.45 12.8 12.8 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        Call Us
+      </a>
+      <a class="help-quick-btn help-quick-wa" href="https://wa.me/911234567890" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        WhatsApp
+      </a>
+      <a class="help-quick-btn help-quick-mail" href="mailto:support@quatar.in">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Email
+      </a>
+    </div>
+
     <div class="help-cats">
-      <div class="help-cat" onclick="showToast('Opening Listings help…')">
+      <div class="help-cat" onclick="filterFaq('listing')">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>
         <div class="help-cat-label">Listings &amp; Posting</div>
       </div>
-      <div class="help-cat" onclick="showToast('Opening Payments help…')">
+      <div class="help-cat" onclick="filterFaq('payment')">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
         <div class="help-cat-label">Payments &amp; Deposits</div>
       </div>
-      <div class="help-cat" onclick="showToast('Opening Account help…')">
+      <div class="help-cat" onclick="filterFaq('account')">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         <div class="help-cat-label">Account &amp; Login</div>
       </div>
-      <div class="help-cat" onclick="showToast('Opening Safety help…')">
+      <div class="help-cat" onclick="filterFaq('safety')">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         <div class="help-cat-label">Safety &amp; Trust</div>
+      </div>
+      <div class="help-cat" onclick="filterFaq('visit')">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <div class="help-cat-label">Visits &amp; Scheduling</div>
+      </div>
+      <div class="help-cat" onclick="filterFaq('refer')">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M19 8l2 2-2 2M21 10h-4"/></svg>
+        <div class="help-cat-label">Refer &amp; Earn</div>
       </div>
     </div>
 
     <div class="lm-section" style="margin-top:4px">Frequently asked</div>
     <div id="faqList">
-      <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">
-          How do I post a property for free?
+
+      <div class="faq-item" data-cat="listing">
+        <div class="faq-q" onclick="toggleFaq(this)">How do I post a property for free?
           <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
-        <div class="faq-a">Tap the + button or "Post a Property" in the menu, fill in your property details and owner contact, then submit. Your first listing is free.</div>
+        <div class="faq-a">Tap the + button or "Post a Property" in the menu, fill in your property details and owner contact, then submit. Your first listing is completely free.</div>
       </div>
-      <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">
-          Is there a brokerage or fee?
+
+      <div class="faq-item" data-cat="listing">
+        <div class="faq-q" onclick="toggleFaq(this)">How long does my listing stay active?
           <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
-        <div class="faq-a">Quatar connects you directly with owners and tenants — no brokerage fees on standard listings.</div>
+        <div class="faq-a">Listings stay active for 90 days by default. You can renew or edit them anytime from your account. Once a tenant moves in, mark the property as rented so others don't waste time.</div>
       </div>
-      <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">
-          How are listings verified?
+
+      <div class="faq-item" data-cat="listing">
+        <div class="faq-q" onclick="toggleFaq(this)">Can I edit my listing after posting?
           <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
-        <div class="faq-a">We verify owner contact details and periodically review listings for accuracy. Look for the verified badge on trusted listings.</div>
+        <div class="faq-a">Yes. Go to your profile, find the listing, and tap Edit. Changes go live immediately after review.</div>
       </div>
+
+      <div class="faq-item" data-cat="payment">
+        <div class="faq-q" onclick="toggleFaq(this)">Is there a brokerage or fee?
+          <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="faq-a">Yes, we charge a one-time brokerage of <b>₹4,000–₹6,000</b> from the tenant — split in two parts:<br><br>
+          <b>₹2,000</b> upfront before we shortlist &amp; show you 4 properties matching your requirement.<br><br>
+          <b>₹2,000–₹4,000</b> on the day you like a house and make an advance payment to the owner.<br><br>
+          No hidden charges beyond this.
+        </div>
+      </div>
+
+      <div class="faq-item" data-cat="payment">
+        <div class="faq-q" onclick="toggleFaq(this)">How is the security deposit handled?
+          <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="faq-a">The deposit is agreed directly between the owner and tenant. We recommend paying only after physically visiting the property and signing a rental agreement. Never pay in advance to unverified owners.</div>
+      </div>
+
+      <div class="faq-item" data-cat="account">
+        <div class="faq-q" onclick="toggleFaq(this)">How do I reset my password?
+          <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="faq-a">On the login screen, tap "Forgot password" and enter your registered mobile number. You'll receive an OTP to reset it.</div>
+      </div>
+
+      <div class="faq-item" data-cat="account">
+        <div class="faq-q" onclick="toggleFaq(this)">How do I delete my account?
+          <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="faq-a">Go to Menu → Account Settings → Delete Account. This will permanently remove your profile and all listings. This action cannot be undone.</div>
+      </div>
+
+      <div class="faq-item" data-cat="safety">
+        <div class="faq-q" onclick="toggleFaq(this)">How are listings verified?
+          <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="faq-a">We verify owner contact details and periodically review listings for accuracy. Look for the green Verified badge on trusted listings. Always visit the property in person before paying any amount.</div>
+      </div>
+
+      <div class="faq-item" data-cat="safety">
+        <div class="faq-q" onclick="toggleFaq(this)">How do I report a suspicious listing?
+          <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="faq-a">Tap the three-dot menu on any listing and select "Report". Our team reviews all reports within 24 hours. Fraudulent listings are removed immediately.</div>
+      </div>
+
+      <div class="faq-item" data-cat="visit">
+        <div class="faq-q" onclick="toggleFaq(this)">How do I schedule a property visit?
+          <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="faq-a">Open the property, tap "Schedule Visit", pick a date and time slot that works for you. The owner will be notified and will confirm via call or WhatsApp.</div>
+      </div>
+
+      <div class="faq-item" data-cat="visit">
+        <div class="faq-q" onclick="toggleFaq(this)">Can I reschedule or cancel a visit?
+          <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="faq-a">Yes. Go to your scheduled visits and tap Reschedule or Cancel. Please cancel at least 2 hours in advance out of courtesy to the owner.</div>
+      </div>
+
+      <div class="faq-item" data-cat="refer">
+        <div class="faq-q" onclick="toggleFaq(this)">When do I get my ₹1,000 referral reward?
+          <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="faq-a">Your ₹1,000 is credited to your UPI on the day the referred tenant successfully moves into the property via a commission-based booking. There is no limit on how many tenants you can refer.</div>
+      </div>
+
+      <div class="faq-item" data-cat="refer">
+        <div class="faq-q" onclick="toggleFaq(this)">How does the referral link work?
+          <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="faq-a">Share your unique referral link via WhatsApp, SMS, or any app. When the tenant opens it, books a property, and moves in, the referral is automatically tracked to your account.</div>
+      </div>
+
     </div>
 
     <div class="help-contact-row">
@@ -2735,6 +2976,10 @@ ul{list-style:none}
     </div>
     <div class="menu-divider"></div>
     <div class="menu-section-label">Support</div>
+    <div class="menu-item" onclick="toggleMenuPanel(); openChargesModal();">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/></svg>
+      Our Charges
+    </div>
     <div class="menu-item" onclick="toggleMenuPanel(); openHelpModal();">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 1 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12" y2="17"/></svg>
       Help &amp; Support
@@ -4395,7 +4640,7 @@ function copyReferralCode() {
 }
 function shareReferralCode() {
   const code = document.getElementById('referCodeText').textContent.trim();
-  const text = 'Looking for a rental in Bengaluru? Check out Quatar — they handle everything from listings to agreements. Use my referral code ' + code + ' when you book. Once you move in, I earn ₹1,000 and you get priority support!';
+  const text = 'Join me on Quatar and find your next home in Bengaluru! Use my code ' + code + ' to get a reward.';
   if (navigator.share) {
     navigator.share({ title: 'Quatar', text: text }).catch(() => {});
   } else {
@@ -4406,6 +4651,15 @@ function shareReferralCode() {
 /* ═══════════════════════════════════════════════
    HELP & SUPPORT MODAL
 ═══════════════════════════════════════════════ */
+function openChargesModal() {
+  document.getElementById('chargesModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeChargesModal() {
+  document.getElementById('chargesModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
 function openHelpModal() {
   document.getElementById('helpModal').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -4450,6 +4704,18 @@ function toggleFaq(el) {
   const wasOpen = item.classList.contains('open');
   document.querySelectorAll('#faqList .faq-item').forEach(f => f.classList.remove('open'));
   if (!wasOpen) item.classList.add('open');
+}
+function filterFaq(cat) {
+  document.querySelectorAll('#faqList .faq-item').forEach(f => {
+    f.style.display = (!cat || f.dataset.cat === cat) ? '' : 'none';
+    f.classList.remove('open');
+  });
+  document.querySelectorAll('.help-cat').forEach(c => c.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+}
+function resetFaq() {
+  document.querySelectorAll('#faqList .faq-item').forEach(f => { f.style.display = ''; f.classList.remove('open'); });
+  document.querySelectorAll('.help-cat').forEach(c => c.classList.remove('active'));
 }
 
 /* ═══════════════════════════════════════════════
@@ -4846,6 +5112,9 @@ document.getElementById('authModal').addEventListener('click', function(e) {
 });
 document.getElementById('notifModal').addEventListener('click', function(e) {
   if (e.target === this) closeNotifModal();
+});
+document.getElementById('chargesModal').addEventListener('click', function(e) {
+  if (e.target === this) closeChargesModal();
 });
 document.getElementById('referModal').addEventListener('click', function(e) {
   if (e.target === this) closeReferModal();
