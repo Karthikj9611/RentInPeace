@@ -179,13 +179,18 @@ ul{list-style:none}
 
 /* ─── Filter Dropdown Bar ───────────────────────── */
 .filter-dd-bar{
-  position:sticky;top:calc(var(--nav-h) + var(--search-h));z-index:98;
+  position:sticky;
+  top:calc(var(--nav-h) + var(--search-h));
+  z-index:98;
   background:var(--bg);
   border-bottom:1px solid var(--border);
-  display:flex;align-items:center;
-  gap:6px;padding:8px 16px;
-  flex-wrap:wrap;
-  row-gap:8px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:8px 16px;
+  flex-wrap:nowrap;        /* changed */
+  overflow-x:auto;         /* allow horizontal scroll */
+  white-space:nowrap;
 }
 .fd-btn{
   display:inline-flex;align-items:center;gap:5px;
