@@ -1547,6 +1547,16 @@ ul{list-style:none}
 }
 .slide-dot.active{background:#fff}
 
+.mic-btn.listening{
+    animation:pulse 1s infinite;
+}
+
+@keyframes pulse{
+    50%{
+        transform:scale(1.2);
+    }
+}
+
 </style>
 </head>
 <body>
@@ -1595,11 +1605,29 @@ ul{list-style:none}
 <!-- ─── Search Bar ──────────────────────────────── -->
 <div class="searchbar-wrap">
   <div class="searchbar">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input type="text" id="searchInput" placeholder='"studio near Whitefield"' oninput="handleSearch()" autocomplete="off" aria-label="Search properties" />
-    <div class="mic-btn" title="Voice search" onclick="showToast('Voice search coming soon')">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="11" cy="11" r="8"/>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+
+    <input 
+      type="text" 
+      id="searchInput" 
+      placeholder='"studio near Whitefield"' 
+      oninput="handleSearch()" 
+      autocomplete="off" 
+      aria-label="Search properties" 
+    />
+
+    <div class="mic-btn" id="micBtn" title="Voice search" onclick="startVoiceSearch()">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+        <line x1="12" y1="19" x2="12" y2="23"/>
+        <line x1="8" y1="23" x2="16" y2="23"/>
+      </svg>
     </div>
+
   </div>
 </div>
 
@@ -5353,6 +5381,61 @@ function showToast(msg) {
   t.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+
+function startVoiceSearch(){
+
+    const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+
+
+    if(!SpeechRecognition){
+        showToast("Browser does not support voice search");
+        return;
+    }
+
+
+    let recognition = new SpeechRecognition();
+
+
+    recognition.lang = "en-IN";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+
+    recognition.onstart = function(){
+        console.log("Listening started");
+        showToast("Listening...");
+    };
+
+
+    recognition.onresult = function(event){
+
+        let text = event.results[0][0].transcript;
+
+        console.log("Voice text:", text);
+
+        document.getElementById("searchInput").value = text;
+
+        handleSearch();
+    };
+
+
+    recognition.onerror = function(event){
+
+        console.log(event.error);
+
+        showToast("Voice error: " + event.error);
+    };
+
+
+    recognition.onend = function(){
+        console.log("Stopped");
+    };
+
+
+    recognition.start();
 }
 
 /* ═══════════════════════════════════════════════
