@@ -3200,11 +3200,7 @@ ul{list-style:none}
 /* ═══════════════════════════════════════════════
    DATA
 ═══════════════════════════════════════════════ */
-let PROPERTIES = [
-  {"id":101,"type":"Rent","verified":true,"title":"Sobha Dream Acres, Panathur","location":"Panathur, Near Sobha Dream Acres","price":32000,"deposit":96000,"maintenance":2500,"escalation":5,"electricityIncluded":"No","waterCharge":"Included","propertyType":"Apartment","bhk":"2 BHK","area":"1180","furnishing":"Semi-Furnished","floor":"6th of 14","age":"1-5 Years","bathrooms":2,"lift":true,"carpark":true,"bikepark":true,"facing":"East","amenities":["Wi-Fi","AC ×2","Washing machine","Refrigerator","Wardrobe / Cupboards ×2","Lift / Elevator","Gym / Pool","Security / CCTV","Power backup","RO water filter"],"tenant":"Family","promoted":false,"posted":"Just now","desc":"Spacious 2 BHK in a well-maintained gated community close to ORR and major tech parks. Semi-furnished with modular kitchen, ample natural light, and 24/7 security. Walking distance to schools, supermarkets, and bus stops.","videoUrl":"https://youtube.com/watch?v=demo-rent-101","city":"Bengaluru","listedBy":"Owner","fullAddress":"Block C, Sobha Dream Acres, Panathur Main Road, Bengaluru, 560103","googleMapsLink":"https://maps.app.goo.gl/Panathur2BHKDemo","latitude":12.9395,"longitude":77.6974,"ownerName":"Arvind Rao","ownerPhone":"9611459960","ownerEmail":"arvind.rao@example.com","ownerAltPhone":"9845098765","ownerAddress":"Sobha Dream Acres, Panathur, Bengaluru, 560103","contactTime":"Evening","negotiable":"yes","availableFrom":"2026-07-15","images":["https://images.unsplash.com/photo-1493809842364-78817add7ffb","https://images.unsplash.com/photo-1502672260266-1c1ef2d93688","https://images.unsplash.com/photo-1484154218962-a197022b5858"],"noticePeriod":"1 Month","leaseDuration":"11 Months","petsAllowed":"Restricted","nonVegAllowed":"Yes","pipedGas":"Yes"},
-  {"id":102,"type":"Lease","verified":true,"title":"Prestige Falcon City, Konanakunte","location":"Konanakunte, Kanakapura Road","price":0,"deposit":0,"maintenance":3000,"escalation":null,"electricityIncluded":"Shared meter","waterCharge":"Included","propertyType":"Villa","bhk":"3 BHK","area":"1850","furnishing":"Unfurnished","floor":"G of 2","age":"5-10 Years","bathrooms":3,"lift":false,"carpark":true,"bikepark":true,"facing":"North-East","amenities":["Wardrobe / Cupboards","Balcony / Terrace ×2","Gym / Pool","Security / CCTV","Power backup","Garden","Piped gas connection"],"tenant":"Family","promoted":true,"posted":"Just now","desc":"Premium independent villa available on long-term lease in a gated layout. Private garden, dedicated parking for two cars, and clubhouse access. Ideal for families seeking a long-term residence with low recurring outgoings.","videoUrl":"https://youtube.com/watch?v=demo-lease-102","city":"Bengaluru","listedBy":"Broker","fullAddress":"Villa 47, Prestige Falcon City, Konanakunte Cross, Kanakapura Road, Bengaluru, 560062","googleMapsLink":"https://maps.app.goo.gl/FalconCityVillaDemo","latitude":12.8783,"longitude":77.5497,"ownerName":"Lakshmi Narayanan","ownerPhone":"9611459960","ownerEmail":"lakshmi.n@example.com","ownerAltPhone":"9900445566","ownerAddress":"Prestige Falcon City, Konanakunte, Bengaluru, 560062","contactTime":"Afternoon","negotiable":"no","availableFrom":"2026-08-01","images":["https://images.unsplash.com/photo-1564013799919-ab600027ffc6","https://images.unsplash.com/photo-1576941089067-2de3c901e126","https://images.unsplash.com/photo-1600596542815-ffad4c1539a9"],"leaseAmount":4500000,"leaseMonthlyRent":0,"leaseMaintenance":3000,"leaseDurationVal":"3 Years","leaseType":"Residential","lockInPeriod":"1 Year","leaseAvailFrom":"Within 1 Month","leaseNotice":"2 Months","rentEscalation":"10% per year","leasePets":"Yes","leaseNonVeg":"Yes"},
-  {"id":103,"type":"PG","verified":false,"title":"Zolo Stanza, BTM Layout","location":"BTM Layout 2nd Stage","price":11500,"deposit":11500,"maintenance":null,"escalation":null,"electricityIncluded":"Yes","waterCharge":"Included","propertyType":null,"bhk":"Studio","area":null,"furnishing":"Fully Furnished","floor":"3rd of 4","age":null,"bathrooms":1,"lift":false,"carpark":false,"bikepark":false,"facing":"North","amenities":["Wi-Fi","AC","Washing machine","Refrigerator","Bed & mattress ×2","Security / CCTV","Power backup","Laundry","Meals included","RO water filter"],"tenant":"Female only","promoted":false,"posted":"Just now","desc":"Fully furnished girls' PG with daily housekeeping, 3 meals a day, and high-speed Wi-Fi. Located close to Jayadeva Hospital and Silk Board, with easy access to BTM bus stand and metro connectivity (upcoming).","videoUrl":null,"city":"Bengaluru","listedBy":"Agent","fullAddress":"16th Cross, BTM Layout 2nd Stage, Bengaluru, 560076","googleMapsLink":"https://maps.app.goo.gl/ZoloStanzaBTMDemo","latitude":12.9166,"longitude":77.6101,"ownerName":"Sandeep Gowda","ownerPhone":"9611459960","ownerEmail":"sandeep.gowda@example.com","ownerAltPhone":null,"ownerAddress":"Zolo Stanza, BTM Layout 2nd Stage, Bengaluru, 560076","contactTime":"Any","negotiable":"no","availableFrom":"2026-07-01","images":["https://images.unsplash.com/photo-1505693416388-ac5ce068fe85","https://images.unsplash.com/photo-1522708323590-d24dbb6b0267","https://images.unsplash.com/photo-1540518614846-7eded433c457"],"pgGender":"Girls","pgRoomType":"Double Sharing","pgBathroom":"Shared","pgOccupancy":"2","pgTotalBeds":"24","pgMealsCost":3500,"pgRoomFurnishing":"Fully Furnished","pgKitchenAccess":"Shared Kitchen","pgAvailableFrom":"Immediate","pgNotice":"15 Days","pgMeals":"All 3 Meals","pgFoodType":"Veg + Non-veg","pgGateTime":"10 PM","pgVisitorPolicy":"Lobby Only","pgNonVeg":"No","pgPets":"No"}
-];
+let PROPERTIES = [{"id":"101","basic":{"status":"For Rent","listedBy":"Owner"},"location":{"area":"Panathur, Near Sobha Dream Acres","city":"Bengaluru","address":"Block C, Sobha Dream Acres, Panathur Main Road, Bengaluru, 560103","lat":12.9395,"lng":77.6974,"mapLink":"https://maps.app.goo.gl/Panathur2BHKDemo"},"owner":{"propertyName":"Sobha Dream Acres, Panathur","name":"Arvind Rao","phone":"9611459960","email":"arvind.rao@example.com","altPhone":"9845098765","contactTime":"Evening","address":"Sobha Dream Acres, Panathur, Bengaluru, 560103"},"price":{"rent":32000,"deposit":96000,"maintenance":2500,"rentIncrease":"5%","electricity":"No","water":"Included","negotiable":true},"property":{"type":"Apartment","bhk":"2 BHK","bike":"Yes","car":"Yes","floor":"6th of 14","area":"1180","bathrooms":"2","furnish":"Semi-Furnished","facing":"East","age":"1-5 Years","tenant":"Family","available":"2026-07-15"},"amenities":{"selected":["Wi-Fi","AC ×2","Washing machine","Refrigerator","Wardrobe / Cupboards ×2","Lift / Elevator","Gym / Pool","Security / CCTV","Power backup","RO water filter"],"extra":""},"terms":{"notice":"1 Month","lease":"11 Months"},"rules":{"pets":"Restricted","nonVeg":"Yes","gas":"Yes"},"media":{"video":"https://youtube.com/watch?v=demo-rent-101","desc":"Spacious 2 BHK in a well-maintained gated community close to ORR and major tech parks. Semi-furnished with modular kitchen, ample natural light, and 24/7 security. Walking distance to schools, supermarkets, and bus stops.","images":["https://images.unsplash.com/photo-1493809842364-78817add7ffb","https://images.unsplash.com/photo-1502672260266-1c1ef2d93688","https://images.unsplash.com/photo-1484154218962-a197022b5858"]},"pg":{},"promoted":false,"posted":"Just now","verified":true},{"id":"102","basic":{"status":"Lease","listedBy":"Broker"},"location":{"area":"Konanakunte, Kanakapura Road","city":"Bengaluru","address":"Villa 47, Prestige Falcon City, Konanakunte Cross, Kanakapura Road, Bengaluru, 560062","lat":12.8783,"lng":77.5497,"mapLink":"https://maps.app.goo.gl/FalconCityVillaDemo"},"owner":{"propertyName":"Prestige Falcon City, Konanakunte","name":"Lakshmi Narayanan","phone":"9611459960","email":"lakshmi.n@example.com","altPhone":"9900445566","contactTime":"Afternoon","address":"Prestige Falcon City, Konanakunte, Bengaluru, 560062"},"price":{"rent":4500000,"deposit":0,"maintenance":3000,"rentIncrease":"10% per year","electricity":"Shared meter","water":"Included","negotiable":false},"property":{"type":"Villa","bhk":"3 BHK","bike":"Yes","car":"Yes","floor":"G of 2","area":"1850","bathrooms":"3","furnish":"Unfurnished","facing":"North-East","age":"5-10 Years","tenant":"Family","available":"2026-08-01"},"amenities":{"selected":["Wardrobe / Cupboards","Balcony / Terrace ×2","Gym / Pool","Security / CCTV","Power backup","Garden","Piped gas connection"],"extra":""},"terms":{"notice":"2 Months","lease":"3 Years · Residential · Lock-in: 1 Year"},"rules":{"pets":"Yes","nonVeg":"Yes","gas":null},"media":{"video":"https://youtube.com/watch?v=demo-lease-102","desc":"Premium independent villa available on long-term lease in a gated layout. Private garden, dedicated parking for two cars, and clubhouse access. Ideal for families seeking a long-term residence with low recurring outgoings.","images":["https://images.unsplash.com/photo-1564013799919-ab600027ffc6","https://images.unsplash.com/photo-1576941089067-2de3c901e126","https://images.unsplash.com/photo-1600596542815-ffad4c1539a9"]},"pg":{},"promoted":true,"posted":"Just now","verified":true},{"id":"103","basic":{"status":"PG","listedBy":"Agent"},"location":{"area":"BTM Layout 2nd Stage","city":"Bengaluru","address":"16th Cross, BTM Layout 2nd Stage, Bengaluru, 560076","lat":12.9166,"lng":77.6101,"mapLink":"https://maps.app.goo.gl/ZoloStanzaBTMDemo"},"owner":{"propertyName":"Zolo Stanza, BTM Layout","name":"Sandeep Gowda","phone":"9611459960","email":"sandeep.gowda@example.com","altPhone":null,"contactTime":"Any","address":"Zolo Stanza, BTM Layout 2nd Stage, Bengaluru, 560076"},"price":{"rent":11500,"deposit":11500,"maintenance":null,"rentIncrease":null,"electricity":"Yes","water":"Included","negotiable":false},"property":{"type":null,"bhk":null,"bike":"No","car":"No","floor":"3rd of 4","area":null,"bathrooms":"1","furnish":"Fully Furnished","facing":"North","age":null,"tenant":"Female only","available":"Immediate"},"amenities":{"selected":["Wi-Fi","AC","Washing machine","Refrigerator","Bed & mattress ×2","Security / CCTV","Power backup","Laundry","Meals included","RO water filter"],"extra":""},"terms":{"notice":"15 Days","lease":null},"rules":{"pets":"No","nonVeg":"No","gas":null},"media":{"video":null,"desc":"Fully furnished girls' PG with daily housekeeping, 3 meals a day, and high-speed Wi-Fi. Located close to Jayadeva Hospital and Silk Board, with easy access to BTM bus stand and metro connectivity (upcoming).","images":["https://images.unsplash.com/photo-1505693416388-ac5ce068fe85","https://images.unsplash.com/photo-1522708323590-d24dbb6b0267","https://images.unsplash.com/photo-1540518614846-7eded433c457"]},"pg":{"gender":"Girls","room":"Double Sharing","meals":"All 3 Meals","occupancy":"2","notice":"15 Days","bathroom":"Shared","mealCost":3500,"beds":"24","furnish":"Fully Furnished","food":"Veg + Non-veg","kitchen":"Shared Kitchen","available":"Immediate","visitors":"Lobby Only","gateTime":"10 PM","nonVeg":"No","pets":"No"},"promoted":false,"posted":"Just now","verified":false}];
 
 
 /* ─── View counts (persisted) ───────────────────
@@ -3426,7 +3422,7 @@ function resetPages() {
 }
 
 function buildImgSlider(p, fg) {
-  const imgs = (p.images && p.images.length) ? p.images : [];
+  const imgs = (p.media?.images && p.media.images.length) ? p.media.images : [];
   if (imgs.length === 0) {
     return `<div class="prop-img-placeholder"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="${fg}" opacity=".3"/><polyline points="9 22 9 12 15 12 15 22" stroke="${fg}" opacity=".3"/></svg></div>`;
   }
@@ -3473,8 +3469,8 @@ let lightboxIdx = 0;
 
 function openLightbox(propId, idx) {
   const p = PROPERTIES.find(x => x.id === propId);
-  if (!p || !p.images || !p.images.length) return;
-  lightboxImgs = p.images;
+  if (!p || !p.media?.images || !p.media.images.length) return;
+  lightboxImgs = p.media.images;
   lightboxIdx = idx || 0;
   renderLightbox();
   document.getElementById('lightboxOverlay').classList.add('open');
@@ -3507,21 +3503,41 @@ function renderLightbox() {
     : '';
 }
 
+/* Derive the frontend tab label (Rent/Lease/PG) from the nested basic.status */
+function pTypeLabel(p) {
+  const status = p.basic?.status;
+  if (status === 'For Rent') return 'Rent';
+  if (status === 'Lease') return 'Lease';
+  if (status === 'PG') return 'PG';
+  return status || 'Rent';
+}
+
+/* Lift/elevator is derived from the amenities list rather than stored as its own field */
+function pHasLift(p) {
+  return (p.amenities?.selected || []).some(a => /lift/i.test(a));
+}
+
 function cardHTML(p) {
   const liked = shortlisted.has(p.id);
   const compared = compareSet.has(p.id);
   const lockedType = getCompareType();
-  const compareDisabled = !compared && lockedType && p.type !== lockedType;
+  const pType = pTypeLabel(p);
+  const compareDisabled = !compared && lockedType && pType !== lockedType;
   const colors = {Rent:'#e8f5ee:#1a6640',Lease:'#dde9fa:#1a4680',PG:'#eee8fa:#4a2a9a'};
-  const [bg, fg] = (colors[p.type]||'#f0f0f0:#333').split(':');
+  const [bg, fg] = (colors[pType]||'#f0f0f0:#333').split(':');
   const listClass = isListView ? ' list-view' : '';
+  const bathrooms = parseInt(p.property?.bathrooms) || 1;
+  const carpark = p.property?.car === 'Yes';
+  const bikepark = p.property?.bike === 'Yes';
+  const lift = pHasLift(p);
+  const deposit = p.price?.deposit || 0;
   return `<div class="prop-card${listClass}" onclick="openDetail('${p.id}')">
     <div class="prop-img" style="background:${bg}" data-idx="0">
       ${buildImgSlider(p, fg)}
       <div class="prop-card-top-row">
         <div class="prop-left-badges">
           ${p.promoted ? '<span class="prop-badge-promoted">Promoted</span>' : ''}
-          <span class="prop-badge-type badge-${p.type.toLowerCase()}">${p.type}</span>
+          <span class="prop-badge-type badge-${pType.toLowerCase()}">${pType}</span>
         </div>
         <div class="prop-heart${liked?' liked':''}" onclick="event.stopPropagation();toggleShortlist('${p.id}',this)" aria-label="${liked?'Remove from':'Add to'} shortlist">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -3529,23 +3545,23 @@ function cardHTML(p) {
       </div>
     </div>
     <div class="prop-body">
-      <div class="prop-title" title="${p.title}">
-        <span class="prop-title-text">${p.title}</span>
+      <div class="prop-title" title="${p.owner?.propertyName}">
+        <span class="prop-title-text">${p.owner?.propertyName}</span>
         ${p.verified ? `<span class="prop-verified-badge" title="Verified listing"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1l3.2 1.6 3.5.4 1.6 3.2 2.7 2.4-.6 3.6 1 3.4-2.7 2.4-1.6 3.2-3.5.4-3.2 1.6-3.2-1.6-3.5-.4-1.6-3.2-2.7-2.4.6-3.6-1-3.4 2.7-2.4 1.6-3.2 3.5-.4z"/><path d="M9 12.5l2 2 4-4.5" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Verified</span>` : ''}
       </div>
       <div class="prop-loc">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        ${p.location}
+        ${p.location?.area}
       </div>
-	  <div>₹${p.price.toLocaleString('en-IN')}<span class="prop-price-unit"> / Month</span></div>
+	  <div>₹${(p.price?.rent||0).toLocaleString('en-IN')}<span class="prop-price-unit"> / Month</span></div>
       <div class="prop-tags">
-        <span class="prop-tag">${p.bhk}</span>
-        <span class="prop-tag">Deposit: ₹${(p.deposit||0).toLocaleString('en-IN')}</span>
-        <span class="prop-tag">${p.furnishing}</span>
-        <span class="prop-tag">${p.bathrooms} Bath${p.bathrooms==1?'':'s'}</span>
-        ${p.lift ? '<span class="prop-tag">Lift</span>' : ''}
-        <span class="prop-tag">${p.carpark ? '✓' : '✕'} Car park</span>
-        <span class="prop-tag">${p.bikepark ? '✓' : '✕'} Bike park</span>
+        <span class="prop-tag">${p.property?.bhk}</span>
+        <span class="prop-tag">Deposit: ₹${deposit.toLocaleString('en-IN')}</span>
+        <span class="prop-tag">${p.property?.furnish}</span>
+        <span class="prop-tag">${bathrooms} Bath${bathrooms==1?'':'s'}</span>
+        ${lift ? '<span class="prop-tag">Lift</span>' : ''}
+        <span class="prop-tag">${carpark ? '✓' : '✕'} Car park</span>
+        <span class="prop-tag">${bikepark ? '✓' : '✕'} Bike park</span>
       </div>
       <div class="prop-footer">
         <div class="prop-action-grid">
@@ -3627,7 +3643,7 @@ function removeShortlist(id) {
   saveShortlist();
   const hearts = document.querySelectorAll('.prop-heart');
   hearts.forEach(h => {
-    if (h.onclick && h.onclick.toString().includes(`toggleShortlist(${id},`)) h.classList.remove('liked');
+    if (h.onclick && h.onclick.toString().includes(`toggleShortlist('${id}',`)) h.classList.remove('liked');
   });
   updateShortlistCount();
   renderShortlistPanel();
@@ -3650,7 +3666,7 @@ function toggleCompare(id, el) {
       return;
     }
     const existingType = getCompareType();
-    if (existingType && prop.type !== existingType) {
+    if (existingType && pTypeLabel(prop) !== existingType) {
       showToast(`You can only compare ${existingType} properties together`);
       return;
     }
@@ -3675,12 +3691,12 @@ function updateComparePillStates() {
     if (!pill) return;
     const isChecked = pill.classList.contains('checked');
     const onclickStr = pill.getAttribute('onclick') || '';
-    const m = onclickStr.match(/toggleCompare\((\d+)/);
+    const m = onclickStr.match(/toggleCompare\('([^']+)'/);
     if (!m) return;
-    const cardId = parseInt(m[1], 10);
+    const cardId = m[1];
     const prop = PROPERTIES.find(p => p.id === cardId);
     if (!prop) return;
-    const shouldDisable = !isChecked && lockedType && prop.type !== lockedType;
+    const shouldDisable = !isChecked && lockedType && pTypeLabel(prop) !== lockedType;
     pill.classList.toggle('disabled', shouldDisable);
     pill.title = shouldDisable ? `You're comparing ${lockedType} properties` : '';
   });
@@ -3689,7 +3705,7 @@ function updateComparePillStates() {
 function getCompareType() {
   if (compareSet.size === 0) return null;
   const first = PROPERTIES.find(p => p.id === [...compareSet][0]);
-  return first ? first.type : null;
+  return first ? pTypeLabel(first) : null;
 }
 
 function clearCompare() {
@@ -3704,7 +3720,7 @@ function removeFromCompare(id) {
   compareSet.delete(id);
   const pills = document.querySelectorAll('.prop-action-compare');
   pills.forEach(p => {
-    if (p.onclick && p.onclick.toString().includes(`toggleCompare(${id}`)) p.classList.remove('checked');
+    if (p.onclick && p.onclick.toString().includes(`toggleCompare('${id}'`)) p.classList.remove('checked');
   });
   renderCompareBar();
   updateComparePillStates();
@@ -3726,8 +3742,8 @@ function renderCompareBar() {
   const ids = [...compareSet];
   document.getElementById('compareBarThumbs').innerHTML = ids.map(id => {
     const p = PROPERTIES.find(x => x.id === id);
-    const initial = p ? p.bhk.charAt(0) : '?';
-    return `<span class="compare-bar-thumb" title="${p ? p.title : ''}">${initial}</span>`;
+    const initial = p ? (p.property?.bhk || '?').charAt(0) : '?';
+    return `<span class="compare-bar-thumb" title="${p ? p.owner?.propertyName : ''}">${initial}</span>`;
   }).join('');
   document.getElementById('compareBarLabel').innerHTML = `<b>${n}</b> of ${COMPARE_MAX} selected`;
   const btn = document.getElementById('compareBarBtn');
@@ -3760,36 +3776,41 @@ function renderCompareTable() {
 
   const yn = (v) => v ? '<span class="compare-yes">Yes</span>' : '<span class="compare-no">No</span>';
   const rows = [
-    { label: 'Rent / Month', get: p => `<span style="font-weight:700;color:var(--text)">₹${p.price.toLocaleString('en-IN')}</span>` },
-    { label: 'Deposit', get: p => `₹${(p.deposit||0).toLocaleString('en-IN')}` },
-    { label: 'Configuration', get: p => p.bhk },
-    { label: 'Furnishing', get: p => p.furnishing },
-    { label: 'Floor', get: p => p.floor },
-    { label: 'Bathrooms', get: p => p.bathrooms },
-    { label: 'Facing', get: p => p.facing },
-    { label: 'Tenant preferred', get: p => p.tenant },
-    { label: 'Lift', get: p => yn(p.lift) },
-    { label: 'Car park', get: p => yn(p.carpark) },
-    { label: 'Bike park', get: p => yn(p.bikepark) },
+    { label: 'Rent / Month', get: p => `<span style="font-weight:700;color:var(--text)">₹${(p.price?.rent||0).toLocaleString('en-IN')}</span>` },
+    { label: 'Deposit', get: p => `₹${(p.price?.deposit||0).toLocaleString('en-IN')}` },
+    { label: 'Configuration', get: p => p.property?.bhk },
+    { label: 'Furnishing', get: p => p.property?.furnish },
+    { label: 'Floor', get: p => p.property?.floor },
+    { label: 'Bathrooms', get: p => p.property?.bathrooms },
+    { label: 'Facing', get: p => p.property?.facing },
+    { label: 'Tenant preferred', get: p => p.property?.tenant },
+    { label: 'Lift', get: p => yn(pHasLift(p)) },
+    { label: 'Car park', get: p => yn(p.property?.car === 'Yes') },
+    { label: 'Bike park', get: p => yn(p.property?.bike === 'Yes') },
     { label: 'Verified', get: p => yn(!!p.verified) },
-    { label: 'Amenities', get: p => (p.amenities && p.amenities.length) ? p.amenities.join(', ') : '—' },
+    { label: 'Amenities', get: p => {
+        const list = (p.amenities?.selected || []).slice();
+        if (p.amenities?.extra) list.push(...p.amenities.extra.split(',').map(s => s.trim()).filter(Boolean));
+        return list.length ? list.join(', ') : '—';
+      } },
     { label: 'Posted', get: p => p.posted },
   ];
 
   const headCells = props.map(p => {
-    const img = (p.images && p.images[0]) ? `<img src="${p.images[0]}" alt="${p.title}" loading="lazy">` : '';
+    const img = (p.media?.images && p.media.images[0]) ? `<img src="${p.media.images[0]}" alt="${p.owner?.propertyName}" loading="lazy">` : '';
+    const pType = pTypeLabel(p);
     const badges = `<div class="compare-col-badges">
         ${p.promoted ? '<span class="prop-badge-promoted">Promoted</span>' : ''}
-        <span class="prop-badge-type badge-${p.type.toLowerCase()}">${p.type}</span>
+        <span class="prop-badge-type badge-${pType.toLowerCase()}">${pType}</span>
       </div>`;
     return `<th class="compare-col compare-col-head">
-      <div class="compare-col-remove" onclick="removeFromCompare(${p.id})" title="Remove from comparison">
+      <div class="compare-col-remove" onclick="removeFromCompare('${p.id}')" title="Remove from comparison">
         <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </div>
       <div class="compare-col-img">${badges}${img}</div>
-      <div class="compare-col-title">${p.title}</div>
-      <div class="compare-col-loc">${p.location}</div>
-      <div class="compare-col-price">₹${p.price.toLocaleString('en-IN')}</div>
+      <div class="compare-col-title">${p.owner?.propertyName}</div>
+      <div class="compare-col-loc">${p.location?.area}</div>
+      <div class="compare-col-price">₹${(p.price?.rent||0).toLocaleString('en-IN')}</div>
     </th>`;
   }).join('');
 
@@ -3974,12 +3995,33 @@ function fdSortValues(filterKey, values) {
   });
 }
 
-/* Collect the distinct values present in PROPERTIES for a simple scalar field */
+/* Maps the legacy flat filter-key names (used as .dataset.filter values throughout
+   the filter-dropdown markup) to their nested-object path in the new property shape. */
+const FILTER_FIELD_PATHS = {
+  propertyType: ['property','type'],
+  bhk:          ['property','bhk'],
+  furnishing:   ['property','furnish'],
+  tenant:       ['property','tenant'],
+  facing:       ['property','facing'],
+  bathrooms:    ['property','bathrooms'],
+  age:          ['property','age'],
+  pgGender:     ['pg','gender'],
+  pgRoomType:   ['pg','room'],
+  pgMeals:      ['pg','meals'],
+  pgFoodType:   ['pg','food'],
+};
+function pFieldByPath(p, pathArr) {
+  return pathArr.reduce((o, k) => (o == null ? o : o[k]), p);
+}
+
+/* Collect the distinct values present in PROPERTIES for a simple scalar field
+   (field is a legacy flat key resolved via FILTER_FIELD_PATHS to its nested path) */
 function fdCollectValues(field, predicate) {
   const set = new Set();
+  const path = FILTER_FIELD_PATHS[field] || [field];
   PROPERTIES.forEach(p => {
     if (predicate && !predicate(p)) return;
-    const v = p[field];
+    const v = pFieldByPath(p, path);
     if (v === null || v === undefined || v === '') return;
     set.add(String(v).trim());
   });
@@ -3990,7 +4032,7 @@ function fdCollectValues(field, predicate) {
 function fdCollectAmenities() {
   const set = new Set();
   PROPERTIES.forEach(p => {
-    (p.amenities || []).forEach(a => {
+    (p.amenities?.selected || []).forEach(a => {
       const clean = String(a).replace(/\s*×\s*\d+\s*$/, '').trim();
       if (clean) set.add(clean);
     });
@@ -4068,19 +4110,19 @@ function buildFilterOptions() {
   restoreSel('fdo-amenities');
 
   fdRenderOpts('fdo-pgGender', 'pgGender',
-    fdSortValues('pgGender', fdCollectValues('pgGender', p => p.type === 'PG')), 'pgGender');
+    fdSortValues('pgGender', fdCollectValues('pgGender', p => pTypeLabel(p) === 'PG')), 'pgGender');
   restoreSel('fdo-pgGender');
 
   fdRenderOpts('fdo-pgRoom', 'pgRoomType',
-    fdSortValues('pgRoomType', fdCollectValues('pgRoomType', p => p.type === 'PG')), 'pgRoom');
+    fdSortValues('pgRoomType', fdCollectValues('pgRoomType', p => pTypeLabel(p) === 'PG')), 'pgRoom');
   restoreSel('fdo-pgRoom');
 
   fdRenderOpts('fdo-pgMeals', 'pgMeals',
-    fdSortValues('pgMeals', fdCollectValues('pgMeals', p => p.type === 'PG')), 'pgMeals');
+    fdSortValues('pgMeals', fdCollectValues('pgMeals', p => pTypeLabel(p) === 'PG')), 'pgMeals');
   restoreSel('fdo-pgMeals');
 
   fdRenderOpts('fdo-pgFoodType', 'pgFoodType',
-    fdSortValues('pgFoodType', fdCollectValues('pgFoodType', p => p.type === 'PG')), 'pgMeals');
+    fdSortValues('pgFoodType', fdCollectValues('pgFoodType', p => pTypeLabel(p) === 'PG')), 'pgMeals');
   restoreSel('fdo-pgFoodType');
 
   // Refresh badges/has-sel state for every dropdown after rebuilding
@@ -4252,88 +4294,94 @@ function getFiltered() {
   const hasFilters = Object.keys(fs).length > 0;
 
   let list = PROPERTIES.filter(p => {
-    if (currentTab !== 'All' && p.type !== currentTab) return false;
+    const pType = pTypeLabel(p);
+    if (currentTab !== 'All' && pType !== currentTab) return false;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      if (!p.title.toLowerCase().includes(q) &&
-          !p.location.toLowerCase().includes(q) &&
-          !(p.bhk||'').toLowerCase().includes(q)) return false;
+      const name = (p.owner?.propertyName || '').toLowerCase();
+      const area = (p.location?.area || '').toLowerCase();
+      const bhk = (p.property?.bhk || '').toLowerCase();
+      if (!name.includes(q) && !area.includes(q) && !bhk.includes(q)) return false;
     }
     if (!hasFilters) return true;
 
-    if (fs.propertyType && !fs.propertyType.includes(p.propertyType)) return false;
+    if (fs.propertyType && !fs.propertyType.includes(p.property?.type)) return false;
     if (fs.bhk) {
-      const bhkVal = (p.bhk||'').trim();
+      const bhkVal = (p.property?.bhk||'').trim();
       const match = fs.bhk.some(b => b==='4 BHK' ? parseInt(bhkVal)>=4 : bhkVal===b);
       if (!match) return false;
     }
-    if (fs.furnishing && !fs.furnishing.includes(p.furnishing)) return false;
+    if (fs.furnishing && !fs.furnishing.includes(p.property?.furnish)) return false;
     if (fs.tenant) {
-      if (!fs.tenant.some(t => t==='Any' || p.tenant===t || p.tenant==='Any')) return false;
+      const tenant = p.property?.tenant;
+      if (!fs.tenant.some(t => t==='Any' || tenant===t || tenant==='Any')) return false;
     }
-    if (fs.facing && !fs.facing.includes(p.facing)) return false;
+    if (fs.facing && !fs.facing.includes(p.property?.facing)) return false;
     if (fs.bathrooms) {
-      const baths = parseInt(p.bathrooms)||0;
+      const baths = parseInt(p.property?.bathrooms)||0;
       if (!fs.bathrooms.some(b => parseInt(b)===4 ? baths>=4 : baths===parseInt(b))) return false;
     }
-    if (fs.age && !fs.age.includes(p.age)) return false;
-    if (fs.negotiable && !fs.negotiable.includes(p.negotiable)) return false;
+    if (fs.age && !fs.age.includes(p.property?.age)) return false;
+    if (fs.negotiable && !fs.negotiable.includes(p.price?.negotiable)) return false;
     if (fs._availBucket) {
-      const days = fdDaysFromToday(p.availableFrom);
+      const days = fdDaysFromToday(p.property?.available);
       if (days === null || !fdValueInBuckets(Math.max(days, 0), fs._availBucket)) return false;
     }
-    if (fs.lift && fs.lift.includes('true') && !p.lift) return false;
-    if (fs.carpark && fs.carpark.includes('true') && !p.carpark) return false;
-    if (fs.bikepark && fs.bikepark.includes('true') && !p.bikepark) return false;
+    const lift = pHasLift(p);
+    const carpark = p.property?.car === 'Yes';
+    const bikepark = p.property?.bike === 'Yes';
+    if (fs.lift && fs.lift.includes('true') && !lift) return false;
+    if (fs.carpark && fs.carpark.includes('true') && !carpark) return false;
+    if (fs.bikepark && fs.bikepark.includes('true') && !bikepark) return false;
     if (fs.verified && fs.verified.includes('true') && !p.verified) return false;
     if (fs.amenities) {
       // Match against individual amenity entries (qty suffixes like " ×2" stripped)
       // rather than a single joined string, so short tokens like "AC" can't
       // false-positive match inside unrelated words such as "Terrace" or "backup".
-      const pAmList = (p.amenities||[]).map(a => String(a).replace(/\s*×\s*\d+\s*$/, '').trim().toLowerCase());
+      const pAmList = (p.amenities?.selected||[]).map(a => String(a).replace(/\s*×\s*\d+\s*$/, '').trim().toLowerCase());
       const hasToken = (needle) => pAmList.some(a => a === needle || a.split(/[\s/&]+/).includes(needle));
       if (!fs.amenities.every(a => {
-        if (a==='Parking') return p.carpark||p.bikepark;
+        if (a==='Parking') return carpark||bikepark;
         if (a==='AC') return hasToken('ac');
         if (a==='Gym / Pool') return hasToken('gym')||hasToken('pool');
         if (a==='Security / CCTV') return hasToken('security')||hasToken('cctv');
         return pAmList.includes(a.toLowerCase());
       })) return false;
     }
-    if (p.type==='Rent') {
-      if (fs._rentBucket && !fdValueInBuckets(p.price, fs._rentBucket)) return false;
-      if (fs._depositBucket && !fdValueInBuckets(p.deposit, fs._depositBucket)) return false;
-      if (fs._maintenanceBucket && !fdValueInBuckets(p.maintenance||0, fs._maintenanceBucket)) return false;
+    if (pType==='Rent') {
+      if (fs._rentBucket && !fdValueInBuckets(p.price?.rent, fs._rentBucket)) return false;
+      if (fs._depositBucket && !fdValueInBuckets(p.price?.deposit, fs._depositBucket)) return false;
+      if (fs._maintenanceBucket && !fdValueInBuckets(p.price?.maintenance||0, fs._maintenanceBucket)) return false;
     }
-    if (p.type==='Lease') {
-      if (fs._leaseBucket && !fdValueInBuckets(p.leaseAmount||0, fs._leaseBucket)) return false;
-      if (fs._maintenanceBucket && !fdValueInBuckets(p.maintenance||p.leaseMaintenance||0, fs._maintenanceBucket)) return false;
+    if (pType==='Lease') {
+      if (fs._leaseBucket && !fdValueInBuckets(p.price?.rent||0, fs._leaseBucket)) return false;
+      if (fs._maintenanceBucket && !fdValueInBuckets(p.price?.maintenance||0, fs._maintenanceBucket)) return false;
     }
     // PG-only filters must exclude non-PG properties outright (checked unconditionally,
-    // not nested inside an `if (p.type==='PG')` gate, otherwise Rent/Lease rows would
+    // not nested inside an `if (pType==='PG')` gate, otherwise Rent/Lease rows would
     // skip the check entirely and incorrectly pass through every PG filter).
     if (fs.pgGender) {
-      if (p.type!=='PG' || !fs.pgGender.includes(p.pgGender)) return false;
+      if (pType!=='PG' || !fs.pgGender.includes(p.pg?.gender)) return false;
     }
     if (fs.pgRoomType) {
-      if (p.type!=='PG' || !fs.pgRoomType.includes(p.pgRoomType)) return false;
+      if (pType!=='PG' || !fs.pgRoomType.includes(p.pg?.room)) return false;
     }
     if (fs.pgMeals) {
-      if (p.type!=='PG' || !fs.pgMeals.includes(p.pgMeals)) return false;
+      if (pType!=='PG' || !fs.pgMeals.includes(p.pg?.meals)) return false;
     }
     if (fs.pgFoodType) {
-      if (p.type!=='PG' || !fs.pgFoodType.includes(p.pgFoodType)) return false;
+      if (pType!=='PG' || !fs.pgFoodType.includes(p.pg?.food)) return false;
     }
     if (fs._pgRentBucket) {
-      if (p.type!=='PG' || !fdValueInBuckets(p.price, fs._pgRentBucket)) return false;
+      if (pType!=='PG' || !fdValueInBuckets(p.price?.rent, fs._pgRentBucket)) return false;
     }
     return true;
   });
 
-  if (currentSort==='price-asc') list.sort((a,b)=>a.price-b.price);
-  else if (currentSort==='price-desc') list.sort((a,b)=>b.price-a.price);
+  if (currentSort==='price-asc') list.sort((a,b)=>(a.price?.rent||0)-(b.price?.rent||0));
+  else if (currentSort==='price-desc') list.sort((a,b)=>(b.price?.rent||0)-(a.price?.rent||0));
   else if (currentSort==='promoted') list.sort((a,b)=>(b.promoted?1:0)-(a.promoted?1:0));
-  else list.sort((a,b)=>a.id-b.id);
+  else list.sort((a,b)=>String(a.id).localeCompare(String(b.id)));
   return list;
 }
 
@@ -4380,16 +4428,28 @@ function openDetail(id) {
   incrementViews(p);   // count this open as a view, persisted to storage
   renderCards();        // reflect the new count on the card grid
   const liked = shortlisted.has(p.id);
+  const pType = pTypeLabel(p);
   const colors = {Rent:'#e8f5ee',Lease:'#dde9fa',PG:'#eee8fa'};
+  const loc = p.location || {};
+  const owner = p.owner || {};
+  const price = p.price || {};
+  const prop = p.property || {};
+  const terms = p.terms || {};
+  const rules = p.rules || {};
+  const media = p.media || {};
+  const pg = p.pg || {};
+  const lift = pHasLift(p);
+  const carpark = prop.car === 'Yes';
+  const bikepark = prop.bike === 'Yes';
 
   // ── Hero gallery (reuses the same slider pattern as the listing cards) ──
-  const imgs = (p.images && p.images.length) ? p.images : [];
+  const imgs = (media.images && media.images.length) ? media.images : [];
   const uid = 'modalSlide' + p.id;
   let galleryHtml;
   if (imgs.length === 0) {
     galleryHtml = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`;
   } else {
-    const slides = imgs.map((url, i) => `<div class="img-slide${i===0?' active':''}" style="background-image:url('${url}')" onclick="event.stopPropagation();openLightbox(${p.id},${i})"></div>`).join('');
+    const slides = imgs.map((url, i) => `<div class="img-slide${i===0?' active':''}" style="background-image:url('${url}')" onclick="event.stopPropagation();openLightbox('${p.id}',${i})"></div>`).join('');
     const dots = imgs.length > 1 ? `<div class="slide-dots">${imgs.map((_,i)=>`<button class="slide-dot${i===0?' active':''}" onclick="event.stopPropagation();slideGo('${uid}',${i})"></button>`).join('')}</div>` : '';
     const arrows = imgs.length > 1 ? `
       <div class="slide-arrows">
@@ -4399,9 +4459,9 @@ function openDetail(id) {
     galleryHtml = `<div id="${uid}" style="position:absolute;inset:0">${slides}</div>${arrows}${dots}`;
   }
   const modalImgEl = document.getElementById('modalImg');
-  modalImgEl.style.background = imgs.length ? 'var(--bg-3)' : (colors[p.type] || '#f0f0f0');
+  modalImgEl.style.background = imgs.length ? 'var(--bg-3)' : (colors[pType] || '#f0f0f0');
   modalImgEl.innerHTML = `
-    <span class="modal-img-typebadge" style="background:${colors[p.type] || '#eee'}">${p.type || '—'}</span>
+    <span class="modal-img-typebadge" style="background:${colors[pType] || '#eee'}">${pType || '—'}</span>
     ${galleryHtml}
     ${imgs.length > 1 ? `<span class="modal-img-counter">${imgs.length} photos</span>` : ''}
     <button class="modal-close" onclick="closeDetail()" aria-label="Close details">
@@ -4443,100 +4503,84 @@ function openDetail(id) {
 
   // ── Quick-fact strip (signature element) ──
   const facts = [
-    {icon:I.cash, val: p.price ? '₹'+p.price.toLocaleString('en-IN') : '—', lbl:'Rent / mo'},
-    {icon:I.bed, val: p.bhk || '—', lbl:'BHK'},
-    {icon:I.home, val: p.area ? p.area+' sqft' : '—', lbl:'Area'},
-    {icon:I.doc, val: p.furnishing || '—', lbl:'Furnishing'},
-    {icon:I.cash, val: p.deposit ? '₹'+p.deposit.toLocaleString('en-IN') : '—', lbl:'Deposit'},
+    {icon:I.cash, val: price.rent ? '₹'+price.rent.toLocaleString('en-IN') : '—', lbl:'Rent / mo'},
+    {icon:I.bed, val: prop.bhk || '—', lbl:'BHK'},
+    {icon:I.home, val: prop.area ? prop.area+' sqft' : '—', lbl:'Area'},
+    {icon:I.doc, val: prop.furnish || '—', lbl:'Furnishing'},
+    {icon:I.cash, val: price.deposit ? '₹'+price.deposit.toLocaleString('en-IN') : '—', lbl:'Deposit'},
   ];
   const factStripHtml = facts.map(f => `<div class="modal-fact">${f.icon}<div class="modal-fact-val">${f.val}</div><div class="modal-fact-lbl">${f.lbl}</div></div>`).join('');
 
   // ── Core fields (common to all types) ──
   const coreFields = [
-    mf('Property type', p.propertyType),
-    mf('BHK', p.bhk),
-    mf('Furnishing', p.furnishing),
-    mf('Floor', p.floor),
-    mf('Built-up area', p.area ? p.area + ' sq.ft' : ''),
-    mf('Bathrooms', p.bathrooms),
-    mf('Facing', p.facing),
-    mf('Age of property', p.age),
-    mf('Lift', p.lift !== undefined ? (p.lift ? 'Yes' : 'No') : ''),
-    mf('Car parking', p.carpark !== undefined ? (p.carpark ? 'Yes' : 'No') : ''),
-    mf('Bike parking', p.bikepark !== undefined ? (p.bikepark ? 'Yes' : 'No') : ''),
-    mf('Tenant preferred', p.tenant),
-    mf('Available from', p.availableFrom),
+    mf('Property type', prop.type),
+    mf('BHK', prop.bhk),
+    mf('Furnishing', prop.furnish),
+    mf('Floor', prop.floor),
+    mf('Built-up area', prop.area ? prop.area + ' sq.ft' : ''),
+    mf('Bathrooms', prop.bathrooms),
+    mf('Facing', prop.facing),
+    mf('Age of property', prop.age),
+    mf('Lift', 'lift' in prop || true ? (lift ? 'Yes' : 'No') : ''),
+    mf('Car parking', prop.car !== undefined ? (carpark ? 'Yes' : 'No') : ''),
+    mf('Bike parking', prop.bike !== undefined ? (bikepark ? 'Yes' : 'No') : ''),
+    mf('Tenant preferred', prop.tenant),
+    mf('Available from', prop.available),
   ];
 
   // ── Pricing fields ──
   const pricingFields = [
-    mf('Deposit', money(p.deposit)),
-    mf('Maintenance', p.maintenance ? money(p.maintenance) + '/mo' : ''),
-    mf('Annual rent escalation', p.escalation ? p.escalation + '%' : ''),
-    mf('Electricity included', p.electricityIncluded),
-    mf('Water charge', p.waterCharge),
-    mf('Negotiable', p.negotiable ? (p.negotiable === 'yes' ? 'Yes' : 'No') : ''),
+    mf('Deposit', money(price.deposit)),
+    mf('Maintenance', price.maintenance ? money(price.maintenance) + '/mo' : ''),
+    mf('Rent escalation', price.rentIncrease),
+    mf('Electricity included', price.electricity),
+    mf('Water charge', price.water),
+    mf('Negotiable', price.negotiable ? 'Yes' : 'No'),
   ];
 
-  // ── Rent-specific ──
-  const rentFields = [
-    mf('Notice period', p.noticePeriod),
-    mf('Lease duration', p.leaseDuration),
-    mf('Pets allowed', p.petsAllowed),
-    mf('Non-veg allowed', p.nonVegAllowed),
-    mf('Piped gas', p.pipedGas),
-  ];
-
-  // ── Lease-specific ──
-  const leaseFields = [
-    mf('Lease amount', money(p.leaseAmount)),
-    mf('Monthly rent (on lease)', p.leaseMonthlyRent ? money(p.leaseMonthlyRent) : ''),
-    mf('Maintenance', p.leaseMaintenance ? money(p.leaseMaintenance) + '/mo' : ''),
-    mf('Lease duration', p.leaseDurationVal),
-    mf('Lease type', p.leaseType),
-    mf('Lock-in period', p.lockInPeriod),
-    mf('Available from', p.leaseAvailFrom),
-    mf('Notice period', p.leaseNotice),
-    mf('Rent escalation', p.rentEscalation),
-    mf('Pets allowed', p.leasePets),
-    mf('Non-veg allowed', p.leaseNonVeg),
+  // ── Rent / Lease terms (shared shape) ──
+  const termsFields = [
+    mf('Notice period', terms.notice),
+    mf('Lease / agreement duration', terms.lease),
+    mf('Pets allowed', rules.pets),
+    mf('Non-veg allowed', rules.nonVeg),
+    mf('Piped gas', rules.gas),
   ];
 
   // ── PG-specific ──
   const pgFields = [
-    mf('Gender', p.pgGender),
-    mf('Room type', p.pgRoomType),
-    mf('Attached bathroom', p.pgBathroom),
-    mf('Occupancy available', p.pgOccupancy),
-    mf('Total beds', p.pgTotalBeds),
-    mf('Meals cost', p.pgMealsCost ? money(p.pgMealsCost) + '/mo' : ''),
-    mf('Room furnishing', p.pgRoomFurnishing),
-    mf('Kitchen access', p.pgKitchenAccess),
-    mf('Available from', p.pgAvailableFrom),
-    mf('Notice period', p.pgNotice),
-    mf('Meals', p.pgMeals),
-    mf('Food type', p.pgFoodType),
-    mf('Gate closing time', p.pgGateTime),
-    mf('Visitor policy', p.pgVisitorPolicy),
-    mf('Non-veg allowed', p.pgNonVeg),
-    mf('Pets allowed', p.pgPets),
+    mf('Gender', pg.gender),
+    mf('Room type', pg.room),
+    mf('Attached bathroom', pg.bathroom),
+    mf('Occupancy available', pg.occupancy),
+    mf('Total beds', pg.beds),
+    mf('Meals cost', pg.mealCost ? money(pg.mealCost) + '/mo' : ''),
+    mf('Room furnishing', pg.furnish),
+    mf('Kitchen access', pg.kitchen),
+    mf('Available from', pg.available),
+    mf('Notice period', pg.notice),
+    mf('Meals', pg.meals),
+    mf('Food type', pg.food),
+    mf('Gate closing time', pg.gateTime),
+    mf('Visitor policy', pg.visitors),
+    mf('Non-veg allowed', pg.nonVeg),
+    mf('Pets allowed', pg.pets),
   ];
-  // If type is unset/unknown on old demo data, still show all three so nothing silently disappears
-  const typeSectionsHtml = [
-    section(I.cash, 'Rent terms', rentFields),
-    section(I.doc, 'Lease terms', leaseFields),
-    section(I.bed, 'PG details', pgFields),
-  ];
-  const activeTypeSection = p.type === 'Rent' ? typeSectionsHtml[0] : p.type === 'Lease' ? typeSectionsHtml[1] : p.type === 'PG' ? typeSectionsHtml[2] : '';
+  const typeSectionsHtml = {
+    Rent:  section(I.cash, 'Rent terms', termsFields),
+    Lease: section(I.doc, 'Lease terms', termsFields),
+    PG:    section(I.bed, 'PG details', pgFields),
+  };
+  const activeTypeSection = typeSectionsHtml[pType] || '';
 
   // ── Location fields ──
   const locationFields = [
-    mf('City', p.city),
-    mf('Full address', p.fullAddress),
-    mf('Coordinates', (p.latitude && p.longitude) ? p.latitude.toFixed(6) + '° N, ' + p.longitude.toFixed(6) + '° E' : ''),
+    mf('City', loc.city),
+    mf('Full address', loc.address),
+    mf('Coordinates', (loc.lat && loc.lng) ? Number(loc.lat).toFixed(6) + '° N, ' + Number(loc.lng).toFixed(6) + '° E' : ''),
   ];
-  const mapsLinkHtml = p.googleMapsLink
-    ? `<a href="${p.googleMapsLink}" target="_blank" rel="noopener" class="modal-link-card">
+  const mapsLinkHtml = loc.mapLink
+    ? `<a href="${loc.mapLink}" target="_blank" rel="noopener" class="modal-link-card">
         <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         View on Google Maps →
       </a>`
@@ -4547,26 +4591,26 @@ function openDetail(id) {
 
   // ── Owner / contact fields ──
   const contactRows = [
-    cf(I.user, 'Listed by', p.listedBy),
-    cf(I.user, 'Owner name', p.ownerName),
-    cf(I.phone, 'Phone', p.ownerPhone),
-    cf(I.mail, 'Email', p.ownerEmail),
-    cf(I.phone, 'Alternate number', p.ownerAltPhone),
-    cf(I.clock, 'Best time to contact', p.contactTime),
-    cf(I.pin, 'Owner address', p.ownerAddress),
+    cf(I.user, 'Listed by', p.basic?.listedBy),
+    cf(I.user, 'Owner name', owner.name),
+    cf(I.phone, 'Phone', owner.phone),
+    cf(I.mail, 'Email', owner.email),
+    cf(I.phone, 'Alternate number', owner.altPhone),
+    cf(I.clock, 'Best time to contact', owner.contactTime),
+    cf(I.pin, 'Owner address', owner.address),
   ].join('');
 
   document.getElementById('modalBody').innerHTML = `
     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
       <div>
-        <div class="modal-price">${p.price ? '₹'+p.price.toLocaleString('en-IN') : '—'} <span>/ Month</span></div>
+        <div class="modal-price">${price.rent ? '₹'+price.rent.toLocaleString('en-IN') : '—'} <span>/ Month</span></div>
         <div class="modal-title" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-          <span>${p.title || 'Untitled listing'}</span>
+          <span>${owner.propertyName || 'Untitled listing'}</span>
           ${p.verified ? `<span class="prop-verified-badge" title="Verified listing"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1l3.2 1.6 3.5.4 1.6 3.2 2.7 2.4-.6 3.6 1 3.4-2.7 2.4-1.6 3.2-3.5.4-3.2 1.6-3.2-1.6-3.5-.4-1.6-3.2-2.7-2.4.6-3.6-1-3.4 2.7-2.4 1.6-3.2 3.5-.4z"/><path d="M9 12.5l2 2 4-4.5" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Verified</span>` : ''}
         </div>
         <div class="modal-loc">
           ${I.pin}
-          ${p.location || '—'}
+          ${loc.area || '—'}
         </div>
       </div>
     </div>
@@ -4585,15 +4629,21 @@ function openDetail(id) {
     <div class="modal-divider"></div>
     <div class="modal-section-head">${I.doc}<div class="modal-section-title">Amenities</div></div>
     <div class="modal-amenities">
-      ${(p.amenities && p.amenities.length) ? p.amenities.map(a => `<div class="modal-amenity"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>${a}</div>`).join('') : '<div class="modal-empty-note">No amenities listed</div>'}
+      ${(() => {
+        const list = (p.amenities?.selected || []).slice();
+        if (p.amenities?.extra) list.push(...p.amenities.extra.split(',').map(s => s.trim()).filter(Boolean));
+        return list.length
+          ? list.map(a => `<div class="modal-amenity"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>${a}</div>`).join('')
+          : '<div class="modal-empty-note">No amenities listed</div>';
+      })()}
     </div>
 
     <div class="modal-divider"></div>
     <div class="modal-section-head">${I.doc}<div class="modal-section-title">About this property</div></div>
-    <div class="modal-desc">${p.desc || '<span class="modal-empty-note">No description provided</span>'}</div>
+    <div class="modal-desc">${media.desc || '<span class="modal-empty-note">No description provided</span>'}</div>
 
-    ${p.videoUrl
-      ? `<a href="${p.videoUrl}" target="_blank" rel="noopener" class="modal-link-card"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Watch property video</a>`
+    ${media.video
+      ? `<a href="${media.video}" target="_blank" rel="noopener" class="modal-link-card"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Watch property video</a>`
       : `<div class="modal-link-card modal-link-card-empty"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>No property video added</div>`}
 
     ${section(I.pin, 'Location', locationFields)}
@@ -4654,7 +4704,7 @@ function openScheduleModal(propId) {
   const p = PROPERTIES.find(x => x.id === propId);
   if (!p) return;
   scheduleForPropId = propId;
-  document.getElementById('scheduleModalSubtitle').textContent = p.title + ' · ' + p.location;
+  document.getElementById('scheduleModalSubtitle').textContent = (p.owner?.propertyName || '') + ' · ' + (p.location?.area || '');
   // reset fields
   document.getElementById('sched-date').value = '';
   document.getElementById('sched-time').value = '';
@@ -4685,7 +4735,7 @@ function submitScheduleVisit() {
   const dateLabel = dateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
   const timeLabel = dateObj.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' });
   closeScheduleModal();
-  showToast(`Visit requested for ${dateLabel}, ${timeLabel}${p ? ' — ' + p.title : ''}`);
+  showToast(`Visit requested for ${dateLabel}, ${timeLabel}${p ? ' — ' + p.owner?.propertyName : ''}`);
 }
 
 /* ═══════════════════════════════════════════════
@@ -4694,14 +4744,14 @@ function submitScheduleVisit() {
 function openWhatsApp(propId) {
   const p = PROPERTIES.find(x => x.id === propId);
   if (!p) return;
-  const rawPhone = (p.ownerNumber || p.ownerPhone || '').replace(/\D/g, '');
+  const rawPhone = (p.owner?.phone || '').replace(/\D/g, '');
   if (!rawPhone) {
     showToast('Owner has not added a WhatsApp number for this listing');
     return;
   }
   const phone = rawPhone.length === 10 ? '91' + rawPhone : rawPhone;
   const propertyUrl = `${window.location.origin}${window.location.pathname}?property=${p.id}`;
-  const msg = `Hi, I'm interested in "${p.title}" (${p.location}) listed on Quatar. Is it still available?\n\nView listing: ${propertyUrl}`;
+  const msg = `Hi, I'm interested in "${p.owner?.propertyName}" (${p.location?.area}) listed on Quatar. Is it still available?\n\nView listing: ${propertyUrl}`;
   const url = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(msg);
   window.open(url, '_blank', 'noopener');
 }
@@ -5132,106 +5182,124 @@ function submitListing() {
   function gv(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
   function gb(id) { const el = document.getElementById(id); return el ? el.checked : false; }
 
-  const amenities = AM_LIST.filter(([id]) => gb(id)).map(([id, label, unitId]) => {
+  const amenitiesSelected = AM_LIST.filter(([id]) => gb(id)).map(([id, label, unitId]) => {
     if (unitId) {
       const qty = parseInt(gv(unitId)) || 1;
       return qty > 1 ? label + ' ×' + qty : label;
     }
     return label;
   });
-  const extra = gv('f-amenities-extra');
-  if (extra) extra.split(',').map(s => s.trim()).filter(Boolean).forEach(a => amenities.push(a));
+  const amenitiesExtra = gv('f-amenities-extra');
 
   const images = fImages.slice();
 
   const typeRaw = document.getElementById('f-type').value;
-  // Map frontend type values → schema status enum values
+  // Map frontend type values → schema basic.status enum values
   // Schema enum: "For Sale" | "For Rent" | "New Launch" | "Sold" | "Booked" | "Lease" | "PG"
   const statusMap = { 'Rent': 'For Rent', 'For Rent': 'For Rent', 'Lease': 'Lease', 'PG': 'PG' };
   const status = statusMap[typeRaw] || 'For Rent';
+  const isPG = status === 'PG';
+  const isLease = status === 'Lease';
 
+  // ── Build the nested submission payload ──────────────────────
+  // {basic, location, owner, price, property, amenities, terms, rules, media, pg}
   const newProp = {
-    // ── Schema field names (NOT frontend names) ──
-    title:    title,
-    loc:      loc,                          // schema: loc  (frontend sends: location)
-    city:     document.getElementById('f-city').value.trim() || 'Bengaluru',
-    price:    parseInt(rent) || 0,
-    status:   status,                       // schema: status (frontend sends: type)
-    deposit:  parseInt(document.getElementById('f-deposit').value) || 0,
-    maintenance:         parseFloat(gv('f-maintenance')) || null,
-    escalation:          parseFloat(gv('f-escalation')) || null,
-    electricityIncluded: gv('f-electricityIncluded') || null,
-    waterCharge:         gv('f-waterCharge') || null,
-    propertyType:        status === 'PG' ? null : gv('f-propertyType'),
-    bhk:      status === 'PG' ? null : (parseInt(document.getElementById('f-bhk').value) || null),
-    area:     status === 'PG' ? null : gv('f-area'),
-    furnishing: document.getElementById('f-furnishing').value,
-    floor:    document.getElementById('f-floor').value || 'G',
-    age:      status === 'PG' ? null : gv('f-age'),
-    toilet:   status === 'PG' ? '1' : String(parseInt(document.getElementById('f-baths').value) || 1), // schema: toilet
-    carparking: status === 'PG' ? 'No' : (document.getElementById('f-carpark').checked ? 'Yes' : 'No'),  // schema: carparking
-    bikeparking: status === 'PG' ? 'No' : (document.getElementById('f-bikepark').checked ? 'Yes' : 'No'), // schema: bikeparking
-    facing:   status === 'PG' ? 'North' : document.getElementById('f-facing').value,
-    amenities: amenities,
-    tenantPref: status === 'PG'                                                                // schema: tenantPref
-      ? (document.getElementById('f-pgGender').value === 'Girls' ? 'Female only' : 'Any')
-      : document.getElementById('f-tenant').value,
-    desc:     document.getElementById('f-desc').value.trim(),
-    videoUrl: gv('f-videoUrl') || null,
-    listedBy: document.getElementById('f-listedBy').value,
-    fullAddress:    document.getElementById('f-fullAddress').value.trim(),
-    googleMapsLink: gv('f-googleMapsLink') || null,
-    latitude:  parseFloat(document.getElementById('f-latitude').value) || null,
-    longitude: parseFloat(document.getElementById('f-longitude').value) || null,
-    ownerName:    ownerName,
-    ownerNumber:  ownerPhone,               // schema: ownerNumber  (frontend sends: ownerPhone)
-    ownerEmail:   document.getElementById('f-ownerEmail').value.trim(),
-    ownerAltPhone: gv('f-ownerAltPhone') || null,
-    ownerAddress:  gv('f-ownerAddress') || null,
-    contactTime:   gv('f-contactTime') || null,
-    negotiable:    gv('f-negotiable') === 'Yes',
-    availableFrom: document.getElementById('f-avail').value || null,
-    images: images,
+    basic: {
+      status:   status,
+      listedBy: document.getElementById('f-listedBy').value,
+    },
+    location: {
+      area:    loc,
+      city:    document.getElementById('f-city').value.trim() || 'Bengaluru',
+      address: document.getElementById('f-fullAddress').value.trim(),
+      lat:     parseFloat(document.getElementById('f-latitude').value) || null,
+      lng:     parseFloat(document.getElementById('f-longitude').value) || null,
+      mapLink: gv('f-googleMapsLink') || null,
+    },
+    owner: {
+      propertyName: title,
+      name:         ownerName,
+      phone:        ownerPhone,
+      email:        document.getElementById('f-ownerEmail').value.trim(),
+      altPhone:     gv('f-ownerAltPhone') || null,
+      contactTime:  gv('f-contactTime') || null,
+      address:      gv('f-ownerAddress') || null,
+    },
+    price: isLease ? {
+      rent:         parseFloat(gv('f-leaseAmount')) || 0,
+      deposit:      parseInt(document.getElementById('f-deposit').value) || 0,
+      maintenance:  parseFloat(gv('f-leaseMaintenance')) || null,
+      rentIncrease: gv('f-rentEscalation') || null,
+      electricity:  gv('f-electricityIncluded') || null,
+      water:        gv('f-waterCharge') || null,
+      negotiable:   gv('f-negotiable') === 'Yes',
+    } : {
+      rent:         parseInt(rent) || 0,
+      deposit:      parseInt(document.getElementById('f-deposit').value) || 0,
+      maintenance:  parseFloat(gv('f-maintenance')) || null,
+      rentIncrease: parseFloat(gv('f-escalation')) ? gv('f-escalation') + '%' : null,
+      electricity:  gv('f-electricityIncluded') || null,
+      water:        gv('f-waterCharge') || null,
+      negotiable:   gv('f-negotiable') === 'Yes',
+    },
+    property: {
+      type:      isPG ? null : gv('f-propertyType'),
+      bhk:       isPG ? null : gv('f-bhk'),
+      bike:      isPG ? 'No' : (document.getElementById('f-bikepark').checked ? 'Yes' : 'No'),
+      car:       isPG ? 'No' : (document.getElementById('f-carpark').checked ? 'Yes' : 'No'),
+      floor:     document.getElementById('f-floor').value || 'G',
+      area:      isPG ? null : gv('f-area'),
+      bathrooms: isPG ? '1' : String(parseInt(document.getElementById('f-baths').value) || 1),
+      furnish:   document.getElementById('f-furnishing').value,
+      facing:    isPG ? 'North' : document.getElementById('f-facing').value,
+      age:       isPG ? null : gv('f-age'),
+      tenant:    isPG
+        ? (document.getElementById('f-pgGender').value === 'Girls' ? 'Female only' : 'Any')
+        : document.getElementById('f-tenant').value,
+      available: isPG ? gv('f-pgAvailableFrom') : document.getElementById('f-avail').value || null,
+    },
+    amenities: {
+      selected: amenitiesSelected,
+      extra:    amenitiesExtra,
+    },
+    terms: {
+      notice: isPG ? (gv('f-pgNotice') || null)
+            : isLease ? (gv('f-leaseNoticePeriod') || null)
+            : (gv('f-noticePeriod') || null),
+      lease:  isLease
+        ? [gv('f-leaseDurationVal'), gv('f-leaseType'), gv('f-lockInPeriod') ? ('Lock-in: ' + gv('f-lockInPeriod')) : '']
+            .filter(Boolean).join(' · ') || null
+        : (gv('f-leaseDuration') || null),
+    },
+    rules: {
+      pets:   isPG ? (gv('f-pgPets') || null) : isLease ? (gv('f-leasePets') || null) : (gv('f-petsAllowed') || null),
+      nonVeg: isPG ? (gv('f-pgNonVeg') || null) : isLease ? (gv('f-leaseNonVeg') || null) : (gv('f-nonVegAllowed') || null),
+      gas:    isPG ? null : (gv('f-pipedGas') || null),
+    },
+    media: {
+      video: gv('f-videoUrl') || null,
+      desc:  document.getElementById('f-desc').value.trim(),
+      images: images,
+    },
+    pg: isPG ? {
+      gender:    document.getElementById('f-pgGender').value,
+      room:      document.getElementById('f-pgRoomType').value,
+      meals:     document.getElementById('f-pgMeals').value,
+      occupancy: gv('f-pgOccupancy') || null,
+      notice:    gv('f-pgNotice') || null,
+      bathroom:  gv('f-pgBathroom') || null,
+      mealCost:  parseFloat(gv('f-pgMealsCost')) || null,
+      beds:      gv('f-pgTotalBeds') || null,
+      furnish:   gv('f-pgRoomFurnishing') || null,
+      food:      gv('f-pgFoodType') || null,
+      kitchen:   gv('f-pgKitchenAccess') || null,
+      available: gv('f-pgAvailableFrom') || null,
+      visitors:  gv('f-pgVisitorPolicy') || null,
+      gateTime:  gv('f-pgGateTime') || null,
+      nonVeg:    gv('f-pgNonVeg') || null,
+      pets:      gv('f-pgPets') || null,
+    } : {},
   };
-
-  if (status === 'For Rent') {
-    newProp.noticePeriod  = gv('f-noticePeriod') || null;
-    newProp.leaseDuration = gv('f-leaseDuration') || null;
-    newProp.petsAllowed   = gv('f-petsAllowed') || null;
-    newProp.nonVegAllowed = gv('f-nonVegAllowed') || null;
-    newProp.pipedGas      = gv('f-pipedGas') || null;
-  }
-  if (status === 'Lease') {
-    newProp.leaseAmount      = parseFloat(gv('f-leaseAmount')) || null;
-    newProp.leaseMonthlyRent = parseFloat(gv('f-leaseMonthlyRent')) || null;
-    newProp.leaseMaintenance = parseFloat(gv('f-leaseMaintenance')) || null;
-    newProp.leaseDurationVal = gv('f-leaseDurationVal') || null;
-    newProp.leaseType        = gv('f-leaseType') || null;
-    newProp.lockInPeriod     = gv('f-lockInPeriod') || null;
-    newProp.leaseAvailFrom   = gv('f-leaseAvailableFrom') || null;
-    newProp.leaseNotice      = gv('f-leaseNoticePeriod') || null;
-    newProp.rentEscalation   = gv('f-rentEscalation') || null;
-    newProp.leasePets        = gv('f-leasePets') || null;
-    newProp.leaseNonVeg      = gv('f-leaseNonVeg') || null;
-  }
-  if (status === 'PG') {
-    newProp.pgGender        = document.getElementById('f-pgGender').value;
-    newProp.pgRoomType      = document.getElementById('f-pgRoomType').value;
-    newProp.pgBathroom      = gv('f-pgBathroom') || null;
-    newProp.pgOccupancy     = parseInt(gv('f-pgOccupancy')) || null;
-    newProp.pgTotalBeds     = gv('f-pgTotalBeds') || null;
-    newProp.pgMealsCost     = parseFloat(gv('f-pgMealsCost')) || null;
-    newProp.pgRoomFurnishing= gv('f-pgRoomFurnishing') || null;
-    newProp.pgKitchenAccess = gv('f-pgKitchenAccess') || null;
-    newProp.pgAvailableFrom = gv('f-pgAvailableFrom') || null;
-    newProp.pgNotice        = gv('f-pgNotice') || null;
-    newProp.pgMeals         = document.getElementById('f-pgMeals').value;
-    newProp.pgFoodType      = gv('f-pgFoodType') || null;
-    newProp.pgGateTime      = gv('f-pgGateTime') || null;
-    newProp.pgVisitorPolicy = gv('f-pgVisitorPolicy') || null;
-    newProp.pgNonVeg        = gv('f-pgNonVeg') || null;
-    newProp.pgPets          = gv('f-pgPets') || null;
-  }
 
   // ── POST to backend ──────────────────────────────────────────
   const submitBtn = document.querySelector('#addModal .form-submit');
@@ -5245,20 +5313,13 @@ function submitListing() {
   .then(async res => {
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Server error');
-    // Build a local card object from the saved doc
+    // Use the saved doc as-is (already in the nested shape); just attach
+    // the bits the GET endpoint normally adds (id/posted/verified/displayPrice).
     const saved = data.property || {};
     const localProp = Object.assign({}, newProp, saved, {
-      id:         saved._id || (PROPERTIES.length + 1),
-      type:       typeRaw,          // keep original frontend type for tab filtering
-      location:   loc,              // keep 'location' key used by renderCards
-      posted:     'Just now',
-      verified:   false,
-      // Map schema field names → frontend field names used by cardHTML / filters
-      bathrooms:  parseInt(saved.toilet) || parseInt(newProp.toilet) || 1,
-      carpark:    (saved.carparking || newProp.carparking) === 'Yes',
-      bikepark:   (saved.bikeparking || newProp.bikeparking) === 'Yes',
-      lift:       (saved.amenities || newProp.amenities || []).some(a => /lift/i.test(a)),
-      ownerPhone: saved.ownerNumber || newProp.ownerNumber || '',
+      id:      saved._id || saved.id || (PROPERTIES.length + 1),
+      posted:  'Just now',
+      verified: false,
     });
     PROPERTIES.unshift(localProp);
     fImages = [];
