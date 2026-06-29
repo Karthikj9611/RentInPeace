@@ -6,6 +6,7 @@ const cors       = require('cors');
 const path       = require('path');
 const crypto     = require('crypto');
 const rateLimit  = require('express-rate-limit');
+const bcrypt     = require('bcryptjs');
 
 // ── Env checks ──
 if (!process.env.MONGODB_URI)   throw new Error('MONGODB_URI env var is required');
@@ -74,6 +75,171 @@ app.post('/api/admin/logout', (req, res) => {
   const key = (req.headers['x-admin-key'] || '').toString();
   adminSessions.delete(key);
   res.json({ message: 'Logged out' });
+});
+
+// ── User Schema ──
+const UserSchema = new mongoose.Schema({
+  name:      { type: String, trim: true },
+  contact:   { type: String, required: true, unique: true, trim: true, lowercase: true },
+  password:  { type: String, required: true },
+  createdAt: { type: Date, default: Date.now }
+});
+const User = mongoose.model('User', UserSchema);
+
+// Rate limiter for user auth
+const userAuthLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, max: 20,
+  standardHeaders: true, legacyHeaders: false,
+  message: { message: 'Too many attempts. Please try again later.' }
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// ── USER SESSIONS ──
+// Same lightweight in-memory pattern as the admin sessions above: a random
+// token handed back on login/signup, sent on later requests as 'x-user-key',
+// matched here. Resets on server restart — fine for this app's current scale,
+// swap for a signed JWT or a sessions collection if that ever matters.
+// ────────────────────────────────────────────────────────────────────────────
+const userSessions = new Map(); // userKey -> { userId, expiry }
+const USER_SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+function issueUserSession(userId) {
+  const key = crypto.randomBytes(32).toString('hex');
+  userSessions.set(key, { userId: String(userId), expiry: Date.now() + USER_SESSION_TTL_MS });
+  return key;
+}
+
+function getUserIdFromSession(key) {
+  if (!key) return null;
+  const session = userSessions.get(key);
+  if (!session) return null;
+  if (Date.now() > session.expiry) {
+    userSessions.delete(key);
+    return null;
+  }
+  return session.userId;
+}
+
+// Middleware to protect routes that require a logged-in user.
+// Attaches req.userId when the session is valid.
+function requireUser(req, res, next) {
+  const key = (req.headers['x-user-key'] || '').toString();
+  const userId = getUserIdFromSession(key);
+  if (!userId) return res.status(401).json({ message: 'Please log in to continue' });
+  req.userId = userId;
+  next();
+}
+
+// Like requireUser, but never blocks the request — just attaches req.userId
+// if a valid session key was sent (null otherwise). Used on routes that must
+// still work for guests, e.g. submitting a listing while logged out.
+function attachUserIfPresent(req, res, next) {
+  const key = (req.headers['x-user-key'] || '').toString();
+  req.userId = getUserIdFromSession(key);
+  next();
+}
+
+// ── User Signup ──
+app.post('/api/user/signup', userAuthLimiter, async (req, res) => {
+  try {
+    const { name, contact, password } = req.body || {};
+    if (!contact || !password) return res.status(400).json({ message: 'Contact and password are required' });
+    if (password.length < 6) return res.status(400).json({ message: 'Password must be at least 6 characters' });
+
+    const existing = await User.findOne({ contact: contact.toLowerCase().trim() });
+    if (existing) return res.status(409).json({ message: 'Account already exists. Please log in.' });
+
+    const hashed = await bcrypt.hash(password, 10);
+    const user = await User.create({ name: name?.trim(), contact: contact.toLowerCase().trim(), password: hashed });
+    const userKey = issueUserSession(user._id);
+    return res.status(201).json({ message: 'Account created successfully', userId: user._id, name: user.name, contact: user.contact, userKey });
+  } catch (err) {
+    console.error('Signup error:', err);
+    res.status(500).json({ message: 'Server error. Please try again.' });
+  }
+});
+
+// ── User Login ──
+app.post('/api/user/login', userAuthLimiter, async (req, res) => {
+  try {
+    const { contact, password } = req.body || {};
+    if (!contact || !password) return res.status(400).json({ message: 'Please enter your details' });
+
+    const user = await User.findOne({ contact: contact.toLowerCase().trim() });
+    if (!user) return res.status(401).json({ message: 'No account found. Please sign up.' });
+
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) return res.status(401).json({ message: 'Incorrect password' });
+
+    const userKey = issueUserSession(user._id);
+    return res.json({ message: 'Logged in successfully', userId: user._id, name: user.name, contact: user.contact, userKey });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ message: 'Server error. Please try again.' });
+  }
+});
+
+// ── User Logout ──
+app.post('/api/user/logout', (req, res) => {
+  const key = (req.headers['x-user-key'] || '').toString();
+  userSessions.delete(key);
+  res.json({ message: 'Logged out' });
+});
+
+// ── GET current user profile ──
+app.get('/api/user/me', requireUser, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).lean();
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ userId: user._id, name: user.name || '', contact: user.contact, createdAt: user.createdAt });
+  } catch (err) {
+    console.error('GET /api/user/me error:', err);
+    res.status(500).json({ message: 'Server error. Please try again.' });
+  }
+});
+
+// ── UPDATE current user profile (name / contact) ──
+app.put('/api/user/me', requireUser, async (req, res) => {
+  try {
+    const { name, contact } = req.body || {};
+    const update = {};
+    if (name !== undefined) update.name = String(name).trim();
+    if (contact !== undefined) {
+      const cleanContact = String(contact).toLowerCase().trim();
+      if (!cleanContact) return res.status(400).json({ message: 'Contact cannot be empty' });
+      const existing = await User.findOne({ contact: cleanContact, _id: { $ne: req.userId } });
+      if (existing) return res.status(409).json({ message: 'That phone/email is already in use by another account' });
+      update.contact = cleanContact;
+    }
+    const user = await User.findByIdAndUpdate(req.userId, update, { new: true });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ message: 'Profile updated', userId: user._id, name: user.name || '', contact: user.contact });
+  } catch (err) {
+    console.error('PUT /api/user/me error:', err);
+    res.status(500).json({ message: 'Server error. Please try again.' });
+  }
+});
+
+// ── CHANGE password ──
+app.put('/api/user/password', requireUser, userAuthLimiter, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body || {};
+    if (!currentPassword || !newPassword) return res.status(400).json({ message: 'Current and new password are required' });
+    if (newPassword.length < 6) return res.status(400).json({ message: 'New password must be at least 6 characters' });
+
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const match = await bcrypt.compare(currentPassword, user.password);
+    if (!match) return res.status(401).json({ message: 'Current password is incorrect' });
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+    res.json({ message: 'Password updated successfully' });
+  } catch (err) {
+    console.error('PUT /api/user/password error:', err);
+    res.status(500).json({ message: 'Server error. Please try again.' });
+  }
 });
 
 // Middleware to protect admin-only API routes.
@@ -198,6 +364,7 @@ const PropertySchema = new mongoose.Schema({
   media:      { type: MediaSchema,            default: () => ({}) },
   pg:         { type: PgSchema,               default: () => ({}) },
   // ── Meta (kept top-level / flat — not part of the submitted payload) ──
+  userId:           { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true }, // owner of this listing, null = posted while logged out
   promoted:         { type: Boolean, default: false },
   promotedPriority: { type: Number,  default: 3 },
   views:            { type: Number,  default: 0 },
@@ -265,7 +432,7 @@ const listingLimiter = rateLimit({
 });
 
 // ── POST /api/properties ──
-app.post('/api/properties', listingLimiter, async (req, res) => {
+app.post('/api/properties', listingLimiter, attachUserIfPresent, async (req, res) => {
   try {
     const body = req.body || {};
     const fields = NESTED_SECTIONS.reduce((acc, k) => {
@@ -287,6 +454,7 @@ app.post('/api/properties', listingLimiter, async (req, res) => {
     const displayPrice = formatPrice(fields.price.rent, status);
 
     const prop = new Property({
+      userId:    req.userId || null, // links the listing to its creator when logged in
       basic:     fields.basic,
       location:  fields.location,
       owner:     fields.owner,
@@ -484,6 +652,83 @@ app.delete('/api/properties/:id', requireAdmin, async (req, res) => {
   } catch (err) {
     console.error('DELETE /api/properties/:id error:', err);
     res.status(500).json({ message: 'Error deleting property: ' + err.message });
+  }
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// ── USER-OWNED LISTINGS ──
+// These three routes are the only way a regular (non-admin) user can read,
+// edit, or delete listings tied to their own account. Every query below
+// filters by { _id, userId: req.userId } together — never by _id alone — so
+// a user can only ever touch a property that has THEIR userId stamped on it.
+// Listings posted while logged out (userId: null) are not user-editable by
+// anyone; only the admin panel can manage those.
+// ────────────────────────────────────────────────────────────────────────────
+
+// ── GET /api/user/my-listings ──
+app.get('/api/user/my-listings', requireUser, async (req, res) => {
+  try {
+    const docs = await Property.find({ userId: req.userId })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const mapped = docs.map(doc => ({
+      ...doc,
+      id:           String(doc._id),
+      displayPrice: formatPrice((doc.price || {}).rent, (doc.basic || {}).status),
+    }));
+
+    res.json({ properties: mapped, total: mapped.length });
+  } catch (err) {
+    console.error('GET /api/user/my-listings error:', err);
+    res.status(500).json({ message: 'Error fetching your listings: ' + err.message });
+  }
+});
+
+// ── PUT /api/user/listings/:id (edit a listing the user owns) ──
+app.put('/api/user/listings/:id', requireUser, async (req, res) => {
+  try {
+    const prop = await Property.findOne({ _id: req.params.id, userId: req.userId });
+    if (!prop) return res.status(404).json({ message: 'Listing not found, or you do not have permission to edit it' });
+
+    const body = req.body || {};
+    const fields = NESTED_SECTIONS.reduce((acc, k) => {
+      acc[k] = (body[k] && typeof body[k] === 'object') ? body[k] : {};
+      return acc;
+    }, {});
+
+    // Only validate/apply sections the client actually sent something for,
+    // so a partial edit (e.g. just price) doesn't get wiped by empty objects.
+    const sentSections = NESTED_SECTIONS.filter(k => body[k] && typeof body[k] === 'object');
+    const fieldsForValidation = {};
+    for (const k of sentSections) fieldsForValidation[k] = fields[k];
+    const validationError = validatePropertyFields(fieldsForValidation);
+    if (validationError) return res.status(400).json({ message: validationError });
+
+    for (const section of sentSections) {
+      prop[section] = Object.assign({}, prop[section]?.toObject ? prop[section].toObject() : prop[section], fields[section]);
+    }
+
+    await prop.save();
+    const saved = prop.toObject();
+    saved.displayPrice = formatPrice((saved.price || {}).rent, (saved.basic || {}).status);
+
+    res.json({ message: 'Listing updated successfully', property: saved });
+  } catch (err) {
+    console.error('PUT /api/user/listings/:id error:', err);
+    res.status(500).json({ message: 'Error updating listing: ' + err.message });
+  }
+});
+
+// ── DELETE /api/user/listings/:id (delete a listing the user owns) ──
+app.delete('/api/user/listings/:id', requireUser, async (req, res) => {
+  try {
+    const deleted = await Property.findOneAndDelete({ _id: req.params.id, userId: req.userId });
+    if (!deleted) return res.status(404).json({ message: 'Listing not found, or you do not have permission to delete it' });
+    res.json({ message: 'Listing deleted' });
+  } catch (err) {
+    console.error('DELETE /api/user/listings/:id error:', err);
+    res.status(500).json({ message: 'Error deleting listing: ' + err.message });
   }
 });
 

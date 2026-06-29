@@ -1143,6 +1143,101 @@ ul{list-style:none}
 .auth-social:hover{background:var(--bg-2)}
 .auth-foot{text-align:center;font-size:12px;color:var(--text-3);margin-top:16px}
 .auth-foot a{color:var(--brand);font-weight:600;cursor:pointer}
+/* ─── User Profile Button (nav) ─────────────────── */
+.user-profile-btn{
+  display:flex;align-items:center;gap:7px;
+  background:var(--brand-light);border:1.5px solid #f5c0c8;
+  border-radius:99px;padding:5px 12px 5px 6px;
+  cursor:pointer;transition:background .15s;
+}
+.user-profile-btn:hover{background:#fde4e8}
+.user-avatar{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--brand);color:#fff;
+  font-size:12px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.user-profile-name{font-size:13px;font-weight:600;color:var(--brand);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ─── Profile Modal ─────────────────────────────── */
+.profile-info-row{display:flex;align-items:center;gap:14px;padding:4px 0 16px}
+.profile-avatar-lg{
+  width:52px;height:52px;border-radius:50%;
+  background:var(--brand);color:#fff;
+  font-size:20px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.profile-info-name{font-size:16px;font-weight:700;color:var(--text)}
+.profile-info-contact{font-size:12px;color:var(--text-3);margin-top:2px}
+.profile-logout-btn{
+  width:100%;padding:12px;border-radius:10px;
+  border:1.5px solid #f5c0c8;background:var(--brand-light);
+  color:var(--brand);font-size:14px;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-top:14px;transition:background .15s;
+}
+.profile-logout-btn:hover{background:#fde4e8}
+
+.profile-tabs{display:flex;gap:4px;background:var(--bg-2);border-radius:10px;padding:4px;margin-bottom:18px}
+.profile-tab{
+  flex:1;text-align:center;padding:8px 4px;border-radius:8px;
+  font-size:12.5px;font-weight:600;color:var(--text-2);cursor:pointer;
+  transition:background .15s,color .15s;white-space:nowrap;
+}
+.profile-tab.active{background:var(--bg);color:var(--brand);box-shadow:var(--shadow)}
+.profile-tab-panel{display:none}
+.profile-tab-panel.active{display:block}
+
+.profile-edit-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.profile-link-btn{
+  font-size:12px;font-weight:600;color:var(--brand);cursor:pointer;
+  background:none;border:none;padding:0;display:flex;align-items:center;gap:4px;
+}
+.profile-link-btn svg{width:13px;height:13px;stroke:var(--brand);fill:none;stroke-width:2.2}
+.profile-save-row{display:flex;gap:8px;margin-top:6px}
+.profile-save-row .form-submit{margin-top:0}
+.profile-btn-secondary{
+  width:100%;padding:12px;border-radius:10px;
+  background:var(--bg-2);color:var(--text-2);font-size:14px;font-weight:600;
+  border:1.5px solid var(--border-2);cursor:pointer;transition:background .12s;
+}
+.profile-btn-secondary:hover{background:var(--border)}
+
+.profile-list-empty{
+  text-align:center;color:var(--text-3);font-size:12.5px;
+  padding:32px 12px;line-height:1.6;
+}
+.profile-mini-card{
+  display:flex;gap:10px;align-items:center;padding:10px;
+  border:1.5px solid var(--border);border-radius:12px;margin-bottom:10px;
+  cursor:pointer;transition:border-color .12s,background .12s;
+}
+.profile-mini-card:hover{border-color:var(--brand);background:var(--brand-light)}
+.profile-mini-thumb{
+  width:54px;height:54px;border-radius:9px;flex-shrink:0;
+  background:var(--bg-3);background-size:cover;background-position:center;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text-3);font-size:10px;font-weight:600;text-align:center;
+}
+.profile-mini-body{flex:1;min-width:0}
+.profile-mini-title{font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.profile-mini-sub{font-size:11.5px;color:var(--text-3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.profile-mini-price{font-size:12.5px;font-weight:700;color:var(--brand);margin-top:3px}
+.profile-mini-actions{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.profile-mini-icon-btn{
+  width:30px;height:30px;border-radius:8px;border:1.5px solid var(--border-2);
+  background:var(--bg);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:background .12s,border-color .12s;
+}
+.profile-mini-icon-btn svg{width:14px;height:14px;stroke:var(--text-2);fill:none;stroke-width:2}
+.profile-mini-icon-btn:hover{border-color:var(--brand)}
+.profile-mini-icon-btn.danger:hover{background:var(--brand-light);border-color:var(--brand)}
+.profile-mini-icon-btn.danger:hover svg{stroke:var(--brand)}
+.profile-status-pill{
+  display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;
+  background:var(--bg-3);color:var(--text-2);margin-top:3px;
+}
+.profile-loading{text-align:center;color:var(--text-3);font-size:12.5px;padding:28px 12px}
 
 /* ─── Notifications Modal ──────────────────────── */
 .notif-item{
@@ -1687,6 +1782,9 @@ ul{list-style:none}
       <span class="shortlist-txt">Shortlisted</span>
       <span class="shortlist-badge" id="shortlistCount">0</span>
     </button>
+    <div id="navAuthBtn">
+      <!-- Filled by updateNavAuth() on load / login / logout -->
+    </div>
     <div class="icon-btn" onclick="toggleMenuPanel()" aria-label="Menu" title="Menu">
       <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </div>
@@ -2777,6 +2875,142 @@ ul{list-style:none}
   </div>
 </div>
 
+<!-- ─── User Profile Modal ───────────────────────── -->
+<div class="add-modal-overlay" id="profileModal" role="dialog" aria-modal="true" aria-label="Your profile">
+  <div class="add-modal" style="max-width:420px">
+    <div class="add-modal-header">
+      <div class="add-modal-title">My Profile</div>
+      <button class="modal-close" style="position:static" onclick="closeProfileModal()" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="profile-info-row">
+      <div class="profile-avatar-lg" id="profileAvatarLg">G</div>
+      <div>
+        <div class="profile-info-name" id="profileModalName">Guest</div>
+        <div class="profile-info-contact" id="profileModalContact">—</div>
+      </div>
+    </div>
+
+    <div class="profile-tabs">
+      <div class="profile-tab active" id="profileTabInfo" onclick="switchProfileTab('info')">Profile</div>
+      <div class="profile-tab" id="profileTabListings" onclick="switchProfileTab('listings')">My Listings</div>
+      <div class="profile-tab" id="profileTabSaved" onclick="switchProfileTab('saved')">Saved</div>
+    </div>
+
+    <!-- ── Tab: Profile info / edit / password ── -->
+    <div class="profile-tab-panel active" id="profilePanelInfo">
+
+      <div id="profileViewMode">
+        <div class="profile-edit-row">
+          <span style="font-size:12px;color:var(--text-3)">Account details</span>
+          <button class="profile-link-btn" onclick="enterProfileEditMode()">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Edit
+          </button>
+        </div>
+        <button class="profile-btn-secondary" style="margin-bottom:10px" onclick="enterPasswordEditMode()">Change password</button>
+      </div>
+
+      <div id="profileEditMode" style="display:none">
+        <div class="form-group">
+          <label class="form-label">Full name</label>
+          <input class="form-input" type="text" id="profile-edit-name" placeholder="Your name" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone or email</label>
+          <input class="form-input" type="text" id="profile-edit-contact" placeholder="98765 43210 or you@email.com" />
+        </div>
+        <div class="profile-save-row">
+          <button class="profile-btn-secondary" onclick="exitProfileEditMode()">Cancel</button>
+          <button class="form-submit" id="profileSaveBtn" onclick="saveProfileEdits()">Save changes</button>
+        </div>
+      </div>
+
+      <div id="passwordEditMode" style="display:none">
+        <div class="form-group">
+          <label class="form-label">Current password</label>
+          <input class="form-input" type="password" id="profile-current-password" placeholder="••••••••" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">New password</label>
+          <input class="form-input" type="password" id="profile-new-password" placeholder="At least 6 characters" />
+        </div>
+        <div class="profile-save-row">
+          <button class="profile-btn-secondary" onclick="exitPasswordEditMode()">Cancel</button>
+          <button class="form-submit" id="profilePasswordBtn" onclick="savePasswordChange()">Update password</button>
+        </div>
+      </div>
+
+      <button class="profile-logout-btn" onclick="logoutUser()">
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Log out
+      </button>
+    </div>
+
+    <!-- ── Tab: My Listings ── -->
+    <div class="profile-tab-panel" id="profilePanelListings">
+      <div id="myListingsContent">
+        <div class="profile-loading">Loading your listings…</div>
+      </div>
+    </div>
+
+    <!-- ── Tab: Saved ── -->
+    <div class="profile-tab-panel" id="profilePanelSaved">
+      <div id="savedListingsContent">
+        <div class="profile-loading">Loading saved properties…</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── Edit Listing Modal (used from My Listings) ─── -->
+<div class="add-modal-overlay" id="editListingModal" role="dialog" aria-modal="true" aria-label="Edit listing">
+  <div class="add-modal" style="max-width:440px">
+    <div class="add-modal-header">
+      <div class="add-modal-title">Edit Listing</div>
+      <button class="modal-close" style="position:static" onclick="closeEditListingModal()" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Property name</label>
+      <input class="form-input" type="text" id="edit-listing-name" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Rent (₹/month)</label>
+        <input class="form-input" type="number" id="edit-listing-rent" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Deposit (₹)</label>
+        <input class="form-input" type="number" id="edit-listing-deposit" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Area / locality</label>
+      <input class="form-input" type="text" id="edit-listing-area" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select class="form-select" id="edit-listing-status">
+        <option>For Rent</option>
+        <option>For Sale</option>
+        <option>New Launch</option>
+        <option>Sold</option>
+        <option>Booked</option>
+        <option>Lease</option>
+        <option>PG</option>
+      </select>
+    </div>
+    <button class="form-submit" id="editListingSaveBtn" onclick="saveListingEdits()">Save changes</button>
+  </div>
+</div>
+
+
+
 <!-- ─── Notifications Modal ─────────────────────── -->
 <div class="add-modal-overlay" id="notifModal" role="dialog" aria-modal="true" aria-label="Notifications">
   <div class="add-modal" id="notifModalBox" style="max-width:440px">
@@ -3242,10 +3476,10 @@ ul{list-style:none}
 <aside class="menu-panel" id="menuPanel" aria-label="Main menu">
   <div class="menu-panel-header">
     <div class="menu-user-row">
-      <div class="menu-avatar">G</div>
+      <div class="menu-avatar" id="menuAvatar">G</div>
       <div>
-        <div class="menu-user-name">Guest</div>
-        <div class="menu-user-sub">Log in to manage listings</div>
+        <div class="menu-user-name" id="menuUserName">Guest</div>
+        <div class="menu-user-sub" id="menuUserSub">Log in to manage listings</div>
       </div>
     </div>
     <button class="panel-close" onclick="toggleMenuPanel()" aria-label="Close menu">
@@ -3253,9 +3487,9 @@ ul{list-style:none}
     </button>
   </div>
   <div class="menu-list">
-    <div class="menu-item" onclick="toggleMenuPanel(); openAuthModal();">
+    <div class="menu-item" id="menuAuthItem" onclick="toggleMenuPanel(); handleMenuAuthClick();">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-      Log in / Sign up
+      <span id="menuAuthLabel">Log in / Sign up</span>
     </div>
     <div class="menu-item" onclick="toggleMenuPanel(); openNotifModal();">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -4930,6 +5164,65 @@ function closeAuthModal() {
   document.getElementById('authModal').classList.remove('open');
   document.body.style.overflow = '';
 }
+
+function openProfileModal() {
+  const user = getLoggedInUser();
+  if (!user) return;
+  document.getElementById('profileAvatarLg').textContent = (user.name || user.contact || '?')[0].toUpperCase();
+  document.getElementById('profileModalName').textContent = user.name || 'User';
+  document.getElementById('profileModalContact').textContent = user.contact || '';
+  document.getElementById('profileModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  switchProfileTab('info');
+}
+function closeProfileModal() {
+  document.getElementById('profileModal').classList.remove('open');
+  document.body.style.overflow = '';
+  exitProfileEditMode();
+  exitPasswordEditMode();
+}
+function getLoggedInUser() {
+  try { return JSON.parse(sessionStorage.getItem('quatar_user')); } catch { return null; }
+}
+// Every authenticated request to /api/user/... or /api/properties/... edits
+// must carry this header so the server can verify which account is asking.
+function userAuthHeaders(extra) {
+  const user = getLoggedInUser();
+  return Object.assign({ 'x-user-key': (user && user.userKey) || '' }, extra || {});
+}
+async function logoutUser() {
+  const user = getLoggedInUser();
+  try {
+    if (user && user.userKey) {
+      await fetch('/api/user/logout', { method: 'POST', headers: userAuthHeaders() });
+    }
+  } catch (err) { /* best-effort; clear local session regardless */ }
+  sessionStorage.removeItem('quatar_user');
+  closeProfileModal();
+  updateNavAuth();
+  showToast('Logged out successfully');
+}
+function handleMenuAuthClick() {
+  if (getLoggedInUser()) openProfileModal();
+  else openAuthModal();
+}
+function updateNavAuth() {
+  const user = getLoggedInUser();
+  const navBtn = document.getElementById('navAuthBtn');
+  if (user) {
+    navBtn.innerHTML = '';
+    document.getElementById('menuAvatar').textContent = (user.name || 'U')[0].toUpperCase();
+    document.getElementById('menuUserName').textContent = user.name || 'User';
+    document.getElementById('menuUserSub').textContent = user.contact || 'Logged in';
+    document.getElementById('menuAuthLabel').textContent = 'My Profile / Log out';
+  } else {
+    navBtn.innerHTML = '';
+    document.getElementById('menuAvatar').textContent = 'G';
+    document.getElementById('menuUserName').textContent = 'Guest';
+    document.getElementById('menuUserSub').textContent = 'Log in to manage listings';
+    document.getElementById('menuAuthLabel').textContent = 'Log in / Sign up';
+  }
+}
 function switchAuthTab(tab) {
   const isLogin = tab === 'login';
   document.getElementById('authTabLogin').classList.toggle('active', isLogin);
@@ -4942,21 +5235,319 @@ function switchAuthTab(tab) {
     ? 'New to Quatar? <a onclick="switchAuthTab(\'signup\')">Sign up</a>'
     : 'Already have an account? <a onclick="switchAuthTab(\'login\')">Log in</a>';
 }
-function submitAuth() {
-  const contact = document.getElementById('auth-contact').value.trim();
+async function submitAuth() {
+  const contact  = document.getElementById('auth-contact').value.trim();
   const password = document.getElementById('auth-password').value;
-  const isLogin = document.getElementById('authTabLogin').classList.contains('active');
-  if (!contact || !password) {
-    showToast('Please fill in your details');
-    return;
+  const isLogin  = document.getElementById('authTabLogin').classList.contains('active');
+  const name     = document.getElementById('auth-name').value.trim();
+
+  if (!contact || !password) { showToast('Please fill in your details'); return; }
+  if (!isLogin && !name)     { showToast('Please enter your name'); return; }
+
+  const btn = document.getElementById('authSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = isLogin ? 'Logging in…' : 'Creating account…';
+
+  try {
+    const endpoint = isLogin ? '/api/user/login' : '/api/user/signup';
+    const body     = isLogin ? { contact, password } : { name, contact, password };
+    const res      = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      showToast(data.message || 'Something went wrong');
+      return;
+    }
+    sessionStorage.setItem('quatar_user', JSON.stringify({
+      id: data.userId, name: data.name, contact: data.contact, userKey: data.userKey
+    }));
+    closeAuthModal();
+    updateNavAuth();
+    showToast(data.message);
+  } catch (err) {
+    showToast('Network error. Please try again.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = isLogin ? 'Log in' : 'Sign up';
   }
-  if (!isLogin && !document.getElementById('auth-name').value.trim()) {
-    showToast('Please enter your name');
-    return;
-  }
-  closeAuthModal();
-  showToast(isLogin ? 'Logged in successfully (demo)' : 'Account created successfully (demo)');
 }
+
+/* ═══════════════════════════════════════════════
+   PROFILE MODAL — TABS
+═══════════════════════════════════════════════ */
+function switchProfileTab(tab) {
+  document.getElementById('profileTabInfo').classList.toggle('active', tab === 'info');
+  document.getElementById('profileTabListings').classList.toggle('active', tab === 'listings');
+  document.getElementById('profileTabSaved').classList.toggle('active', tab === 'saved');
+  document.getElementById('profilePanelInfo').classList.toggle('active', tab === 'info');
+  document.getElementById('profilePanelListings').classList.toggle('active', tab === 'listings');
+  document.getElementById('profilePanelSaved').classList.toggle('active', tab === 'saved');
+
+  if (tab === 'info') { exitProfileEditMode(); exitPasswordEditMode(); }
+  if (tab === 'listings') loadMyListings();
+  if (tab === 'saved') loadSavedListings();
+}
+
+/* ═══════════════════════════════════════════════
+   PROFILE MODAL — EDIT NAME / CONTACT
+═══════════════════════════════════════════════ */
+function enterProfileEditMode() {
+  const user = getLoggedInUser();
+  if (!user) return;
+  document.getElementById('profile-edit-name').value = user.name || '';
+  document.getElementById('profile-edit-contact').value = user.contact || '';
+  document.getElementById('profileViewMode').style.display = 'none';
+  document.getElementById('profileEditMode').style.display = '';
+  document.getElementById('passwordEditMode').style.display = 'none';
+}
+function exitProfileEditMode() {
+  document.getElementById('profileViewMode').style.display = '';
+  document.getElementById('profileEditMode').style.display = 'none';
+}
+async function saveProfileEdits() {
+  const name    = document.getElementById('profile-edit-name').value.trim();
+  const contact = document.getElementById('profile-edit-contact').value.trim();
+  if (!contact) { showToast('Contact cannot be empty'); return; }
+
+  const btn = document.getElementById('profileSaveBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  try {
+    const res = await fetch('/api/user/me', {
+      method: 'PUT',
+      headers: userAuthHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ name, contact })
+    });
+    const data = await res.json();
+    if (!res.ok) { showToast(data.message || 'Could not update profile'); return; }
+
+    const user = getLoggedInUser();
+    user.name = data.name;
+    user.contact = data.contact;
+    sessionStorage.setItem('quatar_user', JSON.stringify(user));
+
+    document.getElementById('profileAvatarLg').textContent = (user.name || user.contact || '?')[0].toUpperCase();
+    document.getElementById('profileModalName').textContent = user.name || 'User';
+    document.getElementById('profileModalContact').textContent = user.contact || '';
+    updateNavAuth();
+    exitProfileEditMode();
+    showToast('Profile updated');
+  } catch (err) {
+    showToast('Network error. Please try again.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save changes';
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   PROFILE MODAL — CHANGE PASSWORD
+═══════════════════════════════════════════════ */
+function enterPasswordEditMode() {
+  document.getElementById('profile-current-password').value = '';
+  document.getElementById('profile-new-password').value = '';
+  document.getElementById('profileViewMode').style.display = 'none';
+  document.getElementById('profileEditMode').style.display = 'none';
+  document.getElementById('passwordEditMode').style.display = '';
+}
+function exitPasswordEditMode() {
+  document.getElementById('passwordEditMode').style.display = 'none';
+  document.getElementById('profileViewMode').style.display = '';
+}
+async function savePasswordChange() {
+  const currentPassword = document.getElementById('profile-current-password').value;
+  const newPassword     = document.getElementById('profile-new-password').value;
+  if (!currentPassword || !newPassword) { showToast('Please fill in both fields'); return; }
+  if (newPassword.length < 6) { showToast('New password must be at least 6 characters'); return; }
+
+  const btn = document.getElementById('profilePasswordBtn');
+  btn.disabled = true;
+  btn.textContent = 'Updating…';
+  try {
+    const res = await fetch('/api/user/password', {
+      method: 'PUT',
+      headers: userAuthHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ currentPassword, newPassword })
+    });
+    const data = await res.json();
+    if (!res.ok) { showToast(data.message || 'Could not update password'); return; }
+    exitPasswordEditMode();
+    showToast('Password updated successfully');
+  } catch (err) {
+    showToast('Network error. Please try again.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Update password';
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   PROFILE MODAL — MY LISTINGS (only what this user posted)
+═══════════════════════════════════════════════ */
+let MY_LISTINGS_CACHE = [];
+
+async function loadMyListings() {
+  const wrap = document.getElementById('myListingsContent');
+  wrap.innerHTML = '<div class="profile-loading">Loading your listings…</div>';
+  try {
+    const res = await fetch('/api/user/my-listings', { headers: userAuthHeaders() });
+    const data = await res.json();
+    if (!res.ok) { wrap.innerHTML = `<div class="profile-list-empty">${data.message || 'Could not load your listings.'}</div>`; return; }
+    MY_LISTINGS_CACHE = data.properties || [];
+    renderMyListings();
+  } catch (err) {
+    wrap.innerHTML = '<div class="profile-list-empty">⚠️ Could not connect to server.</div>';
+  }
+}
+
+function renderMyListings() {
+  const wrap = document.getElementById('myListingsContent');
+  if (!MY_LISTINGS_CACHE.length) {
+    wrap.innerHTML = '<div class="profile-list-empty">You haven\'t posted any listings yet.<br>Tap "+ List property" to add one.</div>';
+    return;
+  }
+  wrap.innerHTML = MY_LISTINGS_CACHE.map(p => {
+    const img = (p.media?.images || [])[0];
+    const thumb = img ? `style="background-image:url('${img}')"` : '';
+    const rent = p.price?.rent != null ? '₹' + Number(p.price.rent).toLocaleString('en-IN') : '—';
+    return `<div class="profile-mini-card" onclick="closeProfileModal();openDetail('${p.id}')">
+      <div class="profile-mini-thumb" ${thumb}>${img ? '' : 'No photo'}</div>
+      <div class="profile-mini-body">
+        <div class="profile-mini-title">${p.owner?.propertyName || 'Untitled listing'}</div>
+        <div class="profile-mini-sub">${p.location?.area || ''}</div>
+        <div class="profile-mini-price">${rent}<span style="color:var(--text-3);font-weight:500"> /mo</span></div>
+        <span class="profile-status-pill">${p.basic?.status || 'For Rent'}</span>
+      </div>
+      <div class="profile-mini-actions">
+        <button class="profile-mini-icon-btn" title="Edit" onclick="event.stopPropagation();openEditListingModal('${p.id}')">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="profile-mini-icon-btn danger" title="Delete" onclick="event.stopPropagation();deleteMyListing('${p.id}')">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function deleteMyListing(id) {
+  if (!confirm('Delete this listing? This cannot be undone.')) return;
+  try {
+    const res = await fetch('/api/user/listings/' + id, { method: 'DELETE', headers: userAuthHeaders() });
+    const data = await res.json();
+    if (!res.ok) { showToast(data.message || 'Could not delete listing'); return; }
+    MY_LISTINGS_CACHE = MY_LISTINGS_CACHE.filter(p => p.id !== id);
+    renderMyListings();
+    PROPERTIES = PROPERTIES.filter(p => p.id !== id);
+    renderCards();
+    showToast('Listing deleted');
+  } catch (err) {
+    showToast('Network error. Please try again.');
+  }
+}
+
+let editListingId = null;
+function openEditListingModal(id) {
+  const p = MY_LISTINGS_CACHE.find(x => x.id === id);
+  if (!p) return;
+  editListingId = id;
+  document.getElementById('edit-listing-name').value = p.owner?.propertyName || '';
+  document.getElementById('edit-listing-rent').value = p.price?.rent ?? '';
+  document.getElementById('edit-listing-deposit').value = p.price?.deposit ?? '';
+  document.getElementById('edit-listing-area').value = p.location?.area || '';
+  document.getElementById('edit-listing-status').value = p.basic?.status || 'For Rent';
+  document.getElementById('editListingModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeEditListingModal() {
+  document.getElementById('editListingModal').classList.remove('open');
+  document.body.style.overflow = '';
+  editListingId = null;
+}
+async function saveListingEdits() {
+  if (!editListingId) return;
+  const name   = document.getElementById('edit-listing-name').value.trim();
+  const rent   = document.getElementById('edit-listing-rent').value;
+  const deposit = document.getElementById('edit-listing-deposit').value;
+  const area   = document.getElementById('edit-listing-area').value.trim();
+  const status = document.getElementById('edit-listing-status').value;
+
+  if (!name || !area || rent === '') { showToast('Property name, area, and rent are required'); return; }
+
+  const btn = document.getElementById('editListingSaveBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  try {
+    const res = await fetch('/api/user/listings/' + editListingId, {
+      method: 'PUT',
+      headers: userAuthHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({
+        owner: { propertyName: name },
+        location: { area },
+        price: { rent: Number(rent), deposit: deposit === '' ? null : Number(deposit) },
+        basic: { status }
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) { showToast(data.message || 'Could not save changes'); return; }
+    closeEditListingModal();
+    showToast('Listing updated');
+    loadMyListings();
+    fetchProperties(); // refresh main grid so the edit shows up there too
+  } catch (err) {
+    showToast('Network error. Please try again.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save changes';
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   PROFILE MODAL — SAVED (shortlisted) PROPERTIES
+═══════════════════════════════════════════════ */
+function loadSavedListings() {
+  const wrap = document.getElementById('savedListingsContent');
+  const ids = [...shortlisted];
+  if (!ids.length) {
+    wrap.innerHTML = '<div class="profile-list-empty">No saved properties yet.<br>Tap ♡ on any listing to save it here.</div>';
+    return;
+  }
+  const items = ids.map(id => PROPERTIES.find(p => p.id === id)).filter(Boolean);
+  if (!items.length) {
+    wrap.innerHTML = '<div class="profile-list-empty">No saved properties yet.<br>Tap ♡ on any listing to save it here.</div>';
+    return;
+  }
+  wrap.innerHTML = items.map(p => {
+    const img = (p.media?.images || [])[0];
+    const thumb = img ? `style="background-image:url('${img}')"` : '';
+    const rent = p.price?.rent != null ? '₹' + Number(p.price.rent).toLocaleString('en-IN') : '—';
+    return `<div class="profile-mini-card" onclick="closeProfileModal();openDetail('${p.id}')">
+      <div class="profile-mini-thumb" ${thumb}>${img ? '' : 'No photo'}</div>
+      <div class="profile-mini-body">
+        <div class="profile-mini-title">${p.owner?.propertyName || 'Untitled listing'}</div>
+        <div class="profile-mini-sub">${p.location?.area || ''}</div>
+        <div class="profile-mini-price">${rent}<span style="color:var(--text-3);font-weight:500"> /mo</span></div>
+      </div>
+      <div class="profile-mini-actions">
+        <button class="profile-mini-icon-btn danger" title="Remove from saved" onclick="event.stopPropagation();removeSavedListing('${p.id}')">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function removeSavedListing(id) {
+  shortlisted.delete(id);
+  saveShortlist();
+  loadSavedListings();
+  renderCards();
+  showToast('Removed from saved');
+}
+
+
 
 /* ═══════════════════════════════════════════════
    NOTIFICATIONS MODAL
@@ -5177,31 +5768,42 @@ AM_LIST.forEach(([, , unitId]) => {
   el.addEventListener('input', renderAmSelected);
 });
 
+/* ═══════════════════════════════════════════════
+   LOAD PROPERTIES FROM DB
+   Reusable so it can be re-run after a user edits/deletes
+   one of their own listings from the My Listings tab.
+═══════════════════════════════════════════════ */
+async function fetchProperties() {
+  const ng = document.getElementById('normalGrid');
+  const pg = document.getElementById('promotedGrid');
+  if (ng) ng.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--text-2)">Loading listings…</div>';
+  if (pg) pg.innerHTML = '';
+  try {
+    const res = await fetch('/api/properties');
+    if (!res.ok) throw new Error('Server returned ' + res.status);
+    const data = await res.json();
+    if (data.properties && data.properties.length > 0) {
+      PROPERTIES = data.properties;
+    }
+  } catch (err) {
+    console.error('Could not load properties from server:', err.message);
+    const ng2 = document.getElementById('normalGrid');
+    if (ng2) ng2.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--text-2)">⚠️ Could not connect to server. Please refresh the page.</div>';
+    return false;
+  }
+  buildFilterOptions();
+  renderCards();
+  return true;
+}
+
 /* ── Ad Banner ── */
 document.addEventListener('DOMContentLoaded', function() {
   syncFdBar();
 
   // ── Load properties from DB ──
   (async function loadPropertiesFromDB() {
-    const ng = document.getElementById('normalGrid');
-    const pg = document.getElementById('promotedGrid');
-    if (ng) ng.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--text-2)">Loading listings…</div>';
-    if (pg) pg.innerHTML = '';
-    try {
-      const res = await fetch('/api/properties');
-      if (!res.ok) throw new Error('Server returned ' + res.status);
-      const data = await res.json();
-      if (data.properties && data.properties.length > 0) {
-        PROPERTIES = data.properties;
-      }
-    } catch (err) {
-      console.error('Could not load properties from server:', err.message);
-      const ng = document.getElementById('normalGrid');
-      if (ng) ng.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--text-2)">⚠️ Could not connect to server. Please refresh the page.</div>';
-      return;
-    }
-    buildFilterOptions();
-    renderCards();
+    const ok = await fetchProperties();
+    if (!ok) return;
 
     // ── Deep-link: auto-open property from URL param ──
     const _dlParam = new URLSearchParams(window.location.search).get('property');
@@ -5449,7 +6051,7 @@ function submitListing() {
 
   fetch('/api/properties', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: userAuthHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(newProp)
   })
   .then(async res => {
@@ -5588,6 +6190,12 @@ document.getElementById('addModal').addEventListener('click', function(e) {
 document.getElementById('authModal').addEventListener('click', function(e) {
   if (e.target === this) closeAuthModal();
 });
+document.getElementById('profileModal').addEventListener('click', function(e) {
+  if (e.target === this) closeProfileModal();
+});
+document.getElementById('editListingModal').addEventListener('click', function(e) {
+  if (e.target === this) closeEditListingModal();
+});
 document.getElementById('notifModal').addEventListener('click', function(e) {
   if (e.target === this) closeNotifModal();
 });
@@ -5611,6 +6219,7 @@ buildFilterOptions();
 renderCards();
 updateShortlistCount();
 renderShortlistPanel();
+updateNavAuth();
 
 // ── Welcome Modal ──
 (function(){
