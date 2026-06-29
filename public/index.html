@@ -1797,7 +1797,7 @@ ul{list-style:none}
 }
 .welcome-slide.active{opacity:1;display:flex;animation:wm-pop .35s cubic-bezier(.34,1.56,.64,1) both}
 .welcome-slide img{
-  width:90%;
+  width:50%;
   height:auto;
   max-height:none;
   object-fit:fill;
@@ -6216,10 +6216,11 @@ function submitListing() {
   const loc = document.getElementById('f-location').value.trim();
   const ownerName = document.getElementById('f-ownerName').value.trim();
   const ownerPhone = document.getElementById('f-ownerPhone').value.trim();
-  if (!title || !rent || !loc || !ownerName || !ownerPhone) {
+/*  if (!title || !rent || !loc || !ownerName || !ownerPhone) {
     showToast('Please fill in title, rent, location and owner details');
     return;
   }
+*/
 
   function gv(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
   function gb(id) { const el = document.getElementById(id); return el ? el.checked : false; }
