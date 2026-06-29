@@ -375,6 +375,21 @@ PropertySchema.index({ createdAt: -1 });
 PropertySchema.index({ 'basic.status': 1, createdAt: -1 });
 const Property = mongoose.model('Property', PropertySchema);
 
+// ── Visit Request Schema (from the "Schedule a Visit" modal) ──
+const VisitRequestSchema = new mongoose.Schema({
+  propertyId:   { type: mongoose.Schema.Types.ObjectId, ref: 'Property', required: true, index: true },
+  userId:       { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true }, // null if requested while logged out
+  visitorName:  { type: String, required: true, trim: true },
+  visitorPhone: { type: String, required: true, trim: true },
+  note:         { type: String, default: '', trim: true },
+  visitDate:    { type: String, required: true }, // 'YYYY-MM-DD', kept as the raw picker value
+  visitTime:    { type: String, required: true }, // 'HH:MM', kept as the raw picker value
+  status:       { type: String, enum: ['Pending', 'Confirmed', 'Cancelled', 'Completed'], default: 'Pending' },
+  createdAt:    { type: Date, default: Date.now },
+});
+VisitRequestSchema.index({ createdAt: -1 });
+const VisitRequest = mongoose.model('VisitRequest', VisitRequestSchema);
+
 // ── Helpers ──
 function formatPrice(price, status) {
   const num = Number(price);
@@ -512,6 +527,97 @@ app.get('/api/properties', async (req, res) => {
   } catch (err) {
     console.error('GET /api/properties error:', err);
     res.status(500).json({ message: 'Error fetching properties: ' + err.message });
+  }
+});
+
+// ── POST /api/visits (Schedule a Visit modal) ──
+const visitLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, max: 20,
+  standardHeaders: true, legacyHeaders: false,
+  message: { message: 'Too many visit requests. Please try again later.' }
+});
+
+app.post('/api/visits', visitLimiter, attachUserIfPresent, async (req, res) => {
+  try {
+    const { propertyId, visitorName, visitorPhone, note, visitDate, visitTime } = req.body || {};
+
+    if (!propertyId || !mongoose.Types.ObjectId.isValid(propertyId)) {
+      return res.status(400).json({ message: 'A valid propertyId is required' });
+    }
+    if (!visitorName || !String(visitorName).trim()) {
+      return res.status(400).json({ message: 'Your name is required' });
+    }
+    if (!visitorPhone || !String(visitorPhone).trim()) {
+      return res.status(400).json({ message: 'Your phone number is required' });
+    }
+    if (!visitDate || !/^\d{4}-\d{2}-\d{2}$/.test(visitDate)) {
+      return res.status(400).json({ message: 'A valid visit date is required' });
+    }
+    if (!visitTime || !/^\d{2}:\d{2}$/.test(visitTime)) {
+      return res.status(400).json({ message: 'A valid visit time is required' });
+    }
+
+    const property = await Property.findById(propertyId).lean();
+    if (!property) return res.status(404).json({ message: 'Property not found' });
+
+    const visit = await VisitRequest.create({
+      propertyId,
+      userId:       req.userId || null,
+      visitorName:  String(visitorName).trim(),
+      visitorPhone: String(visitorPhone).trim(),
+      note:         note ? String(note).trim().slice(0, 1000) : '',
+      visitDate,
+      visitTime,
+    });
+
+    res.status(201).json({ message: 'Visit request saved', visit });
+  } catch (err) {
+    console.error('POST /api/visits error:', err);
+    res.status(500).json({ message: 'Error saving visit request: ' + err.message });
+  }
+});
+
+// ── GET /api/user/my-visits (visit requests the logged-in user has made) ──
+app.get('/api/user/my-visits', requireUser, async (req, res) => {
+  try {
+    const docs = await VisitRequest.find({ userId: req.userId })
+      .sort({ createdAt: -1 })
+      .populate('propertyId', 'owner.propertyName location.area')
+      .lean();
+    res.json({ visits: docs });
+  } catch (err) {
+    console.error('GET /api/user/my-visits error:', err);
+    res.status(500).json({ message: 'Error fetching your visit requests: ' + err.message });
+  }
+});
+
+// ── GET /api/admin/visits (admin panel — all visit requests, newest first) ──
+app.get('/api/admin/visits', requireAdmin, async (req, res) => {
+  try {
+    const docs = await VisitRequest.find({})
+      .sort({ createdAt: -1 })
+      .populate('propertyId', 'owner.propertyName location.area owner.phone')
+      .lean();
+    res.json({ visits: docs, total: docs.length });
+  } catch (err) {
+    console.error('GET /api/admin/visits error:', err);
+    res.status(500).json({ message: 'Error fetching visit requests: ' + err.message });
+  }
+});
+
+// ── PATCH /api/admin/visits/:id/status (admin: confirm/cancel/complete a visit) ──
+app.patch('/api/admin/visits/:id/status', requireAdmin, async (req, res) => {
+  try {
+    const { status } = req.body || {};
+    if (!['Pending', 'Confirmed', 'Cancelled', 'Completed'].includes(status)) {
+      return res.status(400).json({ message: 'Invalid status' });
+    }
+    const visit = await VisitRequest.findByIdAndUpdate(req.params.id, { status }, { new: true });
+    if (!visit) return res.status(404).json({ message: 'Visit request not found' });
+    res.json({ message: 'Status updated', visit });
+  } catch (err) {
+    console.error('PATCH /api/admin/visits/:id/status error:', err);
+    res.status(500).json({ message: 'Error updating visit status: ' + err.message });
   }
 });
 

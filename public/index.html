@@ -5202,11 +5202,12 @@ function openScheduleModal(propId) {
   if (!p) return;
   scheduleForPropId = propId;
   document.getElementById('scheduleModalSubtitle').textContent = (p.owner?.propertyName || '') + ' · ' + (p.location?.area || '');
-  // reset fields
+  // reset fields, pre-filling name/phone if the visitor is logged in
+  const user = getLoggedInUser();
   document.getElementById('sched-date').value = '';
   document.getElementById('sched-time').value = '';
-  document.getElementById('sched-name').value = '';
-  document.getElementById('sched-phone').value = '';
+  document.getElementById('sched-name').value = (user && user.name) || '';
+  document.getElementById('sched-phone').value = (user && /^[\d+\-\s]{7,}$/.test(user.contact || '')) ? user.contact : '';
   document.getElementById('sched-note').value = '';
   // default the date picker's minimum to today so past dates can't be picked
   const today = new Date().toISOString().split('T')[0];
@@ -5220,19 +5221,54 @@ function closeScheduleModal() {
   document.body.style.overflow = '';
 }
 
-function submitScheduleVisit() {
-  const date = document.getElementById('sched-date').value;
-  const time = document.getElementById('sched-time').value;
+async function submitScheduleVisit() {
+  const date  = document.getElementById('sched-date').value;
+  const time  = document.getElementById('sched-time').value;
+  const name  = document.getElementById('sched-name').value.trim();
+  const phone = document.getElementById('sched-phone').value.trim();
+  const note  = document.getElementById('sched-note').value.trim();
+
   if (!date || !time) {
     showToast('Please pick a date and time for your visit');
     return;
   }
+  if (!name) { showToast('Please enter your name'); return; }
+  if (!phone) { showToast('Please enter your phone number'); return; }
+
   const p = PROPERTIES.find(x => x.id === scheduleForPropId);
-  const dateObj = new Date(date + 'T' + time);
-  const dateLabel = dateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
-  const timeLabel = dateObj.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' });
-  closeScheduleModal();
-  showToast(`Visit requested for ${dateLabel}, ${timeLabel}${p ? ' — ' + p.owner?.propertyName : ''}`);
+  if (!p) { showToast('Could not find that property. Please try again.'); return; }
+
+  const btn = document.getElementById('scheduleSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Requesting…';
+
+  try {
+    const res = await fetch('/api/visits', {
+      method: 'POST',
+      headers: userAuthHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({
+        propertyId:   scheduleForPropId,
+        visitorName:  name,
+        visitorPhone: phone,
+        note,
+        visitDate:    date,
+        visitTime:    time,
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) { showToast(data.message || 'Could not request the visit. Please try again.'); return; }
+
+    const dateObj   = new Date(date + 'T' + time);
+    const dateLabel = dateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+    const timeLabel = dateObj.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' });
+    closeScheduleModal();
+    showToast(`Visit requested for ${dateLabel}, ${timeLabel} — ${p.owner?.propertyName || ''}`);
+  } catch (err) {
+    showToast('Network error. Please try again.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Request visit';
+  }
 }
 
 /* ═══════════════════════════════════════════════
