@@ -5521,5 +5521,149 @@ renderCards();
 updateShortlistCount();
 renderShortlistPanel();
 </script>
+
+<!-- Image Slider Popup -->
+<div id="imagePopup" class="image-popup">
+
+  <div class="image-slider-box">
+
+    <button class="image-close" onclick="closeImagePopup()">✕</button>
+
+    <button class="slide-btn left" onclick="changeImage(-1)">❮</button>
+
+    <img id="popupImage" src="" class="slider-image">
+
+    <button class="slide-btn right" onclick="changeImage(1)">❯</button>
+
+  </div>
+
+</div>
+
+
+<style>
+
+.image-popup{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+
+.image-popup.open{
+  display:flex;
+}
+
+.image-slider-box{
+  position:relative;
+  width:90%;
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.slider-image{
+  width:90%;
+  height:90%;
+  object-fit:cover;
+  border-radius:0;
+}
+
+
+.image-close{
+  position:absolute;
+  right:-10px;
+  top:-10px;
+  background:#e03a52;
+  color:white;
+  border:none;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  font-size:20px;
+  cursor:pointer;
+  z-index:2;
+}
+
+
+.slide-btn{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  background:white;
+  border:none;
+  width:45px;
+  height:45px;
+  border-radius:50%;
+  font-size:25px;
+  cursor:pointer;
+}
+
+.left{
+  left:10px;
+}
+
+.right{
+  right:10px;
+}
+
+</style>
+
+
+<script>
+
+let images=[
+ "https://picsum.photos/800/500?1",
+ "https://picsum.photos/800/500?2",
+ "https://picsum.photos/800/500?3"
+];
+
+let currentImage=0;
+
+
+window.onload=function(){
+
+ document.getElementById("imagePopup")
+ .classList.add("open");
+
+ showImage();
+
+}
+
+
+function showImage(){
+
+ document.getElementById("popupImage").src=
+ images[currentImage];
+
+}
+
+
+function changeImage(direction){
+
+ currentImage += direction;
+
+ if(currentImage < 0)
+    currentImage = images.length-1;
+
+ if(currentImage >= images.length)
+    currentImage = 0;
+
+ showImage();
+
+}
+
+
+function closeImagePopup(){
+
+ document.getElementById("imagePopup")
+ .classList.remove("open");
+
+}
+
+</script>
 </body>
 </html>
