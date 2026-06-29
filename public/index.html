@@ -1557,6 +1557,97 @@ ul{list-style:none}
     }
 }
 
+
+/* ─── Welcome / Offer Modal ────────────────────── */
+#welcomeModal{
+  position:fixed;inset:0;z-index:9999;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.93);
+  opacity:0;pointer-events:none;
+  transition:opacity .3s;
+  padding:0;
+}
+#welcomeModal.open{opacity:1;pointer-events:all}
+.welcome-box{
+  position:relative;
+  width:100%;height:100%;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+}
+@keyframes wm-pop{from{transform:scale(.93);opacity:0}to{transform:scale(1);opacity:1}}
+.welcome-close{
+  position:fixed;top:14px;right:16px;
+  width:42px;height:42px;border-radius:50%;
+  background:rgba(255,255,255,.15);border:none;
+  color:#fff;font-size:20px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  z-index:10000;
+}
+.welcome-close:hover{background:rgba(255,255,255,.3)}
+.welcome-slides{
+  position:relative;
+  width:100%;
+  height:100vh;
+  overflow-y:auto;
+  overflow-x:hidden;
+  background:#000;
+  flex-shrink:0;
+}
+.welcome-slide{
+  position:relative;
+  width:100%;
+  opacity:0;transition:opacity .5s;
+  display:none;
+  align-items:flex-start;justify-content:center;
+}
+.welcome-slide.active{opacity:1;display:flex;animation:wm-pop .35s cubic-bezier(.34,1.56,.64,1) both}
+.welcome-slide img{
+  width:100%;
+  height:auto;
+  max-height:none;
+  object-fit:fill;
+  cursor:default;
+  display:block;
+}
+.welcome-dots{
+  display:flex;gap:10px;justify-content:center;
+  position:fixed;bottom:18px;left:0;right:0;z-index:10000;
+}
+.welcome-dot{
+  width:10px;height:10px;border-radius:50%;
+  background:rgba(255,255,255,.4);border:none;cursor:pointer;
+  transition:background .3s,transform .3s;padding:0;
+}
+.welcome-dot.active{background:#fff;transform:scale(1.35)}
+.welcome-footer{display:none}
+.welcome-cta{display:none}
+/* ─── Image Zoom Lightbox ───────────────────────── */
+#imgZoomOverlay{
+  position:fixed;inset:0;z-index:99999;
+  background:rgba(0,0,0,.92);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .25s;
+  padding:16px;
+}
+#imgZoomOverlay.open{opacity:1;pointer-events:all}
+#imgZoomOverlay img{
+  max-width:100%;max-height:90vh;
+  object-fit:contain;border-radius:6px;
+  transform:scale(.92);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+  user-select:none;
+}
+#imgZoomOverlay.open img{transform:scale(1)}
+#imgZoomClose{
+  position:absolute;top:14px;right:16px;
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(255,255,255,.15);border:none;
+  color:#fff;font-size:20px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+#imgZoomClose:hover{background:rgba(255,255,255,.3)}
+
 </style>
 </head>
 <body>
@@ -5520,150 +5611,92 @@ buildFilterOptions();
 renderCards();
 updateShortlistCount();
 renderShortlistPanel();
+
+// ── Welcome Modal ──
+(function(){
+  setTimeout(()=>{
+    document.getElementById('welcomeModal').classList.add('open');
+  }, 800);
+})();
+
+let _wmIdx = 0;
+function goWelcomeSlide(n){
+  const slides = document.querySelectorAll('.welcome-slide');
+  const dots   = document.querySelectorAll('.welcome-dot');
+  slides[_wmIdx].classList.remove('active');
+  dots[_wmIdx].classList.remove('active');
+  _wmIdx = n;
+  slides[_wmIdx].classList.add('active');
+  dots[_wmIdx].classList.add('active');
+}
+function closeWelcomeModal(){
+  document.getElementById('welcomeModal').classList.remove('open');
+}
+let _wmTimer = null;
+function _wmStart(){ _wmTimer = setInterval(()=>{ goWelcomeSlide((_wmIdx+1)%3); }, 3000); }
+function _wmStop(){ clearInterval(_wmTimer); _wmTimer = null; }
+_wmStart();
+document.addEventListener('DOMContentLoaded',function(){
+  const slides = document.querySelector('.welcome-slides');
+  if(!slides) return;
+  slides.addEventListener('mouseenter', _wmStop);
+  slides.addEventListener('mouseleave', _wmStart);
+  slides.addEventListener('touchstart', _wmStop, {passive:true});
+  slides.addEventListener('touchend',   ()=>{ setTimeout(_wmStart, 2000); }, {passive:true});
+});
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('welcomeModal').addEventListener('click',function(e){
+    if(e.target===this) closeWelcomeModal();
+  });
+});
+
+// ── Image Zoom Lightbox ──
+function openImgZoom(src){
+  const overlay = document.getElementById('imgZoomOverlay');
+  document.getElementById('imgZoomSrc').src = src;
+  overlay.classList.add('open');
+}
+function closeImgZoom(){
+  document.getElementById('imgZoomOverlay').classList.remove('open');
+}
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape') closeImgZoom();
+});
 </script>
 
-<!-- Image Slider Popup -->
-<div id="imagePopup" class="image-popup">
-
-  <div class="image-slider-box">
-
-    <button class="image-close" onclick="closeImagePopup()">✕</button>
-
-    <button class="slide-btn left" onclick="changeImage(-1)">❮</button>
-
-    <img id="popupImage" src="" class="slider-image">
-
-    <button class="slide-btn right" onclick="changeImage(1)">❯</button>
-
+<!-- ── Welcome / Offer Modal ── -->
+<div id="welcomeModal">
+  <div class="welcome-box">
+    <button class="welcome-close" onclick="closeWelcomeModal()">&#x2715;</button>
+    <div class="welcome-slides">
+      <div class="welcome-slide active">
+        <img src="Images/1st Month.png" alt="Offer - Month 1" loading="eager">
+      </div>
+      <div class="welcome-slide">
+        <img src="Images/2nd month.png" alt="Offer - Month 2" loading="lazy">
+      </div>
+      <div class="welcome-slide">
+        <img src="Images/3rd Month.png" alt="Offer - Month 3" loading="lazy">
+      </div>
+      <div class="welcome-dots">
+        <button class="welcome-dot active" onclick="goWelcomeSlide(0)"></button>
+        <button class="welcome-dot" onclick="goWelcomeSlide(1)"></button>
+        <button class="welcome-dot" onclick="goWelcomeSlide(2)"></button>
+      </div>
+    </div>
+    <div class="welcome-footer">
+      <h3>&#x1F389; Special Offer!</h3>
+      <p>Get exclusive deals on your first rental. Browse verified listings in Bengaluru.</p>
+      <button class="welcome-cta" onclick="closeWelcomeModal()">Explore Listings</button>
+    </div>
   </div>
-
 </div>
 
+<!-- ── Image Zoom Lightbox ── -->
+<div id="imgZoomOverlay" onclick="if(event.target===this)closeImgZoom()">
+  <button id="imgZoomClose" onclick="closeImgZoom()">&#x2715;</button>
+  <img id="imgZoomSrc" src="" alt="Zoomed image">
+</div>
 
-<style>
-
-.image-popup{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.7);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:9999;
-}
-
-.image-popup.open{
-  display:flex;
-}
-
-.image-slider-box{
-  position:relative;
-  width:90%;
-  height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.slider-image{
-  width:90%;
-  height:90%;
-  object-fit:cover;
-  border-radius:0;
-}
-
-
-.image-close{
-  position:absolute;
-  right:-10px;
-  top:-10px;
-  background:#e03a52;
-  color:white;
-  border:none;
-  width:40px;
-  height:40px;
-  border-radius:50%;
-  font-size:20px;
-  cursor:pointer;
-  z-index:2;
-}
-
-
-.slide-btn{
-  position:absolute;
-  top:50%;
-  transform:translateY(-50%);
-  background:white;
-  border:none;
-  width:45px;
-  height:45px;
-  border-radius:50%;
-  font-size:25px;
-  cursor:pointer;
-}
-
-.left{
-  left:10px;
-}
-
-.right{
-  right:10px;
-}
-
-</style>
-
-
-<script>
-
-let images=[
- "https://picsum.photos/800/500?1",
- "https://picsum.photos/800/500?2",
- "https://picsum.photos/800/500?3"
-];
-
-let currentImage=0;
-
-
-window.onload=function(){
-
- document.getElementById("imagePopup")
- .classList.add("open");
-
- showImage();
-
-}
-
-
-function showImage(){
-
- document.getElementById("popupImage").src=
- images[currentImage];
-
-}
-
-
-function changeImage(direction){
-
- currentImage += direction;
-
- if(currentImage < 0)
-    currentImage = images.length-1;
-
- if(currentImage >= images.length)
-    currentImage = 0;
-
- showImage();
-
-}
-
-
-function closeImagePopup(){
-
- document.getElementById("imagePopup")
- .classList.remove("open");
-
-}
-
-</script>
 </body>
 </html>
