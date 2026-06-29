@@ -368,6 +368,7 @@ const PropertySchema = new mongoose.Schema({
   promoted:         { type: Boolean, default: false },
   promotedPriority: { type: Number,  default: 3 },
   views:            { type: Number,  default: 0 },
+  visitCount:       { type: Number,  default: 0 }, // # of "Schedule a Visit" requests made for this listing
   remarks:          { type: [String], default: [] }, // admin-panel notes
   createdAt:        { type: Date,    default: Date.now },
 });
@@ -570,7 +571,19 @@ app.post('/api/visits', visitLimiter, attachUserIfPresent, async (req, res) => {
       visitTime,
     });
 
-    res.status(201).json({ message: 'Visit request saved', visit });
+    // Bump the property's visit-request counter. $inc is atomic, so concurrent
+    // requests for the same property can't race and undercount each other.
+    const updatedProperty = await Property.findByIdAndUpdate(
+      propertyId,
+      { $inc: { visitCount: 1 } },
+      { new: true, select: 'visitCount' }
+    ).lean();
+
+    res.status(201).json({
+      message: 'Visit request saved',
+      visit,
+      visitCount: updatedProperty ? updatedProperty.visitCount : undefined,
+    });
   } catch (err) {
     console.error('POST /api/visits error:', err);
     res.status(500).json({ message: 'Error saving visit request: ' + err.message });
@@ -659,6 +672,7 @@ app.get('/api/admin/properties', requireAdmin, async (req, res) => {
           promoted:         !!doc.promoted,
           promotedPriority: doc.promotedPriority != null ? doc.promotedPriority : null,
           views:            doc.views != null ? doc.views : 0,
+          visitCount:       doc.visitCount != null ? doc.visitCount : 0,
         },
 
         // Basic Info
@@ -670,6 +684,7 @@ app.get('/api/admin/properties', requireAdmin, async (req, res) => {
         loc:          location.area || '',
         facing:       property.facing || '',
         age:          property.age || '',
+        visitCount:   doc.visitCount != null ? doc.visitCount : 0,
 
         // Property Details
         bhk:          property.bhk || '',

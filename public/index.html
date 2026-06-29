@@ -489,6 +489,16 @@ ul{list-style:none}
 }
 .prop-views svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0}
 .prop-posted{font-size:11px;color:var(--text-3);text-align:right}
+
+/* Service pricing modal */
+.svc-pricing-section{margin:14px 0 6px}
+.svc-pricing-title{font-size:12px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.svc-pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.svc-price-item{background:var(--bg-2);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+.svc-price-label{font-size:11.5px;color:var(--text-2);margin-bottom:3px}
+.svc-price-value{font-size:14px;font-weight:700;color:var(--text)}
+.svc-price-value span{font-size:11px;font-weight:400;color:var(--text-3)}
+.svc-price-note{font-size:11px;color:var(--text-3);margin-top:10px;padding:8px 10px;background:var(--brand-light);border-radius:8px;line-height:1.5}
 .prop-action-grid{
   display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
 }
@@ -722,6 +732,12 @@ ul{list-style:none}
 .modal-btn-outline:hover{background:var(--bg-2)}
 .modal-btn-outline:active{transform:scale(.98)}
 .modal-btn-outline svg{width:16px;height:16px;stroke:var(--text-2);fill:none;stroke-width:1.8;flex-shrink:0}
+.modal-visit-count-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:19px;height:19px;padding:0 5px;border-radius:99px;
+  background:var(--brand-light);color:var(--brand);font-size:10.5px;font-weight:800;
+  margin-left:2px;
+}
 
 @media (max-width:520px){
   .modal-grid{grid-template-columns:1fr}
@@ -1781,7 +1797,7 @@ ul{list-style:none}
 }
 .welcome-slide.active{opacity:1;display:flex;animation:wm-pop .35s cubic-bezier(.34,1.56,.64,1) both}
 .welcome-slide img{
-  width:95%;
+  width:90%;
   height:auto;
   max-height:none;
   object-fit:fill;
@@ -2431,7 +2447,16 @@ ul{list-style:none}
         <label class="form-label">Tell us what you need (optional)</label>
         <textarea class="form-input" id="svc-notes" rows="3" placeholder="Briefly describe your requirement…" style="resize:vertical"></textarea>
       </div>
-      <button type="submit" class="form-submit">Send Request</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px">
+        <a href="tel:9611459960" onclick="closeServiceModal()" class="form-submit" style="display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;background:var(--brand)">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Call Us
+        </a>
+        <a href="https://wa.me/919611459960" target="_blank" onclick="closeServiceModal()" class="form-submit" style="display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;background:#25d366">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg>
+          WhatsApp
+        </a>
+      </div>
     </form>
   </div>
 </div>
@@ -4070,9 +4095,10 @@ function cardHTML(p) {
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg>
             <span>WhatsApp</span>
           </button>
-          <button class="prop-action-btn" onclick="event.stopPropagation();openScheduleModal('${p.id}')" aria-label="Schedule a visit">
+          <button class="prop-action-btn" style="position:relative" onclick="event.stopPropagation();openScheduleModal('${p.id}')" aria-label="Schedule a visit">
             <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             <span>Visit</span>
+            ${(p.visitCount||0) > 0 ? `<span style="position:absolute;top:-6px;right:-6px;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:1;pointer-events:none">${p.visitCount}</span>` : ''}
           </button>
           <button class="prop-action-btn prop-action-compare${compared?' checked':''}${compareDisabled?' disabled':''}" onclick="event.stopPropagation();toggleCompare('${p.id}',this)" aria-label="${compared?'Remove from':'Add to'} compare" title="${compareDisabled?`You're comparing ${lockedType} properties`:''}">
             <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
@@ -5159,6 +5185,7 @@ function openDetail(id) {
       <button class="modal-btn-outline" onclick="openScheduleModal('${p.id}')">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         Schedule visit
+        ${(p.visitCount || 0) > 0 ? `<span class="modal-visit-count-badge" id="modal-visit-count" data-prop-id="${p.id}">${p.visitCount}</span>` : `<span class="modal-visit-count-badge" id="modal-visit-count" data-prop-id="${p.id}" style="display:none">0</span>`}
       </button>
       <button class="modal-btn-whatsapp" onclick="openWhatsApp('${p.id}')" >
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg>
@@ -5257,6 +5284,22 @@ async function submitScheduleVisit() {
     });
     const data = await res.json();
     if (!res.ok) { showToast(data.message || 'Could not request the visit. Please try again.'); return; }
+
+    // Reflect the server's authoritative visitCount locally so the badge in
+    // the detail modal / My Listings updates immediately, without touching
+    // the unrelated page-view counter.
+    if (typeof data.visitCount === 'number') {
+      p.visitCount = data.visitCount;
+      const badge = document.querySelector(`#modal-visit-count[data-prop-id="${p.id}"]`);
+      if (badge) {
+        badge.textContent = data.visitCount;
+        badge.style.display = data.visitCount > 0 ? '' : 'none';
+      }
+      if (typeof MY_LISTINGS_CACHE !== 'undefined') {
+        const myListing = MY_LISTINGS_CACHE.find(x => x.id === p.id);
+        if (myListing) { myListing.visitCount = data.visitCount; renderMyListings(); }
+      }
+    }
 
     const dateObj   = new Date(date + 'T' + time);
     const dateLabel = dateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
@@ -5592,6 +5635,7 @@ function renderMyListings() {
         </div>
         <div class="profile-mini-price">${rent}<span style="color:var(--text-3);font-weight:500"> /mo</span></div>
         <span class="profile-status-pill">${p.basic?.status || 'For Rent'}</span>
+        ${p.visitCount > 0 ? `<span class="profile-status-pill" style="background:var(--brand-light);color:var(--brand);margin-left:5px">${p.visitCount} visit${p.visitCount===1?'':'s'} requested</span>` : ''}
       </div>
       <div class="profile-mini-actions">
         <button class="profile-mini-icon-btn" title="Edit" onclick="event.stopPropagation();openEditListingModal('${p.id}')">
@@ -5790,6 +5834,63 @@ function scrollServices(dir) {
   const cardWidth = el.querySelector('.service-card')?.offsetWidth || 200;
   el.scrollBy({ left: dir * (cardWidth + 16) * 2, behavior: 'smooth' });
 }
+const SERVICE_PRICING = {
+  'Website & App Development': {
+    items: [
+      { label: 'Basic Website',     value: '₹8,000',   note: 'onwards' },
+      { label: 'Mobile App',        value: '₹25,000',  note: 'onwards' },
+      { label: 'E-commerce Site',   value: '₹15,000',  note: 'onwards' },
+      { label: 'Maintenance',       value: '₹999',     note: '/ month' },
+    ],
+    note: '🕐 Delivery in 5–10 working days. Free 1-month support included.'
+  },
+  'Rental Agreement': {
+    items: [
+      { label: 'Basic Draft',       value: '₹499',     note: 'one-time' },
+      { label: 'E-Stamp + Print',   value: '₹999',     note: 'one-time' },
+      { label: 'Notarised Copy',    value: '₹1,499',   note: 'one-time' },
+      { label: 'Express (24 hrs)',  value: '₹1,999',   note: 'one-time' },
+    ],
+    note: '📋 Karnataka stamp duty as per govt rates, charged separately.'
+  },
+  'Building Painter': {
+    items: [
+      { label: 'Labour (1 BHK)',    value: '₹4,000',   note: 'onwards' },
+      { label: 'Labour (2 BHK)',    value: '₹7,000',   note: 'onwards' },
+      { label: 'Labour (3 BHK)',    value: '₹10,000',  note: 'onwards' },
+      { label: 'Paint Material',    value: 'Actual',   note: 'cost extra' },
+    ],
+    note: '🎨 Asian / Berger / Dulux paint supplied at market price. Free colour consultation.'
+  },
+  'Plumbing': {
+    items: [
+      { label: 'Visit Charge',      value: '₹200',     note: 'adjusted in bill' },
+      { label: 'Minor Repair',      value: '₹300–600', note: '' },
+      { label: 'New Fixture Fit',   value: '₹500–1,200', note: '' },
+      { label: 'Pipe Work (hr)',    value: '₹400',     note: '/ hour' },
+    ],
+    note: '🔧 Spare parts charged at actual cost. GST extra if applicable.'
+  },
+  'Transportation': {
+    items: [
+      { label: '1 BHK Move',        value: '₹3,500',  note: 'within Blr' },
+      { label: '2 BHK Move',        value: '₹6,000',  note: 'within Blr' },
+      { label: '3 BHK Move',        value: '₹9,000',  note: 'within Blr' },
+      { label: 'Mini Truck (day)',   value: '₹2,500',  note: 'per day' },
+    ],
+    note: '🚚 Packing material extra. Intercity moves quoted separately.'
+  },
+  'Electrician': {
+    items: [
+      { label: 'Visit Charge',      value: '₹150',     note: 'adjusted in bill' },
+      { label: 'Minor Work',        value: '₹200–500', note: '' },
+      { label: 'Fan / Light Fit',   value: '₹150',     note: 'per point' },
+      { label: 'Wiring (hr)',       value: '₹350',     note: '/ hour' },
+    ],
+    note: '⚡ Material charged at actual. Same-day service available in most areas.'
+  },
+};
+
 function openServiceModal(name, category, icon, imgUrl) {
   document.getElementById('svc-service').value = name;
   document.getElementById('svcModalImg').src = imgUrl;
@@ -5799,6 +5900,31 @@ function openServiceModal(name, category, icon, imgUrl) {
   document.getElementById('svc-phone').value = '';
   document.getElementById('svc-area').value = '';
   document.getElementById('svc-notes').value = '';
+
+  // Inject pricing block
+  const pricing = SERVICE_PRICING[name];
+  let pricingHTML = '';
+  if (pricing) {
+    const itemsHTML = pricing.items.map(i => `
+      <div class="svc-price-item">
+        <div class="svc-price-label">${i.label}</div>
+        <div class="svc-price-value">${i.value} <span>${i.note}</span></div>
+      </div>`).join('');
+    pricingHTML = `
+      <div class="svc-pricing-section">
+        <div class="svc-pricing-title">💰 Estimated Costs</div>
+        <div class="svc-pricing-grid">${itemsHTML}</div>
+        <div class="svc-price-note">${pricing.note}</div>
+      </div>`;
+  }
+  let el = document.getElementById('svc-pricing-block');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'svc-pricing-block';
+    document.getElementById('svc-service').closest('.form-group').insertAdjacentElement('afterend', el);
+  }
+  el.innerHTML = pricingHTML;
+
   document.getElementById('serviceModal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -5806,12 +5932,7 @@ function closeServiceModal() {
   document.getElementById('serviceModal').classList.remove('open');
   document.body.style.overflow = '';
 }
-function submitServiceRequest(e) {
-  e.preventDefault();
-  const service = document.getElementById('svc-service').value;
-  closeServiceModal();
-  showToast('Request sent for "' + service + '" — we\'ll call you shortly!');
-}
+
 document.getElementById('serviceModal').addEventListener('click', function(e) {
   if (e.target === this) closeServiceModal();
 });
