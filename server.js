@@ -46,6 +46,8 @@ const OwnerSchema = new mongoose.Schema({
   altPhone:     { type: String, default: '' },
   contactTime:  { type: String, default: '' },
   address:      { type: String, default: '' },
+  agentPhone:   { type: String, default: '' },
+  agentArea:    { type: String, default: '' },
 }, { _id: false });
 
 const PriceSchema = new mongoose.Schema({

@@ -1614,7 +1614,7 @@ ul{list-style:none}
       type="text" 
       id="searchInput" 
       placeholder='City, Area, BHK, Property, Rent, Budget, Deposit, Maintenance, Negotiable, Lease, Furnishing, Tenant, Facing, Bathrooms, Age, Availability, Amenities, Parking, Floor, Nearby' 
-      oninput="handleSearch()" 
+      onkeydown="if(event.key==='Enter') handleSearch()"
       autocomplete="off" 
       aria-label="Search properties" 
     />
@@ -2367,6 +2367,19 @@ ul{list-style:none}
       <div class="form-group" style="grid-column:span 3">
         <label class="form-label">Owner address (optional)</label>
         <textarea class="form-input" id="f-ownerAddress" rows="2" placeholder="Street, city, pincode (optional)" style="resize:vertical"></textarea>
+      </div>
+      <!-- Agent-only fields — shown when Listed by = Agent -->
+      <div id="f-agentFields" style="grid-column:span 3">
+        <div class="form-row" style="grid-template-columns:1fr 1fr;margin-top:4px">
+          <div class="form-group">
+            <label class="form-label">Agent phone number</label>
+            <input class="form-input" type="tel" id="f-agentPhone" placeholder="e.g. 9876543210" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Agent service area</label>
+            <input class="form-input" type="text" id="f-agentArea" placeholder="e.g. Koramangala, HSR Layout, BTM" />
+          </div>
+        </div>
       </div>
     </div>
 
@@ -3233,7 +3246,7 @@ ul{list-style:none}
 /* ═══════════════════════════════════════════════
    DATA
 ═══════════════════════════════════════════════ */
-let PROPERTIES = [{"id":"101","basic":{"status":"For Rent","listedBy":"Owner"},"location":{"area":"Panathur, Near Sobha Dream Acres","city":"Bengaluru","address":"Block C, Sobha Dream Acres, Panathur Main Road, Bengaluru, 560103","lat":12.9395,"lng":77.6974,"mapLink":"https://maps.app.goo.gl/Panathur2BHKDemo"},"owner":{"propertyName":"Sobha Dream Acres, Panathur","name":"Arvind Rao","phone":"9611459960","email":"arvind.rao@example.com","altPhone":"9845098765","contactTime":"Evening","address":"Sobha Dream Acres, Panathur, Bengaluru, 560103"},"price":{"rent":32000,"deposit":96000,"maintenance":2500,"rentIncrease":"5%","electricity":"No","water":"Included","negotiable":true},"property":{"type":"Apartment","bhk":"2 BHK","bike":"Yes","car":"Yes","floor":"6th of 14","area":"1180","bathrooms":"2","furnish":"Semi-Furnished","facing":"East","age":"1-5 Years","tenant":"Family","available":"2026-07-15"},"amenities":{"selected":["Wi-Fi","AC ×2","Washing machine","Refrigerator","Wardrobe / Cupboards ×2","Lift / Elevator","Gym / Pool","Security / CCTV","Power backup","RO water filter"],"extra":""},"terms":{"notice":"1 Month","lease":"11 Months"},"rules":{"pets":"Restricted","nonVeg":"Yes","gas":"Yes"},"media":{"video":"https://youtube.com/watch?v=demo-rent-101","desc":"Spacious 2 BHK in a well-maintained gated community close to ORR and major tech parks. Semi-furnished with modular kitchen, ample natural light, and 24/7 security. Walking distance to schools, supermarkets, and bus stops.","images":["https://images.unsplash.com/photo-1493809842364-78817add7ffb","https://images.unsplash.com/photo-1502672260266-1c1ef2d93688","https://images.unsplash.com/photo-1484154218962-a197022b5858"]},"pg":{},"promoted":false,"posted":"Just now","verified":true},{"id":"102","basic":{"status":"Lease","listedBy":"Broker"},"location":{"area":"Konanakunte, Kanakapura Road","city":"Bengaluru","address":"Villa 47, Prestige Falcon City, Konanakunte Cross, Kanakapura Road, Bengaluru, 560062","lat":12.8783,"lng":77.5497,"mapLink":"https://maps.app.goo.gl/FalconCityVillaDemo"},"owner":{"propertyName":"Prestige Falcon City, Konanakunte","name":"Lakshmi Narayanan","phone":"9611459960","email":"lakshmi.n@example.com","altPhone":"9900445566","contactTime":"Afternoon","address":"Prestige Falcon City, Konanakunte, Bengaluru, 560062"},"price":{"rent":4500000,"deposit":0,"maintenance":3000,"rentIncrease":"10% per year","electricity":"Shared meter","water":"Included","negotiable":false},"property":{"type":"Villa","bhk":"3 BHK","bike":"Yes","car":"Yes","floor":"G of 2","area":"1850","bathrooms":"3","furnish":"Unfurnished","facing":"North-East","age":"5-10 Years","tenant":"Family","available":"2026-08-01"},"amenities":{"selected":["Wardrobe / Cupboards","Balcony / Terrace ×2","Gym / Pool","Security / CCTV","Power backup","Garden","Piped gas connection"],"extra":""},"terms":{"notice":"2 Months","lease":"3 Years · Residential · Lock-in: 1 Year"},"rules":{"pets":"Yes","nonVeg":"Yes","gas":null},"media":{"video":"https://youtube.com/watch?v=demo-lease-102","desc":"Premium independent villa available on long-term lease in a gated layout. Private garden, dedicated parking for two cars, and clubhouse access. Ideal for families seeking a long-term residence with low recurring outgoings.","images":["https://images.unsplash.com/photo-1564013799919-ab600027ffc6","https://images.unsplash.com/photo-1576941089067-2de3c901e126","https://images.unsplash.com/photo-1600596542815-ffad4c1539a9"]},"pg":{},"promoted":true,"posted":"Just now","verified":true},{"id":"103","basic":{"status":"PG","listedBy":"Agent"},"location":{"area":"BTM Layout 2nd Stage","city":"Bengaluru","address":"16th Cross, BTM Layout 2nd Stage, Bengaluru, 560076","lat":12.9166,"lng":77.6101,"mapLink":"https://maps.app.goo.gl/ZoloStanzaBTMDemo"},"owner":{"propertyName":"Zolo Stanza, BTM Layout","name":"Sandeep Gowda","phone":"9611459960","email":"sandeep.gowda@example.com","altPhone":null,"contactTime":"Any","address":"Zolo Stanza, BTM Layout 2nd Stage, Bengaluru, 560076"},"price":{"rent":11500,"deposit":11500,"maintenance":null,"rentIncrease":null,"electricity":"Yes","water":"Included","negotiable":false},"property":{"type":null,"bhk":null,"bike":"No","car":"No","floor":"3rd of 4","area":null,"bathrooms":"1","furnish":"Fully Furnished","facing":"North","age":null,"tenant":"Female only","available":"Immediate"},"amenities":{"selected":["Wi-Fi","AC","Washing machine","Refrigerator","Bed & mattress ×2","Security / CCTV","Power backup","Laundry","Meals included","RO water filter"],"extra":""},"terms":{"notice":"15 Days","lease":null},"rules":{"pets":"No","nonVeg":"No","gas":null},"media":{"video":null,"desc":"Fully furnished girls' PG with daily housekeeping, 3 meals a day, and high-speed Wi-Fi. Located close to Jayadeva Hospital and Silk Board, with easy access to BTM bus stand and metro connectivity (upcoming).","images":["https://images.unsplash.com/photo-1505693416388-ac5ce068fe85","https://images.unsplash.com/photo-1522708323590-d24dbb6b0267","https://images.unsplash.com/photo-1540518614846-7eded433c457"]},"pg":{"gender":"Girls","room":"Double Sharing","meals":"All 3 Meals","occupancy":"2","notice":"15 Days","bathroom":"Shared","mealCost":3500,"beds":"24","furnish":"Fully Furnished","food":"Veg + Non-veg","kitchen":"Shared Kitchen","available":"Immediate","visitors":"Lobby Only","gateTime":"10 PM","nonVeg":"No","pets":"No"},"promoted":false,"posted":"Just now","verified":false}];
+let PROPERTIES = [];
 
 
 /* ─── View counts (persisted) ───────────────────
@@ -5091,7 +5104,10 @@ document.addEventListener('DOMContentLoaded', function() {
         PROPERTIES = data.properties;
       }
     } catch (err) {
-      console.warn('Could not load from DB, using seed data:', err.message);
+      console.error('Could not load properties from server:', err.message);
+      const ng = document.getElementById('normalGrid');
+      if (ng) ng.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--text-2)">⚠️ Could not connect to server. Please refresh the page.</div>';
+      return;
     }
     buildFilterOptions();
     renderCards();
@@ -5257,6 +5273,8 @@ function submitListing() {
       altPhone:     gv('f-ownerAltPhone') || null,
       contactTime:  gv('f-contactTime') || null,
       address:      gv('f-ownerAddress') || null,
+      agentPhone:   gv('f-agentPhone') || null,
+      agentArea:    gv('f-agentArea') || null,
     },
     price: isLease ? {
       rent:         parseFloat(gv('f-leaseAmount')) || 0,
