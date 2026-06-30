@@ -401,7 +401,8 @@ ul{list-style:none}
 .prop-img{
   position:relative;
   width:100%;
-  aspect-ratio:16/9;
+  min-height:160px;
+  max-height:320px;
   overflow:hidden;
   background:var(--bg-3);
   flex-shrink:0;
@@ -410,7 +411,7 @@ ul{list-style:none}
 
 .prop-card.list-view .prop-img{width:230px;aspect-ratio:unset;height:auto;min-height:150px;border-radius:16px 0 0 16px}
 .prop-img-placeholder{
-  width:100%;height:100%;
+  width:100%;height:200px;
   display:flex;align-items:center;justify-content:center;
 }
 .prop-img-placeholder svg{width:52px;height:52px;stroke:var(--border-2);fill:none;stroke-width:1.4}
@@ -627,13 +628,14 @@ ul{list-style:none}
 
 /* ── Hero gallery ── */
 .modal-img{
-  height:280px;background:var(--bg-3);
+  height:420px;background:var(--bg-3);
   display:flex;align-items:center;justify-content:center;
   position:relative;flex-shrink:0;overflow:hidden;
   border-radius:var(--radius-xl) var(--radius-xl) 0 0;
 }
 .modal-img svg{width:56px;height:56px;stroke:var(--border-2);fill:none;stroke-width:1.2}
-.modal-img .img-slide{border-radius:0;cursor:zoom-in}
+.modal-img .img-slide{border-radius:0;cursor:zoom-in;position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:none}
+.modal-img .img-slide.active{display:block}
 /* Modal gallery arrows: always visible (unlike card hover-only arrows), centered vertically */
 .modal-img .slide-arrows{
   position:absolute;top:50%;left:0;right:0;bottom:auto;transform:translateY(-50%);
@@ -652,14 +654,17 @@ ul{list-style:none}
 .modal-img .slide-dots{bottom:14px}
 .modal-img-typebadge{
   position:absolute;top:14px;left:14px;z-index:2;
-  padding:5px 13px;border-radius:99px;font-size:11px;font-weight:700;
-  letter-spacing:.02em;color:var(--text);
-  box-shadow:0 2px 8px rgba(0,0,0,.12);
+  padding:6px 14px;border-radius:99px;font-size:11.5px;font-weight:800;
+  letter-spacing:.03em;color:var(--text);
+  background:#fff;
+  border:1.5px solid rgba(0,0,0,.06);
+  box-shadow:0 3px 12px rgba(0,0,0,.18);
 }
 .modal-img-counter{
   position:absolute;bottom:14px;right:14px;z-index:2;
-  background:rgba(0,0,0,.55);color:#fff;font-size:11px;font-weight:600;
-  padding:4px 10px;border-radius:99px;letter-spacing:.02em;
+  background:rgba(0,0,0,.72);color:#fff;font-size:11.5px;font-weight:700;
+  padding:5px 12px;border-radius:99px;letter-spacing:.03em;
+  box-shadow:0 3px 12px rgba(0,0,0,.18);
 }
 .modal-close{
   position:absolute;top:12px;right:12px;z-index:3;
@@ -815,7 +820,7 @@ ul{list-style:none}
 
 @media (max-width:520px){
   .modal-grid{grid-template-columns:1fr}
-  .modal-img{height:220px}
+  .modal-img{height:300px}
 }
 
 /* ─── Lightbox (full-image viewer) ─────────────── */
@@ -1899,8 +1904,9 @@ ul{list-style:none}
 }
 
 /* ─── Card image slider ─────────────────────────── */
-.img-slides{position:relative;width:100%;height:100%;overflow:hidden}
-.img-slide{position:absolute;inset:0;opacity:0;transition:opacity .3s;background-size:cover;background-position:center;pointer-events:none}
+.img-slides{position:relative;width:100%;height:auto;overflow:hidden}
+.img-slide{display:none;width:100%;max-width:100%;height:auto;object-fit:contain;background-color:var(--bg-3);pointer-events:none;vertical-align:top}
+.img-slide.active{display:block}
 .img-slide.active{pointer-events:auto}
 .img-slide.active{opacity:1}
 .slide-arrows{
@@ -4350,7 +4356,7 @@ function buildImgSlider(p, fg) {
   }
   const uid = 'sl' + p.id;
   const slides = imgs.map((url, i) =>
-    `<div class="img-slide${i===0?' active':''}" style="background-image:url('${safeUrl(url)}')"></div>`
+    `<img class="img-slide${i===0?' active':''}" src="${safeUrl(url)}" loading="lazy" alt="" onclick="event.stopPropagation();openLightbox('${p.id}',${i})" />`
   ).join('');
   const dots = imgs.length > 1 ? `<div class="slide-dots">${imgs.map((_,i)=>
     `<button class="slide-dot${i===0?' active':''}" onclick="event.stopPropagation();slideGo('${uid}',${i})"></button>`
@@ -5437,7 +5443,7 @@ function openDetail(id) {
   if (imgs.length === 0) {
     galleryHtml = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`;
   } else {
-    const slides = imgs.map((url, i) => `<div class="img-slide${i===0?' active':''}" style="background-image:url('${safeUrl(url)}')" onclick="event.stopPropagation();openLightbox('${p.id}',${i})"></div>`).join('');
+    const slides = imgs.map((url, i) => `<img class="img-slide${i===0?' active':''}" src="${safeUrl(url)}" alt="" onclick="event.stopPropagation();openLightbox('${p.id}',${i})" />`).join('');
     const dots = imgs.length > 1 ? `<div class="slide-dots">${imgs.map((_,i)=>`<button class="slide-dot${i===0?' active':''}" onclick="event.stopPropagation();slideGo('${uid}',${i})"></button>`).join('')}</div>` : '';
     const arrows = imgs.length > 1 ? `
       <div class="slide-arrows">
