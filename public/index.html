@@ -2966,7 +2966,7 @@ ul{list-style:none}
     <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
       <div class="form-group"><label class="form-label" id="f-rentLabel">Monthly rent (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-rent" placeholder="e.g. 22000" min="0" max="9999999" /></div>
       <div class="form-group" id="f-depositWrap"><label class="form-label">Security deposit (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-deposit" placeholder="e.g. 44000" min="0" max="9999999" /></div>
-      <div class="form-group"><label class="form-label">Maintenance (₹/mo)</label><input class="form-input" type="number" id="f-maintenance" placeholder="e.g. 2000" /></div>
+      <div class="form-group"><label class="form-label">Maintenance (₹/ Month)</label><input class="form-input" type="number" id="f-maintenance" placeholder="e.g. 2000" /></div>
       <div class="form-group"><label class="form-label">Annual rent escalation (%)</label><input class="form-input" type="number" step="0.5" id="f-escalation" placeholder="e.g. 5" /></div>
       <div class="form-group">
         <label class="form-label">Electricity included?</label>
@@ -3129,7 +3129,7 @@ ul{list-style:none}
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
         <div class="form-group"><label class="form-label">Lease amount (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-leaseAmount" placeholder="e.g. 2500000" /></div>
         <div class="form-group"><label class="form-label">Monthly rent (₹) <span class="form-label-hint" title="Optional recurring rent on top of the lease corpus — most lease agreements set this to ₹0">ⓘ</span></label><input class="form-input" type="number" id="f-leaseMonthlyRent" placeholder="e.g. 0 (leave blank if none)" /></div>
-        <div class="form-group"><label class="form-label">Maintenance (₹/mo)</label><input class="form-input" type="number" id="f-leaseMaintenance" placeholder="e.g. 2000" /></div>
+        <div class="form-group"><label class="form-label">Maintenance (₹/ Month)</label><input class="form-input" type="number" id="f-leaseMaintenance" placeholder="e.g. 2000" /></div>
       </div>
       <div class="lm-section">📋 Lease Terms</div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
@@ -3162,7 +3162,7 @@ ul{list-style:none}
         <div class="form-group"><label class="form-label">Attached bathroom</label><select class="form-select" id="f-pgBathroom"><option>Yes</option><option>Shared</option></select></div>
         <div class="form-group"><label class="form-label">Occupancy available</label><input class="form-input" type="number" id="f-pgOccupancy" placeholder="e.g. 2" /></div>
         <div class="form-group"><label class="form-label">Total beds</label><input class="form-input" type="number" id="f-pgTotalBeds" placeholder="e.g. 20" /></div>
-        <div class="form-group"><label class="form-label">Meals cost (₹/mo)</label><input class="form-input" type="number" id="f-pgMealsCost" placeholder="e.g. 3000" /></div>
+        <div class="form-group"><label class="form-label">Meals cost (₹/ Month)</label><input class="form-input" type="number" id="f-pgMealsCost" placeholder="e.g. 3000" /></div>
         <div class="form-group"><label class="form-label">Room furnishing</label><select class="form-select" id="f-pgRoomFurnishing"><option value="">Select</option><option>Fully Furnished</option><option>Semi-Furnished</option><option>Unfurnished</option></select></div>
         <div class="form-group"><label class="form-label">Kitchen access</label><select class="form-select" id="f-pgKitchenAccess"><option value="">Select</option><option>Shared Kitchen</option><option>No Kitchen</option><option>Private Kitchen</option></select></div>
       </div>
@@ -4192,7 +4192,7 @@ function recentlyViewedCardHTML(rv) {
     <div class="rv-card-body">
       <div class="rv-card-title">${esc(rv.name)}</div>
       <div class="rv-card-sub">${esc(rv.area)}</div>
-      <div class="rv-card-price">${rent}<span style="color:var(--text-3);font-weight:500"> /mo</span></div>
+      <div class="rv-card-price">${rent}<span style="color:var(--text-3);font-weight:500">/ Month</span></div>
     </div>
   </div>`;
 }
@@ -4514,7 +4514,7 @@ function cardHTML(p) {
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         </div>
       </div>
-      <div class="prop-img-price"><b>₹${(p.price?.rent||0).toLocaleString('en-IN')}</b><span>/mo</span></div>
+      <div class="prop-img-price"><b>₹${(p.price?.rent||0).toLocaleString('en-IN')}</b><span>/ Month</span></div>
     </div>
     <div class="prop-body">
       <div class="prop-title" title="${esc(p.owner?.propertyName)}">
@@ -5526,7 +5526,7 @@ function openDetail(id) {
 
   // ── Quick-fact strip (signature element) ──
   const facts = [
-    {icon:I.cash, val: price.rent ? '₹'+price.rent.toLocaleString('en-IN') : '—', lbl:'Rent / mo'},
+    {icon:I.cash, val: price.rent ? '₹'+price.rent.toLocaleString('en-IN') : '—', lbl:'Rent / Month'},
     {icon:I.bed, val: prop.bhk || '—', lbl:'BHK'},
     {icon:I.home, val: prop.area ? prop.area+' sqft' : '—', lbl:'Area'},
     {icon:I.doc, val: prop.furnish || '—', lbl:'Furnishing'},
@@ -5554,7 +5554,7 @@ function openDetail(id) {
   // ── Pricing fields ──
   const pricingFields = [
     mf('Deposit', money(price.deposit)),
-    mf('Maintenance', price.maintenance ? money(price.maintenance) + '/mo' : ''),
+    mf('Maintenance', price.maintenance ? money(price.maintenance) + '/ Month' : ''),
     mf('Rent escalation', price.rentIncrease),
     mf('Electricity included', price.electricity),
     mf('Water charge', price.water),
@@ -5577,7 +5577,7 @@ function openDetail(id) {
     mf('Attached bathroom', pg.bathroom),
     mf('Occupancy available', pg.occupancy),
     mf('Total beds', pg.beds),
-    mf('Meals cost', pg.mealCost ? money(pg.mealCost) + '/mo' : ''),
+    mf('Meals cost', pg.mealCost ? money(pg.mealCost) + '/ Month' : ''),
     mf('Room furnishing', pg.furnish),
     mf('Kitchen access', pg.kitchen),
     mf('Available from', pg.available),
@@ -6153,7 +6153,7 @@ function renderMyListings() {
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
           ${esc(p.location?.area)}
         </div>
-        <div class="profile-mini-price">${rent}<span style="color:var(--text-3);font-weight:500"> /mo</span></div>
+        <div class="profile-mini-price">${rent}<span style="color:var(--text-3);font-weight:500">/ Month</span></div>
         <span class="profile-status-pill">${esc(p.basic?.status) || 'For Rent'}</span>
         ${p.visitCount > 0 ? `<span class="profile-status-pill" style="background:var(--brand-light);color:var(--brand);margin-left:5px">${p.visitCount} visit${p.visitCount===1?'':'s'} requested</span>` : ''}
       </div>
@@ -6272,7 +6272,7 @@ function loadSavedListings() {
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
           ${esc(p.location?.area)}
         </div>
-        <div class="profile-mini-price">${rent}<span style="color:var(--text-3);font-weight:500"> /mo</span></div>
+        <div class="profile-mini-price">${rent}<span style="color:var(--text-3);font-weight:500">/ Month</span></div>
       </div>
       <div class="profile-mini-actions">
         <button class="profile-mini-icon-btn danger" title="Remove from saved" onclick="event.stopPropagation();removeSavedListing('${p.id}')">
