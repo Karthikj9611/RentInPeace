@@ -379,18 +379,20 @@ ul{list-style:none}
 }
 .prop-card{
   background:var(--bg);
-  border-radius:10px;
+  border-radius:16px;
   border:1px solid var(--border);
   overflow:visible;
   cursor:pointer;
-  transition:box-shadow .15s;
+  transition:box-shadow .2s ease,transform .2s ease,border-color .2s ease;
   position:relative;
   z-index:0;
   display:flex;flex-direction:column;
   height:100%;
 }
 .prop-card:hover{
-  box-shadow:0 0 0 2px var(--brand);
+  box-shadow:0 10px 28px rgba(20,16,17,.10);
+  transform:translateY(-3px);
+  border-color:var(--border-2);
   z-index:2;
 }
 .prop-card.list-view{
@@ -403,10 +405,10 @@ ul{list-style:none}
   overflow:hidden;
   background:var(--bg-3);
   flex-shrink:0;
-  border-radius:10px 10px 0 0;
+  border-radius:16px 16px 0 0;
 }
 
-.prop-card.list-view .prop-img{width:240px;aspect-ratio:unset;height:auto;min-height:160px;border-radius:10px 0 0 10px}
+.prop-card.list-view .prop-img{width:230px;aspect-ratio:unset;height:auto;min-height:150px;border-radius:16px 0 0 16px}
 .prop-img-placeholder{
   width:100%;height:100%;
   display:flex;align-items:center;justify-content:center;
@@ -422,41 +424,52 @@ ul{list-style:none}
   display:flex;align-items:center;gap:6px;
 }
 .prop-badge-promoted{
-  height:24px;display:flex;align-items:center;
-  background:var(--brand);color:#fff;
+  height:23px;display:flex;align-items:center;gap:3px;
+  background:rgba(20,16,17,.78);backdrop-filter:blur(6px);color:#fff;
   font-size:10px;font-weight:700;
   padding:0 10px;border-radius:99px;box-sizing:border-box;
   letter-spacing:.03em;text-transform:uppercase;
   flex-shrink:0;
 }
 .prop-badge-type{
-  height:24px;display:flex;align-items:center;
+  height:23px;display:flex;align-items:center;
   font-size:10px;font-weight:700;
   padding:0 10px;border-radius:99px;box-sizing:border-box;
   letter-spacing:.03em;text-transform:uppercase;
   flex-shrink:0;
+  backdrop-filter:blur(6px);
 }
-.badge-rent{background:#dff0e8;color:#1a6640}
-.badge-lease{background:#dde9fa;color:#1a4680}
-.badge-pg{background:#eee8fa;color:#4a2a9a}
+.badge-rent{background:rgba(223,240,232,.92);color:#1a6640}
+.badge-lease{background:rgba(221,233,250,.92);color:#1a4680}
+.badge-pg{background:rgba(238,232,250,.92);color:#4a2a9a}
 .prop-heart{
-  width:24px;height:24px;border-radius:50%;
-  background:rgba(255,255,255,.9);
+  width:30px;height:30px;border-radius:50%;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(6px);
+  box-shadow:0 2px 6px rgba(20,16,17,.12);
   display:flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:background .12s;
+  cursor:pointer;transition:background .12s,transform .12s;
   flex-shrink:0;
 }
-.prop-heart:hover{background:#fff}
-.prop-heart svg{width:13px;height:13px;stroke:var(--brand);fill:none;stroke-width:2;transition:fill .12s}
+.prop-heart:hover{background:#fff;transform:scale(1.07)}
+.prop-heart svg{width:14px;height:14px;stroke:var(--brand);fill:none;stroke-width:2;transition:fill .12s}
 .prop-heart.liked svg{fill:var(--brand)}
-.prop-body{padding:14px;flex:1;min-width:0;display:flex;flex-direction:column}
+.prop-img-price{
+  position:absolute;left:10px;bottom:10px;z-index:2;
+  background:rgba(20,16,17,.78);backdrop-filter:blur(6px);
+  color:#fff;border-radius:10px;padding:5px 11px;
+  display:flex;align-items:baseline;gap:3px;
+  pointer-events:none;
+}
+.prop-img-price b{font-size:15px;font-weight:700;letter-spacing:-.01em}
+.prop-img-price span{font-size:10.5px;font-weight:500;color:rgba(255,255,255,.75)}
+.prop-body{padding:13px 14px 12px;flex:1;min-width:0;display:flex;flex-direction:column}
 .prop-price{
   font-size:18px;font-weight:600;color:var(--text);
   display:flex;align-items:baseline;gap:4px;
 }
 .prop-price-unit{font-size:12px;font-weight:400;color:var(--text-3)}
 .prop-title{
-  font-size:13px;color:var(--text-2);margin-top:3px;
+  font-size:13.5px;font-weight:600;color:var(--text);margin-top:0;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   display:flex;align-items:center;gap:5px;min-width:0;
 }
@@ -470,9 +483,33 @@ ul{list-style:none}
 .prop-verified-badge svg{width:11px;height:11px;stroke:none;fill:#1a7d4a;flex-shrink:0}
 .prop-loc{
   display:flex;align-items:center;gap:4px;
-  font-size:12px;color:var(--text-3);margin-top:4px;
+  font-size:12px;color:var(--text-3);margin-top:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .prop-loc svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
+.prop-loc span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ── Modern icon stat row (replaces verbose pill tags) ── */
+.prop-stats{
+  display:flex;align-items:center;flex-wrap:wrap;
+  gap:3px 0;margin-top:10px;
+}
+.prop-stat{
+  display:flex;align-items:center;gap:4px;
+  font-size:11.5px;font-weight:600;color:var(--text-2);
+  padding:0 9px 0 0;
+}
+.prop-stat:not(:last-child){border-right:1px solid var(--border);}
+.prop-stat svg{width:14px;height:14px;stroke:var(--text-3);fill:none;stroke-width:1.8;flex-shrink:0}
+.prop-stat.is-off{color:var(--text-3);font-weight:500}
+.prop-stat.is-off svg{stroke:var(--border-2)}
+.prop-chip-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.prop-chip{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:10.5px;font-weight:600;color:var(--text-2);
+  background:var(--bg-2);border:1px solid var(--border);
+  padding:3px 8px 3px 7px;border-radius:7px;
+}
+.prop-chip svg{width:11px;height:11px;stroke:var(--text-3);fill:none;stroke-width:2;flex-shrink:0}
 .prop-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
 .prop-tag{
   font-size:11px;background:var(--bg-2);color:var(--text-2);
@@ -480,9 +517,46 @@ ul{list-style:none}
 }
 .prop-footer{
   display:flex;flex-direction:column;gap:8px;
-  margin-top:auto;padding-top:10px;border-top:1px solid var(--border);
+  margin-top:auto;padding-top:11px;
 }
-.prop-meta-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.prop-quick-actions{
+  display:flex;align-items:center;gap:6px;
+}
+.prop-qa-btn{
+  flex:1;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  padding:8px 6px;border-radius:9px;
+  border:1.5px solid var(--border-2);background:var(--bg);
+  color:var(--text-2);cursor:pointer;
+  font-size:11.5px;font-weight:600;
+  transition:border-color .12s,background .12s,color .12s,transform .1s;
+  min-width:0;
+}
+.prop-qa-btn:active{transform:scale(.96)}
+.prop-qa-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.9;flex-shrink:0}
+.prop-qa-btn:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-light)}
+.prop-qa-btn.prop-qa-whatsapp{color:#1ebe5a;border-color:#bfe8cf}
+.prop-qa-btn.prop-qa-whatsapp svg{fill:currentColor;stroke:none}
+.prop-qa-btn.prop-qa-whatsapp:hover{background:#e8faef;border-color:#25D366;color:#1ebe5a}
+.prop-qa-icon{
+  width:34px;height:34px;flex:none;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  border:1.5px solid var(--border-2);background:var(--bg);
+  color:var(--text-2);cursor:pointer;position:relative;
+  transition:border-color .12s,background .12s,color .12s,transform .1s;
+}
+.prop-qa-icon:active{transform:scale(.93)}
+.prop-qa-icon svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9}
+.prop-qa-icon:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-light)}
+.prop-qa-icon.checked{border-color:var(--brand);color:var(--brand);background:var(--brand-light)}
+.prop-qa-icon.disabled{opacity:.4;cursor:not-allowed}
+.prop-qa-icon.disabled:hover{border-color:var(--border-2);color:var(--text-2);background:var(--bg)}
+.prop-qa-count{
+  position:absolute;top:-6px;right:-6px;min-width:16px;height:16px;padding:0 3px;
+  border-radius:99px;background:var(--brand);color:#fff;font-size:9.5px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;line-height:1;pointer-events:none;
+}
+.prop-meta-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:9px}
 .prop-views{
   display:flex;align-items:center;gap:4px;
   font-size:11px;color:var(--text-3);
@@ -4349,18 +4423,29 @@ function cardHTML(p) {
   const bikepark = p.property?.bike === 'Yes';
   const lift = pHasLift(p);
   const deposit = p.price?.deposit || 0;
+  const maintenance = p.price?.maintenance || 0;
+  const floor = p.property?.floor || '';
+  const facing = p.property?.facing || '';
+  const tenant = p.property?.tenant || '';
+  const negotiable = p.price?.negotiable || '';
+  const available = p.property?.available || '';
+  const availableFmt = available ? (() => {
+    const d = new Date(available);
+    return isNaN(d) ? available : d.toLocaleDateString('en-IN', {day:'numeric',month:'short'});
+  })() : '';
   return `<div class="prop-card${listClass}" onclick="openDetail('${p.id}')">
     <div class="prop-img" style="background:${bg}" data-idx="0">
       ${buildImgSlider(p, fg)}
       <div class="prop-card-top-row">
         <div class="prop-left-badges">
-          ${p.promoted ? '<span class="prop-badge-promoted">Promoted</span>' : ''}
+          ${p.promoted ? '<span class="prop-badge-promoted">★ Promoted</span>' : ''}
           <span class="prop-badge-type badge-${pType.toLowerCase()}">${pType}</span>
         </div>
         <div class="prop-heart${liked?' liked':''}" onclick="event.stopPropagation();toggleShortlist('${p.id}',this)" aria-label="${liked?'Remove from':'Add to'} shortlist">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         </div>
       </div>
+      <div class="prop-img-price"><b>₹${(p.price?.rent||0).toLocaleString('en-IN')}</b><span>/mo</span></div>
     </div>
     <div class="prop-body">
       <div class="prop-title" title="${p.owner?.propertyName}">
@@ -4369,37 +4454,82 @@ function cardHTML(p) {
       </div>
       <div class="prop-loc">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        ${p.location?.area}
+        <span>${p.location?.area}</span>
       </div>
-	  <div>₹${(p.price?.rent||0).toLocaleString('en-IN')}<span class="prop-price-unit"> / Month</span></div>
-      <div class="prop-tags">
-        <span class="prop-tag">${p.property?.bhk}</span>
-        <span class="prop-tag">Deposit: ₹${deposit.toLocaleString('en-IN')}</span>
-        <span class="prop-tag">${p.property?.furnish}</span>
-        <span class="prop-tag">${bathrooms} Bath${bathrooms==1?'':'s'}</span>
-        ${lift ? '<span class="prop-tag">Lift</span>' : ''}
-        <span class="prop-tag">${carpark ? '✓' : '✕'} Car park</span>
-        <span class="prop-tag">${bikepark ? '✓' : '✕'} Bike park</span>
+      <div class="prop-stats">
+        <span class="prop-stat" title="Configuration">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7v11M3 11h18M21 7v11M7 7v4M17 7v4"/></svg>
+          ${p.property?.bhk}
+        </span>
+        <span class="prop-stat" title="Bathrooms">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h17a1 1 0 0 1 1 1v1a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4v-9a2 2 0 0 1 2-2 2 2 0 0 1 2 2"/><path d="M9 12V5a2 2 0 0 1 4 0"/></svg>
+          ${bathrooms} Bath${bathrooms==1?'':'s'}
+        </span>
+        <span class="prop-stat" title="Furnishing">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7v11M21 7v11M3 13h18M5 13V9a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4"/></svg>
+          ${p.property?.furnish}
+        </span>
+        <span class="prop-stat${carpark?'':' is-off'}" title="${carpark?'Car parking available':'No car parking'}">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/><rect x="3" y="11" width="18" height="6" rx="2"/><circle cx="7.5" cy="17" r="1.3"/><circle cx="16.5" cy="17" r="1.3"/></svg>
+          Car
+        </span>
+        <span class="prop-stat${bikepark?'':' is-off'}" title="${bikepark?'Bike parking available':'No bike parking'}">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="17.5" r="3"/><circle cx="18.5" cy="17.5" r="3"/><path d="M12 17.5l2.5-7.5h3M5.5 17.5L9 9h3l2.5 4"/></svg>
+          Bike
+        </span>
+        ${lift ? `<span class="prop-stat" title="Lift available"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M9 9l3-3 3 3M9 15l3 3 3-3"/></svg>Lift</span>` : ''}
+      </div>
+      <div class="prop-chip-row">
+        <span class="prop-chip" title="Security deposit">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2"/><circle cx="12" cy="12.5" r="2.5"/></svg>
+          ₹${deposit.toLocaleString('en-IN')} deposit
+        </span>
+        <span class="prop-chip" title="Posted">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg>
+          Posted ${p.posted}
+        </span>
+        ${maintenance > 0 ? `<span class="prop-chip" title="Monthly maintenance">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          ₹${maintenance.toLocaleString('en-IN')} maint.
+        </span>` : ''}
+        ${floor ? `<span class="prop-chip" title="Floor">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg>
+          ${floor}
+        </span>` : ''}
+        ${facing ? `<span class="prop-chip" title="Facing direction">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/></svg>
+          ${facing} facing
+        </span>` : ''}
+        ${tenant ? `<span class="prop-chip" title="Tenant preference">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg>
+          ${tenant}
+        </span>` : ''}
+        ${negotiable === 'Yes' ? `<span class="prop-chip" title="Rent is negotiable">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H7"/></svg>
+          Negotiable
+        </span>` : ''}
+        ${availableFmt ? `<span class="prop-chip" title="Available from">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          From ${availableFmt}
+        </span>` : ''}
       </div>
       <div class="prop-footer">
-        <div class="prop-action-grid">
-          <button class="prop-action-btn prop-action-contact" onclick="event.stopPropagation();showToast('Contact info shown to verified users')" aria-label="Contact owner">
+        <div class="prop-quick-actions">
+          <button class="prop-qa-btn" onclick="event.stopPropagation();showToast('Contact info shown to verified users')" aria-label="Contact owner">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
             <span>Contact</span>
           </button>
-          <button class="prop-action-btn prop-action-whatsapp" onclick="event.stopPropagation();openWhatsApp('${p.id}')" aria-label="Contact on WhatsApp">
+          <button class="prop-qa-btn prop-qa-whatsapp" onclick="event.stopPropagation();openWhatsApp('${p.id}')" aria-label="Contact on WhatsApp">
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg>
             <span>WhatsApp</span>
           </button>
-          <button class="prop-action-btn" style="position:relative" onclick="event.stopPropagation();openScheduleModal('${p.id}')" aria-label="Schedule a visit">
+          <div class="prop-qa-icon" onclick="event.stopPropagation();openScheduleModal('${p.id}')" aria-label="Schedule a visit" title="Schedule a visit">
             <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            <span>Visit</span>
-            ${(p.visitCount||0) > 0 ? `<span style="position:absolute;top:-6px;right:-6px;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:1;pointer-events:none">${p.visitCount}</span>` : ''}
-          </button>
-          <button class="prop-action-btn prop-action-compare${compared?' checked':''}${compareDisabled?' disabled':''}" onclick="event.stopPropagation();toggleCompare('${p.id}',this)" aria-label="${compared?'Remove from':'Add to'} compare" title="${compareDisabled?`You're comparing ${lockedType} properties`:''}">
+            ${(p.visitCount||0) > 0 ? `<span class="prop-qa-count">${p.visitCount}</span>` : ''}
+          </div>
+          <div class="prop-qa-icon prop-action-compare${compared?' checked':''}${compareDisabled?' disabled':''}" onclick="event.stopPropagation();toggleCompare('${p.id}',this)" aria-label="${compared?'Remove from':'Add to'} compare" title="${compareDisabled?`You're comparing ${lockedType} properties`:'Compare'}">
             <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-            <span>Compare</span>
-          </button>
+          </div>
         </div>
         <div class="prop-meta-row">
           <span class="prop-views" title="${getViews(p).toLocaleString('en-IN')} views">
