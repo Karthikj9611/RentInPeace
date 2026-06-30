@@ -5860,6 +5860,18 @@ function closeProfileModal() {
   exitProfileEditMode();
   exitPasswordEditMode();
 }
+// Formats a Date as 'dd-mm-yyyy hh:mm AM/PM', matching the server's posted-date format.
+function formatPostedDateTime(date) {
+  const d = new Date(date);
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  let hours = d.getHours();
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12; if (hours === 0) hours = 12;
+  return `${dd}-${mm}-${yyyy} ${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
+}
 function getLoggedInUser() {
   try { return JSON.parse(sessionStorage.getItem('quatar_user')); } catch { return null; }
 }
@@ -7035,7 +7047,7 @@ function submitListing() {
     const saved = data.property || {};
     const localProp = Object.assign({}, newProp, saved, {
       id:      saved._id || saved.id || (PROPERTIES.length + 1),
-      posted:  'Just now',
+      posted:  formatPostedDateTime(new Date()),
       verified: false,
     });
     PROPERTIES.unshift(localProp);

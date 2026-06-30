@@ -445,6 +445,24 @@ function formatPrice(price, status) {
   return display;
 }
 
+// Formats a Date as 'dd-mm-yyyy hh:mm AM/PM' in IST, e.g. '30-06-2026 02:30 PM'.
+function formatPostedDateTime(date) {
+  const d = new Date(date);
+  const parts = new Intl.DateTimeFormat('en-IN', {
+    timeZone: 'Asia/Kolkata',
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit', hour12: true
+  }).formatToParts(d);
+  const get = (type) => parts.find(p => p.type === type)?.value || '';
+  const dayPart   = get('day');
+  const monthPart = get('month');
+  const yearPart  = get('year');
+  const hourPart  = get('hour');
+  const minPart   = get('minute');
+  const ampm      = get('dayPeriod').toUpperCase();
+  return `${dayPart}-${monthPart}-${yearPart} ${hourPart}:${minPart} ${ampm}`;
+}
+
 // Top-level keys accepted from the client, matching the nested submission shape exactly.
 const NESTED_SECTIONS = ['basic','location','owner','price','property','amenities','terms','rules','media','pg'];
 
@@ -582,7 +600,7 @@ app.get('/api/properties', async (req, res) => {
       id:           String(doc._id),
       displayPrice: formatPrice((doc.price || {}).rent, (doc.basic || {}).status),
       posted:       doc.createdAt
-                      ? new Date(doc.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
+                      ? formatPostedDateTime(doc.createdAt)
                       : 'Recently',
       verified:     false,
     }));
