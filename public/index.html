@@ -1997,15 +1997,26 @@ ul{list-style:none}
   width:100%;
   opacity:0;transition:opacity .5s;
   display:none;
-  align-items:flex-start;justify-content:center;
+  flex-direction:column;
+  align-items:stretch;justify-content:flex-start;
 }
 .welcome-slide.active{opacity:1;display:flex;animation:wm-pop .35s cubic-bezier(.34,1.56,.64,1) both}
+.welcome-slide-title{
+  padding:12px 16px 8px;
+  font-size:13.5px;font-weight:700;color:#fff;
+  text-align:center;letter-spacing:.01em;line-height:1.3;
+  background:#0a0a0a;
+}
+.welcome-slide-title span{
+  display:block;font-size:11px;font-weight:600;color:var(--brand);
+  text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;
+}
 .welcome-slide img{
   width:100%;
   height:auto;
   max-height:none;
   object-fit:cover;
-  cursor:default;
+  cursor:zoom-in;
   display:block;
 }
 .welcome-dots{
@@ -2058,8 +2069,22 @@ ul{list-style:none}
   background:rgba(255,255,255,.15);border:none;
   color:#fff;font-size:20px;font-weight:700;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
+  z-index:2;
 }
 #imgZoomClose:hover{background:rgba(255,255,255,.3)}
+#imgZoomCaption{
+  position:absolute;left:0;right:0;bottom:0;
+  padding:14px 60px 16px 20px;
+  background:linear-gradient(transparent,rgba(0,0,0,.85) 40%);
+  color:#fff;text-align:left;
+  font-size:14px;font-weight:600;line-height:1.4;
+  display:none;
+}
+#imgZoomCaption span{
+  display:block;font-size:11px;font-weight:700;color:var(--brand);
+  text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;
+}
+#imgZoomCaption.show{display:block}
 
 </style>
 </head>
@@ -4471,7 +4496,11 @@ function cardHTML(p) {
   const available = p.property?.available || '';
   const availableFmt = available ? (() => {
     const d = new Date(available);
-    return isNaN(d) ? available : d.toLocaleDateString('en-IN', {day:'numeric',month:'short'});
+    if (isNaN(d)) return available;
+    const dd = String(d.getDate()).padStart(2,'0');
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const yyyy = d.getFullYear();
+    return `${dd}-${mm}-${yyyy}`;
   })() : '';
   return `<div class="prop-card${listClass}" onclick="openDetail('${p.id}')">
     <div class="prop-img" style="background:${bg}" data-idx="0">
@@ -4524,13 +4553,9 @@ function cardHTML(p) {
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2"/><circle cx="12" cy="12.5" r="2.5"/></svg>
           ₹${deposit.toLocaleString('en-IN')} deposit
         </span>
-        <span class="prop-chip" title="Posted">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></svg>
-          Posted ${p.posted}
-        </span>
         ${maintenance > 0 ? `<span class="prop-chip" title="Monthly maintenance">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          ₹${maintenance.toLocaleString('en-IN')} maint.
+          ₹${maintenance.toLocaleString('en-IN')} maintenance
         </span>` : ''}
         ${floor ? `<span class="prop-chip" title="Floor">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg>
@@ -4550,7 +4575,7 @@ function cardHTML(p) {
         </span>` : ''}
         ${availableFmt ? `<span class="prop-chip" title="Available from">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          From ${availableFmt}
+          Available From ${availableFmt}
         </span>` : ''}
       </div>
       <div class="prop-footer">
@@ -7265,13 +7290,24 @@ document.addEventListener('DOMContentLoaded',function(){
 });
 
 // ── Image Zoom Lightbox ──
-function openImgZoom(src){
+function openImgZoom(src, evt, label, title){
+  if(evt) evt.stopPropagation();
   const overlay = document.getElementById('imgZoomOverlay');
   document.getElementById('imgZoomSrc').src = src;
+  const cap = document.getElementById('imgZoomCaption');
+  if(title){
+    cap.innerHTML = (label? '<span>'+label+'</span>':'') + title;
+    cap.classList.add('show');
+  } else {
+    cap.classList.remove('show');
+    cap.innerHTML='';
+  }
   overlay.classList.add('open');
+  if(typeof _wmStop==='function') _wmStop();
 }
 function closeImgZoom(){
   document.getElementById('imgZoomOverlay').classList.remove('open');
+  if(typeof _wmStart==='function') _wmStart();
 }
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape') closeImgZoom();
@@ -7284,13 +7320,13 @@ document.addEventListener('keydown',function(e){
     <button class="welcome-close" onclick="closeWelcomeModal()">&#x2715;</button>
     <div class="welcome-slides">
       <div class="welcome-slide active">
-        <img src="Images/1st Month.png" alt="Offer - Month 1" loading="eager">
+        <img src="Images/1st Month.png" alt="Offer - Month 1" loading="eager" onclick="openImgZoom(this.src, event, 'The Problem', 'Tired of rental struggles searching on your own?')">
       </div>
       <div class="welcome-slide">
-        <img src="Images/2nd month.png" alt="Offer - Month 2" loading="lazy">
+        <img src="Images/2nd month.png" alt="Offer - Month 2" loading="lazy" onclick="openImgZoom(this.src, event, 'Other Platforms &amp; Brokers', 'Endless listings, fake photos, broker hassles — sound familiar?')">
       </div>
       <div class="welcome-slide">
-        <img src="Images/3rd Month.png" alt="Offer - Month 3" loading="lazy">
+        <img src="Images/3rd Month.png" alt="Offer - Month 3" loading="lazy" onclick="openImgZoom(this.src, event, 'Why Choose Us', 'Verified homes, real photos, zero stress — find your perfect home in 1 day')">
       </div>
       <div class="welcome-dots">
         <button class="welcome-dot active" onclick="goWelcomeSlide(0)"></button>
@@ -7299,8 +7335,6 @@ document.addEventListener('keydown',function(e){
       </div>
     </div>
     <div class="welcome-footer">
-      <h3>&#x1F389; Special Offer!</h3>
-      <p>Get exclusive deals on your first rental. Browse verified listings in Bengaluru.</p>
       <div class="welcome-actions">
         <button class="welcome-skip" onclick="welcomeSkip()">Skip for now</button>
         <button class="welcome-noted" onclick="welcomeNoted()">Noted</button>
@@ -7312,7 +7346,10 @@ document.addEventListener('keydown',function(e){
 <!-- ── Image Zoom Lightbox ── -->
 <div id="imgZoomOverlay" onclick="if(event.target===this)closeImgZoom()">
   <button id="imgZoomClose" onclick="closeImgZoom()">&#x2715;</button>
-  <img id="imgZoomSrc" src="" alt="Zoomed image">
+  <div style="position:relative;max-width:100%;max-height:90vh;display:flex;">
+    <img id="imgZoomSrc" src="" alt="Zoomed image">
+    <div id="imgZoomCaption"></div>
+  </div>
 </div>
 
 </body>
