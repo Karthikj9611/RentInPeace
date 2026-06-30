@@ -4,9 +4,12 @@ const express    = require('express');
 const mongoose   = require('mongoose');
 const cors       = require('cors');
 const path       = require('path');
+const fs         = require('fs');
 const crypto     = require('crypto');
 const rateLimit  = require('express-rate-limit');
 const bcrypt     = require('bcryptjs');
+const multer     = require('multer');
+const sharp      = require('sharp');
 
 // ── Env checks ──
 if (!process.env.MONGODB_URI)   throw new Error('MONGODB_URI env var is required');
@@ -14,45 +17,49 @@ if (!process.env.ALLOWED_ORIGIN) {
   if (process.env.NODE_ENV === 'production') throw new Error('ALLOWED_ORIGIN env var is required in production');
   console.warn('⚠️  ALLOWED_ORIGIN not set — defaulting to * (development only)');
 }
+if (process.env.NODE_ENV === 'production' && (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD)) {
+  throw new Error('ADMIN_EMAIL and ADMIN_PASSWORD env vars are required in production (hardcoded admin/admin login is dev-only)');
+}
 
 const app = express();
+app.set('trust proxy', 1); // we're behind Render's proxy; needed for express-rate-limit to key off the real client IP
 app.use(cors({ origin: process.env.ALLOWED_ORIGIN || '*' }));
 app.use(express.json({ limit: '10mb' })); // 10mb to allow base64 images
 app.use(express.static('public', { maxAge: '7d', etag: true }));
 
 // ────────────────────────────────────────────────────────────────────────────
-// ── DEV-ONLY ADMIN LOGIN ──
-// Hardcoded admin/admin credentials + in-memory session tokens.
-// This is intentionally NOT production-safe:
-//   - credentials are hardcoded, not hashed, not in env vars
-//   - sessions live in a JS Map and reset on every server restart
-//   - no HTTPS-only / secure cookie flags
-// Before deploying anywhere public, replace with real auth
-// (hashed password in DB or env var, signed JWT or proper session store).
+// ── ADMIN LOGIN ──
+// In dev (no ADMIN_EMAIL/ADMIN_PASSWORD set), falls back to admin@admin.com/admin.
+// In production, the env check above forces real credentials to be set.
+// Sessions are stored in Mongo (not a JS Map) so they survive restarts/deploys —
+// important on free-tier hosting where the process restarts/cold-starts often.
 // ────────────────────────────────────────────────────────────────────────────
 // admin.html logs in with { email, password } and expects { adminKey, firstName } back,
 // then sends the key on every request as the 'x-admin-key' header — matched here.
-const ADMIN_EMAIL    = 'admin@admin.com';
-const ADMIN_PASSWORD = 'admin';
+const ADMIN_EMAIL    = (process.env.ADMIN_EMAIL || 'admin@admin.com').toLowerCase();
+// Hashed once at startup, never compared as a plain string — closes the timing-attack
+// gap a direct `password === ADMIN_PASSWORD` check would have, and means the raw
+// password only ever exists in process memory for the comparison itself.
+const ADMIN_PASSWORD_HASH = bcrypt.hashSync(process.env.ADMIN_PASSWORD || 'admin', 10);
 const ADMIN_NAME     = 'Admin';
-const adminSessions = new Map(); // adminKey -> expiry timestamp
 const SESSION_TTL_MS = 4 * 60 * 60 * 1000; // 4 hours
 
-function issueAdminSession() {
+const AdminSessionSchema = new mongoose.Schema({
+  key:       { type: String, required: true, unique: true, index: true },
+  expiresAt: { type: Date, required: true, expires: 0 }, // TTL index: Mongo auto-deletes once expiresAt passes
+});
+const AdminSession = mongoose.model('AdminSession', AdminSessionSchema);
+
+async function issueAdminSession() {
   const key = crypto.randomBytes(32).toString('hex');
-  adminSessions.set(key, Date.now() + SESSION_TTL_MS);
+  await AdminSession.create({ key, expiresAt: new Date(Date.now() + SESSION_TTL_MS) });
   return key;
 }
 
-function isValidAdminSession(key) {
+async function isValidAdminSession(key) {
   if (!key) return false;
-  const expiry = adminSessions.get(key);
-  if (!expiry) return false;
-  if (Date.now() > expiry) {
-    adminSessions.delete(key);
-    return false;
-  }
-  return true;
+  const session = await AdminSession.findOne({ key, expiresAt: { $gt: new Date() } }).lean();
+  return !!session;
 }
 
 // Simple rate limiter on the login route to slow down brute-force attempts
@@ -62,19 +69,33 @@ const loginLimiter = rateLimit({
   message: { message: 'Too many login attempts. Please try again later.' }
 });
 
-app.post('/api/login', loginLimiter, (req, res) => {
-  const { email, password } = req.body || {};
-  if (String(email).toLowerCase() === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-    const adminKey = issueAdminSession();
-    return res.json({ message: 'Login successful', adminKey, firstName: ADMIN_NAME });
+app.post('/api/login', loginLimiter, async (req, res) => {
+  try {
+    const { email, password } = req.body || {};
+    const emailMatch = String(email || '').toLowerCase() === ADMIN_EMAIL;
+    const passwordMatch = typeof password === 'string' && await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
+    // Always run bcrypt.compare even when the email doesn't match, so a wrong-email
+    // request and a wrong-password request take the same amount of time.
+    if (emailMatch && passwordMatch) {
+      const adminKey = await issueAdminSession();
+      return res.json({ message: 'Login successful', adminKey, firstName: ADMIN_NAME });
+    }
+    return res.status(401).json({ message: 'Invalid email or password' });
+  } catch (err) {
+    console.error('Admin login error:', err);
+    res.status(500).json({ message: 'Server error. Please try again.' });
   }
-  return res.status(401).json({ message: 'Invalid email or password' });
 });
 
-app.post('/api/admin/logout', (req, res) => {
-  const key = (req.headers['x-admin-key'] || '').toString();
-  adminSessions.delete(key);
-  res.json({ message: 'Logged out' });
+app.post('/api/admin/logout', async (req, res) => {
+  try {
+    const key = (req.headers['x-admin-key'] || '').toString();
+    await AdminSession.deleteOne({ key });
+    res.json({ message: 'Logged out' });
+  } catch (err) {
+    console.error('Admin logout error:', err);
+    res.status(500).json({ message: 'Server error. Please try again.' });
+  }
 });
 
 // ── User Schema ──
@@ -95,48 +116,59 @@ const userAuthLimiter = rateLimit({
 
 // ────────────────────────────────────────────────────────────────────────────
 // ── USER SESSIONS ──
-// Same lightweight in-memory pattern as the admin sessions above: a random
-// token handed back on login/signup, sent on later requests as 'x-user-key',
-// matched here. Resets on server restart — fine for this app's current scale,
-// swap for a signed JWT or a sessions collection if that ever matters.
+// Same pattern as admin sessions above, also Mongo-backed: a random token
+// handed back on login/signup, sent on later requests as 'x-user-key',
+// matched here. Survives restarts and cold starts.
 // ────────────────────────────────────────────────────────────────────────────
-const userSessions = new Map(); // userKey -> { userId, expiry }
 const USER_SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
-function issueUserSession(userId) {
+const UserSessionSchema = new mongoose.Schema({
+  key:       { type: String, required: true, unique: true, index: true },
+  userId:    { type: mongoose.Schema.Types.ObjectId, required: true, index: true },
+  expiresAt: { type: Date, required: true, expires: 0 }, // TTL index: Mongo auto-deletes once expiresAt passes
+});
+const UserSession = mongoose.model('UserSession', UserSessionSchema);
+
+async function issueUserSession(userId) {
   const key = crypto.randomBytes(32).toString('hex');
-  userSessions.set(key, { userId: String(userId), expiry: Date.now() + USER_SESSION_TTL_MS });
+  await UserSession.create({ key, userId, expiresAt: new Date(Date.now() + USER_SESSION_TTL_MS) });
   return key;
 }
 
-function getUserIdFromSession(key) {
+async function getUserIdFromSession(key) {
   if (!key) return null;
-  const session = userSessions.get(key);
-  if (!session) return null;
-  if (Date.now() > session.expiry) {
-    userSessions.delete(key);
-    return null;
-  }
-  return session.userId;
+  const session = await UserSession.findOne({ key, expiresAt: { $gt: new Date() } }).lean();
+  return session ? String(session.userId) : null;
 }
 
 // Middleware to protect routes that require a logged-in user.
 // Attaches req.userId when the session is valid.
-function requireUser(req, res, next) {
-  const key = (req.headers['x-user-key'] || '').toString();
-  const userId = getUserIdFromSession(key);
-  if (!userId) return res.status(401).json({ message: 'Please log in to continue' });
-  req.userId = userId;
-  next();
+async function requireUser(req, res, next) {
+  try {
+    const key = (req.headers['x-user-key'] || '').toString();
+    const userId = await getUserIdFromSession(key);
+    if (!userId) return res.status(401).json({ message: 'Please log in to continue' });
+    req.userId = userId;
+    next();
+  } catch (err) {
+    console.error('requireUser error:', err);
+    res.status(500).json({ message: 'Server error. Please try again.' });
+  }
 }
 
 // Like requireUser, but never blocks the request — just attaches req.userId
 // if a valid session key was sent (null otherwise). Used on routes that must
 // still work for guests, e.g. submitting a listing while logged out.
-function attachUserIfPresent(req, res, next) {
-  const key = (req.headers['x-user-key'] || '').toString();
-  req.userId = getUserIdFromSession(key);
-  next();
+async function attachUserIfPresent(req, res, next) {
+  try {
+    const key = (req.headers['x-user-key'] || '').toString();
+    req.userId = await getUserIdFromSession(key);
+    next();
+  } catch (err) {
+    console.error('attachUserIfPresent error:', err);
+    req.userId = null;
+    next();
+  }
 }
 
 // ── User Signup ──
@@ -151,7 +183,7 @@ app.post('/api/user/signup', userAuthLimiter, async (req, res) => {
 
     const hashed = await bcrypt.hash(password, 10);
     const user = await User.create({ name: name?.trim(), contact: contact.toLowerCase().trim(), password: hashed });
-    const userKey = issueUserSession(user._id);
+    const userKey = await issueUserSession(user._id);
     return res.status(201).json({ message: 'Account created successfully', userId: user._id, name: user.name, contact: user.contact, userKey });
   } catch (err) {
     console.error('Signup error:', err);
@@ -171,7 +203,7 @@ app.post('/api/user/login', userAuthLimiter, async (req, res) => {
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(401).json({ message: 'Incorrect password' });
 
-    const userKey = issueUserSession(user._id);
+    const userKey = await issueUserSession(user._id);
     return res.json({ message: 'Logged in successfully', userId: user._id, name: user.name, contact: user.contact, userKey });
   } catch (err) {
     console.error('Login error:', err);
@@ -180,10 +212,15 @@ app.post('/api/user/login', userAuthLimiter, async (req, res) => {
 });
 
 // ── User Logout ──
-app.post('/api/user/logout', (req, res) => {
-  const key = (req.headers['x-user-key'] || '').toString();
-  userSessions.delete(key);
-  res.json({ message: 'Logged out' });
+app.post('/api/user/logout', async (req, res) => {
+  try {
+    const key = (req.headers['x-user-key'] || '').toString();
+    await UserSession.deleteOne({ key });
+    res.json({ message: 'Logged out' });
+  } catch (err) {
+    console.error('User logout error:', err);
+    res.status(500).json({ message: 'Server error. Please try again.' });
+  }
 });
 
 // ── GET current user profile ──
@@ -245,12 +282,17 @@ app.put('/api/user/password', requireUser, userAuthLimiter, async (req, res) => 
 // Middleware to protect admin-only API routes.
 // Apply this to any route you want to require a valid session for, e.g.:
 //   app.delete('/api/properties/:id', requireAdmin, async (req, res) => {...})
-function requireAdmin(req, res, next) {
-  const key = (req.headers['x-admin-key'] || '').toString();
-  if (!isValidAdminSession(key)) {
-    return res.status(401).json({ message: 'Not authenticated' });
+async function requireAdmin(req, res, next) {
+  try {
+    const key = (req.headers['x-admin-key'] || '').toString();
+    if (!(await isValidAdminSession(key))) {
+      return res.status(401).json({ message: 'Not authenticated' });
+    }
+    next();
+  } catch (err) {
+    console.error('requireAdmin error:', err);
+    res.status(500).json({ message: 'Server error. Please try again.' });
   }
-  next();
 }
 // ────────────────────────────────────────────────────────────────────────────
 
@@ -423,7 +465,11 @@ function validatePropertyFields(fields) {
     for (const k of urlKeys) {
       const val = obj[k];
       if (val && String(val).trim()) {
-        try { new URL(String(val).trim()); } catch { return `Invalid URL in field '${section}.${k}'.`; }
+        let parsed;
+        try { parsed = new URL(String(val).trim()); } catch { return `Invalid URL in field '${section}.${k}'.`; }
+        if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+          return `Field '${section}.${k}' must be an http(s) URL.`;
+        }
       }
     }
   }
@@ -437,6 +483,23 @@ function validatePropertyFields(fields) {
   if (email && String(email).trim() &&
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim()))
     return `Invalid email address in field 'owner.email'.`;
+
+  const images = (fields.media || {}).images;
+  if (images !== undefined) {
+    if (!Array.isArray(images)) return `Field 'media.images' must be an array.`;
+    if (images.length > 20) return `Field 'media.images' must have at most 20 images.`;
+    for (const img of images) {
+      if (typeof img !== 'string' || !img.trim()) return `Field 'media.images' contains an invalid entry.`;
+      const val = img.trim();
+      if (val.startsWith('/uploads/')) continue; // our own upload endpoint returns relative paths — allow as-is
+      let parsed;
+      try { parsed = new URL(val); } catch { return `Field 'media.images' contains an invalid URL.`; }
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+        return `Field 'media.images' must contain only http(s) URLs.`;
+      }
+    }
+  }
+
   return null;
 }
 
@@ -448,7 +511,7 @@ const listingLimiter = rateLimit({
 });
 
 // ── POST /api/properties ──
-app.post('/api/properties', listingLimiter, attachUserIfPresent, async (req, res) => {
+app.post('/api/properties', listingLimiter, requireUser, async (req, res) => {
   try {
     const body = req.body || {};
     const fields = NESTED_SECTIONS.reduce((acc, k) => {
@@ -499,8 +562,8 @@ app.get('/api/properties', async (req, res) => {
   try {
     const { status, q, limit = 100, skip = 0 } = req.query;
     const filter = {};
-    if (status) filter['basic.status'] = status;
-    if (q) {
+    if (status && typeof status === 'string') filter['basic.status'] = status;
+    if (q && typeof q === 'string') {
       const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
       filter.$or = [{ 'owner.propertyName': re }, { 'location.area': re }, { 'media.desc': re }];
     }
@@ -538,7 +601,7 @@ const visitLimiter = rateLimit({
   message: { message: 'Too many visit requests. Please try again later.' }
 });
 
-app.post('/api/visits', visitLimiter, attachUserIfPresent, async (req, res) => {
+app.post('/api/visits', visitLimiter, requireUser, async (req, res) => {
   try {
     const { propertyId, visitorName, visitorPhone, note, visitDate, visitTime } = req.body || {};
 
@@ -737,6 +800,9 @@ app.patch('/api/properties/:id/remarks', requireAdmin, async (req, res) => {
     }
     const prop = await Property.findById(req.params.id);
     if (!prop) return res.status(404).json({ message: 'Property not found' });
+    if (prop.remarks.length >= 200) {
+      return res.status(400).json({ message: 'This property already has the maximum number of remarks (200). Delete an old one first.' });
+    }
     prop.remarks.push(String(remarks).trim());
     await prop.save();
     res.json({ message: 'Remark added', remarks: prop.remarks });
@@ -907,7 +973,7 @@ app.get('/api/reviews/mine', async (req, res) => {
     const userKey = req.headers['x-user-key'];
     if (!userKey) return res.json({ hasReviewed: false });
 
-    const userId = getUserIdFromSession(userKey);
+    const userId = await getUserIdFromSession(userKey);
     if (!userId) return res.json({ hasReviewed: false });
 
     const existing = await Review.findOne({ userId }).lean();
@@ -925,7 +991,7 @@ app.post('/api/reviews', async (req, res) => {
     const userKey = req.headers['x-user-key'];
     if (!userKey) return res.status(401).json({ error: 'Please log in to leave a review' });
 
-    const userId = getUserIdFromSession(userKey);
+    const userId = await getUserIdFromSession(userKey);
     if (!userId) return res.status(401).json({ error: 'Invalid or expired session' });
 
     const user = await User.findById(userId);
@@ -960,6 +1026,69 @@ app.post('/api/reviews', async (req, res) => {
   }
 });
 
+
+// ────────────────────────────────────────────────────────────────────────────
+// ── IMAGE UPLOAD (POST /api/upload-images) ──
+// Accepts up to 8 images (multipart/form-data, field name 'images'), converts
+// each to WebP (max 1200px on the long edge, quality 80) via sharp, and saves
+// them under public/uploads/. Returns the public URLs so the client can store
+// them in media.images. Files are kept off disk until they're validated and
+// re-encoded — multer holds them in memory, sharp never touches the original
+// bytes after that, so this also strips any embedded scripts/metadata that
+// might be hiding in a malicious "image" upload.
+// ────────────────────────────────────────────────────────────────────────────
+const UPLOADS_DIR = path.join(__dirname, 'public', 'uploads');
+fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+app.use('/uploads', express.static(UPLOADS_DIR, { maxAge: '30d' }));
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 8 * 1024 * 1024, files: 8 }, // 8MB per file, 8 files per request
+  fileFilter: (req, file, cb) => {
+    const ok = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif'].includes(file.mimetype);
+    cb(ok ? null : new Error('Only image files are allowed'), ok);
+  },
+});
+
+const uploadLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, max: 30,
+  standardHeaders: true, legacyHeaders: false,
+  message: { message: 'Too many upload requests. Please try again later.' }
+});
+
+app.post('/api/upload-images', uploadLimiter, attachUserIfPresent, upload.array('images', 8), async (req, res) => {
+  try {
+    const files = req.files || [];
+    if (!files.length) return res.status(400).json({ message: 'No images uploaded' });
+
+    const urls = [];
+    for (const file of files) {
+      const filename = `${Date.now()}-${crypto.randomBytes(8).toString('hex')}.webp`;
+      const outPath = path.join(UPLOADS_DIR, filename);
+      await sharp(file.buffer)
+        .rotate() // honor EXIF orientation before stripping metadata
+        .resize({ width: 1200, height: 1200, fit: 'inside', withoutEnlargement: true })
+        .webp({ quality: 80 })
+        .toFile(outPath);
+      urls.push(`/uploads/${filename}`);
+    }
+
+    res.status(201).json({ message: 'Images uploaded successfully', urls });
+  } catch (err) {
+    console.error('POST /api/upload-images error:', err);
+    res.status(500).json({ message: 'Error uploading images: ' + err.message });
+  }
+});
+
+// Multer-specific errors (file too large, too many files, wrong type) come through
+// as thrown errors rather than rejections multer itself formats — catch them here
+// so the client gets a clean 400 instead of a raw 500.
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError || (err && /Only image files/.test(err.message || ''))) {
+    return res.status(400).json({ message: err.message });
+  }
+  next(err);
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server on port ${PORT}`));

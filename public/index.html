@@ -3964,6 +3964,36 @@ ul{list-style:none}
 
 <script>
 /* ═══════════════════════════════════════════════
+   SECURITY HELPERS — escape any user-submitted text
+   before it touches innerHTML, and allowlist URL
+   schemes before any value is used as an href/src.
+   Apply esc() to every piece of listing/owner/user
+   text rendered via innerHTML; apply safeUrl() to
+   every mapLink/video/image URL before using it as
+   an href or src.
+═══════════════════════════════════════════════ */
+function esc(v) {
+  if (v === null || v === undefined) return '';
+  return String(v).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+// Escapes text but preserves line breaks as <br> (for free-text fields like description).
+function escMultiline(v) {
+  return esc(v).replace(/\n/g, '<br>');
+}
+// Only allows http/https URLs through to an href/src; anything else (javascript:, data:, etc.) is dropped.
+function safeUrl(v) {
+  if (!v) return '';
+  const s = String(v).trim();
+  try {
+    const u = new URL(s, window.location.origin);
+    if (u.protocol === 'http:' || u.protocol === 'https:') return u.href;
+  } catch {}
+  return '';
+}
+
+/* ═══════════════════════════════════════════════
    DATA
 ═══════════════════════════════════════════════ */
 let PROPERTIES = [];
@@ -4117,7 +4147,7 @@ function clearRecentlyViewed() {
 }
 
 function recentlyViewedCardHTML(rv) {
-  const thumb = rv.img ? `style="background-image:url('${rv.img}')"` : '';
+  const thumb = rv.img ? `style="background-image:url('${safeUrl(rv.img)}')"` : '';
   const rent = rv.rent != null ? '₹' + Number(rv.rent).toLocaleString('en-IN') : '—';
   return `<div class="rv-card" onclick="openDetail('${rv.id}')">
     <button class="rv-card-remove" onclick="event.stopPropagation();removeRecentlyViewed('${rv.id}')" aria-label="Remove from recently viewed">
@@ -4125,8 +4155,8 @@ function recentlyViewedCardHTML(rv) {
     </button>
     <div class="rv-card-thumb" ${thumb}>${rv.img ? '' : 'No photo'}</div>
     <div class="rv-card-body">
-      <div class="rv-card-title">${rv.name}</div>
-      <div class="rv-card-sub">${rv.area}</div>
+      <div class="rv-card-title">${esc(rv.name)}</div>
+      <div class="rv-card-sub">${esc(rv.area)}</div>
       <div class="rv-card-price">${rent}<span style="color:var(--text-3);font-weight:500"> /mo</span></div>
     </div>
   </div>`;
@@ -4320,7 +4350,7 @@ function buildImgSlider(p, fg) {
   }
   const uid = 'sl' + p.id;
   const slides = imgs.map((url, i) =>
-    `<div class="img-slide${i===0?' active':''}" style="background-image:url('${url}')"></div>`
+    `<div class="img-slide${i===0?' active':''}" style="background-image:url('${safeUrl(url)}')"></div>`
   ).join('');
   const dots = imgs.length > 1 ? `<div class="slide-dots">${imgs.map((_,i)=>
     `<button class="slide-dot${i===0?' active':''}" onclick="event.stopPropagation();slideGo('${uid}',${i})"></button>`
@@ -4391,7 +4421,7 @@ function renderLightbox() {
   document.getElementById('lightboxPrev').style.display = multi ? 'flex' : 'none';
   document.getElementById('lightboxNext').style.display = multi ? 'flex' : 'none';
   document.getElementById('lightboxThumbs').innerHTML = multi
-    ? lightboxImgs.map((url, i) => `<div class="lightbox-thumb${i===lightboxIdx?' active':''}" style="background-image:url('${url}')" onclick="lightboxGo(${i})"></div>`).join('')
+    ? lightboxImgs.map((url, i) => `<div class="lightbox-thumb${i===lightboxIdx?' active':''}" style="background-image:url('${safeUrl(url)}')" onclick="lightboxGo(${i})"></div>`).join('')
     : '';
 }
 
@@ -4448,13 +4478,13 @@ function cardHTML(p) {
       <div class="prop-img-price"><b>₹${(p.price?.rent||0).toLocaleString('en-IN')}</b><span>/mo</span></div>
     </div>
     <div class="prop-body">
-      <div class="prop-title" title="${p.owner?.propertyName}">
-        <span class="prop-title-text">${p.owner?.propertyName}</span>
+      <div class="prop-title" title="${esc(p.owner?.propertyName)}">
+        <span class="prop-title-text">${esc(p.owner?.propertyName)}</span>
         ${p.verified ? `<span class="prop-verified-badge" title="Verified listing"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1l3.2 1.6 3.5.4 1.6 3.2 2.7 2.4-.6 3.6 1 3.4-2.7 2.4-1.6 3.2-3.5.4-3.2 1.6-3.2-1.6-3.5-.4-1.6-3.2-2.7-2.4.6-3.6-1-3.4 2.7-2.4 1.6-3.2 3.5-.4z"/><path d="M9 12.5l2 2 4-4.5" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Verified</span>` : ''}
       </div>
       <div class="prop-loc">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span>${p.location?.area}</span>
+        <span>${esc(p.location?.area)}</span>
       </div>
       <div class="prop-stats">
         <span class="prop-stat" title="Configuration">
@@ -4700,7 +4730,7 @@ function renderCompareBar() {
   document.getElementById('compareBarThumbs').innerHTML = ids.map(id => {
     const p = PROPERTIES.find(x => x.id === id);
     const initial = p ? (p.property?.bhk || '?').charAt(0) : '?';
-    return `<span class="compare-bar-thumb" title="${p ? p.owner?.propertyName : ''}">${initial}</span>`;
+    return `<span class="compare-bar-thumb" title="${p ? esc(p.owner?.propertyName) : ''}">${initial}</span>`;
   }).join('');
   document.getElementById('compareBarLabel').innerHTML = `<b>${n}</b> of ${COMPARE_MAX} selected`;
   const btn = document.getElementById('compareBarBtn');
@@ -4754,7 +4784,7 @@ function renderCompareTable() {
   ];
 
   const headCells = props.map(p => {
-    const img = (p.media?.images && p.media.images[0]) ? `<img src="${p.media.images[0]}" alt="${p.owner?.propertyName}" loading="lazy">` : '';
+    const img = (p.media?.images && p.media.images[0]) ? `<img src="${safeUrl(p.media.images[0])}" alt="${esc(p.owner?.propertyName)}" loading="lazy">` : '';
     const pType = pTypeLabel(p);
     const badges = `<div class="compare-col-badges">
         ${p.promoted ? '<span class="prop-badge-promoted">Promoted</span>' : ''}
@@ -4765,8 +4795,8 @@ function renderCompareTable() {
         <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </div>
       <div class="compare-col-img">${badges}${img}</div>
-      <div class="compare-col-title">${p.owner?.propertyName}</div>
-      <div class="compare-col-loc">${p.location?.area}</div>
+      <div class="compare-col-title">${esc(p.owner?.propertyName)}</div>
+      <div class="compare-col-loc">${esc(p.location?.area)}</div>
       <div class="compare-col-price">₹${(p.price?.rent||0).toLocaleString('en-IN')}</div>
     </th>`;
   }).join('');
@@ -5407,7 +5437,7 @@ function openDetail(id) {
   if (imgs.length === 0) {
     galleryHtml = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`;
   } else {
-    const slides = imgs.map((url, i) => `<div class="img-slide${i===0?' active':''}" style="background-image:url('${url}')" onclick="event.stopPropagation();openLightbox('${p.id}',${i})"></div>`).join('');
+    const slides = imgs.map((url, i) => `<div class="img-slide${i===0?' active':''}" style="background-image:url('${safeUrl(url)}')" onclick="event.stopPropagation();openLightbox('${p.id}',${i})"></div>`).join('');
     const dots = imgs.length > 1 ? `<div class="slide-dots">${imgs.map((_,i)=>`<button class="slide-dot${i===0?' active':''}" onclick="event.stopPropagation();slideGo('${uid}',${i})"></button>`).join('')}</div>` : '';
     const arrows = imgs.length > 1 ? `
       <div class="slide-arrows">
@@ -5431,11 +5461,11 @@ function openDetail(id) {
   // Every field always renders. Missing values show a muted em dash instead of being hidden.
   function mf(label, value) {
     const has = !(value === null || value === undefined || value === '');
-    return `<div class="modal-field"><div class="modal-field-label">${label}</div><div class="modal-field-value${has?'':' empty'}">${has ? value : '—'}</div></div>`;
+    return `<div class="modal-field"><div class="modal-field-label">${esc(label)}</div><div class="modal-field-value${has?'':' empty'}">${has ? esc(value) : '—'}</div></div>`;
   }
   function cf(icon, label, value) {
     const has = !(value === null || value === undefined || value === '');
-    return `<div class="modal-contact-row"><div class="modal-contact-label">${icon}${label}</div><div class="modal-contact-value${has?'':' empty'}">${has ? value : '—'}</div></div>`;
+    return `<div class="modal-contact-row"><div class="modal-contact-label">${icon}${esc(label)}</div><div class="modal-contact-value${has?'':' empty'}">${has ? esc(value) : '—'}</div></div>`;
   }
   function money(v) {
     if (v === null || v === undefined || v === '') return '';
@@ -5537,8 +5567,8 @@ function openDetail(id) {
     mf('Full address', loc.address),
     mf('Coordinates', (loc.lat && loc.lng) ? Number(loc.lat).toFixed(6) + '° N, ' + Number(loc.lng).toFixed(6) + '° E' : ''),
   ];
-  const mapsLinkHtml = loc.mapLink
-    ? `<a href="${loc.mapLink}" target="_blank" rel="noopener" class="modal-link-card">
+  const mapsLinkHtml = safeUrl(loc.mapLink)
+    ? `<a href="${safeUrl(loc.mapLink)}" target="_blank" rel="noopener" class="modal-link-card">
         <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         View on Google Maps →
       </a>`
@@ -5563,12 +5593,12 @@ function openDetail(id) {
       <div>
         <div class="modal-price">${price.rent ? '₹'+price.rent.toLocaleString('en-IN') : '—'} <span>/ Month</span></div>
         <div class="modal-title" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-          <span>${owner.propertyName || 'Untitled listing'}</span>
+          <span>${esc(owner.propertyName) || 'Untitled listing'}</span>
           ${p.verified ? `<span class="prop-verified-badge" title="Verified listing"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1l3.2 1.6 3.5.4 1.6 3.2 2.7 2.4-.6 3.6 1 3.4-2.7 2.4-1.6 3.2-3.5.4-3.2 1.6-3.2-1.6-3.5-.4-1.6-3.2-2.7-2.4.6-3.6-1-3.4 2.7-2.4 1.6-3.2 3.5-.4z"/><path d="M9 12.5l2 2 4-4.5" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Verified</span>` : ''}
         </div>
         <div class="modal-loc">
           ${I.pin}
-          ${loc.area || '—'}
+          ${esc(loc.area) || '—'}
         </div>
       </div>
     </div>
@@ -5591,17 +5621,17 @@ function openDetail(id) {
         const list = (p.amenities?.selected || []).slice();
         if (p.amenities?.extra) list.push(...p.amenities.extra.split(',').map(s => s.trim()).filter(Boolean));
         return list.length
-          ? list.map(a => `<div class="modal-amenity"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>${a}</div>`).join('')
+          ? list.map(a => `<div class="modal-amenity"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>${esc(a)}</div>`).join('')
           : '<div class="modal-empty-note">No amenities listed</div>';
       })()}
     </div>
 
     <div class="modal-divider"></div>
     <div class="modal-section-head">${I.doc}<div class="modal-section-title">About this property</div></div>
-    <div class="modal-desc">${media.desc || '<span class="modal-empty-note">No description provided</span>'}</div>
+    <div class="modal-desc">${media.desc ? escMultiline(media.desc) : '<span class="modal-empty-note">No description provided</span>'}</div>
 
-    ${media.video
-      ? `<a href="${media.video}" target="_blank" rel="noopener" class="modal-link-card"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Watch property video</a>`
+    ${safeUrl(media.video)
+      ? `<a href="${safeUrl(media.video)}" target="_blank" rel="noopener" class="modal-link-card"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Watch property video</a>`
       : `<div class="modal-link-card modal-link-card-empty"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>No property video added</div>`}
 
     ${section(I.pin, 'Location', locationFields)}
@@ -5665,6 +5695,7 @@ function toggleShortlistFromModal(id) {
 let scheduleForPropId = null;
 
 function openScheduleModal(propId) {
+  if (!getLoggedInUser()) { showToast('Please log in to schedule a visit'); openAuthModal(); return; }
   const p = PROPERTIES.find(x => x.id === propId);
   if (!p) return;
   scheduleForPropId = propId;
@@ -5788,6 +5819,7 @@ function resetListingForm() {
 }
 
 function openAddModal() {
+  if (!getLoggedInUser()) { showToast('Please log in to list your property'); openAuthModal(); return; }
   resetListingForm();
   document.getElementById('addModal').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -6064,18 +6096,18 @@ function renderMyListings() {
   }
   wrap.innerHTML = MY_LISTINGS_CACHE.map(p => {
     const img = (p.media?.images || [])[0];
-    const thumb = img ? `style="background-image:url('${img}')"` : '';
+    const thumb = img ? `style="background-image:url('${safeUrl(img)}')"` : '';
     const rent = p.price?.rent != null ? '₹' + Number(p.price.rent).toLocaleString('en-IN') : '—';
     return `<div class="profile-mini-card" onclick="closeProfileModal();openDetail('${p.id}')">
       <div class="profile-mini-thumb" ${thumb}>${img ? '' : 'No photo'}</div>
       <div class="profile-mini-body">
-        <div class="profile-mini-title">${p.owner?.propertyName || 'Untitled listing'}</div>
+        <div class="profile-mini-title">${esc(p.owner?.propertyName) || 'Untitled listing'}</div>
         <div class="profile-mini-sub">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          ${p.location?.area || ''}
+          ${esc(p.location?.area)}
         </div>
         <div class="profile-mini-price">${rent}<span style="color:var(--text-3);font-weight:500"> /mo</span></div>
-        <span class="profile-status-pill">${p.basic?.status || 'For Rent'}</span>
+        <span class="profile-status-pill">${esc(p.basic?.status) || 'For Rent'}</span>
         ${p.visitCount > 0 ? `<span class="profile-status-pill" style="background:var(--brand-light);color:var(--brand);margin-left:5px">${p.visitCount} visit${p.visitCount===1?'':'s'} requested</span>` : ''}
       </div>
       <div class="profile-mini-actions">
@@ -6183,15 +6215,15 @@ function loadSavedListings() {
   }
   wrap.innerHTML = items.map(p => {
     const img = (p.media?.images || [])[0];
-    const thumb = img ? `style="background-image:url('${img}')"` : '';
+    const thumb = img ? `style="background-image:url('${safeUrl(img)}')"` : '';
     const rent = p.price?.rent != null ? '₹' + Number(p.price.rent).toLocaleString('en-IN') : '—';
     return `<div class="profile-mini-card" onclick="closeProfileModal();openDetail('${p.id}')">
       <div class="profile-mini-thumb" ${thumb}>${img ? '' : 'No photo'}</div>
       <div class="profile-mini-body">
-        <div class="profile-mini-title">${p.owner?.propertyName || 'Untitled listing'}</div>
+        <div class="profile-mini-title">${esc(p.owner?.propertyName) || 'Untitled listing'}</div>
         <div class="profile-mini-sub">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          ${p.location?.area || ''}
+          ${esc(p.location?.area)}
         </div>
         <div class="profile-mini-price">${rent}<span style="color:var(--text-3);font-weight:500"> /mo</span></div>
       </div>
@@ -6624,7 +6656,7 @@ function avatarColorFromName(name) {
 }
 
 function reviewCardHTML(rv) {
-  const name = rv.userName || 'Quatar user';
+  const name = esc(rv.userName || 'Quatar user');
   const initial = (name[0] || 'U').toUpperCase();
   return `<div class="review-card">
     <div class="review-card-head">
@@ -6635,7 +6667,7 @@ function reviewCardHTML(rv) {
       </div>
       <div class="review-card-stars" aria-label="${rv.rating} out of 5 stars">${renderStarString(rv.rating)}</div>
     </div>
-    <div class="review-card-text">${(rv.text || '').replace(/</g, '&lt;')}</div>
+    <div class="review-card-text">${esc(rv.text)}</div>
   </div>`;
 }
 
@@ -6793,18 +6825,27 @@ function addImageFromUrl() {
   ta.value = '';
   renderFImages();
 }
-function addImagesFromFiles(input) {
+async function addImagesFromFiles(input) {
   const files = Array.from(input.files || []);
   input.value = '';
   if (!files.length) return;
-  files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      fImages.push(e.target.result);
-      renderFImages();
-    };
-    reader.readAsDataURL(file);
-  });
+
+  const hint = document.getElementById('fImgHint');
+  if (hint) hint.textContent = 'Uploading…';
+
+  const form = new FormData();
+  files.forEach(file => form.append('images', file));
+
+  try {
+    const res = await fetch('/api/upload-images', { method: 'POST', body: form, headers: userAuthHeaders() });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Upload failed');
+    (data.urls || []).forEach(u => { if (fImages.indexOf(u) < 0) fImages.push(u); });
+  } catch (err) {
+    showToast(err.message || 'Could not upload images. Please try again.');
+  } finally {
+    renderFImages();
+  }
 }
 
 function onFTypeChange(val) {
