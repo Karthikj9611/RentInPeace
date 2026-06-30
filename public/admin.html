@@ -1017,7 +1017,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
 
   <!-- TAB BAR -->
   <div class="tab-bar">
-    <button class="tab-btn" id="tab-customers" disabled title="Not available — no backend yet" style="opacity:0.5; cursor:not-allowed;">
+    <button class="tab-btn" id="tab-customers" onclick="switchTab('customers')">
       <i class="fas fa-users"></i>
       <span class="tab-btn-label">Customers</span>
       <span class="tab-count" id="tab-customers-count">—</span>
@@ -1027,7 +1027,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
       <span class="tab-btn-label">Properties</span>
       <span class="tab-count" id="tab-properties-count">—</span>
     </button>
-    <button class="tab-btn" id="tab-appointments" disabled title="Not available — no backend yet" style="opacity:0.5; cursor:not-allowed;">
+    <button class="tab-btn" id="tab-appointments" onclick="switchTab('appointments')">
       <i class="fas fa-calendar-days"></i>
       <span class="tab-btn-label">Appointments</span>
       <span class="tab-count" id="tab-appointments-count">—</span>
@@ -2261,7 +2261,7 @@ function buildPropFilters(data){
 
   populate('filterStatus', statuses);
   populate('filterCity',   cities);
-  populate('filterBhk',    bhks, 'BHK ');
+  populate('filterBhk',    bhks, '');
 }
 
 function applyPropFilters(){
