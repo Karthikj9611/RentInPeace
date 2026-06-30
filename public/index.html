@@ -803,6 +803,30 @@ ul{list-style:none}
   .lightbox-thumbs{display:none}
 }
 
+/* ─── Recently Viewed ──────────────────────────── */
+.recently-viewed-section{padding:16px 20px 4px}
+.recently-viewed-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.recently-viewed-title{font-size:15px;font-weight:700;color:var(--text-1)}
+.recently-viewed-clear{background:none;border:none;color:var(--text-2);font-size:13px;cursor:pointer;padding:4px 6px}
+.recently-viewed-clear:hover{color:var(--brand)}
+.recently-viewed-strip{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px;scrollbar-width:thin}
+.recently-viewed-strip::-webkit-scrollbar{height:6px}
+.recently-viewed-strip::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.rv-card{position:relative;flex:0 0 180px;border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;background:var(--bg-1);transition:box-shadow .15s,transform .15s}
+.rv-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.08);transform:translateY(-1px)}
+.rv-card-thumb{height:100px;background-size:cover;background-position:center;background-color:var(--bg-2);display:flex;align-items:center;justify-content:center;color:var(--text-3);font-size:12px}
+.rv-card-body{padding:8px 10px}
+.rv-card-title{font-size:13px;font-weight:600;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rv-card-sub{font-size:12px;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.rv-card-price{font-size:13px;font-weight:700;color:var(--text-1);margin-top:4px}
+.rv-card-remove{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.92);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2}
+.rv-card-remove svg{width:12px;height:12px;stroke:var(--text-2);stroke-width:2.4;fill:none}
+.rv-card-remove:hover svg{stroke:var(--brand)}
+@media (max-width:640px){
+  .rv-card{flex:0 0 150px}
+  .rv-card-thumb{height:85px}
+}
+
 /* ─── Shortlist Panel ──────────────────────────── */
 .shortlist-panel{
   position:fixed;top:0;right:0;bottom:0;z-index:250;
@@ -1765,16 +1789,25 @@ ul{list-style:none}
 #welcomeModal.open{opacity:1;pointer-events:all}
 .welcome-box{
   position:relative;
-  width:100%;height:100%;
+  width:min(420px,90vw);
+  max-height:85vh;
+  margin:auto;
+  background:#0a0a0a;
+  border-radius:18px;
+  overflow:hidden;
   display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
+  align-items:center;justify-content:flex-start;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+  transform:scale(.93);opacity:0;
+  transition:transform .3s,opacity .3s;
 }
+#welcomeModal.open .welcome-box{transform:scale(1);opacity:1}
 @keyframes wm-pop{from{transform:scale(.93);opacity:0}to{transform:scale(1);opacity:1}}
 .welcome-close{
-  position:fixed;top:14px;right:16px;
-  width:42px;height:42px;border-radius:50%;
-  background:rgba(255,255,255,.15);border:none;
-  color:#fff;font-size:20px;font-weight:700;
+  position:absolute;top:10px;right:10px;
+  width:34px;height:34px;border-radius:50%;
+  background:rgba(0,0,0,.45);border:none;
+  color:#fff;font-size:17px;font-weight:700;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
   z-index:10000;
 }
@@ -1782,7 +1815,8 @@ ul{list-style:none}
 .welcome-slides{
   position:relative;
   width:100%;
-  height:100vh;
+  height:auto;
+  max-height:60vh;
   overflow-y:auto;
   overflow-x:hidden;
   background:#000;
@@ -1797,25 +1831,39 @@ ul{list-style:none}
 }
 .welcome-slide.active{opacity:1;display:flex;animation:wm-pop .35s cubic-bezier(.34,1.56,.64,1) both}
 .welcome-slide img{
-  width:50%;
+  width:100%;
   height:auto;
   max-height:none;
-  object-fit:fill;
+  object-fit:cover;
   cursor:default;
   display:block;
 }
 .welcome-dots{
   display:flex;gap:10px;justify-content:center;
-  position:fixed;bottom:18px;left:0;right:0;z-index:10000;
+  position:absolute;bottom:14px;left:0;right:0;z-index:10000;
 }
 .welcome-dot{
-  width:10px;height:10px;border-radius:50%;
+  width:8px;height:8px;border-radius:50%;
   background:rgba(255,255,255,.4);border:none;cursor:pointer;
   transition:background .3s,transform .3s;padding:0;
 }
 .welcome-dot.active{background:#fff;transform:scale(1.35)}
-.welcome-footer{display:none}
-.welcome-cta{display:none}
+.welcome-footer{
+  display:flex;flex-direction:column;gap:12px;
+  width:100%;padding:18px 22px 22px;
+  background:#0a0a0a;color:#fff;text-align:center;
+}
+.welcome-footer h3{margin:0;font-size:18px}
+.welcome-footer p{margin:0;font-size:13px;color:rgba(255,255,255,.7);line-height:1.4}
+.welcome-actions{display:flex;gap:10px;margin-top:4px}
+.welcome-actions button{
+  flex:1;padding:11px 0;border-radius:10px;border:none;
+  font-size:14px;font-weight:600;cursor:pointer;
+}
+.welcome-noted{background:#E03A52;color:#fff}
+.welcome-noted:hover{background:#c8324a}
+.welcome-skip{background:rgba(255,255,255,.12);color:#fff}
+.welcome-skip:hover{background:rgba(255,255,255,.22)}
 /* ─── Image Zoom Lightbox ───────────────────────── */
 #imgZoomOverlay{
   position:fixed;inset:0;z-index:99999;
@@ -2251,6 +2299,14 @@ ul{list-style:none}
 
 <!-- ─── Main Content ────────────────────────────── -->
 <main class="main">
+  <div id="recentlyViewedSection" class="recently-viewed-section" style="display:none">
+    <div class="recently-viewed-header">
+      <span class="recently-viewed-title">Recently viewed</span>
+      <button class="recently-viewed-clear" onclick="clearRecentlyViewed()">Clear all</button>
+    </div>
+    <div class="recently-viewed-strip" id="recentlyViewedStrip"></div>
+  </div>
+
   <div class="results-header">
     <div class="results-count"><strong id="resultCount">12</strong> <strong>Properties found</strong></div>
 
@@ -2426,38 +2482,18 @@ ul{list-style:none}
       <div class="svc-modal-img-label" id="svcModalLabel"></div>
     </div>
 
-    <form onsubmit="submitServiceRequest(event)">
-      <div class="form-group">
-        <label class="form-label">Service</label>
-        <input class="form-input" id="svc-service" type="text" readonly style="background:var(--bg-2);color:var(--text-2)" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Your name</label>
-        <input class="form-input" id="svc-name" type="text" placeholder="Enter your full name" required />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Phone number</label>
-        <input class="form-input" id="svc-phone" type="tel" placeholder="10-digit mobile number" pattern="[0-9]{10}" required />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Area / Locality</label>
-        <input class="form-input" id="svc-area" type="text" placeholder="e.g. Indiranagar, Bangalore" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Tell us what you need (optional)</label>
-        <textarea class="form-input" id="svc-notes" rows="3" placeholder="Briefly describe your requirement…" style="resize:vertical"></textarea>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px">
-        <a href="tel:9611459960" onclick="closeServiceModal()" class="form-submit" style="display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;background:var(--brand)">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-          Call Us
-        </a>
-        <a href="https://wa.me/919611459960" target="_blank" onclick="closeServiceModal()" class="form-submit" style="display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;background:#25d366">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg>
-          WhatsApp
-        </a>
-      </div>
-    </form>
+    <input type="hidden" id="svc-service" />
+    <div id="svc-pricing-block"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px">
+      <a href="tel:9611459960" onclick="closeServiceModal()" class="form-submit" style="display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;background:var(--brand)">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        Call 9611459960
+      </a>
+      <a href="https://wa.me/919611459960" target="_blank" onclick="closeServiceModal()" class="form-submit" style="display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;background:#25d366">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg>
+        WhatsApp
+      </a>
+    </div>
   </div>
 </div>
 
@@ -3763,6 +3799,7 @@ function formatViews(n) {
 let currentTab = 'All';
 let currentSort = 'newest';
 const SHORTLIST_KEY = 'quatar_shortlisted_properties';
+const SHORTLIST_DATA_KEY = 'quatar_shortlisted_properties_data';
 function loadShortlist() {
   try {
     const arr = JSON.parse(localStorage.getItem(SHORTLIST_KEY));
@@ -3776,7 +3813,132 @@ function saveShortlist() {
     localStorage.setItem(SHORTLIST_KEY, JSON.stringify([...shortlisted]));
   } catch (e) { /* storage unavailable — shortlist still works for this session */ }
 }
+function loadShortlistData() {
+  try {
+    const obj = JSON.parse(localStorage.getItem(SHORTLIST_DATA_KEY));
+    return obj && typeof obj === 'object' ? obj : {};
+  } catch (e) {
+    return {};
+  }
+}
+function saveShortlistData() {
+  try {
+    localStorage.setItem(SHORTLIST_DATA_KEY, JSON.stringify(shortlistedData));
+  } catch (e) { /* storage unavailable — shortlist still works for this session */ }
+}
 let shortlisted = loadShortlist();
+let shortlistedData = loadShortlistData();
+
+/* ─── Recently Viewed ─── */
+const RECENTLY_VIEWED_KEY = 'quatar_recently_viewed';
+const RECENTLY_VIEWED_DATA_KEY = 'quatar_recently_viewed_data';
+const RECENTLY_VIEWED_MAX = 12;
+function loadRecentlyViewed() {
+  try {
+    const arr = JSON.parse(localStorage.getItem(RECENTLY_VIEWED_KEY));
+    return Array.isArray(arr) ? arr.map(String) : [];
+  } catch (e) {
+    return [];
+  }
+}
+function saveRecentlyViewed() {
+  try {
+    localStorage.setItem(RECENTLY_VIEWED_KEY, JSON.stringify(recentlyViewed));
+  } catch (e) { console.warn('Could not save recently-viewed list:', e); }
+}
+function loadRecentlyViewedData() {
+  try {
+    const obj = JSON.parse(localStorage.getItem(RECENTLY_VIEWED_DATA_KEY));
+    return obj && typeof obj === 'object' ? obj : {};
+  } catch (e) {
+    return {};
+  }
+}
+function saveRecentlyViewedData() {
+  try {
+    localStorage.setItem(RECENTLY_VIEWED_DATA_KEY, JSON.stringify(recentlyViewedData));
+  } catch (e) { console.warn('Could not save recently-viewed data:', e); }
+}
+let recentlyViewed = loadRecentlyViewed();
+let recentlyViewedData = loadRecentlyViewedData();
+
+/* Build a small thumbnail-only snapshot rather than persisting the entire
+   property object — keeps storage tiny and avoids quota failures that were
+   silently dropping entries on refresh. */
+function recentlyViewedSnapshot(p) {
+  return {
+    id: String(p.id),
+    name: p.owner?.propertyName || 'Untitled listing',
+    area: p.location?.area || '',
+    rent: p.price?.rent ?? null,
+    img: (p.media?.images || [])[0] || null
+  };
+}
+
+/* Record a property as viewed: move/insert it at the front, snapshot its
+   data, and cap the list length. Called from openDetail(). */
+function recordRecentlyViewed(p) {
+  const id = String(p.id);
+  recentlyViewed = recentlyViewed.filter(x => x !== id);
+  recentlyViewed.unshift(id);
+  if (recentlyViewed.length > RECENTLY_VIEWED_MAX) {
+    const dropped = recentlyViewed.splice(RECENTLY_VIEWED_MAX);
+    dropped.forEach(dId => { delete recentlyViewedData[dId]; });
+  }
+  recentlyViewedData[id] = recentlyViewedSnapshot(p);
+  saveRecentlyViewed();
+  saveRecentlyViewedData();
+  renderRecentlyViewed();
+}
+
+function removeRecentlyViewed(id) {
+  id = String(id);
+  recentlyViewed = recentlyViewed.filter(x => x !== id);
+  delete recentlyViewedData[id];
+  saveRecentlyViewed();
+  saveRecentlyViewedData();
+  renderRecentlyViewed();
+}
+
+function clearRecentlyViewed() {
+  recentlyViewed = [];
+  recentlyViewedData = {};
+  saveRecentlyViewed();
+  saveRecentlyViewedData();
+  renderRecentlyViewed();
+}
+
+function recentlyViewedCardHTML(rv) {
+  const thumb = rv.img ? `style="background-image:url('${rv.img}')"` : '';
+  const rent = rv.rent != null ? '₹' + Number(rv.rent).toLocaleString('en-IN') : '—';
+  return `<div class="rv-card" onclick="openDetail('${rv.id}')">
+    <button class="rv-card-remove" onclick="event.stopPropagation();removeRecentlyViewed('${rv.id}')" aria-label="Remove from recently viewed">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="rv-card-thumb" ${thumb}>${rv.img ? '' : 'No photo'}</div>
+    <div class="rv-card-body">
+      <div class="rv-card-title">${rv.name}</div>
+      <div class="rv-card-sub">${rv.area}</div>
+      <div class="rv-card-price">${rent}<span style="color:var(--text-3);font-weight:500"> /mo</span></div>
+    </div>
+  </div>`;
+}
+
+function renderRecentlyViewed() {
+  const section = document.getElementById('recentlyViewedSection');
+  if (!section) return;
+  const strip = document.getElementById('recentlyViewedStrip');
+  if (recentlyViewed.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = '';
+  strip.innerHTML = recentlyViewed.map(id => {
+    const rv = recentlyViewedData[id];
+    if (!rv) return '';
+    return recentlyViewedCardHTML(rv);
+  }).join('');
+}
 let compareSet = new Set();
 const COMPARE_MAX = 4;
 let isListView = false;
@@ -4040,7 +4202,7 @@ function pHasLift(p) {
 }
 
 function cardHTML(p) {
-  const liked = shortlisted.has(p.id);
+  const liked = shortlisted.has(String(p.id));
   const compared = compareSet.has(p.id);
   const lockedType = getCompareType();
   const pType = pTypeLabel(p);
@@ -4121,16 +4283,21 @@ function cardHTML(p) {
    SHORTLIST
 ═══════════════════════════════════════════════ */
 function toggleShortlist(id, el) {
+  id = String(id);
   if (shortlisted.has(id)) {
     shortlisted.delete(id);
+    delete shortlistedData[id];
     el.classList.remove('liked');
     showToast('Removed from shortlist');
   } else {
     shortlisted.add(id);
+    const p = PROPERTIES.find(x => String(x.id) === id);
+    if (p) shortlistedData[id] = p;
     el.classList.add('liked');
     showToast('Added to shortlist ♥');
   }
   saveShortlist();
+  saveShortlistData();
   updateShortlistCount();
   renderShortlistPanel();
   const saveBtn = document.getElementById('modal-save-btn');
@@ -4154,7 +4321,7 @@ function renderShortlistPanel() {
     return;
   }
   list.innerHTML = [...shortlisted].map(id => {
-    const p = PROPERTIES.find(x => x.id === id);
+    const p = shortlistedData[id];
     if (!p) return '';
     return cardHTML(p);
   }).join('');
@@ -4162,8 +4329,11 @@ function renderShortlistPanel() {
 
 
 function removeShortlist(id) {
+  id = String(id);
   shortlisted.delete(id);
+  delete shortlistedData[id];
   saveShortlist();
+  saveShortlistData();
   const hearts = document.querySelectorAll('.prop-heart');
   hearts.forEach(h => {
     if (h.onclick && h.onclick.toString().includes(`toggleShortlist('${id}',`)) h.classList.remove('liked');
@@ -4949,8 +5119,9 @@ function openDetail(id) {
   const p = PROPERTIES.find(x => x.id === id);
   if (!p) return;
   incrementViews(p);   // count this open as a view, persisted to storage
+  recordRecentlyViewed(p);
   renderCards();        // reflect the new count on the card grid
-  const liked = shortlisted.has(p.id);
+  const liked = shortlisted.has(String(p.id));
   const pType = pTypeLabel(p);
   const colors = {Rent:'#e8f5ee',Lease:'#dde9fa',PG:'#eee8fa'};
   const loc = p.location || {};
@@ -5203,17 +5374,22 @@ function closeDetail() {
 }
 
 function toggleShortlistFromModal(id) {
+  id = String(id);
   const el = {classList:{contains:()=>shortlisted.has(id),add:()=>{},remove:()=>{}}};
   if (shortlisted.has(id)) {
     shortlisted.delete(id);
+    delete shortlistedData[id];
     document.getElementById('modal-save-btn').textContent = '♡ Save';
     showToast('Removed from shortlist');
   } else {
     shortlisted.add(id);
+    const p = PROPERTIES.find(x => String(x.id) === id);
+    if (p) shortlistedData[id] = p;
     document.getElementById('modal-save-btn').textContent = '♥ Saved';
     showToast('Added to shortlist ♥');
   }
   saveShortlist();
+  saveShortlistData();
   updateShortlistCount();
   renderShortlistPanel();
   renderCards();
@@ -5735,7 +5911,7 @@ function loadSavedListings() {
     wrap.innerHTML = emptyHtml;
     return;
   }
-  const items = ids.map(id => PROPERTIES.find(p => p.id === id)).filter(Boolean);
+  const items = ids.map(id => shortlistedData[id]).filter(Boolean);
   if (!items.length) {
     wrap.innerHTML = emptyHtml;
     return;
@@ -5763,8 +5939,11 @@ function loadSavedListings() {
   }).join('');
 }
 function removeSavedListing(id) {
+  id = String(id);
   shortlisted.delete(id);
+  delete shortlistedData[id];
   saveShortlist();
+  saveShortlistData();
   loadSavedListings();
   renderCards();
   showToast('Removed from saved');
@@ -5896,10 +6075,6 @@ function openServiceModal(name, category, icon, imgUrl) {
   document.getElementById('svcModalImg').src = imgUrl;
   document.getElementById('svcModalImg').alt = name;
   document.getElementById('svcModalLabel').textContent = icon + '  ' + name;
-  document.getElementById('svc-name').value = '';
-  document.getElementById('svc-phone').value = '';
-  document.getElementById('svc-area').value = '';
-  document.getElementById('svc-notes').value = '';
 
   // Inject pricing block
   const pricing = SERVICE_PRICING[name];
@@ -5917,13 +6092,7 @@ function openServiceModal(name, category, icon, imgUrl) {
         <div class="svc-price-note">${pricing.note}</div>
       </div>`;
   }
-  let el = document.getElementById('svc-pricing-block');
-  if (!el) {
-    el = document.createElement('div');
-    el.id = 'svc-pricing-block';
-    document.getElementById('svc-service').closest('.form-group').insertAdjacentElement('afterend', el);
-  }
-  el.innerHTML = pricingHTML;
+  document.getElementById('svc-pricing-block').innerHTML = pricingHTML;
 
   document.getElementById('serviceModal').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -6084,6 +6253,16 @@ async function fetchProperties() {
     const data = await res.json();
     if (data.properties && data.properties.length > 0) {
       PROPERTIES = data.properties;
+      // One-time migration: backfill shortlistedData for ids saved before
+      // the full-object storage existed, so old shortlists keep working.
+      let migrated = false;
+      shortlisted.forEach(id => {
+        if (!shortlistedData[id]) {
+          const p = PROPERTIES.find(x => String(x.id) === String(id));
+          if (p) { shortlistedData[id] = p; migrated = true; }
+        }
+      });
+      if (migrated) { saveShortlistData(); renderShortlistPanel(); }
     }
   } catch (err) {
     console.error('Could not load properties from server:', err.message);
@@ -6520,14 +6699,24 @@ buildFilterOptions();
 renderCards();
 updateShortlistCount();
 renderShortlistPanel();
+renderRecentlyViewed();
 updateNavAuth();
 
 // ── Welcome Modal ──
 (function(){
+  if(localStorage.getItem('welcomeModalNoted')==='1') return;
   setTimeout(()=>{
     document.getElementById('welcomeModal').classList.add('open');
   }, 800);
 })();
+
+function welcomeNoted(){
+  localStorage.setItem('welcomeModalNoted','1');
+  closeWelcomeModal();
+}
+function welcomeSkip(){
+  closeWelcomeModal();
+}
 
 let _wmIdx = 0;
 function goWelcomeSlide(n){
@@ -6597,7 +6786,10 @@ document.addEventListener('keydown',function(e){
     <div class="welcome-footer">
       <h3>&#x1F389; Special Offer!</h3>
       <p>Get exclusive deals on your first rental. Browse verified listings in Bengaluru.</p>
-      <button class="welcome-cta" onclick="closeWelcomeModal()">Explore Listings</button>
+      <div class="welcome-actions">
+        <button class="welcome-skip" onclick="welcomeSkip()">Skip for now</button>
+        <button class="welcome-noted" onclick="welcomeNoted()">Noted</button>
+      </div>
     </div>
   </div>
 </div>
