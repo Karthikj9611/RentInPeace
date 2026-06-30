@@ -862,5 +862,104 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ message: err.message || 'An unexpected error occurred.' });
 });
 
+
+const reviewSchema = new mongoose.Schema({
+  userId:    { type: mongoose.Schema.Types.ObjectId, required: true, index: true },
+  userKey:   { type: String, required: true, index: true },
+  userName:  { type: String, required: true },
+  rating:    { type: Number, required: true, min: 1, max: 5 },
+  text:      { type: String, required: true, maxlength: 500 },
+  createdAt: { type: Date, default: Date.now }
+});
+
+const Review = mongoose.model('Review', reviewSchema);
+
+// GET /api/reviews?page=1&limit=10
+// Public — no auth required to read reviews.
+app.get('/api/reviews', async (req, res) => {
+  try {
+    const page  = Math.max(parseInt(req.query.page) || 1, 1);
+    const limit = Math.min(Math.max(parseInt(req.query.limit) || 10, 1), 50);
+    const skip  = (page - 1) * limit;
+
+    const [reviews, total, avgResult] = await Promise.all([
+      Review.find({}).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+      Review.countDocuments({}),
+      Review.aggregate([{ $group: { _id: null, avg: { $avg: '$rating' } } }])
+    ]);
+
+    res.json({
+      reviews,
+      total,
+      avgRating: avgResult[0]?.avg || 0
+    });
+  } catch (err) {
+    console.error('GET /api/reviews error:', err.message);
+    res.status(500).json({ error: 'Could not load reviews' });
+  }
+});
+
+// GET /api/reviews/mine — tells the client whether the logged-in user has
+// already posted a review, so the form can be hidden/shown correctly on load
+// (not just right after a successful submit in the same session).
+app.get('/api/reviews/mine', async (req, res) => {
+  try {
+    const userKey = req.headers['x-user-key'];
+    if (!userKey) return res.json({ hasReviewed: false });
+
+    const userId = getUserIdFromSession(userKey);
+    if (!userId) return res.json({ hasReviewed: false });
+
+    const existing = await Review.findOne({ userId }).lean();
+    res.json({ hasReviewed: !!existing, review: existing || null });
+  } catch (err) {
+    console.error('GET /api/reviews/mine error:', err.message);
+    res.status(500).json({ error: 'Could not check review status' });
+  }
+});
+
+// POST /api/reviews — requires a logged-in user (x-user-key header).
+// Mirrors the same auth pattern used by your other /api/user/... routes.
+app.post('/api/reviews', async (req, res) => {
+  try {
+    const userKey = req.headers['x-user-key'];
+    if (!userKey) return res.status(401).json({ error: 'Please log in to leave a review' });
+
+    const userId = getUserIdFromSession(userKey);
+    if (!userId) return res.status(401).json({ error: 'Invalid or expired session' });
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(401).json({ error: 'Invalid or expired session' });
+
+    const rating = Number(req.body.rating);
+    const text = (req.body.text || '').trim();
+    if (!rating || rating < 1 || rating > 5) {
+      return res.status(400).json({ error: 'Rating must be between 1 and 5' });
+    }
+    if (!text || text.length > 500) {
+      return res.status(400).json({ error: 'Review text must be 1–500 characters' });
+    }
+
+    const existing = await Review.findOne({ userId: user._id });
+    if (existing) {
+      return res.status(409).json({ error: 'You have already posted a review' });
+    }
+
+    const review = await Review.create({
+      userId: user._id,
+      userKey,
+      userName: user.name || 'Quatar user',
+      rating,
+      text
+    });
+
+    res.status(201).json({ review });
+  } catch (err) {
+    console.error('POST /api/reviews error:', err.message);
+    res.status(500).json({ error: 'Could not save review' });
+  }
+});
+
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server on port ${PORT}`));
