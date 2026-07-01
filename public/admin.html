@@ -1155,17 +1155,17 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
         <table id="appointmentTable" class="display nowrap" style="width:100%">
           <thead>
             <tr>
-              <th>Customer</th>
-              <th>Contact</th>
-              <th>Property</th>
+              <th>Appointment ID</th>
+              <th>Property ID</th>
+              <th>User ID</th>
               <th>Purpose</th>
-              <th>Visit Date</th>
-              <th>Visit Time</th>
+              <th>Customer</th>
+              <th>Property</th>
+              <th>Contact</th>
+              <th>Visit Date &amp; Time</th>
               <th>Message</th>
               <th>Status</th>
               <th>Booked On</th>
-              <th>Property ID</th>
-              <th>User ID</th>
               <th>Remarks</th>
               <th>Action</th>
             </tr>
@@ -1318,11 +1318,29 @@ function renderEmail(row){
 function plainPhone(row){ return row.mobile||''; }
 function plainEmail(row){ return row.email||''; }
 
+/* ── UNIFIED DATE/TIME FORMAT: "Wed, 01 Jul 2026" / "6:00 PM" ── */
+function formatKRDate(dt){
+  if(!dt) return '—';
+  const d = new Date(dt);
+  if(isNaN(d)) return '—';
+  return d.toLocaleDateString('en-GB', {weekday:'short', day:'2-digit', month:'short', year:'numeric'});
+}
+function formatKRTime(dt){
+  if(!dt) return '';
+  const d = new Date(dt);
+  if(isNaN(d)) return '';
+  return d.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit', hour12:true});
+}
+function formatKRDateTime(dt){
+  if(!dt) return '—';
+  const time = formatKRTime(dt);
+  return time ? `${formatKRDate(dt)}, ${time}` : formatKRDate(dt);
+}
+
 function formatDateTime(createdAt){
   if(!createdAt) return '—';
-  const d = new Date(createdAt);
-  const date = d.toLocaleDateString('en-GB');
-  const time = d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
+  const date = formatKRDate(createdAt);
+  const time = formatKRTime(createdAt);
   return `<div class="date-cell">
     <div class="date-main"><i class="far fa-calendar-alt" style="color:var(--gold);margin-right:5px"></i>${date}</div>
     <span class="date-time">${time}</span>
@@ -1410,7 +1428,7 @@ function remarkCellHtml(id, remark, type){
   if(entries.length){
     cardsHtml = entries.map((e, i) => {
       const dateStr = e.date
-        ? `<div class="remark-item-date"><i class="far fa-clock"></i>${new Date(e.date).toLocaleDateString('en-GB')}</div>`
+        ? `<div class="remark-item-date"><i class="far fa-clock"></i>${formatKRDateTime(e.date)}</div>`
         : '';
       return `
         <div class="remark-card">
@@ -1694,7 +1712,7 @@ $(document).ready(function(){
             if(col===2){ var ph=plainPhone(rd); return ph?'=HYPERLINK("tel:'+ph+'","'+ph+'")':'—'; }
             if(col===3){ var em=plainEmail(rd); return em?'=HYPERLINK("mailto:'+em+'","'+em+'")':'—'; }
             if(col===4) return rd.contact||'—';
-            if(col===5){ if(!rd.createdAt) return '—'; const d=new Date(rd.createdAt); return d.toLocaleDateString('en-GB')+' '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}); }
+            if(col===5) return formatKRDateTime(rd.createdAt);
             if(col===6) return String(rd.listingsCount||0);
             if(col===7) return String(rd.visitsCount||0);
             if(col===8) return rd.password||'—';
@@ -1713,7 +1731,7 @@ $(document).ready(function(){
             if(col===2) return rd.mobile||'—';
             if(col===3) return rd.email||'—';
             if(col===4) return rd.contact||'—';
-            if(col===5){ if(!rd.createdAt) return '—'; return new Date(rd.createdAt).toLocaleString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true}); }
+            if(col===5) return formatKRDateTime(rd.createdAt);
             if(col===6) return String(rd.listingsCount||0);
             if(col===7) return String(rd.visitsCount||0);
             if(col===8) return rd.password||'—';
@@ -1833,7 +1851,7 @@ $(document).ready(function(){
             if(col===3) return rd.ownerName||'—';
             if(col===4){ var ph=rd.ownerNumber||''; return ph?'=HYPERLINK("tel:'+ph+'","'+ph+'")':'—'; }
             if(col===5) return rd.loc||'—';
-            if(col===6){ if(!rd.createdAt) return '—'; const d=new Date(rd.createdAt); return d.toLocaleDateString('en-GB')+' '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}); }
+            if(col===6) return formatKRDateTime(rd.createdAt);
             if(col===7) return flattenRemarks(rd.remarks);
             return data;
           }}
@@ -1850,7 +1868,7 @@ $(document).ready(function(){
             if(col===3) return rd.ownerName||'—';
             if(col===4) return rd.ownerNumber||'—';
             if(col===5) return rd.loc||'—';
-            if(col===6){ if(!rd.createdAt) return '—'; return new Date(rd.createdAt).toLocaleString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true}); }
+            if(col===6) return formatKRDateTime(rd.createdAt);
             if(col===7) return flattenRemarks(rd.remarks);
             return data;
           }}
@@ -1904,17 +1922,36 @@ $(document).ready(function(){
       }
     },
     columns:[
-      /* 0 – Customer Name */
+      /* 0 – Appointment ID */
+      { data:'_id', render:(d,t)=>{
+          const val = d ? String(d) : '—';
+          if(t!=='display') return val;
+          return `<span style="font-family:monospace;font-size:0.72rem;color:var(--ink2);letter-spacing:0.02em;cursor:pointer;border-bottom:1px dashed var(--ink3)" title="Click to copy" onclick="navigator.clipboard.writeText('${val}').then(()=>this.title='Copied!')">${val}</span>`;
+      }},
+      /* 1 – Property ID */
+      { data:'propertyId', render:(d,t)=>{
+          const val = d ? String(d) : '—';
+          if(t!=='display') return val;
+          if(!d) return '<span style="color:var(--ink3);font-size:0.78rem">—</span>';
+          return `<span style="font-family:monospace;font-size:0.72rem;color:var(--ink2);letter-spacing:0.02em;cursor:pointer;border-bottom:1px dashed var(--ink3)" title="Click to copy" onclick="navigator.clipboard.writeText('${String(d)}').then(()=>this.title='Copied!')">${String(d)}</span>`;
+      }},
+      /* 2 – User ID */
+      { data:'userId', render:(d,t)=>{
+          const val = d ? String(d) : '—';
+          if(t!=='display') return val;
+          if(!d) return '<span style="color:var(--ink3);font-size:0.78rem">Guest</span>';
+          return `<span style="font-family:monospace;font-size:0.72rem;color:var(--ink2);letter-spacing:0.02em;cursor:pointer;border-bottom:1px dashed var(--ink3)" title="Click to copy" onclick="navigator.clipboard.writeText('${String(d)}').then(()=>this.title='Copied!')">${String(d)}</span>`;
+      }},
+      /* 3 – Purpose */
+      { data:'purpose', render:(d,t)=>
+          t==='display' ? `<span class="purpose-badge">${escapeHtml(d||'—')}</span>` : (d||'—')
+      },
+      /* 4 – Customer Name */
       { data:'name', render:(d,t,row)=>{
           if(t==='display') return renderName(row);
           return row.name||'—';
       }},
-      /* 1 – Contact */
-      { data:'mobile', orderable:false, render:(d,t,row)=>{
-          if(t==='display') return renderApptContact(row);
-          return [row.mobile,row.email].filter(Boolean).join(' | ');
-      }},
-      /* 2 – Property */
+      /* 5 – Property */
       { data:'propertyName', render:(d,t,row)=>{
           if(t!=='display') return row.propertyName||row.purpose||'—';
           const name = escapeHtml(row.propertyName||'');
@@ -1925,29 +1962,23 @@ $(document).ready(function(){
             ${area ? `<div style="font-size:0.76rem;color:var(--ink2);margin-top:2px"><i class="fas fa-location-dot" style="color:var(--gold);margin-right:3px;font-size:0.7rem"></i>${area}</div>` : ''}
           </div>`;
       }},
-      /* 3 – Purpose */
-      { data:'purpose', render:(d,t)=>
-          t==='display' ? `<span class="purpose-badge">${escapeHtml(d||'—')}</span>` : (d||'—')
-      },
-      /* 4 – Visit Date */
-      { data:'date', render:(d,t)=>
-          t==='display' ? renderApptDate(d) : (d||'—')
-      },
-      /* 5 – Visit Time (exact + slot) */
-      { data:'visitTime', render:(d,t,row)=>{
-          if(t!=='display') return row.visitTimeDisplay||row.visitTime||'—';
-          const display = escapeHtml(row.visitTimeDisplay||'');
-          const slot    = escapeHtml(row.timeSlot||'');
-          if(!display) return '<span style="color:var(--ink3)">—</span>';
-          return renderTimeSlot(slot, display);
+      /* 6 – Contact */
+      { data:'mobile', orderable:false, render:(d,t,row)=>{
+          if(t==='display') return renderApptContact(row);
+          return [row.mobile,row.email].filter(Boolean).join(' | ');
       }},
-      /* 6 – Message */
+      /* 7 – Visit Date & Time (merged) */
+      { data:'date', render:(d,t,row)=>{
+          if(t!=='display') return `${row.date||'—'} ${row.visitTimeDisplay||row.visitTime||''}`.trim();
+          return renderApptDateTime(row);
+      }},
+      /* 8 – Message */
       { data:'message', orderable:false, render:(d)=>{
           const msg = escapeHtml(d||'');
           if(!msg) return '<span class="no-contact">—</span>';
           return `<div style="max-width:180px;font-size:0.8rem;color:var(--ink2);white-space:normal;line-height:1.5">${msg}</div>`;
       }},
-      /* 7 – Status (inline change) */
+      /* 9 – Status (inline change) */
       { data:'status', render:(d,t,row)=>{
           if(t==='display'){
             _apptCache[String(row._id)] = row;
@@ -1955,24 +1986,10 @@ $(document).ready(function(){
           }
           return d||'pending';
       }},
-      /* 8 – Booked On */
+      /* 10 – Booked On */
       { data:'createdAt', render:(d,t)=>
           t==='display' ? formatDateTime(d) : (d||'—')
       },
-      /* 9 – Property ID */
-      { data:'propertyId', render:(d,t)=>{
-          const val = d ? String(d) : '—';
-          if(t!=='display') return val;
-          if(!d) return '<span style="color:var(--ink3);font-size:0.78rem">—</span>';
-          return `<span style="font-family:monospace;font-size:0.72rem;color:var(--ink2);letter-spacing:0.02em;cursor:pointer;border-bottom:1px dashed var(--ink3)" title="Click to copy" onclick="navigator.clipboard.writeText('${String(d)}').then(()=>this.title='Copied!')">${String(d)}</span>`;
-      }},
-      /* 10 – User ID */
-      { data:'userId', render:(d,t)=>{
-          const val = d ? String(d) : '—';
-          if(t!=='display') return val;
-          if(!d) return '<span style="color:var(--ink3);font-size:0.78rem">Guest</span>';
-          return `<span style="font-family:monospace;font-size:0.72rem;color:var(--ink2);letter-spacing:0.02em;cursor:pointer;border-bottom:1px dashed var(--ink3)" title="Click to copy" onclick="navigator.clipboard.writeText('${String(d)}').then(()=>this.title='Copied!')">${String(d)}</span>`;
-      }},
       /* 11 – Remarks */
       { data:'remarks', orderable:false, render:(d,t,row)=>{
           if(t==='display') return remarkCellHtml(String(row._id), d, 'appointment');
@@ -1986,7 +2003,7 @@ $(document).ready(function(){
           </button>`;
       }}
     ],
-    order:[[4,'asc']],
+    order:[[7,'asc']],
     pageLength:10,
     scrollX:true,
     language:{
@@ -2004,17 +2021,17 @@ $(document).ready(function(){
         exportOptions:{ columns:[0,1,2,3,4,5,6,7,8,9,10,11],
           format:{ body:function(data,row,col){
             var rd=apptTable.row(row).data(); if(!rd) return data;
-            if(col===0) return rd.name||'—';
-            if(col===1) return [rd.mobile,rd.email].filter(Boolean).join(' | ')||'—';
-            if(col===2) return [rd.propertyName,rd.propertyArea].filter(Boolean).join(', ')||'—';
+            if(col===0) return rd._id ? String(rd._id) : '—';
+            if(col===1) return rd.propertyId ? String(rd.propertyId) : '—';
+            if(col===2) return rd.userId   ? String(rd.userId)   : 'Guest';
             if(col===3) return rd.purpose||'—';
-            if(col===4) return rd.date||'—';
-            if(col===5) return (rd.visitTimeDisplay||rd.visitTime||'—')+(rd.timeSlot?' ('+rd.timeSlot+')':'');
-            if(col===6) return rd.message||'—';
-            if(col===7) return rd.status||'—';
-            if(col===8){ if(!rd.createdAt) return '—'; const d=new Date(rd.createdAt); return d.toLocaleDateString('en-GB')+' '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}); }
-            if(col===9) return rd.propertyId ? String(rd.propertyId) : '—';
-            if(col===10) return rd.userId   ? String(rd.userId)   : 'Guest';
+            if(col===4) return rd.name||'—';
+            if(col===5) return [rd.propertyName,rd.propertyArea].filter(Boolean).join(', ')||'—';
+            if(col===6) return [rd.mobile,rd.email].filter(Boolean).join(' | ')||'—';
+            if(col===7) return (rd.date||'—')+' '+(rd.visitTimeDisplay||rd.visitTime||'')+(rd.timeSlot?' ('+rd.timeSlot+')':'');
+            if(col===8) return rd.message||'—';
+            if(col===9) return rd.status||'—';
+            if(col===10) return formatKRDateTime(rd.createdAt);
             if(col===11) return flattenRemarks(rd.remarks);
             return data;
           }}
@@ -2025,17 +2042,17 @@ $(document).ready(function(){
         exportOptions:{ columns:[0,1,2,3,4,5,6,7,8,9,10,11],
           format:{ body:function(data,row,col){
             var rd=apptTable.row(row).data(); if(!rd) return data;
-            if(col===0) return rd.name||'—';
-            if(col===1) return [rd.mobile,rd.email].filter(Boolean).join(' | ')||'—';
-            if(col===2) return [rd.propertyName,rd.propertyArea].filter(Boolean).join(', ')||'—';
+            if(col===0) return rd._id ? String(rd._id) : '—';
+            if(col===1) return rd.propertyId ? String(rd.propertyId) : '—';
+            if(col===2) return rd.userId   ? String(rd.userId)   : 'Guest';
             if(col===3) return rd.purpose||'—';
-            if(col===4) return rd.date||'—';
-            if(col===5) return (rd.visitTimeDisplay||rd.visitTime||'—')+(rd.timeSlot?' ('+rd.timeSlot+')':'');
-            if(col===6) return rd.message||'—';
-            if(col===7) return rd.status||'—';
-            if(col===8){ if(!rd.createdAt) return '—'; return new Date(rd.createdAt).toLocaleString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true}); }
-            if(col===9) return rd.propertyId ? String(rd.propertyId) : '—';
-            if(col===10) return rd.userId   ? String(rd.userId)   : 'Guest';
+            if(col===4) return rd.name||'—';
+            if(col===5) return [rd.propertyName,rd.propertyArea].filter(Boolean).join(', ')||'—';
+            if(col===6) return [rd.mobile,rd.email].filter(Boolean).join(' | ')||'—';
+            if(col===7) return (rd.date||'—')+' '+(rd.visitTimeDisplay||rd.visitTime||'')+(rd.timeSlot?' ('+rd.timeSlot+')':'');
+            if(col===8) return rd.message||'—';
+            if(col===9) return rd.status||'—';
+            if(col===10) return formatKRDateTime(rd.createdAt);
             if(col===11) return flattenRemarks(rd.remarks);
             return data;
           }}
@@ -2044,7 +2061,7 @@ $(document).ready(function(){
       {
         extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
         orientation:'landscape', pageSize:'A4', title:'KR Real-Estate — Appointments',
-        exportOptions:{columns:[0,1,2,3,4,5,7,8]},
+        exportOptions:{columns:[3,4,5,6,7,9,10]},
         customize:function(doc){
           doc.styles.tableHeader={fillColor:'#0c0d10',color:'white',bold:true,fontSize:8,alignment:'center'};
           doc.defaultStyle={fontSize:7.5,color:'#0c0d10'};
@@ -2223,7 +2240,7 @@ function openAdminPropModal(id){
       .map(([k, label]) => {
         let val = p[k];
         if(k === 'bhk') val = val + ' BHK';
-        if(k === 'createdAt') val = new Date(val).toLocaleString('en-GB');
+        if(k === 'createdAt') val = formatKRDateTime(val);
         if(k === 'remarks'){
           // Render remarks as numbered list inside the modal card.
           // Each entry can be a plain string (current schema) or an
@@ -2425,10 +2442,22 @@ function renderApptContact(row){
 
 function renderApptDate(dateStr){
   if(!dateStr) return '—';
-  const d = new Date(dateStr+'T00:00:00');
-  const opts = {weekday:'short',day:'2-digit',month:'short',year:'numeric'};
-  const formatted = d.toLocaleDateString('en-GB', opts);
+  const formatted = formatKRDate(dateStr+'T00:00:00');
   return `<div class="date-cell"><div class="date-main"><i class="far fa-calendar-alt" style="color:var(--gold);margin-right:5px"></i>${formatted}</div></div>`;
+}
+
+function renderApptDateTime(row){
+  const dateHtml = renderApptDate(row.date);
+  const icons = {Morning:'fa-sun',Afternoon:'fa-cloud-sun',Evening:'fa-moon'};
+  const icon = icons[row.timeSlot] || 'fa-clock';
+  const timeText = row.visitTimeDisplay || row.visitTime || '';
+  const timeHtml = timeText
+    ? `<div style="margin-top:4px;display:flex;align-items:center;gap:6px;justify-content:center">
+        <span style="font-weight:600;font-size:0.8rem;color:var(--ink)">${escapeHtml(timeText)}</span>
+        ${row.timeSlot ? `<span class="slot-pill"><i class="fas ${icon}"></i>${escapeHtml(row.timeSlot)}</span>` : ''}
+      </div>`
+    : '';
+  return `<div>${dateHtml}${timeHtml}</div>`;
 }
 
 function renderTimeSlot(slot, exactTime){
@@ -2555,7 +2584,7 @@ function openCustomerModal(id){
     { label:'Visit Requests',value: String(c.visitsCount   ?? 0) },
     { label:'Remarks',       value: remarksVal },
     { label:'Registered On', value: c.createdAt
-        ? new Date(c.createdAt).toLocaleString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true})
+        ? formatKRDateTime(c.createdAt)
         : '—' },
     { label:'User ID',       value: String(c._id || '—') },
   ];
