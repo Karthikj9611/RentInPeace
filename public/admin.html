@@ -1047,18 +1047,21 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
         <table id="bookingTable" class="display nowrap" style="width:100%">
           <thead>
             <tr>
+              <th>User ID</th>
               <th>Customer</th>
               <th>Phone</th>
               <th>Email</th>
+              <th>Contact (raw)</th>
+              <th>Registered</th>
               <th>Listings</th>
               <th>Visits</th>
-              <th>Registered</th>
+              <th>Password Hash</th>
               <th>Remarks</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td colspan="8" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
+            <tr><td colspan="11" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
           </tbody>
         </table>
       </div>
@@ -1605,22 +1608,32 @@ $(document).ready(function(){
       }
     },
     columns:[
-      /* 0 – Name */
+      /* 0 – User ID (_id) */
+      { data:'_id', render:(d,t)=>{
+          const id = String(d||'—');
+          if(t==='display') return `<span style="font-family:monospace;font-size:0.76rem;color:var(--ink3)">${id}</span>`;
+          return id;
+      }},
+      /* 1 – Name */
       { data:'name', render:(d,t,row)=>{
           if(t==='display') return renderName(row);
           return row.name || '—';
       }},
-      /* 1 – Phone */
+      /* 2 – Phone */
       { data:'mobile', render:(d,t,row)=>{
           if(t==='display') return renderPhone(row);
           return plainPhone(row);
       }},
-      /* 2 – Email */
+      /* 3 – Email */
       { data:'email', render:(d,t,row)=>{
           if(t==='display') return renderEmail(row);
           return plainEmail(row);
       }},
-      /* 3 – Listings count */
+      /* 4 – Contact (raw) */
+      { data:'contact', render:(d)=> d ? escapeHtml(d) : '—' },
+      /* 5 – Registered */
+      { data:'createdAt', render:(d,t)=> t==='display' ? formatDateTime(d) : (d||'—') },
+      /* 6 – Listings count */
       { data:'listingsCount', render:(d,t)=>{
           const n = Number(d||0);
           if(t==='display') return n
@@ -1628,7 +1641,7 @@ $(document).ready(function(){
             : '<span style="color:var(--ink3);font-size:0.82rem">—</span>';
           return n;
       }},
-      /* 4 – Visits count */
+      /* 7 – Visits count */
       { data:'visitsCount', render:(d,t)=>{
           const n = Number(d||0);
           if(t==='display') return n
@@ -1636,14 +1649,18 @@ $(document).ready(function(){
             : '<span style="color:var(--ink3);font-size:0.82rem">—</span>';
           return n;
       }},
-      /* 5 – Registered */
-      { data:'createdAt', render:(d,t)=> t==='display' ? formatDateTime(d) : (d||'—') },
-      /* 6 – Remarks */
+      /* 8 – Password Hash */
+      { data:'password', render:(d,t)=>{
+          const val = d || '—';
+          if(t==='display') return `<span style="font-family:monospace;font-size:0.72rem;color:var(--ink3);word-break:break-all">${escapeHtml(val)}</span>`;
+          return val;
+      }},
+      /* 9 – Remarks */
       { data:'remarks', orderable:false, render:(d,t,row)=>{
           if(t==='display') return remarkCellHtml(row.mobile||String(row._id), d, 'customer');
           return flattenRemarks(d);
       }},
-      /* 7 – Action */
+      /* 10 – Action */
       { data:null, orderable:false, render:(d,t,row)=>{
           _customerCache[row.mobile || String(row._id)] = row;
           const deleteKey = encodeURIComponent(row.mobile || String(row._id));
@@ -1669,32 +1686,38 @@ $(document).ready(function(){
     buttons:[
       {
         extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV', title:'KR Real-Estate Customers',
-        exportOptions:{ columns:[0,1,2,3,4,5,6],
+        exportOptions:{ columns:[0,1,2,3,4,5,6,7,8,9],
           format:{ body:function(data,row,col){
             var rd=dataTable.row(row).data(); if(!rd) return data;
-            if(col===0) return rd.name||'—';
-            if(col===1){ var ph=plainPhone(rd); return ph?'=HYPERLINK("tel:'+ph+'","'+ph+'")':'—'; }
-            if(col===2){ var em=plainEmail(rd); return em?'=HYPERLINK("mailto:'+em+'","'+em+'")':'—'; }
-            if(col===3) return String(rd.listingsCount||0);
-            if(col===4) return String(rd.visitsCount||0);
+            if(col===0) return String(rd._id||'—');
+            if(col===1) return rd.name||'—';
+            if(col===2){ var ph=plainPhone(rd); return ph?'=HYPERLINK("tel:'+ph+'","'+ph+'")':'—'; }
+            if(col===3){ var em=plainEmail(rd); return em?'=HYPERLINK("mailto:'+em+'","'+em+'")':'—'; }
+            if(col===4) return rd.contact||'—';
             if(col===5){ if(!rd.createdAt) return '—'; const d=new Date(rd.createdAt); return d.toLocaleDateString('en-GB')+' '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}); }
-            if(col===6) return flattenRemarks(rd.remarks);
+            if(col===6) return String(rd.listingsCount||0);
+            if(col===7) return String(rd.visitsCount||0);
+            if(col===8) return rd.password||'—';
+            if(col===9) return flattenRemarks(rd.remarks);
             return data;
           }}
         }
       },
       {
         extend:'excel', text:'<i class="fas fa-file-excel"></i> Excel', title:'KR Real-Estate Customers',
-        exportOptions:{ columns:[0,1,2,3,4,5,6],
+        exportOptions:{ columns:[0,1,2,3,4,5,6,7,8,9],
           format:{ body:function(data,row,col){
             var rd=dataTable.row(row).data(); if(!rd) return data;
-            if(col===0) return rd.name||'—';
-            if(col===1) return rd.mobile||'—';
-            if(col===2) return rd.email||'—';
-            if(col===3) return String(rd.listingsCount||0);
-            if(col===4) return String(rd.visitsCount||0);
+            if(col===0) return String(rd._id||'—');
+            if(col===1) return rd.name||'—';
+            if(col===2) return rd.mobile||'—';
+            if(col===3) return rd.email||'—';
+            if(col===4) return rd.contact||'—';
             if(col===5){ if(!rd.createdAt) return '—'; return new Date(rd.createdAt).toLocaleString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true}); }
-            if(col===6) return flattenRemarks(rd.remarks);
+            if(col===6) return String(rd.listingsCount||0);
+            if(col===7) return String(rd.visitsCount||0);
+            if(col===8) return rd.password||'—';
+            if(col===9) return flattenRemarks(rd.remarks);
             return data;
           }}
         }
@@ -1702,7 +1725,7 @@ $(document).ready(function(){
       {
         extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
         orientation:'landscape', pageSize:'A4', title:'KR Real-Estate — Customers',
-        exportOptions:{columns:[0,1,2,3,4,5,6]},
+        exportOptions:{columns:[0,1,2,3,4,5,6,7,8,9]},
         customize:function(doc){
           doc.styles.tableHeader={fillColor:'#0c0d10',color:'white',bold:true,fontSize:9,alignment:'center'};
           doc.defaultStyle={fontSize:8,color:'#0c0d10'};
@@ -1712,20 +1735,20 @@ $(document).ready(function(){
           rows.forEach(function(rd,i){
             var pdfRow=tableBody[i+1]; if(!pdfRow) return;
             var phone=plainPhone(rd); var email=plainEmail(rd);
-            if(phone&&pdfRow[1]) pdfRow[1]={text:phone,link:'tel:'+phone,color:'#1a7a5e',decoration:'underline',fontSize:8};
-            if(email&&pdfRow[2]) pdfRow[2]={text:email,link:'mailto:'+email,color:'#8a6820',decoration:'underline',fontSize:8};
+            if(phone&&pdfRow[2]) pdfRow[2]={text:phone,link:'tel:'+phone,color:'#1a7a5e',decoration:'underline',fontSize:8};
+            if(email&&pdfRow[3]) pdfRow[3]={text:email,link:'mailto:'+email,color:'#8a6820',decoration:'underline',fontSize:8};
           });
         }
       },
       {
         extend:'print', text:'<i class="fas fa-print"></i> Print', title:'KR Real-Estate Customers',
-        exportOptions:{columns:[0,1,2,3,4,5,6]},
+        exportOptions:{columns:[0,1,2,3,4,5,6,7,8,9]},
         customize:function(win){
           $(win.document.head).append('<style>table td a{color:inherit;text-decoration:underline}table td a.ph{color:#1a7a5e}table td a.em{color:#8a6820}</style>');
           $(win.document.body).find('table tbody tr').each(function(){
             var cells=$(this).find('td');
-            var phText=cells.eq(1).text().trim(); if(phText&&phText!=='—') cells.eq(1).html('<a class="ph" href="tel:'+phText+'">'+phText+'</a>');
-            var emText=cells.eq(2).text().trim(); if(emText&&emText!=='—') cells.eq(2).html('<a class="em" href="mailto:'+emText+'">'+emText+'</a>');
+            var phText=cells.eq(2).text().trim(); if(phText&&phText!=='—') cells.eq(2).html('<a class="ph" href="tel:'+phText+'">'+phText+'</a>');
+            var emText=cells.eq(3).text().trim(); if(emText&&emText!=='—') cells.eq(3).html('<a class="em" href="mailto:'+emText+'">'+emText+'</a>');
           });
         }
       }

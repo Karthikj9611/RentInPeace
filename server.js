@@ -757,6 +757,7 @@ app.get('/api/users', requireAdmin, async (req, res) => {
         mobile,
         email,
         contact:       u.contact || '',
+        password:      u.password || '',
         remarks:       u.remarks || [],
         listingsCount: propMap[String(u._id)]  || 0,
         visitsCount:   visitMap[String(u._id)] || 0,
