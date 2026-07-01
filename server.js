@@ -99,7 +99,7 @@ app.post('/api/admin/logout', async (req, res) => {
 });
 
 // ── User Schema ──
-const RemarkSchema = new mongoose.Schema({
+const RemarkEntrySchema = new mongoose.Schema({
   remark: { type: String, required: true, trim: true, maxlength: 200 },
   date:   { type: Date, default: Date.now },
 }, { _id: false });
@@ -108,7 +108,7 @@ const UserSchema = new mongoose.Schema({
   name:      { type: String, trim: true },
   contact:   { type: String, required: true, unique: true, trim: true, lowercase: true },
   password:  { type: String, required: true },
-  remarks:   { type: [RemarkSchema], default: [] },
+  remarks:   { type: [RemarkEntrySchema], default: [] },
   createdAt: { type: Date, default: Date.now }
 });
 const User = mongoose.model('User', UserSchema);
@@ -427,16 +427,14 @@ const Property = mongoose.model('Property', PropertySchema);
 // ── Visit Request Schema (from the "Schedule a Visit" modal) ──
 const VisitRequestSchema = new mongoose.Schema({
   propertyId:   { type: mongoose.Schema.Types.ObjectId, ref: 'Property', required: true, index: true },
-  userId:       { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true }, // null if requested while logged out
+  userId:       { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true },
   visitorName:  { type: String, required: true, trim: true },
   visitorPhone: { type: String, required: true, trim: true },
-  altMobile:    { type: String, default: '', trim: true },
-  email:        { type: String, default: '', trim: true },
   note:         { type: String, default: '', trim: true },
-  visitDate:    { type: String, required: true }, // 'YYYY-MM-DD', kept as the raw picker value
-  visitTime:    { type: String, required: true }, // 'HH:MM', kept as the raw picker value
+  visitDate:    { type: String, required: true }, // 'YYYY-MM-DD'
+  visitTime:    { type: String, required: true }, // 'HH:MM'
   status:       { type: String, enum: ['Pending', 'Confirmed', 'Cancelled', 'Completed'], default: 'Pending' },
-  remarks:      { type: [RemarkSchema], default: [] },
+  remarks:      { type: [RemarkEntrySchema], default: [] },
   createdAt:    { type: Date, default: Date.now },
 });
 VisitRequestSchema.index({ createdAt: -1 });
@@ -724,12 +722,9 @@ app.patch('/api/admin/visits/:id/status', requireAdmin, async (req, res) => {
   }
 });
 
-// ────────────────────────────────────────────────────────────────────────────
-// ── ADMIN: CUSTOMERS GRID (admin.html "Customers" tab) ──
-// Maps the User collection (name/contact) onto the {name,mobile,email,...}
-// shape admin.html's DataTable expects. `contact` can be a phone or an email
-// at signup time, so we sniff which it looks like for display purposes.
-// ────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
+// ── ADMIN: CUSTOMERS GRID ──
+// ─────────────────────────────────────────────────────────────────────────
 function splitContact(contact) {
   const c = String(contact || '');
   return c.includes('@') ? { mobile: '', email: c } : { mobile: c, email: '' };
@@ -738,17 +733,37 @@ function splitContact(contact) {
 app.get('/api/users', requireAdmin, async (req, res) => {
   try {
     const users = await User.find({}).sort({ createdAt: -1 }).lean();
+    const userIds = users.map(u => u._id);
+
+    const [propAgg, visitAgg] = await Promise.all([
+      Property.aggregate([
+        { $match: { userId: { $in: userIds } } },
+        { $group: { _id: '$userId', count: { $sum: 1 } } }
+      ]),
+      VisitRequest.aggregate([
+        { $match: { userId: { $in: userIds } } },
+        { $group: { _id: '$userId', count: { $sum: 1 } } }
+      ])
+    ]);
+
+    const propMap  = Object.fromEntries(propAgg.map(x  => [String(x._id), x.count]));
+    const visitMap = Object.fromEntries(visitAgg.map(x => [String(x._id), x.count]));
+
     const rows = users.map(u => {
       const { mobile, email } = splitContact(u.contact);
       return {
-        _id: u._id,
-        name: u.name || '',
+        _id:           u._id,
+        name:          u.name || '',
         mobile,
         email,
-        remarks: u.remarks || [],
-        createdAt: u.createdAt,
+        contact:       u.contact || '',
+        remarks:       u.remarks || [],
+        listingsCount: propMap[String(u._id)]  || 0,
+        visitsCount:   visitMap[String(u._id)] || 0,
+        createdAt:     u.createdAt,
       };
     });
+
     res.json(rows);
   } catch (err) {
     console.error('GET /api/users error:', err);
@@ -756,8 +771,6 @@ app.get('/api/users', requireAdmin, async (req, res) => {
   }
 });
 
-// Looks a user up by the `:key` route param, which admin.html sends as
-// row.mobile (if present) or row._id (fallback) — try both.
 async function findUserByMobileOrId(key) {
   const decoded = decodeURIComponent(key || '');
   if (mongoose.Types.ObjectId.isValid(decoded)) {
@@ -796,12 +809,11 @@ app.patch('/api/users/mobile/:mobile/remarks', requireAdmin, async (req, res) =>
 
 app.delete('/api/users/mobile/:mobile/remarks/:idx', requireAdmin, async (req, res) => {
   try {
-    const idx = Number(req.params.idx);
+    const idx  = Number(req.params.idx);
     const user = await findUserByMobileOrId(req.params.mobile);
     if (!user) return res.status(404).json({ message: 'Customer not found' });
-    if (!Number.isInteger(idx) || idx < 0 || idx >= user.remarks.length) {
+    if (!Number.isInteger(idx) || idx < 0 || idx >= user.remarks.length)
       return res.status(400).json({ message: 'Invalid remark index' });
-    }
     user.remarks.splice(idx, 1);
     await user.save();
     res.json({ message: 'Remark deleted', remarks: user.remarks });
@@ -811,37 +823,51 @@ app.delete('/api/users/mobile/:mobile/remarks/:idx', requireAdmin, async (req, r
   }
 });
 
-// ────────────────────────────────────────────────────────────────────────────
-// ── ADMIN: APPOINTMENTS GRID (admin.html "Appointments" tab) ──
-// Maps the VisitRequest collection onto the shape admin.html's DataTable
-// expects: {name, mobile, altMobile, email, purpose, date, timeSlot, message,
-// status, remarks, createdAt}. Status is stored capitalized in the DB (shared
-// with the older /api/admin/visits routes above) but sent/received here in
-// lowercase to match the admin.html status filter/select values.
-// ────────────────────────────────────────────────────────────────────────────
-function timeToSlot(visitTime) {
-  const hour = Number(String(visitTime || '').split(':')[0]);
-  if (Number.isNaN(hour)) return '';
-  if (hour < 12) return 'Morning';
-  if (hour < 17) return 'Afternoon';
+// ─────────────────────────────────────────────────────────────────────────
+// ── ADMIN: APPOINTMENTS GRID ──
+// ─────────────────────────────────────────────────────────────────────────
+function visitTimeToDisplay(hhmm) {
+  if (!hhmm) return '';
+  const [hStr, mStr] = hhmm.split(':');
+  let h = Number(hStr);
+  const m = String(mStr || '00').padStart(2, '0');
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  if (h === 0) h = 12;
+  else if (h > 12) h -= 12;
+  return `${h}:${m} ${ampm}`;
+}
+
+function visitTimeToSlot(hhmm) {
+  const h = Number(String(hhmm || '').split(':')[0]);
+  if (Number.isNaN(h)) return '';
+  if (h < 12) return 'Morning';
+  if (h < 17) return 'Afternoon';
   return 'Evening';
 }
 
 function toApptRow(doc) {
-  const prop = doc.propertyId && typeof doc.propertyId === 'object' ? doc.propertyId : null;
+  const prop         = doc.propertyId && typeof doc.propertyId === 'object' ? doc.propertyId : null;
+  const propertyName = (prop && prop.owner    && prop.owner.propertyName) || '';
+  const propertyArea = (prop && prop.location && prop.location.area)      || '';
+  const purpose      = (prop && prop.basic    && prop.basic.status)       || 'General Enquiry';
   return {
-    _id: doc._id,
-    name: doc.visitorName || '',
-    mobile: doc.visitorPhone || '',
-    altMobile: doc.altMobile || '',
-    email: doc.email || '',
-    purpose: (prop && prop.basic && prop.basic.status) || 'General Enquiry',
-    date: doc.visitDate || '',
-    timeSlot: timeToSlot(doc.visitTime),
-    message: doc.note || '',
-    status: String(doc.status || 'Pending').toLowerCase(),
-    remarks: doc.remarks || [],
-    createdAt: doc.createdAt,
+    _id:             doc._id,
+    name:            doc.visitorName  || '',
+    mobile:          doc.visitorPhone || '',
+    email:           doc.email        || '',
+    propertyId:      doc.propertyId   ? (doc.propertyId._id || doc.propertyId) : null,
+    propertyName,
+    propertyArea,
+    purpose,
+    date:            doc.visitDate    || '',
+    visitTime:       doc.visitTime    || '',
+    visitTimeDisplay:visitTimeToDisplay(doc.visitTime),
+    timeSlot:        visitTimeToSlot(doc.visitTime),
+    message:         doc.note         || '',
+    status:          String(doc.status || 'Pending').toLowerCase(),
+    remarks:         doc.remarks      || [],
+    userId:          doc.userId       || null,
+    createdAt:       doc.createdAt,
   };
 }
 
@@ -849,7 +875,7 @@ app.get('/api/appointments', requireAdmin, async (req, res) => {
   try {
     const docs = await VisitRequest.find({})
       .sort({ createdAt: -1 })
-      .populate('propertyId', 'basic.status')
+      .populate('propertyId', 'basic.status owner.propertyName location.area')
       .lean();
     res.json(docs.map(toApptRow));
   } catch (err) {
@@ -861,7 +887,7 @@ app.get('/api/appointments', requireAdmin, async (req, res) => {
 app.patch('/api/appointments/:id', requireAdmin, async (req, res) => {
   try {
     const { status } = req.body || {};
-    const STATUS_MAP = { pending: 'Pending', confirmed: 'Confirmed', cancelled: 'Cancelled', completed: 'Completed' };
+    const STATUS_MAP = { pending:'Pending', confirmed:'Confirmed', cancelled:'Cancelled', completed:'Completed' };
     const mapped = STATUS_MAP[String(status || '').toLowerCase()];
     if (!mapped) return res.status(400).json({ message: 'Invalid status' });
     const visit = await VisitRequest.findByIdAndUpdate(req.params.id, { status: mapped }, { new: true });
@@ -890,12 +916,11 @@ app.patch('/api/appointments/:id/remarks', requireAdmin, async (req, res) => {
 
 app.delete('/api/appointments/:id/remarks/:idx', requireAdmin, async (req, res) => {
   try {
-    const idx = Number(req.params.idx);
+    const idx   = Number(req.params.idx);
     const visit = await VisitRequest.findById(req.params.id);
     if (!visit) return res.status(404).json({ message: 'Appointment not found' });
-    if (!Number.isInteger(idx) || idx < 0 || idx >= visit.remarks.length) {
+    if (!Number.isInteger(idx) || idx < 0 || idx >= visit.remarks.length)
       return res.status(400).json({ message: 'Invalid remark index' });
-    }
     visit.remarks.splice(idx, 1);
     await visit.save();
     res.json({ message: 'Remark deleted', remarks: visit.remarks });
