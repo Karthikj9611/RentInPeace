@@ -105,10 +105,17 @@ const RemarkEntrySchema = new mongoose.Schema({
 }, { _id: false });
 
 const UserSchema = new mongoose.Schema({
-  name:      { type: String, trim: true },
-  contact:   { type: String, required: true, unique: true, trim: true, lowercase: true },
+  name:      { type: String, trim: true }, // derived as `${firstName} ${lastName}`.trim(), kept for backward compat with existing UI code
+  firstName: { type: String, trim: true },
+  lastName:  { type: String, trim: true },
+  email:     { type: String, trim: true, lowercase: true, sparse: true, unique: true },
+  mobile:    { type: String, trim: true, sparse: true, unique: true },
   password:  { type: String, required: true },
   remarks:   { type: [RemarkEntrySchema], default: [] },
+  // Human-readable unique id, same pattern as Property.propertyId (e.g. USER-000001).
+  // This is a *display* identifier, distinct from the Mongo _id. Session docs
+  // (UserSession) store this alongside the ObjectId reference — see below.
+  userId:    { type: String, unique: true, sparse: true, index: true },
   createdAt: { type: Date, default: Date.now }
 });
 const User = mongoose.model('User', UserSchema);
@@ -129,22 +136,32 @@ const userAuthLimiter = rateLimit({
 const USER_SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 const UserSessionSchema = new mongoose.Schema({
-  key:       { type: String, required: true, unique: true, index: true },
-  userId:    { type: mongoose.Schema.Types.ObjectId, required: true, index: true },
-  expiresAt: { type: Date, required: true, expires: 0 }, // TTL index: Mongo auto-deletes once expiresAt passes
+  key:            { type: String, required: true, unique: true, index: true },
+  userObjectId:   { type: mongoose.Schema.Types.ObjectId, required: true, index: true }, // Mongo _id — used internally for querying other collections
+  userId:         { type: String, default: null, index: true }, // human-readable User.userId (e.g. USER-000001), stored for readability/lookups in the DB
+  expiresAt:      { type: Date, required: true, expires: 0 }, // TTL index: Mongo auto-deletes once expiresAt passes
 });
 const UserSession = mongoose.model('UserSession', UserSessionSchema);
 
-async function issueUserSession(userId) {
+// Takes the full user document so the session can carry both the Mongo _id
+// (used internally to query Property/VisitRequest/etc, all of which reference
+// users by ObjectId) and the human-readable userId (for admins browsing the
+// usersessions collection directly).
+async function issueUserSession(user) {
   const key = crypto.randomBytes(32).toString('hex');
-  await UserSession.create({ key, userId, expiresAt: new Date(Date.now() + USER_SESSION_TTL_MS) });
+  await UserSession.create({
+    key,
+    userObjectId: user._id,
+    userId:       user.userId || null,
+    expiresAt:    new Date(Date.now() + USER_SESSION_TTL_MS),
+  });
   return key;
 }
 
 async function getUserIdFromSession(key) {
   if (!key) return null;
   const session = await UserSession.findOne({ key, expiresAt: { $gt: new Date() } }).lean();
-  return session ? String(session.userId) : null;
+  return session ? String(session.userObjectId) : null;
 }
 
 // Middleware to protect routes that require a logged-in user.
@@ -180,17 +197,47 @@ async function attachUserIfPresent(req, res, next) {
 // ── User Signup ──
 app.post('/api/user/signup', userAuthLimiter, async (req, res) => {
   try {
-    const { name, contact, password } = req.body || {};
-    if (!contact || !password) return res.status(400).json({ message: 'Contact and password are required' });
-    if (password.length < 6) return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    const { firstName, lastName, email, mobile, password, confirmPassword } = req.body || {};
 
-    const existing = await User.findOne({ contact: contact.toLowerCase().trim() });
-    if (existing) return res.status(409).json({ message: 'Account already exists. Please log in.' });
+    if (!firstName || !String(firstName).trim()) return res.status(400).json({ message: 'First name is required' });
+    if (!lastName  || !String(lastName).trim())  return res.status(400).json({ message: 'Last name is required' });
+    if (!email     || !String(email).trim())     return res.status(400).json({ message: 'Email is required' });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim())) return res.status(400).json({ message: 'Please enter a valid email address' });
+    if (!mobile    || !String(mobile).trim())    return res.status(400).json({ message: 'Mobile number is required' });
+    if (!/^[\d+\-\s]{7,15}$/.test(String(mobile).trim())) return res.status(400).json({ message: 'Please enter a valid mobile number' });
+    if (!password || password.length < 6) return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    if (password !== confirmPassword) return res.status(400).json({ message: 'Passwords do not match' });
+
+    const cleanEmail  = String(email).toLowerCase().trim();
+    const cleanMobile = String(mobile).trim();
+
+    const [existingEmail, existingMobile] = await Promise.all([
+      User.findOne({ email: cleanEmail }),
+      User.findOne({ mobile: cleanMobile }),
+    ]);
+    if (existingEmail)  return res.status(409).json({ message: 'Account already exists for this email. Please log in.' });
+    if (existingMobile) return res.status(409).json({ message: 'Account already exists for this mobile number. Please log in.' });
 
     const hashed = await bcrypt.hash(password, 10);
-    const user = await User.create({ name: name?.trim(), contact: contact.toLowerCase().trim(), password: hashed });
-    const userKey = await issueUserSession(user._id);
-    return res.status(201).json({ message: 'Account created successfully', userId: user._id, name: user.name, contact: user.contact, userKey });
+    const userId = await nextSequenceId('USER');
+    const name = `${String(firstName).trim()} ${String(lastName).trim()}`.trim();
+    const user = await User.create({
+      firstName: String(firstName).trim(),
+      lastName:  String(lastName).trim(),
+      name,
+      email:     cleanEmail,
+      mobile:    cleanMobile,
+      password:  hashed,
+      userId,
+    });
+    const userKey = await issueUserSession(user);
+    return res.status(201).json({
+      message: 'Account created successfully',
+      _id: user._id, userId: user.userId,
+      firstName: user.firstName, lastName: user.lastName, name: user.name,
+      email: user.email, mobile: user.mobile,
+      userKey,
+    });
   } catch (err) {
     console.error('Signup error:', err);
     res.status(500).json({ message: 'Server error. Please try again.' });
@@ -203,14 +250,24 @@ app.post('/api/user/login', userAuthLimiter, async (req, res) => {
     const { contact, password } = req.body || {};
     if (!contact || !password) return res.status(400).json({ message: 'Please enter your details' });
 
-    const user = await User.findOne({ contact: contact.toLowerCase().trim() });
+    // 'contact' is whatever the person typed into the single "Phone or email"
+    // field — figure out which one it is and match the corresponding column.
+    const identifier = String(contact).toLowerCase().trim();
+    const query = identifier.includes('@') ? { email: identifier } : { mobile: identifier };
+    const user = await User.findOne(query);
     if (!user) return res.status(401).json({ message: 'No account found. Please sign up.' });
 
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(401).json({ message: 'Incorrect password' });
 
-    const userKey = await issueUserSession(user._id);
-    return res.json({ message: 'Logged in successfully', userId: user._id, name: user.name, contact: user.contact, userKey });
+    const userKey = await issueUserSession(user);
+    return res.json({
+      message: 'Logged in successfully',
+      _id: user._id, userId: user.userId,
+      firstName: user.firstName, lastName: user.lastName, name: user.name,
+      email: user.email, mobile: user.mobile,
+      userKey,
+    });
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ message: 'Server error. Please try again.' });
@@ -234,29 +291,42 @@ app.get('/api/user/me', requireUser, async (req, res) => {
   try {
     const user = await User.findById(req.userId).lean();
     if (!user) return res.status(404).json({ message: 'User not found' });
-    res.json({ userId: user._id, name: user.name || '', contact: user.contact, createdAt: user.createdAt });
+    res.json({
+      _id: user._id, userId: user.userId || '',
+      firstName: user.firstName || '', lastName: user.lastName || '', name: user.name || '',
+      email: user.email || '', mobile: user.mobile || '',
+      createdAt: user.createdAt,
+    });
   } catch (err) {
     console.error('GET /api/user/me error:', err);
     res.status(500).json({ message: 'Server error. Please try again.' });
   }
 });
 
-// ── UPDATE current user profile (name / contact) ──
+// ── UPDATE current user profile (name / email / mobile) ──
 app.put('/api/user/me', requireUser, async (req, res) => {
   try {
-    const { name, contact } = req.body || {};
+    const { name, email, mobile } = req.body || {};
     const update = {};
     if (name !== undefined) update.name = String(name).trim();
-    if (contact !== undefined) {
-      const cleanContact = String(contact).toLowerCase().trim();
-      if (!cleanContact) return res.status(400).json({ message: 'Contact cannot be empty' });
-      const existing = await User.findOne({ contact: cleanContact, _id: { $ne: req.userId } });
-      if (existing) return res.status(409).json({ message: 'That phone/email is already in use by another account' });
-      update.contact = cleanContact;
+    if (email !== undefined) {
+      const cleanEmail = String(email).toLowerCase().trim();
+      if (!cleanEmail) return res.status(400).json({ message: 'Email cannot be empty' });
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) return res.status(400).json({ message: 'Please enter a valid email address' });
+      const existing = await User.findOne({ email: cleanEmail, _id: { $ne: req.userId } });
+      if (existing) return res.status(409).json({ message: 'That email is already in use by another account' });
+      update.email = cleanEmail;
+    }
+    if (mobile !== undefined) {
+      const cleanMobile = String(mobile).trim();
+      if (!cleanMobile) return res.status(400).json({ message: 'Mobile number cannot be empty' });
+      const existing = await User.findOne({ mobile: cleanMobile, _id: { $ne: req.userId } });
+      if (existing) return res.status(409).json({ message: 'That mobile number is already in use by another account' });
+      update.mobile = cleanMobile;
     }
     const user = await User.findByIdAndUpdate(req.userId, update, { new: true });
     if (!user) return res.status(404).json({ message: 'User not found' });
-    res.json({ message: 'Profile updated', userId: user._id, name: user.name || '', contact: user.contact });
+    res.json({ message: 'Profile updated', _id: user._id, name: user.name || '', email: user.email || '', mobile: user.mobile || '' });
   } catch (err) {
     console.error('PUT /api/user/me error:', err);
     res.status(500).json({ message: 'Server error. Please try again.' });
@@ -414,14 +484,22 @@ const Counter = mongoose.model('Counter', CounterSchema);
 
 const PROPERTY_ID_PREFIX = { 'For Rent': 'RENT', 'Lease': 'LEASE', 'PG': 'PG' };
 
-async function nextPropertyId(status) {
-  const prefix = PROPERTY_ID_PREFIX[status] || 'PROP';
+// Generic version of the same atomic-counter trick, reused below for
+// visitId (VisitRequest) and userId (User) — same Counter collection,
+// keyed by whatever prefix is passed in, so each entity type counts
+// independently of the others.
+async function nextSequenceId(prefix) {
   const counter = await Counter.findOneAndUpdate(
     { _id: prefix },
     { $inc: { seq: 1 } },
     { new: true, upsert: true }
   );
   return `${prefix}-${String(counter.seq).padStart(6, '0')}`; // e.g. RENT-000123
+}
+
+async function nextPropertyId(status) {
+  const prefix = PROPERTY_ID_PREFIX[status] || 'PROP';
+  return nextSequenceId(prefix);
 }
 
 const PropertySchema = new mongoose.Schema({
@@ -451,10 +529,13 @@ const Property = mongoose.model('Property', PropertySchema);
 
 // ── Visit Request Schema (from the "Schedule a Visit" modal) ──
 const VisitRequestSchema = new mongoose.Schema({
+  // Human-readable unique id, same pattern as Property.propertyId (e.g. VISIT-000001).
+  visitId:      { type: String, unique: true, sparse: true, index: true },
   propertyId:   { type: mongoose.Schema.Types.ObjectId, ref: 'Property', required: true, index: true },
   userId:       { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true },
   visitorName:  { type: String, required: true, trim: true },
   visitorPhone: { type: String, required: true, trim: true },
+  email:        { type: String, default: '', trim: true, lowercase: true }, // preloaded from the logged-in user's account email
   note:         { type: String, default: '', trim: true },
   visitDate:    { type: String, required: true }, // 'YYYY-MM-DD'
   visitTime:    { type: String, required: true }, // 'HH:MM'
@@ -670,7 +751,7 @@ const visitLimiter = rateLimit({
 
 app.post('/api/visits', visitLimiter, requireUser, async (req, res) => {
   try {
-    const { propertyId, visitorName, visitorPhone, note, visitDate, visitTime } = req.body || {};
+    const { propertyId, visitorName, visitorPhone, email, note, visitDate, visitTime } = req.body || {};
 
     if (!propertyId || !mongoose.Types.ObjectId.isValid(propertyId)) {
       return res.status(400).json({ message: 'A valid propertyId is required' });
@@ -691,11 +772,15 @@ app.post('/api/visits', visitLimiter, requireUser, async (req, res) => {
     const property = await Property.findById(propertyId).lean();
     if (!property) return res.status(404).json({ message: 'Property not found' });
 
+    const visitId = await nextSequenceId('VISIT');
+
     const visit = await VisitRequest.create({
+      visitId,
       propertyId,
       userId:       req.userId || null,
       visitorName:  String(visitorName).trim(),
       visitorPhone: String(visitorPhone).trim(),
+      email:        email ? String(email).trim().toLowerCase() : '',
       note:         note ? String(note).trim().slice(0, 1000) : '',
       visitDate,
       visitTime,
@@ -767,11 +852,6 @@ app.patch('/api/admin/visits/:id/status', requireAdmin, async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────
 // ── ADMIN: CUSTOMERS GRID ──
 // ─────────────────────────────────────────────────────────────────────────
-function splitContact(contact) {
-  const c = String(contact || '');
-  return c.includes('@') ? { mobile: '', email: c } : { mobile: c, email: '' };
-}
-
 app.get('/api/users', requireAdmin, async (req, res) => {
   try {
     const users = await User.find({}).sort({ createdAt: -1 }).lean();
@@ -791,21 +871,20 @@ app.get('/api/users', requireAdmin, async (req, res) => {
     const propMap  = Object.fromEntries(propAgg.map(x  => [String(x._id), x.count]));
     const visitMap = Object.fromEntries(visitAgg.map(x => [String(x._id), x.count]));
 
-    const rows = users.map(u => {
-      const { mobile, email } = splitContact(u.contact);
-      return {
-        _id:           u._id,
-        name:          u.name || '',
-        mobile,
-        email,
-        contact:       u.contact || '',
-        password:      u.password || '',
-        remarks:       u.remarks || [],
-        listingsCount: propMap[String(u._id)]  || 0,
-        visitsCount:   visitMap[String(u._id)] || 0,
-        createdAt:     u.createdAt,
-      };
-    });
+    const rows = users.map(u => ({
+      _id:           u._id,
+      userId:        u.userId || '',
+      name:          u.name || '',
+      firstName:     u.firstName || '',
+      lastName:      u.lastName || '',
+      mobile:        u.mobile || '',
+      email:         u.email  || '',
+      password:      u.password || '',
+      remarks:       u.remarks || [],
+      listingsCount: propMap[String(u._id)]  || 0,
+      visitsCount:   visitMap[String(u._id)] || 0,
+      createdAt:     u.createdAt,
+    }));
 
     res.json(rows);
   } catch (err) {
@@ -815,12 +894,12 @@ app.get('/api/users', requireAdmin, async (req, res) => {
 });
 
 async function findUserByMobileOrId(key) {
-  const decoded = decodeURIComponent(key || '');
+  const decoded = decodeURIComponent(key || '').toLowerCase().trim();
   if (mongoose.Types.ObjectId.isValid(decoded)) {
     const byId = await User.findById(decoded);
     if (byId) return byId;
   }
-  return User.findOne({ contact: decoded.toLowerCase().trim() });
+  return User.findOne({ $or: [{ mobile: decoded }, { email: decoded }] });
 }
 
 app.delete('/api/users/mobile/:mobile', requireAdmin, async (req, res) => {
@@ -895,6 +974,7 @@ function toApptRow(doc) {
   const purpose      = (prop && prop.basic    && prop.basic.status)       || 'General Enquiry';
   return {
     _id:             doc._id,
+    visitId:         doc.visitId      || '',
     name:            doc.visitorName  || '',
     mobile:          doc.visitorPhone || '',
     email:           doc.email        || '',

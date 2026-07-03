@@ -2851,9 +2851,15 @@ ul{list-style:none}
       <label class="form-label">Your name</label>
       <input class="form-input" type="text" id="sched-name" placeholder="e.g. Priya Sharma" />
     </div>
-    <div class="form-group">
-      <label class="form-label">Your phone</label>
-      <input class="form-input" type="tel" id="sched-phone" placeholder="e.g. 9876543210" />
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Your phone</label>
+        <input class="form-input" type="tel" id="sched-phone" placeholder="e.g. 9876543210" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your email</label>
+        <input class="form-input" type="email" id="sched-email" placeholder="you@email.com" />
+      </div>
     </div>
     <div class="form-group">
       <label class="form-label">Note (optional)</label>
@@ -3239,18 +3245,44 @@ ul{list-style:none}
     </div>
 
     <div id="authSignupNameField" style="display:none">
-      <div class="form-group">
-        <label class="form-label">Full name</label>
-        <input class="form-input" type="text" id="auth-name" placeholder="Your name" />
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">First name</label>
+          <input class="form-input" type="text" id="auth-firstname" placeholder="First name" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last name</label>
+          <input class="form-input" type="text" id="auth-lastname" placeholder="Last name" />
+        </div>
       </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Phone or email</label>
-      <input class="form-input" type="text" id="auth-contact" placeholder="98765 43210 or you@email.com" />
+    <div id="authLoginContactField">
+      <div class="form-group">
+        <label class="form-label">Phone or email</label>
+        <input class="form-input" type="text" id="auth-contact" placeholder="98765 43210 or you@email.com" />
+      </div>
+    </div>
+    <div id="authSignupContactFields" style="display:none">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" id="auth-email" placeholder="you@email.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mobile number</label>
+          <input class="form-input" type="tel" id="auth-mobile" placeholder="98765 43210" />
+        </div>
+      </div>
     </div>
     <div class="form-group">
       <label class="form-label">Password</label>
       <input class="form-input" type="password" id="auth-password" placeholder="••••••••" />
+    </div>
+    <div id="authSignupConfirmField" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Re-enter password</label>
+        <input class="form-input" type="password" id="auth-confirm-password" placeholder="••••••••" />
+      </div>
     </div>
     <div id="authForgotRow" style="text-align:right;margin-bottom:6px">
       <span style="font-size:12px;color:var(--brand);font-weight:600;cursor:pointer" onclick="showToast('Password reset link sent (demo)')">Forgot password?</span>
@@ -3330,8 +3362,17 @@ ul{list-style:none}
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
               </div>
               <div>
-                <div class="profile-info-tile-label">Phone or email</div>
-                <div class="profile-info-tile-value" id="profileTileContact">—</div>
+                <div class="profile-info-tile-label">Email</div>
+                <div class="profile-info-tile-value" id="profileTileEmail">—</div>
+              </div>
+            </div>
+            <div class="profile-info-tile">
+              <div class="profile-info-tile-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              </div>
+              <div>
+                <div class="profile-info-tile-label">Mobile</div>
+                <div class="profile-info-tile-value" id="profileTileMobile">—</div>
               </div>
             </div>
           </div>
@@ -3346,8 +3387,12 @@ ul{list-style:none}
             <input class="form-input" type="text" id="profile-edit-name" placeholder="Your name" />
           </div>
           <div class="form-group">
-            <label class="form-label">Phone or email</label>
-            <input class="form-input" type="text" id="profile-edit-contact" placeholder="98765 43210 or you@email.com" />
+            <label class="form-label">Email</label>
+            <input class="form-input" type="email" id="profile-edit-email" placeholder="you@email.com" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mobile number</label>
+            <input class="form-input" type="tel" id="profile-edit-mobile" placeholder="98765 43210" />
           </div>
           <div class="profile-save-row">
             <button class="profile-btn-secondary" onclick="exitProfileEditMode()">Cancel</button>
@@ -5789,8 +5834,10 @@ function openScheduleModal(propId) {
   const user = getLoggedInUser();
   document.getElementById('sched-date').value = '';
   document.getElementById('sched-time').value = '';
-  document.getElementById('sched-name').value = (user && user.name) || '';
-  document.getElementById('sched-phone').value = (user && /^[\d+\-\s]{7,}$/.test(user.contact || '')) ? user.contact : '';
+  const preloadName = (user && `${user.firstName || ''} ${user.lastName || ''}`.trim()) || (user && user.name) || '';
+  document.getElementById('sched-name').value = preloadName;
+  document.getElementById('sched-phone').value = (user && user.mobile) || '';
+  document.getElementById('sched-email').value = (user && user.email) || '';
   document.getElementById('sched-note').value = '';
   // default the date picker's minimum to today so past dates can't be picked
   const today = new Date().toISOString().split('T')[0];
@@ -5809,6 +5856,7 @@ async function submitScheduleVisit() {
   const time  = document.getElementById('sched-time').value;
   const name  = document.getElementById('sched-name').value.trim();
   const phone = document.getElementById('sched-phone').value.trim();
+  const email = document.getElementById('sched-email').value.trim();
   const note  = document.getElementById('sched-note').value.trim();
 
   if (!date || !time) {
@@ -5833,6 +5881,7 @@ async function submitScheduleVisit() {
         propertyId:   scheduleForPropId,
         visitorName:  name,
         visitorPhone: phone,
+        email,
         note,
         visitDate:    date,
         visitTime:    time,
@@ -5983,11 +6032,12 @@ function closeAuthModal() {
 function openProfileModal() {
   const user = getLoggedInUser();
   if (!user) return;
-  document.getElementById('profileAvatarLg').textContent = (user.name || user.contact || '?')[0].toUpperCase();
+  document.getElementById('profileAvatarLg').textContent = (user.name || user.email || '?')[0].toUpperCase();
   document.getElementById('profileModalName').textContent = user.name || 'User';
-  document.getElementById('profileModalContact').textContent = user.contact || '';
+  document.getElementById('profileModalContact').textContent = user.email || '';
   document.getElementById('profileTileName').textContent = user.name || '—';
-  document.getElementById('profileTileContact').textContent = user.contact || '—';
+  document.getElementById('profileTileEmail').textContent = user.email || '—';
+  document.getElementById('profileTileMobile').textContent = user.mobile || '—';
   document.getElementById('profileModal').classList.add('open');
   document.body.style.overflow = 'hidden';
   switchProfileTab('info');
@@ -6042,7 +6092,7 @@ function updateNavAuth() {
     navBtn.innerHTML = '';
     document.getElementById('menuAvatar').textContent = (user.name || 'U')[0].toUpperCase();
     document.getElementById('menuUserName').textContent = user.name || 'User';
-    document.getElementById('menuUserSub').textContent = user.contact || 'Logged in';
+    document.getElementById('menuUserSub').textContent = user.email || 'Logged in';
     document.getElementById('menuAuthLabel').textContent = 'My Profile / Log out';
   } else {
     navBtn.innerHTML = '';
@@ -6058,6 +6108,9 @@ function switchAuthTab(tab) {
   document.getElementById('authTabLogin').classList.toggle('active', isLogin);
   document.getElementById('authTabSignup').classList.toggle('active', !isLogin);
   document.getElementById('authSignupNameField').style.display = isLogin ? 'none' : '';
+  document.getElementById('authLoginContactField').style.display = isLogin ? '' : 'none';
+  document.getElementById('authSignupContactFields').style.display = isLogin ? 'none' : '';
+  document.getElementById('authSignupConfirmField').style.display = isLogin ? 'none' : '';
   document.getElementById('authForgotRow').style.display = isLogin ? '' : 'none';
   document.getElementById('authModalTitle').textContent = isLogin ? 'Welcome back' : 'Create your account';
   document.getElementById('authSubmitBtn').textContent = isLogin ? 'Log in' : 'Sign up';
@@ -6066,21 +6119,36 @@ function switchAuthTab(tab) {
     : 'Already have an account? <a onclick="switchAuthTab(\'login\')">Log in</a>';
 }
 async function submitAuth() {
-  const contact  = document.getElementById('auth-contact').value.trim();
-  const password = document.getElementById('auth-password').value;
   const isLogin  = document.getElementById('authTabLogin').classList.contains('active');
-  const name     = document.getElementById('auth-name').value.trim();
-
-  if (!contact || !password) { showToast('Please fill in your details'); return; }
-  if (!isLogin && !name)     { showToast('Please enter your name'); return; }
+  const password = document.getElementById('auth-password').value;
 
   const btn = document.getElementById('authSubmitBtn');
+  let body;
+
+  if (isLogin) {
+    const contact = document.getElementById('auth-contact').value.trim();
+    if (!contact || !password) { showToast('Please fill in your details'); return; }
+    body = { contact, password };
+  } else {
+    const firstName       = document.getElementById('auth-firstname').value.trim();
+    const lastName        = document.getElementById('auth-lastname').value.trim();
+    const email            = document.getElementById('auth-email').value.trim();
+    const mobile            = document.getElementById('auth-mobile').value.trim();
+    const confirmPassword = document.getElementById('auth-confirm-password').value;
+
+    if (!firstName || !lastName) { showToast('Please enter your first and last name'); return; }
+    if (!email)  { showToast('Please enter your email'); return; }
+    if (!mobile) { showToast('Please enter your mobile number'); return; }
+    if (!password) { showToast('Please enter a password'); return; }
+    if (password !== confirmPassword) { showToast('Passwords do not match'); return; }
+    body = { firstName, lastName, email, mobile, password, confirmPassword };
+  }
+
   btn.disabled = true;
   btn.textContent = isLogin ? 'Logging in…' : 'Creating account…';
 
   try {
     const endpoint = isLogin ? '/api/user/login' : '/api/user/signup';
-    const body     = isLogin ? { contact, password } : { name, contact, password };
     const res      = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -6092,7 +6160,10 @@ async function submitAuth() {
       return;
     }
     sessionStorage.setItem('quatar_user', JSON.stringify({
-      id: data.userId, name: data.name, contact: data.contact, userKey: data.userKey
+      id: data._id, userId: data.userId,
+      firstName: data.firstName, lastName: data.lastName, name: data.name,
+      email: data.email, mobile: data.mobile,
+      userKey: data.userKey
     }));
     closeAuthModal();
     updateNavAuth();
@@ -6122,13 +6193,14 @@ function switchProfileTab(tab) {
 }
 
 /* ═══════════════════════════════════════════════
-   PROFILE MODAL — EDIT NAME / CONTACT
+   PROFILE MODAL — EDIT NAME / EMAIL / MOBILE
 ═══════════════════════════════════════════════ */
 function enterProfileEditMode() {
   const user = getLoggedInUser();
   if (!user) return;
   document.getElementById('profile-edit-name').value = user.name || '';
-  document.getElementById('profile-edit-contact').value = user.contact || '';
+  document.getElementById('profile-edit-email').value = user.email || '';
+  document.getElementById('profile-edit-mobile').value = user.mobile || '';
   document.getElementById('profileViewMode').style.display = 'none';
   document.getElementById('profileEditMode').style.display = '';
   document.getElementById('passwordEditMode').style.display = 'none';
@@ -6138,9 +6210,11 @@ function exitProfileEditMode() {
   document.getElementById('profileEditMode').style.display = 'none';
 }
 async function saveProfileEdits() {
-  const name    = document.getElementById('profile-edit-name').value.trim();
-  const contact = document.getElementById('profile-edit-contact').value.trim();
-  if (!contact) { showToast('Contact cannot be empty'); return; }
+  const name   = document.getElementById('profile-edit-name').value.trim();
+  const email  = document.getElementById('profile-edit-email').value.trim();
+  const mobile = document.getElementById('profile-edit-mobile').value.trim();
+  if (!email)  { showToast('Email cannot be empty'); return; }
+  if (!mobile) { showToast('Mobile number cannot be empty'); return; }
 
   const btn = document.getElementById('profileSaveBtn');
   btn.disabled = true;
@@ -6149,21 +6223,23 @@ async function saveProfileEdits() {
     const res = await fetch('/api/user/me', {
       method: 'PUT',
       headers: userAuthHeaders({ 'Content-Type': 'application/json' }),
-      body: JSON.stringify({ name, contact })
+      body: JSON.stringify({ name, email, mobile })
     });
     const data = await res.json();
     if (!res.ok) { showToast(data.message || 'Could not update profile'); return; }
 
     const user = getLoggedInUser();
     user.name = data.name;
-    user.contact = data.contact;
+    user.email = data.email;
+    user.mobile = data.mobile;
     sessionStorage.setItem('quatar_user', JSON.stringify(user));
 
-    document.getElementById('profileAvatarLg').textContent = (user.name || user.contact || '?')[0].toUpperCase();
+    document.getElementById('profileAvatarLg').textContent = (user.name || user.email || '?')[0].toUpperCase();
     document.getElementById('profileModalName').textContent = user.name || 'User';
-    document.getElementById('profileModalContact').textContent = user.contact || '';
+    document.getElementById('profileModalContact').textContent = user.email || '';
     document.getElementById('profileTileName').textContent = user.name || '—';
-    document.getElementById('profileTileContact').textContent = user.contact || '—';
+    document.getElementById('profileTileEmail').textContent = user.email || '—';
+    document.getElementById('profileTileMobile').textContent = user.mobile || '—';
     updateNavAuth();
     exitProfileEditMode();
     showToast('Profile updated');
