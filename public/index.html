@@ -4077,12 +4077,23 @@ let PROPERTIES = [];
    Stored in localStorage so a page refresh reads back
    the same counts instead of resetting or reseeding. */
 const VIEWS_KEY = 'quatar_property_views';
+// Ids already counted as a view *for this browser*. Checked before every
+// increment so opening the same card again (or refreshing the page and
+// reopening it) doesn't bump the count a second time — each property only
+// adds +1 the first time this browser ever opens it.
+const VIEWS_SEEN_KEY = 'quatar_property_views_seen';
 let viewCounts = {};
+let viewedSeen = new Set();
 (function loadViewCounts() {
   try {
     viewCounts = JSON.parse(localStorage.getItem(VIEWS_KEY)) || {};
   } catch (e) {
     viewCounts = {};
+  }
+  try {
+    viewedSeen = new Set(JSON.parse(localStorage.getItem(VIEWS_SEEN_KEY)) || []);
+  } catch (e) {
+    viewedSeen = new Set();
   }
 })();
 function saveViewCounts() {
@@ -4090,10 +4101,19 @@ function saveViewCounts() {
     localStorage.setItem(VIEWS_KEY, JSON.stringify(viewCounts));
   } catch (e) { /* storage unavailable — counts still work for this session */ }
 }
+function saveViewedSeen() {
+  try {
+    localStorage.setItem(VIEWS_SEEN_KEY, JSON.stringify([...viewedSeen]));
+  } catch (e) { /* storage unavailable — counts still work for this session */ }
+}
 function getViews(p) {
   return viewCounts[p.id] || 0;
 }
 function incrementViews(p) {
+  const key = String(p.id);
+  if (viewedSeen.has(key)) return getViews(p); // already counted for this browser — reopening or refreshing shouldn't bump it again
+  viewedSeen.add(key);
+  saveViewedSeen();
   viewCounts[p.id] = getViews(p) + 1;
   saveViewCounts();
   return viewCounts[p.id];
