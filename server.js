@@ -164,14 +164,26 @@ async function getUserIdFromSession(key) {
   return session ? String(session.userObjectId) : null;
 }
 
+// Same lookup as getUserIdFromSession, but returns both the Mongo _id and the
+// human-readable User.userId (e.g. USER-000001) in one query — the session
+// doc already stores both (see issueUserSession above), so no extra User
+// lookup is needed. Used wherever a created doc should be stamped with both.
+async function getSessionUserIds(key) {
+  if (!key) return { userId: null, userReadableId: null };
+  const session = await UserSession.findOne({ key, expiresAt: { $gt: new Date() } }).lean();
+  if (!session) return { userId: null, userReadableId: null };
+  return { userId: String(session.userObjectId), userReadableId: session.userId || null };
+}
+
 // Middleware to protect routes that require a logged-in user.
-// Attaches req.userId when the session is valid.
+// Attaches req.userId (ObjectId string) and req.userReadableId (e.g. USER-000001) when the session is valid.
 async function requireUser(req, res, next) {
   try {
     const key = (req.headers['x-user-key'] || '').toString();
-    const userId = await getUserIdFromSession(key);
+    const { userId, userReadableId } = await getSessionUserIds(key);
     if (!userId) return res.status(401).json({ message: 'Please log in to continue' });
     req.userId = userId;
+    req.userReadableId = userReadableId;
     next();
   } catch (err) {
     console.error('requireUser error:', err);
@@ -180,16 +192,20 @@ async function requireUser(req, res, next) {
 }
 
 // Like requireUser, but never blocks the request — just attaches req.userId
-// if a valid session key was sent (null otherwise). Used on routes that must
-// still work for guests, e.g. submitting a listing while logged out.
+// (and req.userReadableId) if a valid session key was sent (null otherwise).
+// Used on routes that must still work for guests, e.g. submitting a listing
+// while logged out.
 async function attachUserIfPresent(req, res, next) {
   try {
     const key = (req.headers['x-user-key'] || '').toString();
-    req.userId = await getUserIdFromSession(key);
+    const { userId, userReadableId } = await getSessionUserIds(key);
+    req.userId = userId;
+    req.userReadableId = userReadableId;
     next();
   } catch (err) {
     console.error('attachUserIfPresent error:', err);
     req.userId = null;
+    req.userReadableId = null;
     next();
   }
 }
@@ -516,6 +532,7 @@ const PropertySchema = new mongoose.Schema({
   // ── Meta (kept top-level / flat — not part of the submitted payload) ──
   propertyId:       { type: String, unique: true, sparse: true, index: true }, // e.g. RENT-000123 / LEASE-000045 / PG-000012
   userId:           { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true }, // owner of this listing, null = posted while logged out
+  userReadableId:   { type: String, default: null, index: true }, // human-readable User.userId (e.g. USER-000001), stamped at creation for admin readability — same pattern as UserSession.userId
   promoted:         { type: Boolean, default: false },
   promotedPriority: { type: Number,  default: 3 },
   views:            { type: Number,  default: 0 },
@@ -533,6 +550,7 @@ const VisitRequestSchema = new mongoose.Schema({
   visitId:      { type: String, unique: true, sparse: true, index: true },
   propertyId:   { type: mongoose.Schema.Types.ObjectId, ref: 'Property', required: true, index: true },
   userId:       { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true },
+  userReadableId: { type: String, default: null, index: true }, // human-readable User.userId (e.g. USER-000001), stamped at creation for admin readability — same pattern as UserSession.userId
   visitorName:  { type: String, required: true, trim: true },
   visitorPhone: { type: String, required: true, trim: true },
   email:        { type: String, default: '', trim: true, lowercase: true }, // preloaded from the logged-in user's account email
@@ -681,7 +699,8 @@ app.post('/api/properties', listingLimiter, requireUser, async (req, res) => {
 
     const prop = new Property({
       propertyId,
-      userId:    req.userId || null, // links the listing to its creator when logged in
+      userId:         req.userId || null, // links the listing to its creator when logged in
+      userReadableId: req.userReadableId || null, // e.g. USER-000001, for admin readability
       basic:     fields.basic,
       location:  fields.location,
       owner:     fields.owner,
@@ -777,7 +796,8 @@ app.post('/api/visits', visitLimiter, requireUser, async (req, res) => {
     const visit = await VisitRequest.create({
       visitId,
       propertyId,
-      userId:       req.userId || null,
+      userId:         req.userId || null,
+      userReadableId: req.userReadableId || null, // e.g. USER-000001, for admin readability
       visitorName:  String(visitorName).trim(),
       visitorPhone: String(visitorPhone).trim(),
       email:        email ? String(email).trim().toLowerCase() : '',
@@ -990,6 +1010,7 @@ function toApptRow(doc) {
     status:          String(doc.status || 'Pending').toLowerCase(),
     remarks:         doc.remarks      || [],
     userId:          doc.userId       || null,
+    userReadableId:  doc.userReadableId || '',
     createdAt:       doc.createdAt,
   };
 }
@@ -1089,6 +1110,7 @@ app.get('/api/admin/properties', requireAdmin, async (req, res) => {
       return {
         _id:          String(doc._id),
         propertyId:   doc.propertyId || '',
+        userId:       doc.userReadableId || '', // human-readable User.userId (e.g. USER-000001), blank if posted while logged out
 
         // Complete raw record (every field stored in the DB for this property,
         // nested exactly as in the schema). The flattened fields below remain
