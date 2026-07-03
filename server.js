@@ -403,6 +403,27 @@ const PgSchema = new mongoose.Schema({
   pets:          { type: String, default: null },
 }, { _id: false });
 
+// ── Counter (atomic per-type sequence for human-readable property IDs) ──
+// Using a dedicated collection with $inc (rather than e.g. Property.countDocuments()+1)
+// so two simultaneous submissions can never be handed the same number.
+const CounterSchema = new mongoose.Schema({
+  _id: { type: String, required: true }, // e.g. 'RENT' | 'LEASE' | 'PG'
+  seq: { type: Number, default: 0 },
+}, { _id: false });
+const Counter = mongoose.model('Counter', CounterSchema);
+
+const PROPERTY_ID_PREFIX = { 'For Rent': 'RENT', 'Lease': 'LEASE', 'PG': 'PG' };
+
+async function nextPropertyId(status) {
+  const prefix = PROPERTY_ID_PREFIX[status] || 'PROP';
+  const counter = await Counter.findOneAndUpdate(
+    { _id: prefix },
+    { $inc: { seq: 1 } },
+    { new: true, upsert: true }
+  );
+  return `${prefix}-${String(counter.seq).padStart(6, '0')}`; // e.g. RENT-000123
+}
+
 const PropertySchema = new mongoose.Schema({
   basic:      { type: BasicSchema,            required: true },
   location:   { type: LocationSchema,         required: true },
@@ -415,6 +436,7 @@ const PropertySchema = new mongoose.Schema({
   media:      { type: MediaSchema,            default: () => ({}) },
   pg:         { type: PgSchema }, // no default — left unset for non-PG listings so we don't store an all-null subdocument
   // ── Meta (kept top-level / flat — not part of the submitted payload) ──
+  propertyId:       { type: String, unique: true, sparse: true, index: true }, // e.g. RENT-000123 / LEASE-000045 / PG-000012
   userId:           { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true }, // owner of this listing, null = posted while logged out
   promoted:         { type: Boolean, default: false },
   promotedPriority: { type: Number,  default: 3 },
@@ -574,8 +596,10 @@ app.post('/api/properties', listingLimiter, requireUser, async (req, res) => {
     }
 
     const displayPrice = formatPrice(fields.price.rent, status);
+    const propertyId = await nextPropertyId(status);
 
     const prop = new Property({
+      propertyId,
       userId:    req.userId || null, // links the listing to its creator when logged in
       basic:     fields.basic,
       location:  fields.location,
@@ -984,6 +1008,7 @@ app.get('/api/admin/properties', requireAdmin, async (req, res) => {
 
       return {
         _id:          String(doc._id),
+        propertyId:   doc.propertyId || '',
 
         // Complete raw record (every field stored in the DB for this property,
         // nested exactly as in the schema). The flattened fields below remain

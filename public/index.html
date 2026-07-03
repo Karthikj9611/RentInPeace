@@ -504,6 +504,7 @@ ul{list-style:none}
 .prop-stat.is-off{color:var(--text-3);font-weight:500}
 .prop-stat.is-off svg{stroke:var(--border-2)}
 .prop-chip-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.prop-id{font-size:11px;font-family:monospace;color:var(--text-3);margin-top:2px;letter-spacing:.02em}
 .prop-desc-preview{margin-top:8px;font-size:12px;line-height:1.4;color:var(--text-3);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .prop-chip{
   display:inline-flex;align-items:center;gap:4px;
@@ -512,6 +513,8 @@ ul{list-style:none}
   padding:3px 8px 3px 7px;border-radius:7px;
 }
 .prop-chip svg{width:11px;height:11px;stroke:var(--text-3);fill:none;stroke-width:2;flex-shrink:0}
+.prop-chip-lbl{color:var(--brand);font-weight:600}
+.prop-chip-val{color:var(--text);font-weight:600}
 .prop-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
 .prop-tag{
   font-size:11px;background:var(--bg-2);color:var(--text-2);
@@ -4471,8 +4474,10 @@ function cardHTML(p) {
   const [bg, fg] = (colors[pType]||'#f0f0f0:#333').split(':');
   const listClass = isListView ? ' list-view' : '';
   const bathrooms = parseInt(p.property?.bathrooms) || 1;
-  const carpark = (parseInt(p.property?.car, 10) || 0) > 0;
-  const bikepark = (parseInt(p.property?.bike, 10) || 0) > 0;
+  const carCount = parseInt(p.property?.car, 10) || 0;
+  const bikeCount = parseInt(p.property?.bike, 10) || 0;
+  const carpark = carCount > 0;
+  const bikepark = bikeCount > 0;
   const lift = pHasLift(p);
   const deposit = p.price?.deposit || 0;
   const maintenance = p.price?.maintenance || 0;
@@ -4496,15 +4501,13 @@ function cardHTML(p) {
   const pets = p.rules?.pets || '';
   const nonVeg = p.rules?.nonVeg || '';
   const gas = p.rules?.gas || '';
-  const amenitiesList = p.amenities?.selected || [];
-  const amenitiesExtra = p.amenities?.extra || '';
   const desc = p.media?.desc || '';
   const video = p.media?.video || '';
   const pg = p.pg || {};
   const isPGCard = pType === 'PG';
   // Plain-text chip, no icon — used for the long tail of fields below so we're not
   // hand-drawing an SVG per field. Skips rendering entirely when value is empty.
-  const chip = (label, value) => value ? `<span class="prop-chip" title="${esc(label)}">${esc(value)}</span>` : '';
+  const chip = (label, value) => value ? `<span class="prop-chip" title="${esc(label)}"><span class="prop-chip-lbl">${esc(label)}:</span> <span class="prop-chip-val">${esc(value)}</span></span>` : '';
   const availableFmt = available ? (() => {
     const d = new Date(available);
     if (isNaN(d)) return available;
@@ -4536,6 +4539,7 @@ function cardHTML(p) {
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         <span>${esc(p.location?.area)}</span>
       </div>
+      ${p.propertyId ? `<div class="prop-id" title="Property ID">${esc(p.propertyId)}</div>` : ''}
       <div class="prop-stats">
         <span class="prop-stat" title="Configuration">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7v11M3 11h18M21 7v11M7 7v4M17 7v4"/></svg>
@@ -4549,13 +4553,13 @@ function cardHTML(p) {
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7v11M21 7v11M3 13h18M5 13V9a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4"/></svg>
           ${p.property?.furnish}
         </span>
-        <span class="prop-stat${carpark?'':' is-off'}" title="${carpark?'Car parking available':'No car parking'}">
+        <span class="prop-stat${carpark?'':' is-off'}" title="${carCount>0?carCount+' car parking spot'+(carCount>1?'s':''):'No car parking'}">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/><rect x="3" y="11" width="18" height="6" rx="2"/><circle cx="7.5" cy="17" r="1.3"/><circle cx="16.5" cy="17" r="1.3"/></svg>
-          Car
+          Car${carCount>0?' ×'+carCount:''}
         </span>
-        <span class="prop-stat${bikepark?'':' is-off'}" title="${bikepark?'Bike parking available':'No bike parking'}">
+        <span class="prop-stat${bikepark?'':' is-off'}" title="${bikeCount>0?bikeCount+' bike parking spot'+(bikeCount>1?'s':''):'No bike parking'}">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="17.5" r="3"/><circle cx="18.5" cy="17.5" r="3"/><path d="M12 17.5l2.5-7.5h3M5.5 17.5L9 9h3l2.5 4"/></svg>
-          Bike
+          Bike${bikeCount>0?' ×'+bikeCount:''}
         </span>
         ${lift ? `<span class="prop-stat" title="Lift available"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M9 9l3-3 3 3M9 15l3 3 3-3"/></svg>Lift</span>` : ''}
       </div>
@@ -4603,10 +4607,6 @@ function cardHTML(p) {
         ${chip('Piped gas', gas)}
         ${video ? `<span class="prop-chip" title="Video walkthrough available">🎥 Video</span>` : ''}
       </div>
-      ${(amenitiesList.length || amenitiesExtra) ? `<div class="prop-chip-row">
-        ${amenitiesList.map(a => `<span class="prop-chip">${esc(a)}</span>`).join('')}
-        ${amenitiesExtra ? amenitiesExtra.split(',').map(a => a.trim()).filter(Boolean).map(a => `<span class="prop-chip">${esc(a)}</span>`).join('') : ''}
-      </div>` : ''}
       ${isPGCard ? `<div class="prop-chip-row">
         ${chip('Gender', pg.gender)}
         ${chip('Room type', pg.room)}
@@ -5580,6 +5580,7 @@ function openDetail(id) {
 
   // ── Core fields (common to all types) ──
   const coreFields = [
+    mf('Property ID', p.propertyId),
     mf('Property type', prop.type),
     mf('BHK', prop.bhk),
     mf('Furnishing', prop.furnish),
