@@ -3048,7 +3048,7 @@ ul{list-style:none}
         <label class="form-label">Tenant preference</label>
         <select class="form-select" id="f-tenant"><option>Any</option><option>Family</option><option>Bachelor</option><option>Female only</option></select>
       </div>
-      <div class="form-group">
+      <div class="form-group" id="f-availWrap">
         <label class="form-label">Available from</label>
         <input class="form-input" type="date" id="f-avail" />
       </div>
@@ -3251,14 +3251,6 @@ ul{list-style:none}
 
     <button class="form-submit" id="authSubmitBtn" onclick="submitAuth()">Log in</button>
 
-    <div class="auth-divider">or continue with</div>
-    <div style="display:flex;flex-direction:column;gap:10px">
-      <button class="auth-social" onclick="showToast('OTP sent (demo)')">
-        <svg viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px;stroke:var(--text);fill:none;stroke-width:1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-        Continue with OTP
-      </button>
-    </div>
-
     <div class="auth-foot" id="authFoot">New to Quatar? <a onclick="switchAuthTab('signup')">Sign up</a></div>
   </div>
 </div>
@@ -3414,7 +3406,7 @@ ul{list-style:none}
         <label class="form-label">Rent (₹/month)</label>
         <input class="form-input" type="number" id="edit-listing-rent" />
       </div>
-      <div class="form-group">
+      <div class="form-group" id="edit-listing-depositWrap">
         <label class="form-label">Deposit (₹)</label>
         <input class="form-input" type="number" id="edit-listing-deposit" />
       </div>
@@ -3425,15 +3417,9 @@ ul{list-style:none}
     </div>
     <div class="form-group">
       <label class="form-label">Status</label>
-      <select class="form-select" id="edit-listing-status">
-        <option>For Rent</option>
-        <option>For Sale</option>
-        <option>New Launch</option>
-        <option>Sold</option>
-        <option>Booked</option>
-        <option>Lease</option>
-        <option>PG</option>
-      </select>
+      <input class="form-input" type="text" id="edit-listing-status" readonly disabled
+             style="background:#f2f2f2;color:#666;cursor:not-allowed" />
+      <span style="font-size:12px;color:#888">Listing type can't be changed here — delete and re-create the listing to switch type.</span>
     </div>
     <button class="form-submit" id="editListingSaveBtn" onclick="saveListingEdits()">Save changes</button>
   </div>
@@ -3711,7 +3697,7 @@ ul{list-style:none}
         <div class="faq-q" onclick="toggleFaq(this)">How do I reset my password?
           <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
-        <div class="faq-a">On the login screen, tap "Forgot password" and enter your registered mobile number. You'll receive an OTP to reset it.</div>
+        <div class="faq-a">On the login screen, tap "Forgot password" to receive a reset link.</div>
       </div>
 
       <div class="faq-item" data-cat="account">
@@ -4484,8 +4470,8 @@ function cardHTML(p) {
   const [bg, fg] = (colors[pType]||'#f0f0f0:#333').split(':');
   const listClass = isListView ? ' list-view' : '';
   const bathrooms = parseInt(p.property?.bathrooms) || 1;
-  const carpark = p.property?.car === 'Yes';
-  const bikepark = p.property?.bike === 'Yes';
+  const carpark = (parseInt(p.property?.car, 10) || 0) > 0;
+  const bikepark = (parseInt(p.property?.bike, 10) || 0) > 0;
   const lift = pHasLift(p);
   const deposit = p.price?.deposit || 0;
   const maintenance = p.price?.maintenance || 0;
@@ -4803,8 +4789,8 @@ function renderCompareTable() {
     { label: 'Facing', get: p => p.property?.facing },
     { label: 'Tenant preferred', get: p => p.property?.tenant },
     { label: 'Lift', get: p => yn(pHasLift(p)) },
-    { label: 'Car park', get: p => yn(p.property?.car === 'Yes') },
-    { label: 'Bike park', get: p => yn(p.property?.bike === 'Yes') },
+    { label: 'Car park', get: p => (parseInt(p.property?.car, 10) || 0) > 0 ? `${parseInt(p.property?.car, 10)}` : 'No' },
+    { label: 'Bike park', get: p => (parseInt(p.property?.bike, 10) || 0) > 0 ? `${parseInt(p.property?.bike, 10)}` : 'No' },
     { label: 'Verified', get: p => yn(!!p.verified) },
     { label: 'Amenities', get: p => {
         const list = (p.amenities?.selected || []).slice();
@@ -5340,14 +5326,14 @@ function getFiltered() {
       if (!fs.bathrooms.some(b => parseInt(b)===4 ? baths>=4 : baths===parseInt(b))) return false;
     }
     if (fs.age && !fs.age.includes(p.property?.age)) return false;
-    if (fs.negotiable && !fs.negotiable.includes(p.price?.negotiable)) return false;
+    if (fs.negotiable && !fs.negotiable.includes(String(p.price?.negotiable || '').toLowerCase())) return false;
     if (fs._availBucket) {
       const days = fdDaysFromToday(p.property?.available);
       if (days === null || !fdValueInBuckets(Math.max(days, 0), fs._availBucket)) return false;
     }
     const lift = pHasLift(p);
-    const carpark = p.property?.car === 'Yes';
-    const bikepark = p.property?.bike === 'Yes';
+    const carpark = (parseInt(p.property?.car, 10) || 0) > 0;
+    const bikepark = (parseInt(p.property?.bike, 10) || 0) > 0;
     if (fs.lift && fs.lift.includes('true') && !lift) return false;
     if (fs.carpark && fs.carpark.includes('true') && !carpark) return false;
     if (fs.bikepark && fs.bikepark.includes('true') && !bikepark) return false;
@@ -5458,8 +5444,8 @@ function openDetail(id) {
   const media = p.media || {};
   const pg = p.pg || {};
   const lift = pHasLift(p);
-  const carpark = prop.car === 'Yes';
-  const bikepark = prop.bike === 'Yes';
+  const carpark = (parseInt(prop.car, 10) || 0) > 0;
+  const bikepark = (parseInt(prop.bike, 10) || 0) > 0;
 
   // ── Hero gallery (reuses the same slider pattern as the listing cards) ──
   const imgs = (media.images && media.images.length) ? media.images : [];
@@ -5541,8 +5527,8 @@ function openDetail(id) {
     mf('Facing', prop.facing),
     mf('Age of property', prop.age),
     mf('Lift', 'lift' in prop || true ? (lift ? 'Yes' : 'No') : ''),
-    mf('Car parking', prop.car !== undefined ? (carpark ? 'Yes' : 'No') : ''),
-    mf('Bike parking', prop.bike !== undefined ? (bikepark ? 'Yes' : 'No') : ''),
+    mf('Car parking', prop.car !== undefined ? (carpark ? String(parseInt(prop.car, 10)) : 'No') : ''),
+    mf('Bike parking', prop.bike !== undefined ? (bikepark ? String(parseInt(prop.bike, 10)) : 'No') : ''),
     mf('Tenant preferred', prop.tenant),
     mf('Available from', prop.available),
   ];
@@ -5554,13 +5540,15 @@ function openDetail(id) {
     mf('Rent escalation', price.rentIncrease),
     mf('Electricity included', price.electricity),
     mf('Water charge', price.water),
-    mf('Negotiable', price.negotiable ? 'Yes' : 'No'),
+    mf('Negotiable', price.negotiable || 'Not specified'),
   ];
 
   // ── Rent / Lease terms (shared shape) ──
   const termsFields = [
     mf('Notice period', terms.notice),
     mf('Lease / agreement duration', terms.lease),
+    mf('Lease type', terms.leaseType),
+    mf('Lock-in period', terms.lockIn),
     mf('Pets allowed', rules.pets),
     mf('Non-veg allowed', rules.nonVeg),
     mf('Piped gas', rules.gas),
@@ -6191,6 +6179,10 @@ function openEditListingModal(id) {
   document.getElementById('edit-listing-deposit').value = p.price?.deposit ?? '';
   document.getElementById('edit-listing-area').value = p.location?.area || '';
   document.getElementById('edit-listing-status').value = p.basic?.status || 'For Rent';
+  // Lease listings don't collect a deposit (see price.deposit === null for Lease) —
+  // hide the field here too so this quick-edit can't reintroduce one.
+  document.getElementById('edit-listing-depositWrap').style.display =
+    (p.basic?.status === 'Lease') ? 'none' : '';
   document.getElementById('editListingModal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -6203,9 +6195,9 @@ async function saveListingEdits() {
   if (!editListingId) return;
   const name   = document.getElementById('edit-listing-name').value.trim();
   const rent   = document.getElementById('edit-listing-rent').value;
-  const deposit = document.getElementById('edit-listing-deposit').value;
+  const depositHidden = document.getElementById('edit-listing-depositWrap').style.display === 'none';
+  const deposit = depositHidden ? '' : document.getElementById('edit-listing-deposit').value;
   const area   = document.getElementById('edit-listing-area').value.trim();
-  const status = document.getElementById('edit-listing-status').value;
 
   if (!name || !area || rent === '') { showToast('Property name, area, and rent are required'); return; }
 
@@ -6219,8 +6211,8 @@ async function saveListingEdits() {
       body: JSON.stringify({
         owner: { propertyName: name },
         location: { area },
-        price: { rent: Number(rent), deposit: deposit === '' ? null : Number(deposit) },
-        basic: { status }
+        price: { rent: Number(rent), deposit: deposit === '' ? null : Number(deposit) }
+        // basic.status intentionally omitted — status can't be changed from this quick-edit modal
       })
     });
     const data = await res.json();
@@ -6901,6 +6893,9 @@ function onFTypeChange(val) {
   document.getElementById('addAmenitiesSection').style.display = isPG ? 'none' : '';
   document.getElementById('addPricingSection').style.display = isLease ? 'none' : '';
   document.getElementById('f-depositWrap').style.display = isPG ? 'none' : '';
+  // Lease has its own "Available from" dropdown in addLeaseSection — hide the
+  // Property-Details date field for Lease so there isn't a second, unused one.
+  document.getElementById('f-availWrap').style.display = isLease ? 'none' : '';
   const lbl = document.getElementById('f-rentLabel');
   if (lbl) lbl.innerHTML = (val === 'For Rent' || val === 'Rent') ? 'Monthly rent (₹) <span style="color:var(--brand)">*</span>' : isLease ? 'Token rent (₹) <span style="color:var(--brand)">*</span>' : 'Monthly charge (₹) <span style="color:var(--brand)">*</span>';
 }
@@ -6987,12 +6982,16 @@ function submitListing() {
     },
     price: isLease ? {
       rent:         parseFloat(gv('f-leaseAmount')) || 0,
-      deposit:      parseInt(document.getElementById('f-deposit').value) || 0,
+      // Deposit/electricity/water/negotiable live in #addPricingSection, which is hidden
+      // for Lease — reading them here would silently save stale/default values the user
+      // never saw or entered. Lease simply doesn't collect these, so they're sent as null.
+      deposit:      null,
+      monthlyRent:  parseFloat(gv('f-leaseMonthlyRent')) || null, // optional recurring rent on top of the lease amount
       maintenance:  parseFloat(gv('f-leaseMaintenance')) || null,
       rentIncrease: gv('f-rentEscalation') || null,
-      electricity:  gv('f-electricityIncluded') || null,
-      water:        gv('f-waterCharge') || null,
-      negotiable:   gv('f-negotiable') === 'Yes',
+      electricity:  null,
+      water:        null,
+      negotiable:   null,
     } : {
       rent:         parseInt(rent) || 0,
       deposit:      parseInt(document.getElementById('f-deposit').value) || 0,
@@ -7000,23 +6999,27 @@ function submitListing() {
       rentIncrease: parseFloat(gv('f-escalation')) ? gv('f-escalation') + '%' : null,
       electricity:  gv('f-electricityIncluded') || null,
       water:        gv('f-waterCharge') || null,
-      negotiable:   gv('f-negotiable') === 'Yes',
+      negotiable:   gv('f-negotiable').toLowerCase() === 'yes' ? 'Yes'
+                  : gv('f-negotiable').toLowerCase() === 'no'  ? 'No'
+                  : null,
     },
     property: {
       type:      isPG ? null : gv('f-propertyType'),
       bhk:       isPG ? null : gv('f-bhk'),
-      bike:      isPG ? 'No' : (document.getElementById('f-bikepark').checked ? 'Yes' : 'No'),
-      car:       isPG ? 'No' : (document.getElementById('f-carpark').checked ? 'Yes' : 'No'),
+      bike:      isPG ? '0' : String(parseInt(document.getElementById('f-bikepark').value, 10) || 0),
+      car:       isPG ? '0' : String(parseInt(document.getElementById('f-carpark').value, 10) || 0),
       floor:     document.getElementById('f-floor').value || 'G',
       area:      isPG ? null : gv('f-area'),
-      bathrooms: isPG ? '1' : String(parseInt(document.getElementById('f-baths').value) || 1),
+      bathrooms: isPG ? '1' : (document.getElementById('f-baths').value || '1'),
       furnish:   document.getElementById('f-furnishing').value,
       facing:    isPG ? 'North' : document.getElementById('f-facing').value,
       age:       isPG ? null : gv('f-age'),
       tenant:    isPG
         ? (document.getElementById('f-pgGender').value === 'Girls' ? 'Female only' : 'Any')
         : document.getElementById('f-tenant').value,
-      available: isPG ? gv('f-pgAvailableFrom') : document.getElementById('f-avail').value || null,
+      available: isPG ? gv('f-pgAvailableFrom')
+                : isLease ? gv('f-leaseAvailableFrom')
+                : (document.getElementById('f-avail').value || null),
     },
     amenities: {
       selected: amenitiesSelected,
@@ -7027,14 +7030,20 @@ function submitListing() {
             : isLease ? (gv('f-leaseNoticePeriod') || null)
             : (gv('f-noticePeriod') || null),
       lease:  isLease
-        ? [gv('f-leaseDurationVal'), gv('f-leaseType'), gv('f-lockInPeriod') ? ('Lock-in: ' + gv('f-lockInPeriod')) : '']
-            .filter(Boolean).join(' · ') || null
-        : (gv('f-leaseDuration') || null),
+        ? (gv('f-leaseDurationVal') || null)
+        // f-leaseDuration lives in #addRentSection, which is hidden for PG — reading it
+        // there would always save null anyway, but do it explicitly so it's not relying
+        // on a hidden field by accident.
+        : (isPG ? null : (gv('f-leaseDuration') || null)),
+      leaseType: isLease ? (gv('f-leaseType') || null) : null,
+      lockIn:    isLease ? (gv('f-lockInPeriod') || null) : null,
     },
     rules: {
       pets:   isPG ? (gv('f-pgPets') || null) : isLease ? (gv('f-leasePets') || null) : (gv('f-petsAllowed') || null),
       nonVeg: isPG ? (gv('f-pgNonVeg') || null) : isLease ? (gv('f-leaseNonVeg') || null) : (gv('f-nonVegAllowed') || null),
-      gas:    isPG ? null : (gv('f-pipedGas') || null),
+      // f-pipedGas lives in #addRentSection, which is hidden for Lease — it would always
+      // save null anyway, but do it explicitly so it's not relying on a hidden field.
+      gas:    (isPG || isLease) ? null : (gv('f-pipedGas') || null),
     },
     media: {
       video: gv('f-videoUrl') || null,

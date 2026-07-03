@@ -337,18 +337,19 @@ const OwnerSchema = new mongoose.Schema({
 const PriceSchema = new mongoose.Schema({
   rent:         { type: Number, required: true },
   deposit:      { type: Number, default: null },
+  monthlyRent:  { type: Number, default: null }, // Lease only: optional recurring rent on top of the lease/token amount (f-leaseMonthlyRent)
   maintenance:  { type: Number, default: null },
   rentIncrease: { type: String, default: null },
   electricity:  { type: String, default: null },
   water:        { type: String, default: null },
-  negotiable:   { type: Boolean, default: false },
+  negotiable:   { type: String, default: null }, // 'Yes' | 'No' | null (not answered)
 }, { _id: false });
 
 const PropertyDetailsSchema = new mongoose.Schema({
   type:      { type: String, default: null },   // propertyType (Apartment/Villa/etc.)
   bhk:       { type: String, default: null },
-  bike:      { type: String, default: 'No' },    // bikeparking: 'Yes' | 'No'
-  car:       { type: String, default: 'No' },    // carparking:  'Yes' | 'No'
+  bike:      { type: String, default: '0' },    // bikeparking: count as string, e.g. '0'..'4'
+  car:       { type: String, default: '0' },    // carparking:  count as string, e.g. '0'..'4'
   floor:     { type: String, default: 'G' },
   area:      { type: String, default: null },
   bathrooms: { type: String, default: '1' },     // toilet
@@ -365,8 +366,10 @@ const AmenitiesSchema = new mongoose.Schema({
 }, { _id: false });
 
 const TermsSchema = new mongoose.Schema({
-  notice: { type: String, default: null }, // noticePeriod / leaseNotice / pgNotice
-  lease:  { type: String, default: null }, // leaseDuration / leaseDurationVal (+type/lock-in folded in)
+  notice:    { type: String, default: null }, // noticePeriod / leaseNotice / pgNotice
+  lease:     { type: String, default: null }, // leaseDuration (Rent) / leaseDurationVal (Lease)
+  leaseType: { type: String, default: null }, // Lease only: Residential / Commercial / Industrial / Mixed Use
+  lockIn:    { type: String, default: null }, // Lease only: lock-in period
 }, { _id: false });
 
 const RulesSchema = new mongoose.Schema({
@@ -410,7 +413,7 @@ const PropertySchema = new mongoose.Schema({
   terms:      { type: TermsSchema,            default: () => ({}) },
   rules:      { type: RulesSchema,            default: () => ({}) },
   media:      { type: MediaSchema,            default: () => ({}) },
-  pg:         { type: PgSchema,               default: () => ({}) },
+  pg:         { type: PgSchema }, // no default — left unset for non-PG listings so we don't store an all-null subdocument
   // ── Meta (kept top-level / flat — not part of the submitted payload) ──
   userId:           { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true }, // owner of this listing, null = posted while logged out
   promoted:         { type: Boolean, default: false },
@@ -547,14 +550,29 @@ app.post('/api/properties', listingLimiter, requireUser, async (req, res) => {
     const validationError = validatePropertyFields(fields);
     if (validationError) return res.status(400).json({ message: validationError });
 
-    if (!fields.owner.propertyName || !fields.location.area || fields.price.rent === undefined || fields.price.rent === null || fields.price.rent === '') {
-      return res.status(400).json({ message: 'owner.propertyName, location.area, and price.rent are required.' });
-    }
-
     fields.basic = Object.assign({ status: 'For Rent', listedBy: 'Owner' }, fields.basic);
     fields.media.displayPrice = undefined; // not part of media; computed separately below
 
     const status = fields.basic.status;
+
+    // Fields required by every listing type, with a type-appropriate label in the error message
+    // (price.rent doubles as "monthly rent" for Rent, "lease amount" for Lease, "monthly charge" for PG).
+    const priceLabel = status === 'Lease' ? 'price.rent (lease amount)'
+                      : status === 'PG'   ? 'price.rent (monthly charge)'
+                      :                     'price.rent (monthly rent)';
+    if (!fields.owner.propertyName || !fields.location.area ||
+        fields.price.rent === undefined || fields.price.rent === null || fields.price.rent === '') {
+      return res.status(400).json({ message: `owner.propertyName, location.area, and ${priceLabel} are required.` });
+    }
+
+    // Fields required only for specific listing types.
+    if (status === 'PG' && (!fields.pg.gender || !fields.pg.room)) {
+      return res.status(400).json({ message: 'pg.gender and pg.room are required for PG listings.' });
+    }
+    if (status === 'Lease' && !fields.terms.lease) {
+      return res.status(400).json({ message: 'terms.lease (lease duration) is required for Lease listings.' });
+    }
+
     const displayPrice = formatPrice(fields.price.rent, status);
 
     const prop = new Property({
@@ -568,7 +586,7 @@ app.post('/api/properties', listingLimiter, requireUser, async (req, res) => {
       terms:     fields.terms,
       rules:     fields.rules,
       media:     fields.media,
-      pg:        fields.pg,
+      pg:        status === 'PG' ? fields.pg : undefined,
     });
     await prop.save();
 
