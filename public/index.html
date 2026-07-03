@@ -504,6 +504,7 @@ ul{list-style:none}
 .prop-stat.is-off{color:var(--text-3);font-weight:500}
 .prop-stat.is-off svg{stroke:var(--border-2)}
 .prop-chip-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.prop-desc-preview{margin-top:8px;font-size:12px;line-height:1.4;color:var(--text-3);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .prop-chip{
   display:inline-flex;align-items:center;gap:4px;
   font-size:10.5px;font-weight:600;color:var(--text-2);
@@ -4480,6 +4481,30 @@ function cardHTML(p) {
   const tenant = p.property?.tenant || '';
   const negotiable = p.price?.negotiable || '';
   const available = p.property?.available || '';
+  // ── Extra fields captured on the post-property form but not previously shown on cards ──
+  const ptype = p.property?.type || '';
+  const areaSqft = p.property?.area || '';
+  const age = p.property?.age || '';
+  const listedBy = p.basic?.listedBy || '';
+  const rentIncrease = p.price?.rentIncrease || '';
+  const electricity = p.price?.electricity || '';
+  const water = p.price?.water || '';
+  const notice = p.terms?.notice || '';
+  const leaseDur = p.terms?.lease || '';
+  const leaseType = p.terms?.leaseType || '';
+  const lockIn = p.terms?.lockIn || '';
+  const pets = p.rules?.pets || '';
+  const nonVeg = p.rules?.nonVeg || '';
+  const gas = p.rules?.gas || '';
+  const amenitiesList = p.amenities?.selected || [];
+  const amenitiesExtra = p.amenities?.extra || '';
+  const desc = p.media?.desc || '';
+  const video = p.media?.video || '';
+  const pg = p.pg || {};
+  const isPGCard = pType === 'PG';
+  // Plain-text chip, no icon — used for the long tail of fields below so we're not
+  // hand-drawing an SVG per field. Skips rendering entirely when value is empty.
+  const chip = (label, value) => value ? `<span class="prop-chip" title="${esc(label)}">${esc(value)}</span>` : '';
   const availableFmt = available ? (() => {
     const d = new Date(available);
     if (isNaN(d)) return available;
@@ -4559,7 +4584,44 @@ function cardHTML(p) {
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           Available From ${availableFmt}
         </span>` : ''}
+        ${facing ? `<span class="prop-chip" title="Facing">${esc(facing)} facing</span>` : ''}
       </div>
+      <div class="prop-chip-row">
+        ${chip('Property type', ptype)}
+        ${chip('Built-up area', areaSqft ? areaSqft + ' sqft' : '')}
+        ${chip('Age of property', age)}
+        ${chip('Listed by', listedBy)}
+        ${chip('Rent escalation', rentIncrease)}
+        ${chip('Electricity included', electricity)}
+        ${chip('Water charge', water)}
+        ${chip('Notice period', notice)}
+        ${pType === 'Lease' ? chip('Lease duration', leaseDur) : ''}
+        ${pType === 'Lease' ? chip('Lease type', leaseType) : ''}
+        ${pType === 'Lease' ? chip('Lock-in', lockIn) : ''}
+        ${chip('Pets allowed', pets)}
+        ${chip('Non-veg allowed', nonVeg)}
+        ${chip('Piped gas', gas)}
+        ${video ? `<span class="prop-chip" title="Video walkthrough available">🎥 Video</span>` : ''}
+      </div>
+      ${(amenitiesList.length || amenitiesExtra) ? `<div class="prop-chip-row">
+        ${amenitiesList.map(a => `<span class="prop-chip">${esc(a)}</span>`).join('')}
+        ${amenitiesExtra ? amenitiesExtra.split(',').map(a => a.trim()).filter(Boolean).map(a => `<span class="prop-chip">${esc(a)}</span>`).join('') : ''}
+      </div>` : ''}
+      ${isPGCard ? `<div class="prop-chip-row">
+        ${chip('Gender', pg.gender)}
+        ${chip('Room type', pg.room)}
+        ${chip('Meals', pg.meals)}
+        ${chip('Occupancy', pg.occupancy)}
+        ${chip('Attached bathroom', pg.bathroom)}
+        ${chip('Meal cost', pg.mealCost ? '₹' + Number(pg.mealCost).toLocaleString('en-IN') : '')}
+        ${chip('Total beds', pg.beds)}
+        ${chip('Room furnishing', pg.furnish)}
+        ${chip('Food type', pg.food)}
+        ${chip('Kitchen access', pg.kitchen)}
+        ${chip('Visitor policy', pg.visitors)}
+        ${chip('Gate time', pg.gateTime)}
+      </div>` : ''}
+      ${desc ? `<div class="prop-desc-preview">${esc(desc)}</div>` : ''}
       <div class="prop-footer">
         <div class="prop-quick-actions">
           <button class="prop-qa-btn" onclick="event.stopPropagation();showToast('Contact info shown to verified users')" aria-label="Contact owner">
