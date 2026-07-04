@@ -4774,6 +4774,107 @@ function cardHTML(p) {
   </div>`;
 }
 
+/* Compact card used only inside the Shortlisted side panel. Unlike the full
+   cardHTML(), it deliberately drops the long tail of chips (floor, tenant,
+   negotiable, lease terms, age, description, etc.) so the 4 action buttons
+   (Contact / WhatsApp / Schedule visit / Compare) are reachable without
+   scrolling through a full spec sheet — the panel is for quick review, not
+   full listing detail (tap the card to open the full detail modal for that). */
+function shortlistCardHTML(p) {
+  const liked = shortlisted.has(String(p.id));
+  const compared = compareSet.has(p.id);
+  const lockedType = getCompareType();
+  const pType = pTypeLabel(p);
+  const compareDisabled = !compared && lockedType && pType !== lockedType;
+  const colors = {Rent:'#e8f5ee:#1a6640',Lease:'#dde9fa:#1a4680',PG:'#eee8fa:#4a2a9a'};
+  const [bg, fg] = (colors[pType]||'#f0f0f0:#333').split(':');
+  const bathrooms = parseInt(p.property?.bathrooms) || 1;
+  const carCount = parseInt(p.property?.car, 10) || 0;
+  const bikeCount = parseInt(p.property?.bike, 10) || 0;
+  const carpark = carCount > 0;
+  const bikepark = bikeCount > 0;
+  const lift = pHasLift(p);
+  const deposit = p.price?.deposit || 0;
+  const maintenance = p.price?.maintenance || 0;
+  return `<div class="prop-card" onclick="openDetail('${p.id}')">
+    <div class="prop-img" style="background:${bg}" data-idx="0">
+      ${buildImgSlider(p, fg)}
+      <div class="prop-card-top-row">
+        <div class="prop-left-badges">
+          ${p.promoted ? '<span class="prop-badge-promoted">★ Promoted</span>' : ''}
+          <span class="prop-badge-type badge-${pType.toLowerCase()}">${pType}</span>
+        </div>
+        <div class="prop-heart${liked?' liked':''}" onclick="event.stopPropagation();toggleShortlist('${p.id}',this)" aria-label="${liked?'Remove from':'Add to'} shortlist">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+      </div>
+      <div class="prop-img-price"><b>₹${(p.price?.rent||0).toLocaleString('en-IN')}</b><span>/ Month</span></div>
+    </div>
+    <div class="prop-body">
+      <div class="prop-title" title="${esc(p.owner?.propertyName)}">
+        <span class="prop-title-text">${esc(p.owner?.propertyName)}</span>
+      </div>
+      <div class="prop-loc">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>${esc(p.location?.area)}</span>
+      </div>
+      ${p.propertyId ? `<div class="prop-id" title="Property ID">${esc(p.propertyId)}</div>` : ''}
+      <div class="prop-stats">
+        <span class="prop-stat" title="Configuration">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7v11M3 11h18M21 7v11M7 7v4M17 7v4"/></svg>
+          ${p.property?.bhk}
+        </span>
+        <span class="prop-stat" title="Bathrooms">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h17a1 1 0 0 1 1 1v1a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4v-9a2 2 0 0 1 2-2 2 2 0 0 1 2 2"/><path d="M9 12V5a2 2 0 0 1 4 0"/></svg>
+          ${bathrooms} Bath${bathrooms==1?'':'s'}
+        </span>
+        <span class="prop-stat" title="Furnishing">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7v11M21 7v11M3 13h18M5 13V9a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4"/></svg>
+          ${p.property?.furnish}
+        </span>
+        <span class="prop-stat${carpark?'':' is-off'}" title="${carCount>0?carCount+' car parking spot'+(carCount>1?'s':''):'No car parking'}">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/><rect x="3" y="11" width="18" height="6" rx="2"/><circle cx="7.5" cy="17" r="1.3"/><circle cx="16.5" cy="17" r="1.3"/></svg>
+          Car${carCount>0?' ×'+carCount:''}
+        </span>
+        <span class="prop-stat${bikepark?'':' is-off'}" title="${bikeCount>0?bikeCount+' bike parking spot'+(bikeCount>1?'s':''):'No bike parking'}">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="17.5" r="3"/><circle cx="18.5" cy="17.5" r="3"/><path d="M12 17.5l2.5-7.5h3M5.5 17.5L9 9h3l2.5 4"/></svg>
+          Bike${bikeCount>0?' ×'+bikeCount:''}
+        </span>
+        ${lift ? `<span class="prop-stat" title="Lift available"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M9 9l3-3 3 3M9 15l3 3 3-3"/></svg>Lift</span>` : ''}
+      </div>
+      <div class="prop-chip-row">
+        <span class="prop-chip" title="Security deposit">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2"/><circle cx="12" cy="12.5" r="2.5"/></svg>
+          ₹${deposit.toLocaleString('en-IN')} deposit
+        </span>
+        ${maintenance > 0 ? `<span class="prop-chip" title="Monthly maintenance">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          ₹${maintenance.toLocaleString('en-IN')} maintenance
+        </span>` : ''}
+      </div>
+      <div class="prop-footer">
+        <div class="prop-quick-actions">
+          <button class="prop-qa-btn" onclick="event.stopPropagation();showToast('Contact info shown to verified users')" aria-label="Contact owner">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span>Contact</span>
+          </button>
+          <button class="prop-qa-btn prop-qa-whatsapp" onclick="event.stopPropagation();openWhatsApp('${p.id}')" aria-label="Contact on WhatsApp">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg>
+            <span>WhatsApp</span>
+          </button>
+          <div class="prop-qa-icon" id="prop-qa-icon-${p.id}" data-prop-id="${p.id}" onclick="event.stopPropagation();openScheduleModal('${p.id}')" aria-label="Schedule a visit" title="Schedule a visit">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span class="prop-qa-count" style="${(p.visitCount||0) > 0 ? '' : 'display:none'}">${p.visitCount||0}</span>
+          </div>
+          <div class="prop-qa-icon prop-action-compare${compared?' checked':''}${compareDisabled?' disabled':''}" onclick="event.stopPropagation();toggleCompare('${p.id}',this)" aria-label="${compared?'Remove from':'Add to'} compare" title="${compareDisabled?`You're comparing ${lockedType} properties`:'Compare'}">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
 /* ═══════════════════════════════════════════════
    SHORTLIST
 ═══════════════════════════════════════════════ */
@@ -4804,9 +4905,10 @@ function toggleShortlist(id, el) {
 function updateShortlistCount() {
   const n = shortlisted.size;
   document.getElementById('shortlistCount').textContent = n;
-  document.getElementById('panelCount').textContent = n;
   const menuBadge = document.getElementById('menuShortlistCount');
   if (menuBadge) menuBadge.textContent = n;
+  // panelCount intentionally not set here — renderShortlistPanel() keeps it in
+  // sync with whatever the current tab filter actually shows (see below).
 }
 
 function renderShortlistPanel() {
@@ -4815,13 +4917,17 @@ function renderShortlistPanel() {
     const p = shortlistedData[id];
     return p && (currentTab === 'All' || pTypeLabel(p) === currentTab);
   });
+  // Header shows the count of items actually visible for the current tab, so it
+  // never disagrees with the list below it (e.g. "Shortlisted (2)" while only
+  // 1 Lease card is shown because the other saved item is a Rent listing).
+  document.getElementById('panelCount').textContent = ids.length;
   if (ids.length === 0) {
     list.innerHTML = shortlisted.size === 0
       ? '<div class="panel-empty">No shortlisted properties yet.<br>Tap ♥ on any listing to save it.</div>'
       : `<div class="panel-empty">No shortlisted ${currentTab} properties.<br>Switch tabs to see the rest of your shortlist.</div>`;
     return;
   }
-  list.innerHTML = ids.map(id => cardHTML(shortlistedData[id])).join('');
+  list.innerHTML = ids.map(id => shortlistCardHTML(shortlistedData[id])).join('');
 }
 
 

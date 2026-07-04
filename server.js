@@ -561,6 +561,8 @@ const VisitRequestSchema = new mongoose.Schema({
   createdAt:    { type: Date, default: Date.now },
 });
 VisitRequestSchema.index({ createdAt: -1 });
+// Speeds up the duplicate-visit lookup in POST /api/visits (same user + property + date).
+VisitRequestSchema.index({ userId: 1, propertyId: 1, visitDate: 1 });
 const VisitRequest = mongoose.model('VisitRequest', VisitRequestSchema);
 
 // ── Helpers ──
@@ -789,6 +791,21 @@ app.post('/api/visits', visitLimiter, requireUser, async (req, res) => {
 
     const property = await Property.findById(propertyId).lean();
     if (!property) return res.status(404).json({ message: 'Property not found' });
+
+    // Block a second visit request from the same user for the same property on the
+    // same date — regardless of the time slot chosen. A previously cancelled request
+    // doesn't count, so the user can still rebook after cancelling.
+    if (req.userId) {
+      const duplicate = await VisitRequest.findOne({
+        userId:     req.userId,
+        propertyId,
+        visitDate,
+        status: { $ne: 'Cancelled' },
+      }).lean();
+      if (duplicate) {
+        return res.status(409).json({ message: 'You already have a visit request for this property on this date. Please choose a different date, or cancel your existing request first.' });
+      }
+    }
 
     const visitId = await nextSequenceId('VISIT');
 
