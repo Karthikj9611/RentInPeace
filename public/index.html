@@ -81,7 +81,7 @@ ul{list-style:none}
 
 /* ─── Topnav ───────────────────────────────────── */
 .topnav{
-  position:sticky;top:0;z-index:100;
+  position:static;
   background:var(--bg);
   border-bottom:1px solid var(--border);
   height:var(--nav-h);
@@ -145,7 +145,7 @@ ul{list-style:none}
 
 /* ─── Search bar ───────────────────────────────── */
 .searchbar-wrap{
-  position:sticky;top:var(--nav-h);z-index:99;
+  position:static;
   background:var(--bg);
   border-bottom:1px solid var(--border);
   padding:10px 20px;
@@ -180,7 +180,7 @@ ul{list-style:none}
 /* ─── Filter Dropdown Bar ───────────────────────── */
 .filter-dd-bar{
   position:sticky;
-  top:calc(var(--nav-h) + var(--search-h));
+  top:0;
   z-index:98;
   background:var(--bg);
   border-bottom:1px solid var(--border);
@@ -401,8 +401,7 @@ ul{list-style:none}
 .prop-img{
   position:relative;
   width:100%;
-  min-height:160px;
-  max-height:320px;
+  aspect-ratio:4/3;
   overflow:hidden;
   background:var(--bg-3);
   flex-shrink:0;
@@ -411,7 +410,7 @@ ul{list-style:none}
 
 .prop-card.list-view .prop-img{width:230px;aspect-ratio:unset;height:auto;min-height:150px;border-radius:16px 0 0 16px}
 .prop-img-placeholder{
-  width:100%;height:200px;
+  position:absolute;inset:0;
   display:flex;align-items:center;justify-content:center;
 }
 .prop-img-placeholder svg{width:52px;height:52px;stroke:var(--border-2);fill:none;stroke-width:1.4}
@@ -1059,16 +1058,34 @@ ul{list-style:none}
   padding:20px 10px;
 }
 
-/* ─── Toast ────────────────────────────────────── */
-.toast{
-  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.96);
-  background:var(--text);color:#fff;border-radius:99px;
-  padding:9px 18px;font-size:13px;font-weight:500;
-  opacity:0;transition:opacity .2s,transform .2s;
-  pointer-events:none;z-index:500;white-space:nowrap;
-  text-align:center;
+/* ─── Toast / Alert ────────────────────────────── */
+.toast-backdrop{
+  position:fixed;inset:0;z-index:499;
+  background:rgba(20,16,17,.14);
+  opacity:0;pointer-events:none;
+  transition:opacity .2s ease;
 }
-.toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.toast-backdrop.show{opacity:1}
+.toast{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) translateY(6px) scale(.97);
+  display:flex;align-items:center;gap:12px;
+  background:#fff;color:var(--text);
+  border-radius:16px;box-shadow:0 16px 40px rgba(20,16,17,.16),0 2px 6px rgba(20,16,17,.06);
+  padding:15px 20px;font-size:14px;font-weight:500;line-height:1.45;
+  width:max-content;max-width:min(86vw,380px);
+  white-space:normal;word-break:break-word;text-align:left;
+  opacity:0;transition:opacity .2s ease,transform .2s ease;
+  pointer-events:none;z-index:500;
+}
+.toast.show{opacity:1;transform:translate(-50%,-50%) translateY(0) scale(1)}
+.toast-icon{
+  flex-shrink:0;width:26px;height:26px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--brand-light);
+}
+.toast-icon svg{width:15px;height:15px;stroke:var(--brand);fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.toast.toast-error .toast-icon{background:#fdeaea}
+.toast.toast-error .toast-icon svg{stroke:#d33}
 
 /* ─── Backdrop for panels ──────────────────────── */
 .panel-backdrop{
@@ -1912,8 +1929,8 @@ ul{list-style:none}
 }
 
 /* ─── Card image slider ─────────────────────────── */
-.img-slides{position:relative;width:100%;height:auto;overflow:hidden}
-.img-slide{display:none;width:100%;max-width:100%;height:auto;object-fit:contain;background-color:var(--bg-3);pointer-events:none;vertical-align:top}
+.img-slides{position:absolute;inset:0;width:100%;height:100%;overflow:hidden}
+.img-slide{display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background-color:var(--bg-3);pointer-events:none;vertical-align:top}
 .img-slide.active{display:block}
 .img-slide.active{pointer-events:auto}
 .img-slide.active{opacity:1}
@@ -4034,8 +4051,14 @@ ul{list-style:none}
   </div>
 </aside>
 
-<!-- ─── Toast ──────────────────────────────────── -->
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<!-- ─── Toast / Alert ─────────────────────────────── -->
+<div class="toast-backdrop" id="toastBackdrop"></div>
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <span class="toast-icon" id="toastIcon">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+  </span>
+  <span id="toastMsg"></span>
+</div>
 
 <!-- ─── Compare Bar ───────────────────────────────── -->
 <div class="compare-bar" id="compareBar" role="region" aria-label="Property comparison bar">
@@ -4227,7 +4250,8 @@ function recentlyViewedSnapshot(p) {
     name: p.owner?.propertyName || 'Untitled listing',
     area: p.location?.area || '',
     rent: p.price?.rent ?? null,
-    img: (p.media?.images || [])[0] || null
+    img: (p.media?.images || [])[0] || null,
+    type: pTypeLabel(p)
   };
 }
 
@@ -4284,16 +4308,21 @@ function renderRecentlyViewed() {
   const section = document.getElementById('recentlyViewedSection');
   if (!section) return;
   const strip = document.getElementById('recentlyViewedStrip');
-  if (recentlyViewed.length === 0) {
+  const ids = recentlyViewed.filter(id => {
+    const rv = recentlyViewedData[id];
+    if (!rv) return false;
+    if (currentTab === 'All') return true;
+    // Older entries saved before "type" was tracked fall back to a live
+    // lookup so they don't just vanish under a specific tab.
+    const type = rv.type || pTypeLabel(PROPERTIES.find(x => x.id === id) || {});
+    return type === currentTab;
+  });
+  if (ids.length === 0) {
     section.style.display = 'none';
     return;
   }
   section.style.display = '';
-  strip.innerHTML = recentlyViewed.map(id => {
-    const rv = recentlyViewedData[id];
-    if (!rv) return '';
-    return recentlyViewedCardHTML(rv);
-  }).join('');
+  strip.innerHTML = ids.map(id => recentlyViewedCardHTML(recentlyViewedData[id])).join('');
 }
 let compareSet = new Set();
 const COMPARE_MAX = 4;
@@ -4725,9 +4754,9 @@ function cardHTML(p) {
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg>
             <span>WhatsApp</span>
           </button>
-          <div class="prop-qa-icon" onclick="event.stopPropagation();openScheduleModal('${p.id}')" aria-label="Schedule a visit" title="Schedule a visit">
+          <div class="prop-qa-icon" id="prop-qa-icon-${p.id}" data-prop-id="${p.id}" onclick="event.stopPropagation();openScheduleModal('${p.id}')" aria-label="Schedule a visit" title="Schedule a visit">
             <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            ${(p.visitCount||0) > 0 ? `<span class="prop-qa-count">${p.visitCount}</span>` : ''}
+            <span class="prop-qa-count" style="${(p.visitCount||0) > 0 ? '' : 'display:none'}">${p.visitCount||0}</span>
           </div>
           <div class="prop-qa-icon prop-action-compare${compared?' checked':''}${compareDisabled?' disabled':''}" onclick="event.stopPropagation();toggleCompare('${p.id}',this)" aria-label="${compared?'Remove from':'Add to'} compare" title="${compareDisabled?`You're comparing ${lockedType} properties`:'Compare'}">
             <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
@@ -4782,15 +4811,17 @@ function updateShortlistCount() {
 
 function renderShortlistPanel() {
   const list = document.getElementById('panelList');
-  if (shortlisted.size === 0) {
-    list.innerHTML = '<div class="panel-empty">No shortlisted properties yet.<br>Tap ♥ on any listing to save it.</div>';
+  const ids = [...shortlisted].filter(id => {
+    const p = shortlistedData[id];
+    return p && (currentTab === 'All' || pTypeLabel(p) === currentTab);
+  });
+  if (ids.length === 0) {
+    list.innerHTML = shortlisted.size === 0
+      ? '<div class="panel-empty">No shortlisted properties yet.<br>Tap ♥ on any listing to save it.</div>'
+      : `<div class="panel-empty">No shortlisted ${currentTab} properties.<br>Switch tabs to see the rest of your shortlist.</div>`;
     return;
   }
-  list.innerHTML = [...shortlisted].map(id => {
-    const p = shortlistedData[id];
-    if (!p) return '';
-    return cardHTML(p);
-  }).join('');
+  list.innerHTML = ids.map(id => cardHTML(shortlistedData[id])).join('');
 }
 
 
@@ -5052,6 +5083,8 @@ function switchTab(el) {
   clearFiltersHiddenByTab();
   closeAllFd();
   renderCards();
+  renderRecentlyViewed();
+  renderShortlistPanel();
 }
 
 function switchTabMobile(el) {
@@ -5063,6 +5096,8 @@ function switchTabMobile(el) {
   clearFiltersHiddenByTab();
   closeAllFd();
   renderCards();
+  renderRecentlyViewed();
+  renderShortlistPanel();
 }
 
 function syncMobileTab() {
@@ -5944,6 +5979,13 @@ async function submitScheduleVisit() {
       if (badge) {
         badge.textContent = data.visitCount;
         badge.style.display = data.visitCount > 0 ? '' : 'none';
+      }
+      // Grid/list card badge (the small count next to the calendar icon) —
+      // was previously only re-rendered on the next full page load.
+      const cardCount = document.querySelector(`#prop-qa-icon-${p.id} .prop-qa-count`);
+      if (cardCount) {
+        cardCount.textContent = data.visitCount;
+        cardCount.style.display = data.visitCount > 0 ? '' : 'none';
       }
       if (typeof MY_LISTINGS_CACHE !== 'undefined') {
         const myListing = MY_LISTINGS_CACHE.find(x => x.id === p.id);
@@ -7584,12 +7626,21 @@ function submitListing() {
    TOAST
 ═══════════════════════════════════════════════ */
 let toastTimer;
-function showToast(msg) {
+const TOAST_ICONS = {
+  info:    '<path d="M20 6L9 17l-5-5"/>',
+  error:   '<circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="16" x2="12" y2="16.01"/>',
+};
+function showToast(msg, type) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
+  const backdrop = document.getElementById('toastBackdrop');
+  document.getElementById('toastMsg').textContent = msg;
+  document.getElementById('toastIcon').innerHTML =
+    `<svg viewBox="0 0 24 24" aria-hidden="true">${TOAST_ICONS[type] || TOAST_ICONS.info}</svg>`;
+  t.classList.toggle('toast-error', type === 'error');
   t.classList.add('show');
+  backdrop.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+  toastTimer = setTimeout(() => { t.classList.remove('show'); backdrop.classList.remove('show'); }, 2400);
 }
 
 
