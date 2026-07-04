@@ -4,7 +4,6 @@ const express    = require('express');
 const mongoose   = require('mongoose');
 const cors       = require('cors');
 const path       = require('path');
-const fs         = require('fs');
 const crypto     = require('crypto');
 const rateLimit  = require('express-rate-limit');
 const bcrypt     = require('bcryptjs');
@@ -1421,15 +1420,35 @@ app.post('/api/reviews', async (req, res) => {
 // ── IMAGE UPLOAD (POST /api/upload-images) ──
 // Accepts up to 8 images (multipart/form-data, field name 'images'), converts
 // each to WebP (max 1200px on the long edge, quality 80) via sharp, and saves
-// them under public/uploads/. Returns the public URLs so the client can store
-// them in media.images. Files are kept off disk until they're validated and
-// re-encoded — multer holds them in memory, sharp never touches the original
-// bytes after that, so this also strips any embedded scripts/metadata that
-// might be hiding in a malicious "image" upload.
+// the resulting bytes as a document in MongoDB (not the local disk — Render's
+// filesystem is wiped on every restart/redeploy/free-tier spin-down, but Mongo
+// data persists, and this way no extra paid service or third-party account is
+// needed). Each image is served back from GET /uploads/:id. Files never touch
+// disk — multer holds them in memory, sharp re-encodes buffer-to-buffer, which
+// also strips any embedded scripts/metadata that might be hiding in a
+// malicious "image" upload.
 // ────────────────────────────────────────────────────────────────────────────
-const UPLOADS_DIR = path.join(__dirname, 'public', 'uploads');
-fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-app.use('/uploads', express.static(UPLOADS_DIR, { maxAge: '30d' }));
+const ImageAssetSchema = new mongoose.Schema({
+  data:        { type: Buffer, required: true },
+  contentType: { type: String, required: true, default: 'image/webp' },
+  createdAt:   { type: Date, default: Date.now },
+});
+const ImageAsset = mongoose.model('ImageAsset', ImageAssetSchema);
+
+// Public — anyone viewing a listing needs to load these, no auth required.
+// Cached hard since each id's bytes never change (a re-upload creates a new id).
+app.get('/uploads/:id', async (req, res) => {
+  try {
+    const img = await ImageAsset.findById(req.params.id).lean();
+    if (!img) return res.status(404).end();
+    res.set('Content-Type', img.contentType);
+    res.set('Cache-Control', 'public, max-age=31536000, immutable');
+    res.send(Buffer.isBuffer(img.data) ? img.data : Buffer.from(img.data.buffer || img.data));
+  } catch (err) {
+    // Malformed/non-ObjectId id, etc. — just 404 rather than 500.
+    res.status(404).end();
+  }
+});
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -1453,14 +1472,14 @@ app.post('/api/upload-images', uploadLimiter, attachUserIfPresent, upload.array(
 
     const urls = [];
     for (const file of files) {
-      const filename = `${Date.now()}-${crypto.randomBytes(8).toString('hex')}.webp`;
-      const outPath = path.join(UPLOADS_DIR, filename);
-      await sharp(file.buffer)
+      const webpBuffer = await sharp(file.buffer)
         .rotate() // honor EXIF orientation before stripping metadata
         .resize({ width: 1200, height: 1200, fit: 'inside', withoutEnlargement: true })
         .webp({ quality: 80 })
-        .toFile(outPath);
-      urls.push(`/uploads/${filename}`);
+        .toBuffer();
+
+      const doc = await ImageAsset.create({ data: webpBuffer, contentType: 'image/webp' });
+      urls.push(`/uploads/${doc._id}`);
     }
 
     res.status(201).json({ message: 'Images uploaded successfully', urls });

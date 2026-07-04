@@ -2886,6 +2886,31 @@ ul{list-style:none}
 
     <div style="overflow-y:auto;padding:20px 28px 28px;flex:1">
 
+    <!-- ===== 0. IMPORT EXISTING DATA (file upload or pasted JSON) ===== -->
+    <div class="lm-section" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between" onclick="toggleImportPanel()">
+      <span>📥 Import property data (optional)</span>
+      <span id="importPanelToggleTxt" style="font-size:12px;color:var(--brand);font-weight:700">Show</span>
+    </div>
+    <div id="importPanelBody" style="display:none;background:var(--bg-2,#f7f7f9);border:1px dashed var(--border-2,#ddd);border-radius:12px;padding:14px;margin-bottom:6px">
+      <div style="font-size:12.5px;color:var(--text-2);margin-bottom:10px">
+        Already have the property details somewhere — a JSON export, a database record, an old listing doc? Upload the file or paste it below and the form fields will be filled in automatically. You can still review and edit everything before submitting.
+      </div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr;align-items:end">
+        <div class="form-group">
+          <label class="form-label">Upload a file (.json / .txt)</label>
+          <input class="form-input" type="file" id="f-importFile" accept=".json,.txt,application/json,text/plain" onchange="handleImportFile(this)" />
+        </div>
+        <div class="form-group">
+          <button type="button" class="form-submit" style="margin:0;height:40px" onclick="applyPastedImportText()">Autofill form from pasted text</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">…or paste JSON / database text here</label>
+        <textarea class="form-input" id="f-importText" rows="6" placeholder='Paste a property JSON object here, e.g. { "basic": {...}, "location": {...}, "owner": {...}, ... }' style="resize:vertical;font-family:monospace;font-size:12px"></textarea>
+      </div>
+      <div id="importStatusMsg" style="font-size:12px;min-height:16px;margin-top:2px"></div>
+    </div>
+
     <!-- ===== 1. BASIC INFORMATION ===== -->
     <div class="lm-section">📋 Basic Information</div>
     <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
@@ -6030,6 +6055,238 @@ function closeAddModal() {
   document.getElementById('addModal').classList.remove('open');
   document.body.style.overflow = '';
 }
+/* ═══════════════════════════════════════════════
+   IMPORT PROPERTY DATA (file upload or pasted JSON/DB text)
+   Lets someone skip manual entry by handing over an existing
+   JSON export / database document, which gets parsed and used
+   to fill in the Add Listing form fields for review before submit.
+═══════════════════════════════════════════════ */
+function toggleImportPanel() {
+  const body = document.getElementById('importPanelBody');
+  const txt = document.getElementById('importPanelToggleTxt');
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  txt.textContent = open ? 'Show' : 'Hide';
+}
+
+function setImportStatus(msg, isError) {
+  const el = document.getElementById('importStatusMsg');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.color = isError ? 'var(--brand)' : 'var(--text-2)';
+}
+
+function handleImportFile(input) {
+  const file = (input.files || [])[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    processImportRawText(String(reader.result || ''));
+    input.value = '';
+  };
+  reader.onerror = () => setImportStatus('Could not read that file.', true);
+  reader.readAsText(file);
+}
+
+function applyPastedImportText() {
+  const raw = document.getElementById('f-importText').value.trim();
+  if (!raw) { setImportStatus('Paste some JSON/text first.', true); return; }
+  processImportRawText(raw);
+}
+
+// Mongo shell / Compass exports use extended JSON wrappers like
+// {"$oid": "..."} and {"$date": "..."} instead of plain strings —
+// unwrap those recursively so the rest of the import logic can just
+// treat every value as a normal string/number.
+function normalizeMongoExtendedJSON(val) {
+  if (Array.isArray(val)) return val.map(normalizeMongoExtendedJSON);
+  if (val && typeof val === 'object') {
+    if (typeof val.$oid === 'string') return val.$oid;
+    if (typeof val.$date === 'string') return val.$date;
+    if (val.$date && typeof val.$date === 'object' && val.$date.$numberLong) return new Date(Number(val.$date.$numberLong)).toISOString();
+    const out = {};
+    for (const k in val) out[k] = normalizeMongoExtendedJSON(val[k]);
+    return out;
+  }
+  return val;
+}
+
+function processImportRawText(raw) {
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (e) {
+    setImportStatus('That doesn\'t look like valid JSON — check for missing commas/quotes and try again.', true);
+    return;
+  }
+  parsed = normalizeMongoExtendedJSON(parsed);
+
+  // Accept a few shapes: a single property object, { properties: [...] }
+  // (like a GET /api/properties dump), or a bare array of properties.
+  let prop = parsed;
+  if (Array.isArray(parsed)) {
+    prop = parsed[0];
+    if (parsed.length > 1) setImportStatus(`Found ${parsed.length} properties — imported the first one (${prop?.owner?.propertyName || prop?.propertyId || 'untitled'}).`);
+  } else if (parsed && Array.isArray(parsed.properties)) {
+    prop = parsed.properties[0];
+    if (parsed.properties.length > 1) setImportStatus(`Found ${parsed.properties.length} properties — imported the first one (${prop?.owner?.propertyName || prop?.propertyId || 'untitled'}).`);
+  }
+
+  if (!prop || typeof prop !== 'object') {
+    setImportStatus('Could not find a property object in that data.', true);
+    return;
+  }
+
+  try {
+    applyImportedProperty(prop);
+    if (!document.getElementById('importStatusMsg').textContent) setImportStatus('Form filled in — review the fields below, then submit.');
+    showToast('Property data imported — please review before submitting');
+  } catch (e) {
+    console.error('Import error:', e);
+    setImportStatus('Imported partially — some fields may need a manual check.', true);
+  }
+}
+
+function applyImportedProperty(p) {
+  function sv(id, val) { const el = document.getElementById(id); if (el && val !== undefined && val !== null) el.value = val; }
+  const basic = p.basic || {}, location = p.location || {}, owner = p.owner || {}, price = p.price || {},
+        property = p.property || {}, amenities = p.amenities || {}, terms = p.terms || {}, rules = p.rules || {},
+        media = p.media || {}, pg = p.pg || {};
+
+  // Map schema status back → the dropdown's own value set
+  const reverseStatusMap = { 'For Rent': 'Rent', 'Lease': 'Lease', 'PG': 'PG' };
+  const typeVal = reverseStatusMap[basic.status] || (basic.status || 'Rent');
+  sv('f-type', typeVal);
+  sv('f-listedBy', basic.listedBy);
+  const isPG = typeVal === 'PG', isLease = typeVal === 'Lease';
+
+  // Location
+  sv('f-location', location.area);
+  sv('f-city', location.city || 'Bengaluru');
+  sv('f-fullAddress', location.address);
+  if (location.lat != null) sv('f-latitude', location.lat);
+  if (location.lng != null) sv('f-longitude', location.lng);
+  if (location.lat != null && location.lng != null) {
+    sv('f-latLngDisplay', Number(location.lat).toFixed(6) + '° N, ' + Number(location.lng).toFixed(6) + '° E');
+  }
+  sv('f-googleMapsLink', location.mapLink);
+
+  // Owner
+  sv('f-title', owner.propertyName);
+  sv('f-ownerName', owner.name);
+  sv('f-ownerPhone', owner.phone);
+  sv('f-ownerEmail', owner.email);
+  sv('f-ownerAltPhone', owner.altPhone);
+  sv('f-contactTime', owner.contactTime);
+  sv('f-ownerAddress', owner.address);
+  sv('f-agentPhone', owner.agentPhone);
+  sv('f-agentArea', owner.agentArea);
+
+  // Pricing
+  if (isLease) {
+    sv('f-leaseAmount', price.rent);
+    sv('f-leaseMonthlyRent', price.monthlyRent);
+    sv('f-leaseMaintenance', price.maintenance);
+    sv('f-rentEscalation', price.rentIncrease);
+  } else {
+    sv('f-rent', price.rent);
+    sv('f-deposit', price.deposit);
+    sv('f-maintenance', price.maintenance);
+    if (price.rentIncrease) sv('f-escalation', parseFloat(price.rentIncrease));
+    sv('f-electricityIncluded', price.electricity);
+    sv('f-waterCharge', price.water);
+    sv('f-negotiable', (price.negotiable || '').toLowerCase() === 'yes' ? 'yes' : (price.negotiable || '').toLowerCase() === 'no' ? 'no' : '');
+  }
+
+  // Property details
+  if (!isPG) {
+    sv('f-propertyType', property.type);
+    sv('f-bhk', property.bhk);
+    sv('f-area', property.area);
+    sv('f-age', property.age);
+    sv('f-tenant', property.tenant);
+    sv('f-facing', property.facing);
+  }
+  sv('f-bikepark', isPG ? '0' : property.bike);
+  sv('f-carpark', isPG ? '0' : property.car);
+  sv('f-floor', property.floor);
+  sv('f-baths', isPG ? '1' : property.bathrooms);
+  sv('f-furnishing', property.furnish);
+  if (isPG) sv('f-pgAvailableFrom', property.available);
+  else if (isLease) sv('f-leaseAvailableFrom', property.available);
+  else sv('f-avail', property.available);
+
+  // Amenities — check the boxes whose label matches, parsing any "Label ×N" qty suffix
+  const selected = Array.isArray(amenities.selected) ? amenities.selected : [];
+  AM_LIST.forEach(([checkId, label, unitId]) => {
+    const match = selected.find(s => s === label || s.indexOf(label + ' ×') === 0 || s.indexOf(label + ' x') === 0);
+    const cb = document.getElementById(checkId);
+    if (cb) cb.checked = !!match;
+    if (match && unitId) {
+      const qtyMatch = match.match(/[×x]\s*(\d+)/i);
+      if (qtyMatch) sv(unitId, qtyMatch[1]);
+    }
+  });
+  sv('f-amenities-extra', amenities.extra);
+  if (typeof onAmCheck === 'function') onAmCheck();
+  if (typeof renderAmSelected === 'function') renderAmSelected();
+
+  // Terms
+  if (isPG) {
+    sv('f-pgNotice', terms.notice);
+  } else if (isLease) {
+    sv('f-leaseNoticePeriod', terms.notice);
+    sv('f-leaseDurationVal', terms.lease);
+    sv('f-leaseType', terms.leaseType);
+    sv('f-lockInPeriod', terms.lockIn);
+  } else {
+    sv('f-noticePeriod', terms.notice);
+    sv('f-leaseDuration', terms.lease);
+  }
+
+  // Rules
+  if (isPG) {
+    sv('f-pgPets', rules.pets);
+    sv('f-pgNonVeg', rules.nonVeg);
+  } else if (isLease) {
+    sv('f-leasePets', rules.pets);
+    sv('f-leaseNonVeg', rules.nonVeg);
+  } else {
+    sv('f-petsAllowed', rules.pets);
+    sv('f-nonVegAllowed', rules.nonVeg);
+    sv('f-pipedGas', rules.gas);
+  }
+
+  // Media
+  sv('f-videoUrl', media.video);
+  sv('f-desc', media.desc);
+  if (Array.isArray(media.images) && media.images.length) {
+    fImages = media.images.slice();
+    renderFImages();
+    const looksStale = media.images.some(u => /^\/uploads\/\d+-[0-9a-f]+\.webp$/i.test(u));
+    if (looksStale) setImportStatus('Imported image links look like old/expired uploads — you may need to re-upload photos.', true);
+  }
+
+  // PG-specific block
+  if (isPG) {
+    sv('f-pgGender', pg.gender);
+    sv('f-pgRoomType', pg.room);
+    sv('f-pgMeals', pg.meals);
+    sv('f-pgOccupancy', pg.occupancy);
+    sv('f-pgBathroom', pg.bathroom);
+    sv('f-pgMealsCost', pg.mealCost);
+    sv('f-pgTotalBeds', pg.beds);
+    sv('f-pgRoomFurnishing', pg.furnish);
+    sv('f-pgFoodType', pg.food);
+    sv('f-pgKitchenAccess', pg.kitchen);
+    sv('f-pgVisitorPolicy', pg.visitors);
+    sv('f-pgGateTime', pg.gateTime);
+  }
+
+  onFTypeChange(typeVal);
+  queueListingDraftSave();
+}
+
 function clearAddModalDraft() {
   resetListingForm();
   clearListingDraft();
