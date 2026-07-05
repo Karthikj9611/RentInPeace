@@ -1303,16 +1303,18 @@ ul{list-style:none}
 }
 
 /* ─── Service Request Modal ────────────────────── */
-.svc-modal-img{
-  height:120px;border-radius:var(--radius-lg);overflow:hidden;
+.svc-modal-banner{
+  height:78px;border-radius:var(--radius-lg);
   margin-bottom:16px;position:relative;
+  display:flex;align-items:center;gap:12px;padding:0 16px;
+  background:rgba(224,58,82,.08);
 }
-.svc-modal-img img{width:100%;height:100%;object-fit:cover}
-.svc-modal-img-label{
-  position:absolute;left:12px;bottom:10px;color:#fff;
-  font-size:15px;font-weight:700;
-  text-shadow:0 1px 6px rgba(0,0,0,.5);
+.svc-modal-icon{
+  font-size:24px;width:46px;height:46px;flex-shrink:0;
+  border-radius:11px;background:rgba(224,58,82,.12);
+  display:flex;align-items:center;justify-content:center;
 }
+.svc-modal-label{color:var(--text);font-size:16px;font-weight:700}
 
 /* ─── Add Listing Modal ────────────────────────── */
 .add-modal-overlay{
@@ -2751,9 +2753,9 @@ ul{list-style:none}
       </button>
     </div>
 
-    <div class="svc-modal-img">
-      <img id="svcModalImg" src="" alt="" />
-      <div class="svc-modal-img-label" id="svcModalLabel"></div>
+    <div class="svc-modal-banner">
+      <div class="svc-modal-icon" id="svcModalIcon"></div>
+      <div class="svc-modal-label" id="svcModalLabel"></div>
     </div>
 
     <input type="hidden" id="svc-service" />
@@ -6831,9 +6833,8 @@ const SERVICE_PRICING = {
 
 function openServiceModal(name, category, icon, imgUrl) {
   document.getElementById('svc-service').value = name;
-  document.getElementById('svcModalImg').src = imgUrl;
-  document.getElementById('svcModalImg').alt = name;
-  document.getElementById('svcModalLabel').textContent = icon + '  ' + name;
+  document.getElementById('svcModalIcon').textContent = icon;
+  document.getElementById('svcModalLabel').textContent = name;
 
   // Inject pricing block
   const pricing = SERVICE_PRICING[name];
