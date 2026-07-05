@@ -456,12 +456,12 @@ ul{list-style:none}
 .prop-img-price{
   position:absolute;left:10px;bottom:10px;z-index:2;
   background:rgba(20,16,17,.78);backdrop-filter:blur(6px);
-  color:#fff;border-radius:10px;padding:5px 11px;
+  color:#fff;border-radius:9px;padding:4px 9px;
   display:flex;align-items:baseline;gap:3px;
-  pointer-events:none;
+  pointer-events:none;max-width:calc(100% - 20px);
 }
-.prop-img-price b{font-size:15px;font-weight:700;letter-spacing:-.01em}
-.prop-img-price span{font-size:10.5px;font-weight:500;color:rgba(255,255,255,.75)}
+.prop-img-price b{font-size:13px;font-weight:700;letter-spacing:-.01em;white-space:nowrap}
+.prop-img-price span{font-size:9.5px;font-weight:500;color:rgba(255,255,255,.75);white-space:nowrap}
 .prop-body{padding:13px 14px 12px;flex:1;min-width:0;display:flex;flex-direction:column}
 .prop-price{
   font-size:18px;font-weight:600;color:var(--text);
@@ -1339,6 +1339,14 @@ ul{list-style:none}
   outline:none;transition:border-color .12s;
 }
 .form-input:focus{border-color:var(--brand)}
+.add-modal.view-mode input:disabled,
+.add-modal.view-mode select:disabled,
+.add-modal.view-mode textarea:disabled{
+  opacity:1;background:var(--bg-2,#f4f4f6);color:var(--brand);cursor:default;-webkit-text-fill-color:var(--brand);font-weight:600;
+}
+.add-modal.view-mode .lm-section{cursor:default}
+.add-modal.view-mode .img-thumb-del{display:none}
+.add-modal.view-mode .form-submit{display:none}
 .form-select{
   width:100%;border:1.5px solid var(--border-2);border-radius:9px;
   padding:9px 12px;font-size:13px;color:var(--text);background:var(--bg);
@@ -2891,12 +2899,13 @@ ul{list-style:none}
   <div class="add-modal" id="addModalBox" style="max-width:860px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:92vh">
     <div class="add-modal-header" style="background:linear-gradient(135deg,var(--brand) 0%,var(--brand-hover) 100%);padding:24px 28px;margin-bottom:0;position:relative;flex-shrink:0">
       <div>
-        <div class="add-modal-title" style="color:#fff">List your property</div>
+        <div class="add-modal-title" style="color:#fff" id="addModalTitleText">List your property</div>
+        <div style="color:rgba(255,255,255,.85);font-size:12px;font-weight:600;margin-top:2px;display:none" id="addModalSubtitleText"></div>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
-      <button type="button" onclick="if(confirm('Clear everything you\'ve filled in for this listing?')) clearAddModalDraft()" style="background:transparent;border:1.5px solid rgba(255,255,255,.4);color:#fff;border-radius:16px;padding:0 12px;height:32px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">Clear form</button>
+      <button type="button" id="clearFormBtn" onclick="if(confirm('Clear everything you\'ve filled in for this listing?')) clearAddModalDraft()" style="background:transparent;border:1.5px solid rgba(255,255,255,.4);color:#fff;border-radius:16px;padding:0 12px;height:32px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">Clear form</button>
       <button class="modal-close" style="position:static;background:rgba(255,255,255,.22);border:1.5px solid rgba(255,255,255,.4);color:#fff;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;transition:background .15s,transform .15s" onmouseover="this.style.background='rgba(255,255,255,.35)';this.style.transform='scale(1.06)'" onmouseout="this.style.background='rgba(255,255,255,.22)';this.style.transform='scale(1)'" onclick="closeAddModal()" aria-label="Close">
-        <svg viewBox="0 0 24 24" aria-hidden="true" stroke="#fff" style="width:18px;height:18px;stroke-width:2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <svg viewBox="0 0 24 24" aria-hidden="true" stroke="#fff" style="width:18px;height:18px;stroke-width:2.2;stroke:#fff !important"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
       </div>
     </div>
@@ -2904,7 +2913,7 @@ ul{list-style:none}
     <div style="overflow-y:auto;padding:20px 28px 28px;flex:1">
 
     <!-- ===== 0. IMPORT EXISTING DATA (file upload or pasted JSON) ===== -->
-    <div class="lm-section" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between" onclick="toggleImportPanel()">
+    <div class="lm-section" id="importSectionHeader" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between" onclick="toggleImportPanel()">
       <span>📥 Import property data (optional)</span>
       <span id="importPanelToggleTxt" style="font-size:12px;color:var(--brand);font-weight:700">Show</span>
     </div>
@@ -2958,7 +2967,7 @@ ul{list-style:none}
         <label class="form-label">City</label>
         <input class="form-input" type="text" id="f-city" value="Bengaluru" />
       </div>
-      <div class="form-group" style="grid-column:span 3">
+      <div class="form-group" id="fullAddressGroup" style="grid-column:span 3">
         <label class="form-label">Building Live Address</label>
         <div style="display:flex;gap:7px;align-items:flex-start">
           <textarea class="form-input" id="f-fullAddress" rows="2" placeholder="House No., Building Name, Street, Landmark, Pincode" style="flex:1;min-width:0;resize:vertical"></textarea>
@@ -2970,11 +2979,11 @@ ul{list-style:none}
         </div>
         <div id="f-locStatus" style="font-size:11px;color:var(--text-2);min-height:14px;margin-top:2px">Live auto-fills from GPS</div>
       </div>
-      <div class="form-group">
+      <div class="form-group" id="latLngGroup">
         <label class="form-label">Latitude / Longitude (auto)</label>
         <input class="form-input" type="text" id="f-latLngDisplay" placeholder="12.9716° N, 77.5946° E or auto-detected" readonly />
       </div>
-      <div class="form-group">
+      <div class="form-group" id="mapsLinkGroup">
         <label class="form-label">Google Maps link (optional)</label>
         <input class="form-input" type="url" id="f-googleMapsLink" placeholder="https://maps.app.goo.gl/..." />
       </div>
@@ -2982,6 +2991,7 @@ ul{list-style:none}
     <input type="hidden" id="f-latitude"/><input type="hidden" id="f-longitude"/>
 
     <!-- ===== 3. OWNER DETAILS ===== -->
+    <div id="ownerDetailsSection">
     <div class="lm-section">👤 Owner Details</div>
     <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
 	<div class="form-group">
@@ -3013,6 +3023,7 @@ ul{list-style:none}
           </div>
         </div>
       </div>
+    </div>
     </div>
 
     <!-- ===== 4. PRICING ===== -->
@@ -3191,7 +3202,7 @@ ul{list-style:none}
         <div class="form-group"><label class="form-label">Lease duration</label><select class="form-select" id="f-leaseDurationVal"><option value="">Select</option><option>1 Year</option><option>2 Years</option><option>3 Years</option><option>5 Years</option><option>9 Years</option><option>15 Years</option><option>30 Years</option></select></div>
         <div class="form-group"><label class="form-label">Lease type</label><select class="form-select" id="f-leaseType"><option value="">Select</option><option>Residential</option><option>Commercial</option><option>Industrial</option><option>Mixed Use</option></select></div>
         <div class="form-group"><label class="form-label">Lock-in period</label><select class="form-select" id="f-lockInPeriod"><option value="">None</option><option>1 Year</option><option>2 Years</option><option>3 Years</option></select></div>
-        <div class="form-group"><label class="form-label">Available from</label><select class="form-select" id="f-leaseAvailableFrom"><option value="">Immediate</option><option>Within 15 Days</option><option>Within 1 Month</option><option>Within 2 Months</option></select></div>
+        <div class="form-group"><label class="form-label">Available from</label><input class="form-input" type="date" id="f-leaseAvailableFrom" /></div>
         <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-leaseNoticePeriod"><option value="">Select</option><option>1 Month</option><option>2 Months</option><option>3 Months</option></select></div>
         <div class="form-group"><label class="form-label">Rent escalation</label><select class="form-select" id="f-rentEscalation"><option value="">None</option><option>5% per year</option><option>10% per year</option><option>15% per year</option></select></div>
       </div>
@@ -3223,7 +3234,7 @@ ul{list-style:none}
       </div>
       <div class="lm-section">📅 Availability &amp; Terms</div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
-        <div class="form-group"><label class="form-label">Available from</label><select class="form-select" id="f-pgAvailableFrom"><option value="">Immediate</option><option>Within 15 Days</option><option>Within 1 Month</option><option>Within 2 Months</option><option>Within 3 Months</option></select></div>
+        <div class="form-group"><label class="form-label">Available from</label><input class="form-input" type="date" id="f-pgAvailableFrom" /></div>
         <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-pgNotice"><option value="">Select</option><option>15 Days</option><option>1 Month</option><option>2 Months</option><option>3 Months</option></select></div>
       </div>
       <div class="lm-section">🍽 Meals &amp; Rules</div>
@@ -3252,7 +3263,7 @@ ul{list-style:none}
     </div>
     <div class="form-group">
       <label class="form-label">Property images (optional)</label>
-      <div class="img-row">
+      <div class="img-row" id="imgAddControls">
         <textarea class="img-url-input" id="f-imgUrlInput" rows="2" placeholder="Paste image URLs, one per line or comma-separated…"></textarea>
         <div class="img-btns">
           <button type="button" class="img-btn-add" onclick="addImageFromUrl()">+ Add URL(s)</button>
@@ -3267,6 +3278,24 @@ ul{list-style:none}
     </div>
 
     <button class="form-submit" onclick="submitListing()">Submit listing</button>
+
+    <!-- View-mode only: quick actions carried over from the old detail view (save,
+         contact, schedule a visit, WhatsApp). Hidden while actually listing a property. -->
+    <div class="modal-actions" id="viewActionsRow" style="display:none;margin-top:14px">
+      <button class="modal-btn-secondary" id="modal-save-btn">♡ Save</button>
+      <button class="modal-btn-primary" onclick="showToast('Contact shown to verified users')">Contact</button>
+    </div>
+    <div class="modal-actions-row" id="viewActionsRow2" style="display:none;margin-top:10px">
+      <button class="modal-btn-outline" id="viewScheduleBtn">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Schedule visit
+        <span class="modal-visit-count-badge" id="modal-visit-count" style="display:none">0</span>
+      </button>
+      <button class="modal-btn-whatsapp" id="viewWhatsappBtn">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg>
+        WhatsApp
+      </button>
+    </div>
     </div>
   </div>
 </div>
@@ -4604,32 +4633,17 @@ function cardHTML(p) {
   const deposit = p.price?.deposit || 0;
   const maintenance = p.price?.maintenance || 0;
   const floor = p.property?.floor || '';
-  const facing = p.property?.facing || '';
-  const tenant = p.property?.tenant || '';
-  const negotiable = p.price?.negotiable || '';
   const available = p.property?.available || '';
   // ── Extra fields captured on the post-property form but not previously shown on cards ──
   const ptype = p.property?.type || '';
   const areaSqft = p.property?.area || '';
-  const age = p.property?.age || '';
-  const listedBy = p.basic?.listedBy || '';
-  const rentIncrease = p.price?.rentIncrease || '';
-  const electricity = p.price?.electricity || '';
-  const water = p.price?.water || '';
-  const notice = p.terms?.notice || '';
   const leaseDur = p.terms?.lease || '';
-  const leaseType = p.terms?.leaseType || '';
-  const lockIn = p.terms?.lockIn || '';
-  const pets = p.rules?.pets || '';
-  const nonVeg = p.rules?.nonVeg || '';
-  const gas = p.rules?.gas || '';
-  const desc = p.media?.desc || '';
   const video = p.media?.video || '';
   const pg = p.pg || {};
   const isPGCard = pType === 'PG';
   // Plain-text chip, no icon — used for the long tail of fields below so we're not
   // hand-drawing an SVG per field. Skips rendering entirely when value is empty.
-  const chip = (label, value) => value ? `<span class="prop-chip" title="${esc(label)}"><span class="prop-chip-lbl">${esc(label)}:</span> <span class="prop-chip-val">${esc(value)}</span></span>` : '';
+  const chip = (label, value) => value ? `<span class="prop-chip" title="${esc(label)}"><span class="prop-chip-val">${esc(value)}</span></span>` : '';
   const availableFmt = available ? (() => {
     const d = new Date(available);
     if (isNaN(d)) return available;
@@ -4650,18 +4664,17 @@ function cardHTML(p) {
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         </div>
       </div>
-      <div class="prop-img-price"><b>₹${(p.price?.rent||0).toLocaleString('en-IN')}</b><span>/ Month</span></div>
+      <div class="prop-img-price"><b>₹${(p.price?.rent||0).toLocaleString('en-IN')}</b><span>/ ${pType === 'Lease' ? (leaseDur || 'Lease') : 'Month'}</span></div>
     </div>
     <div class="prop-body">
-      <div class="prop-title" title="${esc(p.owner?.propertyName)}">
-        <span class="prop-title-text">${esc(p.owner?.propertyName)}</span>
+      <div class="prop-title" title="${esc(p.propertyId || p.owner?.propertyName)}">
+        <span class="prop-title-text">${esc(p.propertyId || p.owner?.propertyName || 'Untitled listing')}</span>
         ${p.verified ? `<span class="prop-verified-badge" title="Verified listing"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1l3.2 1.6 3.5.4 1.6 3.2 2.7 2.4-.6 3.6 1 3.4-2.7 2.4-1.6 3.2-3.5.4-3.2 1.6-3.2-1.6-3.5-.4-1.6-3.2-2.7-2.4.6-3.6-1-3.4 2.7-2.4 1.6-3.2 3.5-.4z"/><path d="M9 12.5l2 2 4-4.5" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Verified</span>` : ''}
       </div>
       <div class="prop-loc">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         <span>${esc(p.location?.area)}</span>
       </div>
-      ${p.propertyId ? `<div class="prop-id" title="Property ID">${esc(p.propertyId)}</div>` : ''}
       <div class="prop-stats">
         <span class="prop-stat" title="Configuration">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7v11M3 11h18M21 7v11M7 7v4M17 7v4"/></svg>
@@ -4698,35 +4711,14 @@ function cardHTML(p) {
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg>
           ${floor}
         </span>` : ''}
-        ${tenant ? `<span class="prop-chip" title="Tenant preference">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg>
-          ${tenant}
-        </span>` : ''}
-        ${negotiable === 'Yes' ? `<span class="prop-chip" title="Rent is negotiable">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H7"/></svg>
-          Negotiable
-        </span>` : ''}
         ${availableFmt ? `<span class="prop-chip" title="Available from">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           Available From ${availableFmt}
         </span>` : ''}
-        ${facing ? `<span class="prop-chip" title="Facing">${esc(facing)} facing</span>` : ''}
       </div>
       <div class="prop-chip-row">
         ${chip('Property type', ptype)}
         ${chip('Built-up area', areaSqft ? areaSqft + ' sqft' : '')}
-        ${chip('Age of property', age)}
-        ${chip('Listed by', listedBy)}
-        ${chip('Rent escalation', rentIncrease)}
-        ${chip('Electricity included', electricity)}
-        ${chip('Water charge', water)}
-        ${chip('Notice period', notice)}
-        ${pType === 'Lease' ? chip('Lease duration', leaseDur) : ''}
-        ${pType === 'Lease' ? chip('Lease type', leaseType) : ''}
-        ${pType === 'Lease' ? chip('Lock-in', lockIn) : ''}
-        ${chip('Pets allowed', pets)}
-        ${chip('Non-veg allowed', nonVeg)}
-        ${chip('Piped gas', gas)}
         ${video ? `<span class="prop-chip" title="Video walkthrough available">🎥 Video</span>` : ''}
       </div>
       ${isPGCard ? `<div class="prop-chip-row">
@@ -4734,16 +4726,7 @@ function cardHTML(p) {
         ${chip('Room type', pg.room)}
         ${chip('Meals', pg.meals)}
         ${chip('Occupancy', pg.occupancy)}
-        ${chip('Attached bathroom', pg.bathroom)}
-        ${chip('Meal cost', pg.mealCost ? '₹' + Number(pg.mealCost).toLocaleString('en-IN') : '')}
-        ${chip('Total beds', pg.beds)}
-        ${chip('Room furnishing', pg.furnish)}
-        ${chip('Food type', pg.food)}
-        ${chip('Kitchen access', pg.kitchen)}
-        ${chip('Visitor policy', pg.visitors)}
-        ${chip('Gate time', pg.gateTime)}
       </div>` : ''}
-      ${desc ? `<div class="prop-desc-preview">${esc(desc)}</div>` : ''}
       <div class="prop-footer">
         <div class="prop-quick-actions">
           <button class="prop-qa-btn" onclick="event.stopPropagation();showToast('Contact info shown to verified users')" aria-label="Contact owner">
@@ -4796,6 +4779,7 @@ function shortlistCardHTML(p) {
   const lift = pHasLift(p);
   const deposit = p.price?.deposit || 0;
   const maintenance = p.price?.maintenance || 0;
+  const leaseDur = p.terms?.lease || '';
   return `<div class="prop-card" onclick="openDetail('${p.id}')">
     <div class="prop-img" style="background:${bg}" data-idx="0">
       ${buildImgSlider(p, fg)}
@@ -4808,17 +4792,16 @@ function shortlistCardHTML(p) {
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         </div>
       </div>
-      <div class="prop-img-price"><b>₹${(p.price?.rent||0).toLocaleString('en-IN')}</b><span>/ Month</span></div>
+      <div class="prop-img-price"><b>₹${(p.price?.rent||0).toLocaleString('en-IN')}</b><span>/ ${pType === 'Lease' ? (leaseDur || 'Lease') : 'Month'}</span></div>
     </div>
     <div class="prop-body">
-      <div class="prop-title" title="${esc(p.owner?.propertyName)}">
-        <span class="prop-title-text">${esc(p.owner?.propertyName)}</span>
+      <div class="prop-title" title="${esc(p.propertyId || p.owner?.propertyName)}">
+        <span class="prop-title-text">${esc(p.propertyId || p.owner?.propertyName || 'Untitled listing')}</span>
       </div>
       <div class="prop-loc">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         <span>${esc(p.location?.area)}</span>
       </div>
-      ${p.propertyId ? `<div class="prop-id" title="Property ID">${esc(p.propertyId)}</div>` : ''}
       <div class="prop-stats">
         <span class="prop-stat" title="Configuration">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7v11M3 11h18M21 7v11M7 7v4M17 7v4"/></svg>
@@ -5722,265 +5705,83 @@ function setView(type, btn) {
 /* ═══════════════════════════════════════════════
    DETAIL MODAL
 ═══════════════════════════════════════════════ */
+// Set while the "List your property" form/modal is being reused to show a
+// read-only view of an existing listing (see openDetail below), so the
+// shared open/close plumbing (backdrop click, the header X button, autosave)
+// can tell the two uses apart and not clobber the user's own in-progress draft.
+let propertyViewMode = false;
+
 function openDetail(id) {
   const p = PROPERTIES.find(x => x.id === id);
   if (!p) return;
   incrementViews(p);   // count this open as a view, persisted to storage
   recordRecentlyViewed(p);
   renderCards();        // reflect the new count on the card grid
+
+  // Show the property using the exact same form used to list one — every
+  // field prefilled from this listing's data, locked to read-only.
+  propertyViewMode = true;
+  resetListingForm();
+  applyImportedProperty(p);
+  onFTypeChange(document.getElementById('f-type').value);
+
+  document.querySelectorAll('#addModalBox input, #addModalBox select, #addModalBox textarea')
+    .forEach(el => { el.disabled = true; });
+  ['importSectionHeader', 'importPanelBody', 'clearFormBtn', 'ownerDetailsSection', 'fullAddressGroup', 'latLngGroup', 'mapsLinkGroup'].forEach(elId => {
+    const el = document.getElementById(elId);
+    if (el) el.style.display = 'none';
+  });
+  document.getElementById('addModalTitleText').textContent = p.owner?.propertyName || 'Property details';
+  const sub = document.getElementById('addModalSubtitleText');
+  if (sub) { sub.textContent = p.propertyId || ''; sub.style.display = p.propertyId ? '' : 'none'; }
+
+  // Wire up the same quick actions the old detail view offered (save,
+  // contact, schedule a visit, WhatsApp) onto the form's action row.
   const liked = shortlisted.has(String(p.id));
-  const pType = pTypeLabel(p);
-  const colors = {Rent:'#e8f5ee',Lease:'#dde9fa',PG:'#eee8fa'};
-  const loc = p.location || {};
-  const owner = p.owner || {};
-  const price = p.price || {};
-  const prop = p.property || {};
-  const terms = p.terms || {};
-  const rules = p.rules || {};
-  const media = p.media || {};
-  const pg = p.pg || {};
-  const lift = pHasLift(p);
-  const carpark = (parseInt(prop.car, 10) || 0) > 0;
-  const bikepark = (parseInt(prop.bike, 10) || 0) > 0;
+  const saveBtn = document.getElementById('modal-save-btn');
+  saveBtn.textContent = liked ? '♥ Saved' : '♡ Save';
+  saveBtn.dataset.propId = String(p.id);
+  saveBtn.onclick = () => toggleShortlistFromModal(String(p.id));
+  document.getElementById('viewScheduleBtn').onclick = () => openScheduleModal(p.id);
+  document.getElementById('viewWhatsappBtn').onclick = () => openWhatsApp(p.id);
+  const visitBadge = document.getElementById('modal-visit-count');
+  visitBadge.dataset.propId = String(p.id);
+  if ((p.visitCount || 0) > 0) { visitBadge.textContent = p.visitCount; visitBadge.style.display = ''; }
+  else { visitBadge.style.display = 'none'; }
+  document.getElementById('viewActionsRow').style.display = '';
+  document.getElementById('viewActionsRow2').style.display = '';
 
-  // ── Hero gallery (reuses the same slider pattern as the listing cards) ──
-  const imgs = (media.images && media.images.length) ? media.images : [];
-  const uid = 'modalSlide' + p.id;
-  let galleryHtml;
-  if (imgs.length === 0) {
-    galleryHtml = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`;
-  } else {
-    const slides = imgs.map((url, i) => `<img class="img-slide${i===0?' active':''}" src="${safeUrl(url)}" alt="" onclick="event.stopPropagation();openLightbox('${p.id}',${i})" />`).join('');
-    const dots = imgs.length > 1 ? `<div class="slide-dots">${imgs.map((_,i)=>`<button class="slide-dot${i===0?' active':''}" onclick="event.stopPropagation();slideGo('${uid}',${i})"></button>`).join('')}</div>` : '';
-    const arrows = imgs.length > 1 ? `
-      <div class="slide-arrows">
-        <button class="slide-prev" onclick="event.stopPropagation();slideStep('${uid}',-1)"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
-        <button class="slide-next" onclick="event.stopPropagation();slideStep('${uid}',1)"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
-      </div>` : '';
-    galleryHtml = `<div id="${uid}" style="position:absolute;inset:0">${slides}</div>${arrows}${dots}`;
-  }
-  const modalImgEl = document.getElementById('modalImg');
-  modalImgEl.style.background = imgs.length ? 'var(--bg-3)' : (colors[pType] || '#f0f0f0');
-  modalImgEl.innerHTML = `
-    <span class="modal-img-typebadge" style="background:${colors[pType] || '#eee'}">${pType || '—'}</span>
-    ${galleryHtml}
-    ${imgs.length > 1 ? `<span class="modal-img-counter">${imgs.length} photos</span>` : ''}
-    <button class="modal-close" onclick="closeDetail()" aria-label="Close details">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-  `;
-
-  // ── helpers ──
-  // Every field always renders. Missing values show a muted em dash instead of being hidden.
-  function mf(label, value) {
-    const has = !(value === null || value === undefined || value === '');
-    return `<div class="modal-field"><div class="modal-field-label">${esc(label)}</div><div class="modal-field-value${has?'':' empty'}">${has ? esc(value) : '—'}</div></div>`;
-  }
-  function cf(icon, label, value) {
-    const has = !(value === null || value === undefined || value === '');
-    return `<div class="modal-contact-row"><div class="modal-contact-label">${icon}${esc(label)}</div><div class="modal-contact-value${has?'':' empty'}">${has ? esc(value) : '—'}</div></div>`;
-  }
-  function money(v) {
-    if (v === null || v === undefined || v === '') return '';
-    const n = Number(v);
-    return isNaN(n) ? v : '₹' + n.toLocaleString('en-IN');
-  }
-  function section(icon, title, fieldsHtml) {
-    return `<div class="modal-divider"></div>
-      <div class="modal-section-head">${icon}<div class="modal-section-title">${title}</div></div>
-      <div class="modal-grid">${fieldsHtml.join('')}${fieldsHtml.length % 2 ? '<div class="modal-field modal-field-filler"></div>' : ''}</div>`;
-  }
-  const I = {
-    home:'<svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
-    cash:'<svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg>',
-    doc:'<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
-    bed:'<svg viewBox="0 0 24 24"><path d="M2 9v9M2 11h20v7M2 4v5M22 11V9a2 2 0 0 0-2-2H6"/></svg>',
-    pin:'<svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
-    user:'<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
-    phone:'<svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
-    mail:'<svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><polyline points="22 6 12 13 2 6"/></svg>',
-    clock:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
-  };
-
-  // ── Quick-fact strip (signature element) ──
-  const facts = [
-    {icon:I.cash, val: price.rent ? '₹'+price.rent.toLocaleString('en-IN') : '—', lbl:'Rent / Month'},
-    {icon:I.bed, val: prop.bhk || '—', lbl:'BHK'},
-    {icon:I.home, val: prop.area ? prop.area+' sqft' : '—', lbl:'Area'},
-    {icon:I.doc, val: prop.furnish || '—', lbl:'Furnishing'},
-    {icon:I.cash, val: price.deposit ? '₹'+price.deposit.toLocaleString('en-IN') : '—', lbl:'Deposit'},
-  ];
-  const factStripHtml = facts.map(f => `<div class="modal-fact">${f.icon}<div class="modal-fact-val">${f.val}</div><div class="modal-fact-lbl">${f.lbl}</div></div>`).join('');
-
-  // ── Core fields (common to all types) ──
-  const coreFields = [
-    mf('Property ID', p.propertyId),
-    mf('Property type', prop.type),
-    mf('BHK', prop.bhk),
-    mf('Furnishing', prop.furnish),
-    mf('Floor', prop.floor),
-    mf('Built-up area', prop.area ? prop.area + ' sq.ft' : ''),
-    mf('Bathrooms', prop.bathrooms),
-    mf('Facing', prop.facing),
-    mf('Age of property', prop.age),
-    mf('Lift', 'lift' in prop || true ? (lift ? 'Yes' : 'No') : ''),
-    mf('Car parking', prop.car !== undefined ? (carpark ? String(parseInt(prop.car, 10)) : 'No') : ''),
-    mf('Bike parking', prop.bike !== undefined ? (bikepark ? String(parseInt(prop.bike, 10)) : 'No') : ''),
-    mf('Tenant preferred', prop.tenant),
-    mf('Available from', prop.available),
-  ];
-
-  // ── Pricing fields ──
-  const pricingFields = [
-    mf('Deposit', money(price.deposit)),
-    mf('Maintenance', price.maintenance ? money(price.maintenance) + '/ Month' : ''),
-    mf('Rent escalation', price.rentIncrease),
-    mf('Electricity included', price.electricity),
-    mf('Water charge', price.water),
-    mf('Negotiable', price.negotiable || 'Not specified'),
-  ];
-
-  // ── Rent / Lease terms (shared shape) ──
-  const termsFields = [
-    mf('Notice period', terms.notice),
-    mf('Lease / agreement duration', terms.lease),
-    mf('Lease type', terms.leaseType),
-    mf('Lock-in period', terms.lockIn),
-    mf('Pets allowed', rules.pets),
-    mf('Non-veg allowed', rules.nonVeg),
-    mf('Piped gas', rules.gas),
-  ];
-
-  // ── PG-specific ──
-  const pgFields = [
-    mf('Gender', pg.gender),
-    mf('Room type', pg.room),
-    mf('Attached bathroom', pg.bathroom),
-    mf('Occupancy available', pg.occupancy),
-    mf('Total beds', pg.beds),
-    mf('Meals cost', pg.mealCost ? money(pg.mealCost) + '/ Month' : ''),
-    mf('Room furnishing', pg.furnish),
-    mf('Kitchen access', pg.kitchen),
-    mf('Available from', pg.available),
-    mf('Notice period', pg.notice),
-    mf('Meals', pg.meals),
-    mf('Food type', pg.food),
-    mf('Gate closing time', pg.gateTime),
-    mf('Visitor policy', pg.visitors),
-    mf('Non-veg allowed', pg.nonVeg),
-    mf('Pets allowed', pg.pets),
-  ];
-  const typeSectionsHtml = {
-    Rent:  section(I.cash, 'Rent terms', termsFields),
-    Lease: section(I.doc, 'Lease terms', termsFields),
-    PG:    section(I.bed, 'PG details', pgFields),
-  };
-  const activeTypeSection = typeSectionsHtml[pType] || '';
-
-  // ── Location fields ──
-  const locationFields = [
-    mf('City', loc.city),
-    mf('Full address', loc.address),
-    mf('Coordinates', (loc.lat && loc.lng) ? Number(loc.lat).toFixed(6) + '° N, ' + Number(loc.lng).toFixed(6) + '° E' : ''),
-  ];
-  const mapsLinkHtml = safeUrl(loc.mapLink)
-    ? `<a href="${safeUrl(loc.mapLink)}" target="_blank" rel="noopener" class="modal-link-card">
-        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        View on Google Maps →
-      </a>`
-    : `<div class="modal-link-card modal-link-card-empty">
-        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        No Google Maps link provided
-      </div>`;
-
-  // ── Owner / contact fields ──
-  const contactRows = [
-    cf(I.user, 'Listed by', p.basic?.listedBy),
-    cf(I.user, 'Owner name', owner.name),
-    cf(I.phone, 'Phone', owner.phone),
-    cf(I.mail, 'Email', owner.email),
-    cf(I.phone, 'Alternate number', owner.altPhone),
-    cf(I.clock, 'Best time to contact', owner.contactTime),
-    cf(I.pin, 'Owner address', owner.address),
-  ].join('');
-
-  document.getElementById('modalBody').innerHTML = `
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
-      <div>
-        <div class="modal-price">${price.rent ? '₹'+price.rent.toLocaleString('en-IN') : '—'} <span>/ Month</span></div>
-        <div class="modal-title" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-          <span>${esc(owner.propertyName) || 'Untitled listing'}</span>
-          ${p.verified ? `<span class="prop-verified-badge" title="Verified listing"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1l3.2 1.6 3.5.4 1.6 3.2 2.7 2.4-.6 3.6 1 3.4-2.7 2.4-1.6 3.2-3.5.4-3.2 1.6-3.2-1.6-3.5-.4-1.6-3.2-2.7-2.4.6-3.6-1-3.4 2.7-2.4 1.6-3.2 3.5-.4z"/><path d="M9 12.5l2 2 4-4.5" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Verified</span>` : ''}
-        </div>
-        <div class="modal-loc">
-          ${I.pin}
-          ${esc(loc.area) || '—'}
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-factstrip">${factStripHtml}</div>
-
-    <div class="modal-divider"></div>
-    <div class="modal-section-head">${I.home}<div class="modal-section-title">Property details</div></div>
-    <div class="modal-grid">
-      ${coreFields.join('')}${coreFields.length % 2 ? '<div class="modal-field modal-field-filler"></div>' : ''}
-    </div>
-
-    ${section(I.cash, 'Pricing details', pricingFields)}
-    ${activeTypeSection}
-
-    <div class="modal-divider"></div>
-    <div class="modal-section-head">${I.doc}<div class="modal-section-title">Amenities</div></div>
-    <div class="modal-amenities">
-      ${(() => {
-        const list = (p.amenities?.selected || []).slice();
-        if (p.amenities?.extra) list.push(...p.amenities.extra.split(',').map(s => s.trim()).filter(Boolean));
-        return list.length
-          ? list.map(a => `<div class="modal-amenity"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>${esc(a)}</div>`).join('')
-          : '<div class="modal-empty-note">No amenities listed</div>';
-      })()}
-    </div>
-
-    <div class="modal-divider"></div>
-    <div class="modal-section-head">${I.doc}<div class="modal-section-title">About this property</div></div>
-    <div class="modal-desc">${media.desc ? escMultiline(media.desc) : '<span class="modal-empty-note">No description provided</span>'}</div>
-
-    ${safeUrl(media.video)
-      ? `<a href="${safeUrl(media.video)}" target="_blank" rel="noopener" class="modal-link-card"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Watch property video</a>`
-      : `<div class="modal-link-card modal-link-card-empty"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>No property video added</div>`}
-
-    ${section(I.pin, 'Location', locationFields)}
-    ${mapsLinkHtml}
-
-    <div class="modal-divider"></div>
-    <div class="modal-section-head">${I.user}<div class="modal-section-title">Contact details</div></div>
-    <div class="modal-contact-card">${contactRows}</div>
-
-    <div class="modal-posted">${I.clock}Posted ${p.posted || '—'}</div>
-    <div class="modal-actions">
-      <button class="modal-btn-secondary" onclick="toggleShortlistFromModal('${p.id}')" id="modal-save-btn" data-prop-id="${p.id}">${liked?'♥ Saved':'♡ Save'}</button>
-      <button class="modal-btn-primary" onclick="showToast('Contact shown to verified users')">Contact</button>
-    </div>
-    <div class="modal-actions-row">
-      <button class="modal-btn-outline" onclick="openScheduleModal('${p.id}')">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        Schedule visit
-        ${(p.visitCount || 0) > 0 ? `<span class="modal-visit-count-badge" id="modal-visit-count" data-prop-id="${p.id}">${p.visitCount}</span>` : `<span class="modal-visit-count-badge" id="modal-visit-count" data-prop-id="${p.id}" style="display:none">0</span>`}
-      </button>
-      <button class="modal-btn-whatsapp" onclick="openWhatsApp('${p.id}')" >
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg>
-        WhatsApp
-      </button>
-    </div>
-  `;
-  document.getElementById('detailModal').classList.add('open');
+  document.getElementById('addModalBox').classList.add('view-mode');
+  document.getElementById('addModal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 
 function closeDetail() {
-  document.getElementById('detailModal').classList.remove('open');
+  document.getElementById('addModal').classList.remove('open');
+  document.getElementById('addModalBox').classList.remove('view-mode');
   document.body.style.overflow = '';
+  propertyViewMode = false;
+
+  // Put the form back to normal "List your property" chrome and clear out
+  // the viewed listing's data so it can never leak into a future draft —
+  // then restore whatever the user themselves had in progress, if anything.
+  document.querySelectorAll('#addModalBox input, #addModalBox select, #addModalBox textarea')
+    .forEach(el => { el.disabled = false; });
+  ['importSectionHeader', 'clearFormBtn', 'ownerDetailsSection', 'fullAddressGroup', 'latLngGroup', 'mapsLinkGroup'].forEach(elId => {
+    const el = document.getElementById(elId);
+    if (el) el.style.display = '';
+  });
+  document.getElementById('importPanelBody').style.display = 'none';
+  document.getElementById('importPanelToggleTxt').textContent = 'Show';
+  document.getElementById('addModalTitleText').textContent = 'List your property';
+  const sub = document.getElementById('addModalSubtitleText');
+  if (sub) { sub.style.display = 'none'; sub.textContent = ''; }
+
+  resetListingForm();
+  restoreListingDraft();
+
+  document.getElementById('viewActionsRow').style.display = 'none';
+  document.getElementById('viewActionsRow2').style.display = 'none';
 }
 
 function toggleShortlistFromModal(id) {
@@ -6196,6 +5997,10 @@ function openAddModal() {
   if (restored) showToast('Your unfinished listing was restored');
 }
 function closeAddModal() {
+  // Same modal/header X button and backdrop-click are shared with the
+  // read-only property view (see openDetail/closeDetail) — route there
+  // instead so we don't save someone else's listing as this user's draft.
+  if (propertyViewMode) { closeDetail(); return; }
   // Do NOT clear the draft here — closing (even accidentally) should not
   // wipe what the user has already filled in. It's cleared only on
   // successful submission or explicit "Clear form".
