@@ -1399,6 +1399,32 @@ ul{list-style:none}
 .add-modal.view-mode textarea:disabled::placeholder{
   color:var(--text-3);-webkit-text-fill-color:var(--text-3);font-weight:400;
 }
+.add-modal.view-mode #videoUrlGroup input{display:none}
+.video-embed-wrap{
+  position:relative;width:100%;aspect-ratio:16/9;
+  border-radius:12px;overflow:hidden;background:#000;margin-bottom:10px;
+}
+.video-embed-wrap iframe,
+.video-embed-wrap video{
+  position:absolute;inset:0;width:100%;height:100%;border:0;display:block;
+}
+.video-view-row{display:none;align-items:center;gap:8px}
+.video-view-link{
+  display:flex;align-items:center;gap:8px;flex:1;min-width:0;
+  color:var(--brand);font-weight:600;font-size:13px;
+  padding:9px 12px;border:1.5px solid var(--border-2);border-radius:9px;
+  overflow:hidden;
+}
+.video-view-link svg{width:16px;height:16px;flex-shrink:0;stroke:var(--brand);fill:none;stroke-width:1.8}
+.video-view-link span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.video-view-link:hover{background:var(--brand-light)}
+.video-view-copy{
+  width:38px;height:38px;flex-shrink:0;border-radius:9px;
+  border:1.5px solid var(--border-2);display:flex;align-items:center;justify-content:center;
+  color:var(--text-2);transition:border-color .12s,color .12s;
+}
+.video-view-copy:hover{border-color:var(--brand);color:var(--brand)}
+.video-view-copy svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8}
 .add-modal.view-mode .lm-section{cursor:default}
 .add-modal.view-mode .img-thumb-del{display:none}
 .add-modal.view-mode .form-submit{display:none}
@@ -3374,9 +3400,26 @@ ul{list-style:none}
          card) instead of the raw "paste a URL" add-listing controls. Hidden
          while actually creating/editing a listing — see openDetail(). -->
     <div class="detail-gallery" id="detailGallerySlot"></div>
-    <div class="form-group">
+    <div class="form-group" id="videoUrlGroup">
       <label class="form-label">Video tour URL (optional)</label>
       <input class="form-input" type="url" id="f-videoUrl" placeholder="https://youtube.com/..." />
+      <!-- View-mode only: an actual playable embed when the URL is a
+           recognizable YouTube/Vimeo link or direct video file — see
+           buildVideoDisplay()/openDetail(). Falls back to just the link
+           row below when the URL can't be embedded. -->
+      <div class="video-embed-wrap" id="videoEmbedWrap" style="display:none"></div>
+      <!-- View-mode only: disabled inputs can't be clicked or selected for
+           copying, so show the link as a real anchor plus a copy button
+           instead — see openDetail(). -->
+      <div class="video-view-row" id="videoViewRow" style="display:none">
+        <a href="#" id="videoViewLink" target="_blank" rel="noopener noreferrer" class="video-view-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+          <span id="videoViewLinkText"></span>
+        </a>
+        <button type="button" class="video-view-copy" onclick="copyVideoLink()" aria-label="Copy video link" title="Copy link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
     </div>
     <div class="form-group" id="imgFormGroup">
       <label class="form-label">Property images (optional)</label>
@@ -4262,6 +4305,52 @@ function safeUrl(v) {
     const u = new URL(s, window.location.origin);
     if (u.protocol === 'http:' || u.protocol === 'https:') return u.href;
   } catch {}
+  return '';
+}
+
+/* Recognize YouTube / Vimeo / direct video-file links so the property view
+   can embed a real player instead of just linking out. Returns null for
+   anything else (custom tour hosts, etc.) so the caller can fall back to
+   a plain "open link" row. */
+function getVideoEmbedInfo(url) {
+  let u;
+  try { u = new URL(url); } catch { return null; }
+  const host = u.hostname.replace(/^www\./, '');
+  if (host === 'youtu.be') {
+    const id = u.pathname.slice(1).split('/')[0];
+    if (id) return { type: 'youtube', id };
+  }
+  if (host === 'youtube.com' || host === 'm.youtube.com') {
+    if (u.pathname === '/watch' && u.searchParams.get('v')) {
+      return { type: 'youtube', id: u.searchParams.get('v') };
+    }
+    const m = u.pathname.match(/^\/(embed|shorts)\/([^/?]+)/);
+    if (m) return { type: 'youtube', id: m[2] };
+  }
+  if (host === 'vimeo.com' || host === 'player.vimeo.com') {
+    const m = u.pathname.match(/(\d+)/);
+    if (m) return { type: 'vimeo', id: m[1] };
+  }
+  if (/\.(mp4|webm|ogg|mov)$/i.test(u.pathname)) {
+    return { type: 'file', src: url };
+  }
+  return null;
+}
+
+// Builds a playable embed for the property-view video field; returns '' when
+// the URL isn't a recognizable embeddable format (caller keeps the link row).
+function buildVideoEmbed(url) {
+  const info = getVideoEmbedInfo(url);
+  if (!info) return '';
+  if (info.type === 'youtube') {
+    return `<iframe src="https://www.youtube.com/embed/${info.id}" title="Video tour" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+  }
+  if (info.type === 'vimeo') {
+    return `<iframe src="https://player.vimeo.com/video/${info.id}" title="Video tour" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+  }
+  if (info.type === 'file') {
+    return `<video controls preload="metadata" src="${safeUrl(info.src)}"></video>`;
+  }
   return '';
 }
 
@@ -5941,6 +6030,32 @@ function openDetail(id) {
     gallerySlot.innerHTML = `<div class="prop-img" style="background:${gbg}" data-idx="0">${buildImgSlider(p, gfg, '-detail')}</div>`;
   }
 
+  // Video tour URL — the input is disabled in view mode (can't be clicked,
+  // played, or copied), so render a real embedded player when we recognize
+  // the URL (YouTube/Vimeo/direct file), plus a clickable link + copy
+  // button so it can always be opened externally or shared either way.
+  const videoUrl = p.media?.video || '';
+  const videoRow = document.getElementById('videoViewRow');
+  const videoEmbedWrap = document.getElementById('videoEmbedWrap');
+  if (videoRow) {
+    const safeVideoUrl = safeUrl(videoUrl);
+    if (safeVideoUrl) {
+      const link = document.getElementById('videoViewLink');
+      link.href = safeVideoUrl;
+      document.getElementById('videoViewLinkText').textContent = videoUrl;
+      link.dataset.url = videoUrl;
+      videoRow.style.display = 'flex';
+      if (videoEmbedWrap) {
+        const embedHtml = buildVideoEmbed(safeVideoUrl);
+        videoEmbedWrap.innerHTML = embedHtml;
+        videoEmbedWrap.style.display = embedHtml ? 'block' : 'none';
+      }
+    } else {
+      videoRow.style.display = 'none';
+      if (videoEmbedWrap) { videoEmbedWrap.innerHTML = ''; videoEmbedWrap.style.display = 'none'; }
+    }
+  }
+
   // Wire up the same quick actions the old detail view offered (save,
   // contact, schedule a visit, WhatsApp) onto the form's action row.
   const liked = shortlisted.has(String(p.id));
@@ -5981,6 +6096,10 @@ function closeDetail() {
   propertyViewMode = false;
   const gallerySlot = document.getElementById('detailGallerySlot');
   if (gallerySlot) gallerySlot.innerHTML = '';
+  const videoRow = document.getElementById('videoViewRow');
+  if (videoRow) videoRow.style.display = 'none';
+  const videoEmbedWrap = document.getElementById('videoEmbedWrap');
+  if (videoEmbedWrap) { videoEmbedWrap.innerHTML = ''; videoEmbedWrap.style.display = 'none'; }
 
   // Put the media block back in its normal spot in the posting flow.
   const mediaSection = document.getElementById('mediaSection');
@@ -6994,6 +7113,16 @@ function closeReferModal() {
   document.getElementById('referModal').classList.remove('open');
   document.body.style.overflow = '';
 }
+function copyVideoLink() {
+  const url = document.getElementById('videoViewLink').dataset.url || '';
+  if (!url) return;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(() => showToast('Video link copied!'));
+  } else {
+    showToast('Video link: ' + url);
+  }
+}
+
 function copyReferralCode() {
   const code = document.getElementById('referCodeText').textContent.trim();
   if (navigator.clipboard) {
