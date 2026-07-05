@@ -1395,9 +1395,26 @@ ul{list-style:none}
 .add-modal.view-mode textarea:disabled{
   opacity:1;background:var(--bg-2,#f4f4f6);color:var(--brand);cursor:default;-webkit-text-fill-color:var(--brand);font-weight:600;
 }
+.add-modal.view-mode input:disabled::placeholder,
+.add-modal.view-mode textarea:disabled::placeholder{
+  color:var(--text-3);-webkit-text-fill-color:var(--text-3);font-weight:400;
+}
 .add-modal.view-mode .lm-section{cursor:default}
 .add-modal.view-mode .img-thumb-del{display:none}
 .add-modal.view-mode .form-submit{display:none}
+/* View-mode swaps the "add images" controls (paste-URL box + tiny thumb
+   grid) for a real photo gallery — see #detailGallerySlot. */
+.add-modal.view-mode #imgAddControls,
+.add-modal.view-mode #fImgGrid,
+.add-modal.view-mode #fImgHint{display:none}
+.add-modal.view-mode #imgFormGroup{display:none}
+.add-modal.view-mode #mediaSectionHeader{display:none}
+.detail-gallery{display:none}
+.add-modal.view-mode .detail-gallery{display:block;margin-bottom:16px}
+.detail-gallery .prop-img{
+  aspect-ratio:16/10;border-radius:14px;
+  border:1px solid var(--border);
+}
 .form-select{
   width:100%;border:1.5px solid var(--border-2);border-radius:9px;
   padding:9px 12px;font-size:13px;color:var(--text);background:var(--bg);
@@ -3004,7 +3021,7 @@ ul{list-style:none}
       </div>
     </div>
 
-    <div style="overflow-y:auto;padding:20px 28px 28px;flex:1">
+    <div style="overflow-y:auto;padding:20px 28px 28px;flex:1" id="addModalScrollBody">
 
     <!-- ===== 0. IMPORT EXISTING DATA (file upload or pasted JSON) ===== -->
     <div class="lm-section" id="importSectionHeader" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between" onclick="toggleImportPanel()">
@@ -3346,16 +3363,22 @@ ul{list-style:none}
     </div>
 
     <!-- ===== 8. MEDIA & DESCRIPTION ===== -->
-    <div class="lm-section">📸 Media &amp; Description</div>
+    <!-- Anchor marks this section's normal spot in the posting flow — in
+         property VIEW mode, #mediaSection gets moved to the top of the
+         scroll body instead (see openDetail/closeDetail) so photos/video
+         are the first thing a visitor sees, not the last. -->
+    <div id="mediaSectionAnchor"></div>
+    <div id="mediaSection">
+    <div class="lm-section" id="mediaSectionHeader">📸 Media &amp; Description</div>
+    <!-- View-mode only: a real photo gallery (same slider used on the property
+         card) instead of the raw "paste a URL" add-listing controls. Hidden
+         while actually creating/editing a listing — see openDetail(). -->
+    <div class="detail-gallery" id="detailGallerySlot"></div>
     <div class="form-group">
       <label class="form-label">Video tour URL (optional)</label>
       <input class="form-input" type="url" id="f-videoUrl" placeholder="https://youtube.com/..." />
     </div>
-    <div class="form-group">
-      <label class="form-label">Description (optional)</label>
-      <textarea class="form-input" id="f-desc" rows="3" placeholder="Describe the property, nearby landmarks, special features…" style="resize:vertical"></textarea>
-    </div>
-    <div class="form-group">
+    <div class="form-group" id="imgFormGroup">
       <label class="form-label">Property images (optional)</label>
       <div class="img-row" id="imgAddControls">
         <textarea class="img-url-input" id="f-imgUrlInput" rows="2" placeholder="Paste image URLs, one per line or comma-separated…"></textarea>
@@ -3369,6 +3392,11 @@ ul{list-style:none}
       </div>
       <div class="img-thumb-grid" id="fImgGrid"></div>
       <div class="img-hint" id="fImgHint">No images added yet.</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description (optional)</label>
+      <textarea class="form-input" id="f-desc" rows="3" placeholder="Describe the property, nearby landmarks, special features…" style="resize:vertical"></textarea>
+    </div>
     </div>
 
     <button class="form-submit" onclick="submitListing()">Submit listing</button>
@@ -4631,12 +4659,12 @@ function resetPages() {
   normalPage = 0;
 }
 
-function buildImgSlider(p, fg) {
+function buildImgSlider(p, fg, uidSuffix) {
   const imgs = (p.media?.images && p.media.images.length) ? p.media.images : [];
   if (imgs.length === 0) {
     return `<div class="prop-img-placeholder"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="${fg}" opacity=".3"/><polyline points="9 22 9 12 15 12 15 22" stroke="${fg}" opacity=".3"/></svg></div>`;
   }
-  const uid = 'sl' + p.id;
+  const uid = 'sl' + p.id + (uidSuffix || '');
   const slides = imgs.map((url, i) =>
     `<img class="img-slide${i===0?' active':''}" src="${safeUrl(url)}" loading="lazy" alt="" onclick="event.stopPropagation();openLightbox('${p.id}',${i})" />`
   ).join('');
@@ -4670,6 +4698,33 @@ function slideStep(uid, dir) {
   const next = (cur + dir + slides.length) % slides.length;
   slideGo(uid, next);
 }
+
+/* Swipe-to-change-photo for every .img-slides gallery (property cards,
+   shortlist panel cards, and the property-view gallery all share this
+   markup, so one delegated listener covers all of them). A horizontal
+   drag past a small threshold steps the slide; anything more vertical
+   than horizontal is left alone so the page can still scroll normally. */
+(function(){
+  let sx = 0, sy = 0, active = null;
+  document.addEventListener('touchstart', function(e){
+    const el = e.target.closest('.img-slides');
+    if (!el || !el.id) { active = null; return; }
+    if (el.querySelectorAll('.img-slide').length < 2) { active = null; return; }
+    active = el;
+    sx = e.touches[0].clientX;
+    sy = e.touches[0].clientY;
+  }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    if (!active) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - sx;
+    const dy = t.clientY - sy;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+      slideStep(active.id, dx < 0 ? 1 : -1);
+    }
+    active = null;
+  }, {passive:true});
+})();
 
 /* ═══════════════════════════════════════════════
    LIGHTBOX (full-image viewer)
@@ -4712,6 +4767,32 @@ function renderLightbox() {
     ? lightboxImgs.map((url, i) => `<div class="lightbox-thumb${i===lightboxIdx?' active':''}" style="background-image:url('${safeUrl(url)}')" onclick="lightboxGo(${i})"></div>`).join('')
     : '';
 }
+
+/* Swipe-to-change-photo inside the fullscreen lightbox — separate from the
+   card sliders since the lightbox swaps a single <img> src rather than
+   toggling .img-slide elements. */
+(function(){
+  let lsx = 0, lsy = 0, lactive = false;
+  const stage = document.querySelector('.lightbox-stage');
+  if (stage) {
+    stage.addEventListener('touchstart', function(e){
+      if (lightboxImgs.length < 2) { lactive = false; return; }
+      lactive = true;
+      lsx = e.touches[0].clientX;
+      lsy = e.touches[0].clientY;
+    }, {passive:true});
+    stage.addEventListener('touchend', function(e){
+      if (!lactive) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - lsx;
+      const dy = t.clientY - lsy;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+        lightboxStep(dx < 0 ? 1 : -1);
+      }
+      lactive = false;
+    }, {passive:true});
+  }
+})();
 
 /* Derive the frontend tab label (Rent/Lease/PG) from the nested basic.status */
 function pTypeLabel(p) {
@@ -4766,7 +4847,7 @@ function cardHTML(p) {
   })() : '';
   return `<div class="prop-card${listClass}" onclick="openDetail('${p.id}')">
     <div class="prop-img" style="background:${bg}" data-idx="0">
-      ${buildImgSlider(p, fg)}
+      ${buildImgSlider(p, fg, '-grid')}
       <div class="prop-card-top-row">
         <div class="prop-left-badges">
           ${p.promoted ? '<span class="prop-badge-promoted">★ Promoted</span>' : ''}
@@ -4896,7 +4977,7 @@ function shortlistCardHTML(p) {
   const leaseDur = p.terms?.lease || '';
   return `<div class="prop-card" onclick="openDetail('${p.id}')">
     <div class="prop-img" style="background:${bg}" data-idx="0">
-      ${buildImgSlider(p, fg)}
+      ${buildImgSlider(p, fg, '-sl')}
       <div class="prop-card-top-row">
         <div class="prop-left-badges">
           ${p.promoted ? '<span class="prop-badge-promoted">★ Promoted</span>' : ''}
@@ -5850,6 +5931,16 @@ function openDetail(id) {
   const subArea = p.location?.area || '';
   if (sub) { sub.textContent = subArea; sub.style.display = subArea ? '' : 'none'; }
 
+  // Render the same photo slider used on the property card (large image,
+  // arrows/dots, tap-to-zoom) instead of the raw add-listing image controls.
+  const gallerySlot = document.getElementById('detailGallerySlot');
+  if (gallerySlot) {
+    const pType = pTypeLabel(p);
+    const colors = {Rent:'#e8f5ee:#1a6640',Lease:'#dde9fa:#1a4680',PG:'#eee8fa:#4a2a9a'};
+    const [gbg, gfg] = (colors[pType]||'#f0f0f0:#333').split(':');
+    gallerySlot.innerHTML = `<div class="prop-img" style="background:${gbg}" data-idx="0">${buildImgSlider(p, gfg, '-detail')}</div>`;
+  }
+
   // Wire up the same quick actions the old detail view offered (save,
   // contact, schedule a visit, WhatsApp) onto the form's action row.
   const liked = shortlisted.has(String(p.id));
@@ -5867,15 +5958,36 @@ function openDetail(id) {
   document.getElementById('viewActionsRow2').style.display = '';
 
   document.getElementById('addModalBox').classList.add('view-mode');
+  document.getElementById('addModal').classList.add('view-mode');
   document.getElementById('addModal').classList.add('open');
   document.body.style.overflow = 'hidden';
+
+  // Move the media block (images/video) to the very top for viewing —
+  // photos are what someone wants to see first, not last.
+  const mediaSection = document.getElementById('mediaSection');
+  const scrollBody = document.getElementById('addModalScrollBody');
+  if (mediaSection && scrollBody && scrollBody.firstElementChild !== mediaSection) {
+    scrollBody.insertBefore(mediaSection, scrollBody.firstElementChild);
+  }
+  scrollBody.scrollTop = 0;
+  hideEmptyViewFields();
 }
 
 function closeDetail() {
   document.getElementById('addModal').classList.remove('open');
   document.getElementById('addModalBox').classList.remove('view-mode');
+  document.getElementById('addModal').classList.remove('view-mode');
   document.body.style.overflow = '';
   propertyViewMode = false;
+  const gallerySlot = document.getElementById('detailGallerySlot');
+  if (gallerySlot) gallerySlot.innerHTML = '';
+
+  // Put the media block back in its normal spot in the posting flow.
+  const mediaSection = document.getElementById('mediaSection');
+  const mediaAnchor = document.getElementById('mediaSectionAnchor');
+  if (mediaSection && mediaAnchor) {
+    mediaAnchor.insertAdjacentElement('afterend', mediaSection);
+  }
 
   // Put the form back to normal "List your property" chrome and clear out
   // the viewed listing's data so it can never leak into a future draft —
@@ -6059,6 +6171,42 @@ function resetListingForm() {
   // Reset image previews
   fImages = [];
   renderFImages();
+  // Undo any empty-field hiding from a previous property view (see
+  // hideEmptyViewFields) so a fresh "List your property" form always shows
+  // every field.
+  resetFieldVisibility();
+}
+
+/* Property view only: hide any field whose value is empty so a viewer only
+   sees the specs that were actually filled in, instead of a form full of
+   blank boxes. Reversed by resetFieldVisibility() whenever the form resets. */
+function resetFieldVisibility() {
+  document.querySelectorAll('#addModalScrollBody .form-group').forEach(group => {
+    group.style.display = '';
+  });
+}
+const VIEW_ALWAYS_HIDDEN_GROUPS = ['fullAddressGroup', 'latLngGroup', 'mapsLinkGroup', 'imgFormGroup'];
+function hideEmptyViewFields() {
+  document.querySelectorAll('#addModalScrollBody .form-group').forEach(group => {
+    if (VIEW_ALWAYS_HIDDEN_GROUPS.includes(group.id)) return; // already force-hidden elsewhere
+    const controls = group.querySelectorAll('input, select, textarea');
+    if (!controls.length) return; // not a field group — leave as-is
+    let hasValue = false;
+    controls.forEach(el => {
+      if (el.type === 'checkbox' || el.type === 'radio') {
+        if (el.checked) hasValue = true;
+      } else if (String(el.value || '').trim() !== '') {
+        hasValue = true;
+      }
+    });
+    group.style.display = hasValue ? '' : 'none';
+  });
+  // A form-row with every field hidden shouldn't leave an empty gap.
+  document.querySelectorAll('#addModalScrollBody .form-row').forEach(row => {
+    const groups = [...row.children].filter(c => c.classList && c.classList.contains('form-group'));
+    const anyVisible = groups.some(g => g.style.display !== 'none');
+    row.style.display = (groups.length && !anyVisible) ? 'none' : '';
+  });
 }
 
 /* ── Draft autosave: keeps whatever the user has typed even if the
