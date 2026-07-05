@@ -2608,54 +2608,6 @@ ul{list-style:none}
   </div>
 </main>
 
-<!-- ─── Reviews Section ─────────────────────────── -->
-<section class="reviews-section" aria-label="User reviews">
-  <div class="reviews-head">
-    <div class="reviews-title">What people are <span>saying</span></div>
-    <div class="reviews-summary" id="reviewsSummary">
-      <span class="reviews-summary-score" id="reviewsAvgScore">—</span>
-      <span class="reviews-summary-stars" id="reviewsAvgStars" aria-hidden="true"></span>
-      <span class="reviews-summary-count" id="reviewsCount">No reviews yet</span>
-    </div>
-  </div>
-
-  <div class="review-form-card" id="reviewFormCard">
-    <div class="review-form-logged-out" id="reviewFormLoggedOut">
-      <p>Log in to share your experience with Quatar.</p>
-      <button class="review-login-btn" onclick="openAuthModal()">Log in to write a review</button>
-    </div>
-    <div class="review-form-logged-in" id="reviewFormLoggedIn" style="display:none">
-      <div class="review-form-row">
-        <span class="review-form-label">Your rating</span>
-        <div class="review-stars-input" id="reviewStarsInput" role="radiogroup" aria-label="Rating">
-          <span class="review-star-btn" data-val="1" onclick="setReviewRating(1)">★</span>
-          <span class="review-star-btn" data-val="2" onclick="setReviewRating(2)">★</span>
-          <span class="review-star-btn" data-val="3" onclick="setReviewRating(3)">★</span>
-          <span class="review-star-btn" data-val="4" onclick="setReviewRating(4)">★</span>
-          <span class="review-star-btn" data-val="5" onclick="setReviewRating(5)">★</span>
-        </div>
-      </div>
-      <textarea class="review-form-textarea" id="reviewText" rows="3" maxlength="500" placeholder="Tell others about your experience finding a home on Quatar…"></textarea>
-      <div class="review-form-actions">
-        <span class="review-form-charcount" id="reviewCharCount">0 / 500</span>
-        <button class="review-submit-btn" id="reviewSubmitBtn" onclick="submitReview()">Post review</button>
-      </div>
-    </div>
-    <div class="review-form-done" id="reviewFormDone" style="display:none">
-      <div class="review-form-done-icon">✓</div>
-      <div class="review-form-done-text">
-        <div class="review-form-done-title">Thanks for your feedback!</div>
-        <div class="review-form-done-sub">You've already shared your review with the community.</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="reviews-list" id="reviewsList">
-    <div class="reviews-loading">Loading reviews…</div>
-  </div>
-  <button class="reviews-loadmore-btn" id="reviewsLoadMoreBtn" style="display:none" onclick="loadMoreReviews()">Show more reviews</button>
-</section>
-
 <!-- ─── Premium Services Section ────────────────── -->
 <section class="services-section" aria-label="Our premium services">
   <div class="services-head">
@@ -2741,6 +2693,54 @@ ul{list-style:none}
       <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
   </div>
+</section>
+
+<!-- ─── Reviews Section ─────────────────────────── -->
+<section class="reviews-section" aria-label="User reviews">
+  <div class="reviews-head">
+    <div class="reviews-title">What people are <span>saying</span></div>
+    <div class="reviews-summary" id="reviewsSummary">
+      <span class="reviews-summary-score" id="reviewsAvgScore">—</span>
+      <span class="reviews-summary-stars" id="reviewsAvgStars" aria-hidden="true"></span>
+      <span class="reviews-summary-count" id="reviewsCount">No reviews yet</span>
+    </div>
+  </div>
+
+  <div class="review-form-card" id="reviewFormCard">
+    <div class="review-form-logged-out" id="reviewFormLoggedOut">
+      <p>Log in to share your experience with Quatar.</p>
+      <button class="review-login-btn" onclick="openAuthModal()">Log in to write a review</button>
+    </div>
+    <div class="review-form-logged-in" id="reviewFormLoggedIn" style="display:none">
+      <div class="review-form-row">
+        <span class="review-form-label">Your rating</span>
+        <div class="review-stars-input" id="reviewStarsInput" role="radiogroup" aria-label="Rating">
+          <span class="review-star-btn" data-val="1" onclick="setReviewRating(1)">★</span>
+          <span class="review-star-btn" data-val="2" onclick="setReviewRating(2)">★</span>
+          <span class="review-star-btn" data-val="3" onclick="setReviewRating(3)">★</span>
+          <span class="review-star-btn" data-val="4" onclick="setReviewRating(4)">★</span>
+          <span class="review-star-btn" data-val="5" onclick="setReviewRating(5)">★</span>
+        </div>
+      </div>
+      <textarea class="review-form-textarea" id="reviewText" rows="3" maxlength="500" placeholder="Tell others about your experience finding a home on Quatar…"></textarea>
+      <div class="review-form-actions">
+        <span class="review-form-charcount" id="reviewCharCount">0 / 500</span>
+        <button class="review-submit-btn" id="reviewSubmitBtn" onclick="submitReview()">Post review</button>
+      </div>
+    </div>
+    <div class="review-form-done" id="reviewFormDone" style="display:none">
+      <div class="review-form-done-icon">✓</div>
+      <div class="review-form-done-text">
+        <div class="review-form-done-title">Thanks for your feedback!</div>
+        <div class="review-form-done-sub">You've already shared your review with the community.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reviews-list" id="reviewsList">
+    <div class="reviews-loading">Loading reviews…</div>
+  </div>
+  <button class="reviews-loadmore-btn" id="reviewsLoadMoreBtn" style="display:none" onclick="loadMoreReviews()">Show more reviews</button>
 </section>
 
 <!-- ─── Service Request Modal ───────────────────── -->
