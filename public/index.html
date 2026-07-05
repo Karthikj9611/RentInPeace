@@ -1158,17 +1158,33 @@ ul{list-style:none}
   font-size:11px;color:var(--text-3);flex-shrink:0;
 }
 
-/* ─── Reviews Section ──────────────────────────── */
-.reviews-section{padding:40px 24px 48px;background:var(--bg);border-top:1px solid var(--border)}
-.reviews-head{max-width:640px;margin:0 auto 26px;text-align:center}
-.reviews-title{font-size:30px;font-weight:800;color:var(--text);letter-spacing:-.4px}
+/* ─── Reviews Section (masonry grid redesign) ──── */
+.reviews-section{padding:48px 24px 56px;background:var(--bg-2);border-top:1px solid var(--border)}
+.reviews-head{max-width:1080px;margin:0 auto 32px}
+.reviews-title{font-size:30px;font-weight:800;color:var(--text);letter-spacing:-.4px;text-align:center}
 .reviews-title span{color:var(--brand)}
-.reviews-summary{display:flex;align-items:center;justify-content:center;gap:9px;margin-top:12px;flex-wrap:wrap}
-.reviews-summary-score{font-size:22px;font-weight:800;color:var(--text)}
-.reviews-summary-stars{color:#f5a623;font-size:17px;letter-spacing:1px}
-.reviews-summary-count{font-size:13px;color:var(--text-2);font-weight:500}
+.reviews-overview{
+  display:flex;align-items:stretch;gap:0;max-width:640px;margin:24px auto 0;
+  background:var(--bg);border:1px solid var(--border);border-radius:18px;
+  overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.04);
+}
+.reviews-overview-score{
+  flex:0 0 140px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;padding:20px 12px;background:linear-gradient(160deg,var(--brand-light),var(--bg));
+  border-right:1px solid var(--border)
+}
+.reviews-overview-score-num{font-size:34px;font-weight:800;color:var(--text);line-height:1}
+.reviews-overview-stars{color:#f5a623;font-size:15px;letter-spacing:1.5px}
+.reviews-overview-count{font-size:11.5px;color:var(--text-3);font-weight:600}
+.reviews-overview-bars{flex:1;display:flex;flex-direction:column;justify-content:center;gap:5px;padding:16px 20px}
+.reviews-bar-row{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-2)}
+.reviews-bar-row span:first-child{flex:0 0 12px;font-weight:700;color:var(--text)}
+.reviews-bar-track{flex:1;height:6px;border-radius:99px;background:var(--border);overflow:hidden}
+.reviews-bar-fill{height:100%;background:#f5a623;border-radius:99px;transition:width .4s ease}
+.reviews-bar-row span:last-child{flex:0 0 26px;text-align:right;color:var(--text-3)}
+
 .review-form-card{
-  max-width:680px;margin:0 auto 14px;padding:22px 24px;
+  max-width:680px;margin:24px auto 0;padding:22px 24px;
   border:1px solid var(--border);border-radius:18px;background:var(--bg-1);
   box-shadow:0 2px 14px rgba(0,0,0,.04);
   transition:box-shadow .2s;
@@ -1181,7 +1197,7 @@ ul{list-style:none}
   padding:10px 18px;font-size:13.5px;font-weight:700;cursor:pointer;white-space:nowrap;
   transition:transform .12s,box-shadow .12s;
 }
-.review-login-btn:hover{background:var(--brand-dark,var(--brand));transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.review-login-btn:hover{background:var(--brand-hover);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
 .review-form-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
 .review-form-label{font-size:13px;font-weight:700;color:var(--text-2)}
 .review-stars-input{display:flex;gap:4px;font-size:26px;cursor:pointer;line-height:1}
@@ -1201,11 +1217,11 @@ ul{list-style:none}
   transition:transform .12s,box-shadow .12s;
 }
 .review-submit-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
-.review-submit-btn:not(:disabled):hover{background:var(--brand-dark,var(--brand));transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.12)}
+.review-submit-btn:not(:disabled):hover{background:var(--brand-hover);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.12)}
 .review-form-done{display:flex;align-items:flex-start;gap:14px;padding:2px 2px}
 .review-form-done-icon{
   width:40px;height:40px;border-radius:50%;flex-shrink:0;
-  background:linear-gradient(135deg,var(--brand),var(--brand-dark,var(--brand)));
+  background:linear-gradient(135deg,var(--brand),var(--brand-hover));
   color:#fff;font-size:18px;font-weight:800;display:flex;align-items:center;justify-content:center;
   box-shadow:0 4px 12px rgba(0,0,0,.12);
   margin-top:2px;
@@ -1213,14 +1229,25 @@ ul{list-style:none}
 .review-form-done-text{padding-top:1px}
 .review-form-done-title{font-size:14.5px;font-weight:700;color:var(--text);line-height:1.3}
 .review-form-done-sub{font-size:12.5px;color:var(--text-2);margin-top:3px;line-height:1.4}
-.reviews-list{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
-.reviews-loading,.reviews-empty{text-align:center;color:var(--text-3);font-size:13.5px;padding:24px}
-.review-card{
-  border:1px solid var(--border);border-radius:16px;padding:16px 18px;background:var(--bg-1);
-  box-shadow:0 1px 8px rgba(0,0,0,.03);transition:box-shadow .15s,transform .15s;
+
+/* Masonry grid — CSS columns keep variable-length cards packed tightly,
+   scaling cleanly whether there are 3 reviews or 3,000. */
+.reviews-list{
+  max-width:1080px;margin:34px auto 0;
+  column-count:3;column-gap:16px;
 }
-.review-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.06);transform:translateY(-1px)}
-.review-card-head{display:flex;align-items:center;gap:11px;margin-bottom:7px}
+.reviews-loading,.reviews-empty{
+  text-align:center;color:var(--text-3);font-size:13.5px;padding:40px;column-span:all;
+}
+.review-card{
+  break-inside:avoid;margin-bottom:16px;display:block;
+  border:1px solid var(--border);border-radius:16px;padding:18px 20px;background:var(--bg-1);
+  box-shadow:0 1px 8px rgba(0,0,0,.03);transition:box-shadow .15s,transform .15s;
+  border-left:3px solid var(--rc-accent,var(--brand));
+}
+.review-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.06);transform:translateY(-2px)}
+.review-card-quote{font-size:30px;line-height:1;color:var(--brand-light);font-weight:800;font-family:Georgia,serif}
+.review-card-head{display:flex;align-items:center;gap:11px;margin:2px 0 8px}
 .review-avatar{
   width:36px;height:36px;border-radius:50%;
   background:linear-gradient(135deg,var(--brand-light),var(--brand));
@@ -1230,17 +1257,23 @@ ul{list-style:none}
 .review-card-meta{flex:1;min-width:0}
 .review-card-name{font-size:13.5px;font-weight:700;color:var(--text)}
 .review-card-date{font-size:11.5px;color:var(--text-3)}
-.review-card-stars{color:#f5a623;font-size:13.5px;letter-spacing:1.5px;white-space:nowrap}
-.review-card-text{font-size:13.5px;color:var(--text-2);line-height:1.6;margin-top:5px;word-break:break-word}
+.review-card-stars{color:#f5a623;font-size:13px;letter-spacing:1.5px;white-space:nowrap}
+.review-card-text{font-size:13.5px;color:var(--text-2);line-height:1.65;word-break:break-word}
 .reviews-loadmore-btn{
-  display:block;margin:20px auto 0;background:none;border:1.5px solid var(--border-2);
+  display:block;margin:26px auto 0;background:none;border:1.5px solid var(--border-2);
   border-radius:10px;padding:9px 20px;font-size:13px;font-weight:600;color:var(--text-2);cursor:pointer;
   transition:background .15s,border-color .15s;
 }
 .reviews-loadmore-btn:hover{background:var(--bg-2);border-color:var(--brand)}
+@media (max-width:900px){
+  .reviews-list{column-count:2}
+}
 @media (max-width:680px){
   .reviews-section{padding:28px 16px 36px}
   .reviews-title{font-size:23px}
+  .reviews-list{column-count:1}
+  .reviews-overview{flex-direction:column}
+  .reviews-overview-score{border-right:none;border-bottom:1px solid var(--border);flex-direction:row;gap:10px;padding:14px}
   .review-form-logged-out{flex-direction:column;align-items:flex-start}
   .review-form-done{flex-direction:column;align-items:flex-start;text-align:left}
 }
@@ -1372,6 +1405,13 @@ ul{list-style:none}
 }
 .form-select:focus{border-color:var(--brand)}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:640px){
+  /* Post Property and View Property share this form — keep every row to
+     exactly 2 fields per line on mobile, even where a row is set to 3+
+     columns inline for desktop. */
+  .form-row{grid-template-columns:1fr 1fr!important;gap:10px}
+  .form-row [style*="grid-column"]{grid-column:1/-1!important}
+}
 .lm-section{font-size:10px;font-weight:800;color:var(--text-2);text-transform:uppercase;letter-spacing:.8px;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border-2)}
 .form-submit{
   width:100%;padding:12px;border-radius:10px;
@@ -2714,10 +2754,19 @@ ul{list-style:none}
 <section class="reviews-section" aria-label="User reviews">
   <div class="reviews-head">
     <div class="reviews-title">What people are <span>saying</span></div>
-    <div class="reviews-summary" id="reviewsSummary">
-      <span class="reviews-summary-score" id="reviewsAvgScore">—</span>
-      <span class="reviews-summary-stars" id="reviewsAvgStars" aria-hidden="true"></span>
-      <span class="reviews-summary-count" id="reviewsCount">No reviews yet</span>
+    <div class="reviews-overview" id="reviewsSummary">
+      <div class="reviews-overview-score">
+        <div class="reviews-overview-score-num" id="reviewsAvgScore">—</div>
+        <div class="reviews-overview-stars" id="reviewsAvgStars" aria-hidden="true"></div>
+        <div class="reviews-overview-count" id="reviewsCount">No reviews yet</div>
+      </div>
+      <div class="reviews-overview-bars" id="reviewsBars">
+        <div class="reviews-bar-row"><span>5</span><div class="reviews-bar-track"><div class="reviews-bar-fill" data-star="5" style="width:0%"></div></div><span data-star-count="5">0</span></div>
+        <div class="reviews-bar-row"><span>4</span><div class="reviews-bar-track"><div class="reviews-bar-fill" data-star="4" style="width:0%"></div></div><span data-star-count="4">0</span></div>
+        <div class="reviews-bar-row"><span>3</span><div class="reviews-bar-track"><div class="reviews-bar-fill" data-star="3" style="width:0%"></div></div><span data-star-count="3">0</span></div>
+        <div class="reviews-bar-row"><span>2</span><div class="reviews-bar-track"><div class="reviews-bar-fill" data-star="2" style="width:0%"></div></div><span data-star-count="2">0</span></div>
+        <div class="reviews-bar-row"><span>1</span><div class="reviews-bar-track"><div class="reviews-bar-fill" data-star="1" style="width:0%"></div></div><span data-star-count="1">0</span></div>
+      </div>
     </div>
   </div>
 
@@ -7133,10 +7182,20 @@ function avatarColorFromName(name) {
   return `linear-gradient(135deg, hsl(${hue},70%,60%), hsl(${(hue+30)%360},70%,48%))`;
 }
 
+function reviewAccentColor(rating) {
+  // Warmer accent for higher ratings, cooler/neutral for lower ones.
+  if (rating >= 5) return '#2fa86a';
+  if (rating === 4) return '#7bb83f';
+  if (rating === 3) return '#f5a623';
+  if (rating === 2) return '#e0762f';
+  return '#e03a52';
+}
+
 function reviewCardHTML(rv) {
   const name = esc(rv.userName || 'Quatar user');
   const initial = (name[0] || 'U').toUpperCase();
-  return `<div class="review-card">
+  return `<div class="review-card" style="--rc-accent:${reviewAccentColor(rv.rating)}">
+    <div class="review-card-quote">"</div>
     <div class="review-card-head">
       <div class="review-avatar" style="background:${avatarColorFromName(name)}">${initial}</div>
       <div class="review-card-meta">
@@ -7147,6 +7206,18 @@ function reviewCardHTML(rv) {
     </div>
     <div class="review-card-text">${esc(rv.text)}</div>
   </div>`;
+}
+
+function renderRatingBars(ratingCounts) {
+  const total = [1, 2, 3, 4, 5].reduce((sum, s) => sum + (ratingCounts[s] || 0), 0);
+  [1, 2, 3, 4, 5].forEach(star => {
+    const count = ratingCounts[star] || 0;
+    const pct = total ? Math.round((count / total) * 100) : 0;
+    const fill = document.querySelector(`.reviews-bar-fill[data-star="${star}"]`);
+    const label = document.querySelector(`[data-star-count="${star}"]`);
+    if (fill) fill.style.width = pct + '%';
+    if (label) label.textContent = count;
+  });
 }
 
 async function loadReviews() {
@@ -7167,6 +7238,7 @@ async function loadReviews() {
         document.getElementById('reviewsAvgScore').textContent = '—';
         document.getElementById('reviewsAvgStars').textContent = '';
         document.getElementById('reviewsCount').textContent = 'No reviews yet';
+        renderRatingBars({});
         loadMoreBtn.style.display = 'none';
         return;
       }
@@ -7175,6 +7247,7 @@ async function loadReviews() {
       document.getElementById('reviewsAvgScore').textContent = avg.toFixed(1);
       document.getElementById('reviewsAvgStars').textContent = renderStarString(avg);
       document.getElementById('reviewsCount').textContent = reviewsTotalCount + (reviewsTotalCount === 1 ? ' review' : ' reviews');
+      renderRatingBars(data.ratingCounts || {});
     } else {
       list.insertAdjacentHTML('beforeend', reviews.map(reviewCardHTML).join(''));
     }

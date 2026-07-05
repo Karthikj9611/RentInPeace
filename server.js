@@ -1354,16 +1354,21 @@ app.get('/api/reviews', async (req, res) => {
     const limit = Math.min(Math.max(parseInt(req.query.limit) || 10, 1), 50);
     const skip  = (page - 1) * limit;
 
-    const [reviews, total, avgResult] = await Promise.all([
+    const [reviews, total, avgResult, starBuckets] = await Promise.all([
       Review.find({}).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
       Review.countDocuments({}),
-      Review.aggregate([{ $group: { _id: null, avg: { $avg: '$rating' } } }])
+      Review.aggregate([{ $group: { _id: null, avg: { $avg: '$rating' } } }]),
+      Review.aggregate([{ $group: { _id: '$rating', count: { $sum: 1 } } }])
     ]);
+
+    const ratingCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    starBuckets.forEach(b => { if (ratingCounts[b._id] !== undefined) ratingCounts[b._id] = b.count; });
 
     res.json({
       reviews,
       total,
-      avgRating: avgResult[0]?.avg || 0
+      avgRating: avgResult[0]?.avg || 0,
+      ratingCounts
     });
   } catch (err) {
     console.error('GET /api/reviews error:', err.message);
