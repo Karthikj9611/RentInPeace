@@ -497,7 +497,6 @@ const CounterSchema = new mongoose.Schema({
 }, { _id: false });
 const Counter = mongoose.model('Counter', CounterSchema);
 
-const PROPERTY_ID_PREFIX = { 'For Rent': 'RENT', 'Lease': 'LEASE', 'PG': 'PG' };
 
 // Generic version of the same atomic-counter trick, reused below for
 // visitId (VisitRequest) and userId (User) — same Counter collection,
@@ -512,9 +511,25 @@ async function nextSequenceId(prefix) {
   return `${prefix}-${String(counter.seq).padStart(6, '0')}`; // e.g. RENT-000123
 }
 
-async function nextPropertyId(status) {
-  const prefix = PROPERTY_ID_PREFIX[status] || 'PROP';
-  return nextSequenceId(prefix);
+async function nextPropertyId() {
+  // Random alphanumeric code (e.g. AAA123) instead of a sequential, type-prefixed
+  // counter. IDs are generated randomly rather than incremented, so we retry on
+  // the rare collision instead of relying on Counter's atomic $inc.
+  const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const DIGITS = '0123456789';
+  const randomCode = () => {
+    let code = '';
+    for (let i = 0; i < 3; i++) code += LETTERS[Math.floor(Math.random() * LETTERS.length)];
+    for (let i = 0; i < 3; i++) code += DIGITS[Math.floor(Math.random() * DIGITS.length)];
+    return code;
+  };
+  let id, exists = true, attempts = 0;
+  while (exists && attempts < 10) {
+    id = randomCode();
+    exists = await Property.exists({ propertyId: id });
+    attempts++;
+  }
+  return id;
 }
 
 const PropertySchema = new mongoose.Schema({
@@ -529,7 +544,7 @@ const PropertySchema = new mongoose.Schema({
   media:      { type: MediaSchema,            default: () => ({}) },
   pg:         { type: PgSchema }, // no default — left unset for non-PG listings so we don't store an all-null subdocument
   // ── Meta (kept top-level / flat — not part of the submitted payload) ──
-  propertyId:       { type: String, unique: true, sparse: true, index: true }, // e.g. RENT-000123 / LEASE-000045 / PG-000012
+  propertyId:       { type: String, unique: true, sparse: true, index: true }, // random alphanumeric code, e.g. AAA123
   userId:           { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true }, // owner of this listing, null = posted while logged out
   userReadableId:   { type: String, default: null, index: true }, // human-readable User.userId (e.g. USER-000001), stamped at creation for admin readability — same pattern as UserSession.userId
   promoted:         { type: Boolean, default: false },
@@ -696,7 +711,7 @@ app.post('/api/properties', listingLimiter, requireUser, async (req, res) => {
     }
 
     const displayPrice = formatPrice(fields.price.rent, status);
-    const propertyId = await nextPropertyId(status);
+    const propertyId = await nextPropertyId();
 
     const prop = new Property({
       propertyId,
