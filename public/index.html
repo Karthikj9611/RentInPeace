@@ -3329,15 +3329,15 @@ ul{list-style:none}
             <label class="am-dd-item"><input type="checkbox" id="am-ac" onchange="onAmCheck()"/> AC <input type="number" id="f-acUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
             <label class="am-dd-item"><input type="checkbox" id="am-washing" onchange="onAmCheck()"/> Washing machine <input type="number" id="f-washingUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
             <label class="am-dd-item"><input type="checkbox" id="am-fridge" onchange="onAmCheck()"/> Refrigerator <input type="number" id="f-fridgeUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-microwave" onchange="onAmCheck()"/> Microwave / Oven <input type="number" id="f-microwaveUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-geyser" onchange="onAmCheck()"/> Geyser / Water heater <input type="number" id="f-geyserUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-wardrobe" onchange="onAmCheck()"/> Wardrobe / Cupboards <input type="number" id="f-wardrobeUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-microwave" onchange="onAmCheck()"/> Microwave <input type="number" id="f-microwaveUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-geyser" onchange="onAmCheck()"/> Geyser <input type="number" id="f-geyserUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-wardrobe" onchange="onAmCheck()"/> Cupboards <input type="number" id="f-wardrobeUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
             <label class="am-dd-item"><input type="checkbox" id="am-bed" onchange="onAmCheck()"/> Bed &amp; mattress <input type="number" id="f-bedUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-sofa" onchange="onAmCheck()"/> Sofa / Seating <input type="number" id="f-sofaUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-lift" onchange="onAmCheck()"/> Lift / Elevator <input type="number" id="f-liftUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-balcony" onchange="onAmCheck()"/> Balcony / Terrace <input type="number" id="f-balconyUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-gym" onchange="onAmCheck()"/> Gym / Pool <input type="number" id="f-gymUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-security" onchange="onAmCheck()"/> Security / CCTV <input type="number" id="f-securityUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-sofa" onchange="onAmCheck()"/> Sofa <input type="number" id="f-sofaUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-lift" onchange="onAmCheck()"/> Elevator <input type="number" id="f-liftUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-balcony" onchange="onAmCheck()"/> Balcony <input type="number" id="f-balconyUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-gym" onchange="onAmCheck()"/> Gym <input type="number" id="f-gymUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-security" onchange="onAmCheck()"/> CCTV <input type="number" id="f-securityUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
             <label class="am-dd-item"><input type="checkbox" id="am-power" onchange="onAmCheck()"/> Power backup <input type="number" id="f-powerUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
             <label class="am-dd-item"><input type="checkbox" id="am-garden" onchange="onAmCheck()"/> Garden <input type="number" id="f-gardenUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
             <label class="am-dd-item"><input type="checkbox" id="am-laundry" onchange="onAmCheck()"/> Laundry <input type="number" id="f-laundryUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
@@ -5974,8 +5974,8 @@ function getFiltered() {
       if (!fs.amenities.every(a => {
         if (a==='Parking') return carpark||bikepark;
         if (a==='AC') return hasToken('ac');
-        if (a==='Gym / Pool') return hasToken('gym')||hasToken('pool');
-        if (a==='Security / CCTV') return hasToken('security')||hasToken('cctv');
+        if (a==='Gym') return hasToken('gym')||hasToken('pool');
+        if (a==='CCTV') return hasToken('security')||hasToken('cctv');
         return pAmList.includes(a.toLowerCase());
       })) return false;
     }
@@ -7388,15 +7388,15 @@ const AM_LIST = [
   ['am-ac',       'AC',                     'f-acUnits'],
   ['am-washing',  'Washing machine',        'f-washingUnits'],
   ['am-fridge',   'Refrigerator',           'f-fridgeUnits'],
-  ['am-microwave','Microwave / Oven',       'f-microwaveUnits'],
-  ['am-geyser',   'Geyser / Water heater',  'f-geyserUnits'],
-  ['am-wardrobe', 'Wardrobe / Cupboards',   'f-wardrobeUnits'],
-  ['am-bed',      'Bed & mattress',         'f-bedUnits'],
-  ['am-sofa',     'Sofa / Seating',         'f-sofaUnits'],
-  ['am-lift',     'Lift / Elevator',        'f-liftUnits'],
-  ['am-balcony',  'Balcony / Terrace',      'f-balconyUnits'],
-  ['am-gym',      'Gym / Pool',             'f-gymUnits'],
-  ['am-security', 'Security / CCTV',        'f-securityUnits'],
+  ['am-microwave','Microwave',       'f-microwaveUnits'],
+  ['am-geyser',   'Geyser',  'f-geyserUnits'],
+  ['am-wardrobe', 'Cupboards',   'f-wardrobeUnits'],
+  ['am-bed',      'Bed',         'f-bedUnits'],
+  ['am-sofa',     'Sofa',         'f-sofaUnits'],
+  ['am-lift',     'Elevator',        'f-liftUnits'],
+  ['am-balcony',  'Balcony',      'f-balconyUnits'],
+  ['am-gym',      'Gym',             'f-gymUnits'],
+  ['am-security', 'CCTV',        'f-securityUnits'],
   ['am-power',    'Power backup',           'f-powerUnits'],
   ['am-garden',   'Garden',                 'f-gardenUnits'],
   ['am-laundry',  'Laundry',                'f-laundryUnits'],
