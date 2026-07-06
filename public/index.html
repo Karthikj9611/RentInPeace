@@ -3209,13 +3209,13 @@ ul{list-style:none}
     <div class="lm-section">📋 Basic Information</div>
     <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
       <div class="form-group">
-        <label class="form-label">Status <span style="color:var(--brand)">*</span></label>
+        <label class="form-label">For <span style="color:var(--brand)">*</span></label>
         <select class="form-select" id="f-type" onchange="onFTypeChange(this.value)">
           <option value="Rent">Rent</option><option value="Lease">Lease</option><option value="PG">PG / Co-living</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Listed by</label>
+        <label class="form-label">Listed By <span style="color:var(--brand)">*</span></label>
         <select class="form-select" id="f-listedBy">
           <option>Owner</option><option>Agent</option><option>Builder</option>
         </select>
@@ -3232,11 +3232,11 @@ ul{list-style:none}
       </div>
 	  
       <div class="form-group">
-        <label class="form-label">City</label>
+        <label class="form-label">City <span style="color:var(--brand)">*</span></label>
         <input class="form-input" type="text" id="f-city" value="Bengaluru" />
       </div>
       <div class="form-group" id="fullAddressGroup" style="grid-column:span 3">
-        <label class="form-label">Building Live Address</label>
+        <label class="form-label">Building Live Address <span style="color:var(--brand)">*</span></label>
         <div style="display:flex;gap:7px;align-items:flex-start">
           <textarea class="form-input" id="f-fullAddress" rows="2" placeholder="House No., Building Name, Street, Landmark, Pincode" style="flex:1;min-width:0;resize:vertical"></textarea>
           <button type="button" onclick="fCaptureLocation()"
@@ -3248,11 +3248,11 @@ ul{list-style:none}
         <div id="f-locStatus" style="font-size:11px;color:var(--text-2);min-height:14px;margin-top:2px">Live auto-fills from GPS</div>
       </div>
       <div class="form-group" id="latLngGroup">
-        <label class="form-label">Latitude / Longitude (auto)</label>
+        <label class="form-label">Latitude / Longitude (Auto)</label>
         <input class="form-input" type="text" id="f-latLngDisplay" placeholder="12.9716° N, 77.5946° E or auto-detected" readonly />
       </div>
       <div class="form-group" id="mapsLinkGroup">
-        <label class="form-label">Google Maps link (optional)</label>
+        <label class="form-label">Google Maps link</label>
         <input class="form-input" type="url" id="f-googleMapsLink" placeholder="https://maps.app.goo.gl/..." />
       </div>
     </div>
@@ -3263,30 +3263,30 @@ ul{list-style:none}
     <div class="lm-section">👤 Owner Details</div>
     <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
 	<div class="form-group">
-      <label class="form-label">Property name</label>
+      <label class="form-label">Property Name</label>
       <input class="form-input" type="text" id="f-title" placeholder="e.g. Prestige Shantiniketan, Whitefield" />
     </div>
-      <div class="form-group"><label class="form-label">Owner name <span style="color:var(--brand)">*</span></label><input class="form-input" type="text" id="f-ownerName" placeholder="e.g. Ramesh Kumar"/></div>
-      <div class="form-group"><label class="form-label">Phone number <span style="color:var(--brand)">*</span></label><input class="form-input" type="tel" id="f-ownerPhone" placeholder="e.g. 9876543210"/></div>
-      <div class="form-group"><label class="form-label">Email (optional)</label><input class="form-input" type="email" id="f-ownerEmail" placeholder="owner@example.com"/></div>
-      <div class="form-group"><label class="form-label">Alternate number</label><input class="form-input" type="tel" id="f-ownerAltPhone" placeholder="optional"/></div>
+      <div class="form-group"><label class="form-label">Owner Name <span style="color:var(--brand)">*</span></label><input class="form-input" type="text" id="f-ownerName" placeholder="e.g. Ramesh Kumar"/></div>
+      <div class="form-group"><label class="form-label">Phone Number <span style="color:var(--brand)">*</span></label><input class="form-input" type="tel" id="f-ownerPhone" placeholder="e.g. 9876543210"/></div>
+      <div class="form-group"><label class="form-label">Email Id</label><input class="form-input" type="email" id="f-ownerEmail" placeholder="owner@example.com"/></div>
+      <div class="form-group"><label class="form-label">Alternate Number</label><input class="form-input" type="tel" id="f-ownerAltPhone" placeholder="optional"/></div>
       <div class="form-group">
-        <label class="form-label">Preferred contact time</label>
+        <label class="form-label">Contact Time</label>
         <select class="form-select" id="f-contactTime"><option>Any</option><option>Morning</option><option>Afternoon</option><option>Evening</option></select>
       </div>
       <div class="form-group" style="grid-column:span 3">
-        <label class="form-label">Owner address (optional)</label>
-        <textarea class="form-input" id="f-ownerAddress" rows="2" placeholder="Street, city, pincode (optional)" style="resize:vertical"></textarea>
+        <label class="form-label">Owner Address</label>
+        <textarea class="form-input" id="f-ownerAddress" rows="2" placeholder="Street, city, pincode" style="resize:vertical"></textarea>
       </div>
       <!-- Agent-only fields — shown when Listed by = Agent -->
       <div id="f-agentFields" style="grid-column:span 3">
         <div class="form-row" style="grid-template-columns:1fr 1fr;margin-top:4px">
           <div class="form-group">
-            <label class="form-label">Agent phone number</label>
+            <label class="form-label">Agent Phone Number</label>
             <input class="form-input" type="tel" id="f-agentPhone" placeholder="e.g. 9876543210" />
           </div>
           <div class="form-group">
-            <label class="form-label">Agent service area</label>
+            <label class="form-label">Agent Service Area</label>
             <input class="form-input" type="text" id="f-agentArea" placeholder="e.g. Koramangala, HSR Layout, BTM" />
           </div>
         </div>
@@ -3298,20 +3298,20 @@ ul{list-style:none}
     <div id="addPricingSection">
     <div class="lm-section">💰 Pricing</div>
     <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
-      <div class="form-group"><label class="form-label" id="f-rentLabel">Monthly rent (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-rent" placeholder="e.g. 22000" min="0" max="9999999" /></div>
-      <div class="form-group" id="f-depositWrap"><label class="form-label">Security deposit (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-deposit" placeholder="e.g. 44000" min="0" max="9999999" /></div>
+      <div class="form-group"><label class="form-label" id="f-rentLabel">Monthly Rent (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-rent" placeholder="e.g. 22000" min="0" max="9999999" /></div>
+      <div class="form-group" id="f-depositWrap"><label class="form-label">Security Deposit (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-deposit" placeholder="e.g. 44000" min="0" max="9999999" /></div>
       <div class="form-group"><label class="form-label">Maintenance (₹/ Month)</label><input class="form-input" type="number" id="f-maintenance" placeholder="e.g. 2000" /></div>
-      <div class="form-group"><label class="form-label">Annual rent escalation (%)</label><input class="form-input" type="number" step="0.5" id="f-escalation" placeholder="e.g. 5" /></div>
+      <div class="form-group"><label class="form-label">Annual Rent Escalation (%)</label><input class="form-input" type="number" step="0.5" id="f-escalation" placeholder="e.g. 5" /></div>
       <div class="form-group">
-        <label class="form-label">Electricity included?</label>
+        <label class="form-label">Electricity Included?</label>
         <select class="form-select" id="f-electricityIncluded"><option>No</option><option>Yes</option><option>Shared meter</option></select>
       </div>
       <div class="form-group">
-        <label class="form-label">Water / borewell charges</label>
+        <label class="form-label">Water Charges</label>
         <select class="form-select" id="f-waterCharge"><option>Included</option><option>Separate</option><option>Tanker</option></select>
       </div>
 	  <div class="form-group">
-        <label class="form-label">Price negotiable</label>
+        <label class="form-label">Price Negotiable</label>
         <select class="form-select" id="f-negotiable"><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select>
       </div>
     </div>
@@ -3322,9 +3322,9 @@ ul{list-style:none}
     <div class="lm-section">🏢 Property Details</div>
     <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
       <div class="form-group">
-        <label class="form-label">Property type</label>
+        <label class="form-label">Property Type</label>
         <select class="form-select" id="f-propertyType">
-          <option>Apartment</option><option>Independent House</option><option>Villa</option><option>Studio</option>
+          <option>Apartment</option><option>Independent</option><option>Villa</option>
         </select>
       </div>
       <div class="form-group">
@@ -3349,11 +3349,11 @@ ul{list-style:none}
       </div>
 	  
       <div class="form-group">
-        <label class="form-label">Floor (out of total)</label>
-        <input class="form-input" type="text" id="f-floor" placeholder="e.g. 3rd / 10 floors" />
+        <label class="form-label">Floor</label>
+        <input class="form-input" type="text" id="f-floor" placeholder="e.g. 3rd Floor" />
       </div>
       <div class="form-group">
-        <label class="form-label">Area (sqft)</label>
+        <label class="form-label">Area (SQFT)</label>
         <input class="form-input" type="number" id="f-area" placeholder="e.g. 1250" />
       </div>
       <div class="form-group">
@@ -3373,17 +3373,17 @@ ul{list-style:none}
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Age of property</label>
+        <label class="form-label">Age Of Building</label>
         <select class="form-select" id="f-age">
           <option value="">Select</option><option>New (0–2 yrs)</option><option>3–5 yrs</option><option>6–10 yrs</option><option>10+ yrs</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Tenant preference</label>
+        <label class="form-label">Tenant Preference</label>
         <select class="form-select" id="f-tenant"><option>Any</option><option>Family</option><option>Bachelor</option><option>Female only</option></select>
       </div>
       <div class="form-group" id="f-availWrap">
-        <label class="form-label">Available from</label>
+        <label class="form-label">Available From</label>
         <input class="form-input" type="date" id="f-avail" />
       </div>
     </div>
@@ -3393,10 +3393,10 @@ ul{list-style:none}
     <div id="addAmenitiesSection">
     <div class="lm-section">✨ Amenities</div>
     <div class="form-group">
-      <label class="form-label">Select amenities</label>
+      <label class="form-label">Select Amenities</label>
       <div class="am-dd" id="amDropdown">
         <button type="button" class="am-dd-trigger" onclick="toggleAmDropdown(event)">
-          <span><span class="am-dd-count" id="amDdCount" style="display:none">0</span><span id="amDdLabel">Choose amenities…</span></span>
+          <span><span class="am-dd-count" id="amDdCount" style="display:none">0</span><span id="amDdLabel">Choose Amenities…</span></span>
           <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
         <div class="am-dd-panel" id="amDdPanel">
@@ -3429,13 +3429,13 @@ ul{list-style:none}
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Selected amenities</label>
+      <label class="form-label">Selected Amenities</label>
       <div class="am-selected-box" id="amSelectedBox">
         <span class="am-selected-empty" id="amSelectedEmpty">No amenities selected yet</span>
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Additional amenities (comma-separated)</label>
+      <label class="form-label">Additional Amenities (comma-separated)</label>
       <input class="form-input" type="text" id="f-amenities-extra" placeholder="Intercom, study table, servant quarter, etc."/>
     </div>
     </div>
@@ -3508,7 +3508,7 @@ ul{list-style:none}
       <div class="lm-section">🍽 Meals &amp; Rules</div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
         <div class="form-group">
-          <label class="form-label">Meals included</label>
+          <label class="form-label">Meals Included</label>
           <select class="form-select" id="f-pgMeals"><option value="">Select</option><option>No Meals</option><option>Breakfast Only</option><option>Dinner Only</option><option>Lunch + Dinner</option><option>All 3 Meals</option><option>On Request</option></select>
         </div>
         <div class="form-group"><label class="form-label">Food type</label><select class="form-select" id="f-pgFoodType"><option value="">Select</option><option>Veg Only</option><option>Veg + Non-veg</option></select></div>
@@ -3532,7 +3532,7 @@ ul{list-style:none}
          while actually creating/editing a listing — see openDetail(). -->
     <div class="detail-gallery" id="detailGallerySlot"></div>
     <div class="form-group" id="videoUrlGroup">
-      <label class="form-label">Video tour URL (optional)</label>
+      <label class="form-label">Video Tour URL</label>
       <input class="form-input" type="url" id="f-videoUrl" placeholder="https://youtube.com/..." />
       <!-- View-mode only: an actual playable embed when the URL is a
            recognizable YouTube/Vimeo link or direct video file — see
@@ -3553,7 +3553,7 @@ ul{list-style:none}
       </div>
     </div>
     <div class="form-group" id="imgFormGroup">
-      <label class="form-label">Property images (optional)</label>
+      <label class="form-label">Property Images</label>
       <div class="img-row" id="imgAddControls">
         <textarea class="img-url-input" id="f-imgUrlInput" rows="2" placeholder="Paste image URLs, one per line or comma-separated…"></textarea>
         <div class="img-btns">
@@ -3568,12 +3568,12 @@ ul{list-style:none}
       <div class="img-hint" id="fImgHint">No images added yet.</div>
     </div>
     <div class="form-group">
-      <label class="form-label">Description (optional)</label>
+      <label class="form-label">Description</label>
       <textarea class="form-input" id="f-desc" rows="3" placeholder="Describe the property, nearby landmarks, special features…" style="resize:vertical"></textarea>
     </div>
     </div>
 
-    <button class="form-submit" onclick="submitListing()">Submit listing</button>
+    <button class="form-submit" onclick="submitListing()">Submit Listing</button>
 
     <!-- View-mode only: quick actions carried over from the old detail view (save,
          contact, schedule a visit, WhatsApp). Sits inline at the end of the
@@ -3588,7 +3588,7 @@ ul{list-style:none}
       <div class="modal-actions-row" id="viewActionsRow2" style="margin-top:10px">
         <button class="modal-btn-outline" id="viewScheduleBtn">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          Schedule visit
+          Schedule Visit
           <span class="modal-visit-count-badge" id="modal-visit-count" style="display:none">0</span>
         </button>
         <button class="modal-btn-whatsapp" id="viewWhatsappBtn">
