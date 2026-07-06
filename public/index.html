@@ -40,7 +40,6 @@ body{
   font-size:14px;
   line-height:1.5;
   -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
   width:100%;
   overscroll-behavior-x:none;
 }
@@ -815,15 +814,13 @@ ul{list-style:none}
 .modal-posted svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8}
 
 .modal-actions{display:flex;gap:10px;margin-top:18px}
-/* Pinned to the bottom of the property-view modal (outside the scrolling
-   body — see the DOM comment above #viewActionsFooter) so Contact/WhatsApp/
-   Save/Schedule stay reachable without scrolling through the whole listing. */
+/* Sits inline at the end of the property-view modal's scrolling body (see
+   the DOM comment above #viewActionsFooter) — scrolls up with the rest of
+   the listing instead of staying pinned to the bottom. */
 .view-actions-footer{
-  flex-shrink:0;
-  padding:14px 28px;
-  background:var(--bg);
+  margin-top:18px;
+  padding-top:18px;
   border-top:1px solid var(--border);
-  box-shadow:0 -4px 16px rgba(0,0,0,.06);
 }
 .view-actions-footer .modal-actions{margin-top:0}
 .modal-btn-primary{
@@ -3494,12 +3491,12 @@ ul{list-style:none}
     </div>
 
     <button class="form-submit" onclick="submitListing()">Submit listing</button>
-    </div>
 
     <!-- View-mode only: quick actions carried over from the old detail view (save,
-         contact, schedule a visit, WhatsApp). Pinned to the bottom of the modal
-         (outside the scrolling body) so they're always reachable without
-         scrolling. Hidden while actually listing a property. -->
+         contact, schedule a visit, WhatsApp). Sits inline at the end of the
+         scrolling body — not pinned — so it scrolls up with the rest of the
+         content instead of staying stuck to the bottom. Hidden while actually
+         listing a property. -->
     <div class="view-actions-footer" id="viewActionsFooter" style="display:none">
       <div class="modal-actions" id="viewActionsRow">
         <button class="modal-btn-secondary" id="modal-save-btn">♡ Save</button>
@@ -3516,6 +3513,7 @@ ul{list-style:none}
           WhatsApp
         </button>
       </div>
+    </div>
     </div>
   </div>
 </div>
@@ -5880,7 +5878,26 @@ function fmtRupee(n) {
 document.addEventListener('click', function(e) {
   if (!e.target.closest('.fd-btn') && !e.target.closest('.fd-pop')) closeAllFd();
 });
-window.addEventListener('scroll', closeAllFd, true);
+/* The popover is appended to <body> with fixed pixel coordinates computed
+   from the trigger button's position (see toggleFd). Rather than closing
+   it every time the page scrolls, just recompute those coordinates so it
+   keeps tracking its button — the filter bar itself is sticky, so once it
+   reaches the top of the viewport the button stops moving anyway. */
+window.addEventListener('scroll', function() {
+  if (!openFd) return;
+  const btnEl = document.getElementById('fdb-' + openFd);
+  const pop = document.getElementById('fdp-' + openFd);
+  if (!btnEl || !pop) { closeAllFd(); return; }
+  const rect = btnEl.getBoundingClientRect();
+  // Button scrolled out of view entirely (e.g. horizontal filter-bar
+  // scroll) — closing is still the right call here.
+  if (rect.bottom < 0 || rect.top > window.innerHeight) { closeAllFd(); return; }
+  const popW = pop.getBoundingClientRect().width || 240;
+  let left = rect.left;
+  if (left + popW > window.innerWidth - 12) left = Math.max(8, rect.right - popW);
+  pop.style.top  = (rect.bottom + 6) + 'px';
+  pop.style.left = left + 'px';
+}, true);
 window.addEventListener('resize', closeAllFd);
 
 /* ── Read all active filter state ── */
