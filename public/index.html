@@ -483,17 +483,33 @@ ul{list-style:none}
 .prop-heart svg{width:14px;height:14px;stroke:var(--brand);fill:none;stroke-width:2;transition:fill .12s}
 .prop-heart.liked svg{fill:var(--brand)}
 .prop-body{padding:13px 14px 12px;flex:1;min-width:0;display:flex;flex-direction:column}
+.prop-price-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:3px;margin-bottom:4px}
 .prop-price{
-  font-size:19px;font-weight:800;color:var(--text);
-  display:flex;align-items:baseline;gap:4px;margin-top:3px;margin-bottom:4px;letter-spacing:-.01em;
+  font-size:15.5px;font-weight:600;color:var(--brand);
+  display:flex;align-items:baseline;gap:4px;letter-spacing:-.01em;
+  min-width:0;
 }
-.prop-price-unit{font-size:12px;font-weight:500;color:var(--text-3)}
+.prop-price-unit{font-size:11px;font-weight:500;color:var(--brand)}
+.prop-deposit-inline{
+  display:flex;align-items:center;gap:4px;flex-shrink:0;
+  font-size:11px;font-weight:600;color:var(--text-2);white-space:nowrap;
+}
+.prop-deposit-inline svg{width:12px;height:12px;stroke:var(--text-3);fill:none;stroke-width:2;flex-shrink:0}
+.prop-deposit-val{color:var(--brand);font-weight:600}
+.prop-deposit-lbl{color:var(--brand);font-weight:500}
 .prop-title{
   font-size:13.5px;font-weight:600;color:var(--text);margin-top:0;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   display:flex;align-items:center;gap:5px;min-width:0;
 }
 .prop-title-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prop-title-buildtype{
+  margin-left:auto;flex-shrink:0;
+  font-size:11px;font-weight:600;color:var(--text-2);
+  background:var(--bg-3);border:1px solid var(--border-2);
+  padding:2px 9px;border-radius:99px;
+  white-space:nowrap;
+}
 .prop-verified-badge{
   display:inline-flex;align-items:center;gap:2px;flex-shrink:0;
   font-size:10px;font-weight:600;color:#1a7d4a;
@@ -510,13 +526,15 @@ ul{list-style:none}
 .prop-loc span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* ── Modern icon stat row (replaces verbose pill tags) ── */
 .prop-stats{
-  display:flex;align-items:center;flex-wrap:wrap;
+  display:flex;align-items:center;flex-wrap:nowrap;
   gap:3px 0;margin-top:10px;
+  overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none;
 }
+.prop-stats::-webkit-scrollbar{display:none}
 .prop-stat{
   display:flex;align-items:center;gap:4px;
   font-size:11.5px;font-weight:600;color:var(--text-2);
-  padding:0 9px 0 0;
+  padding:0 9px 0 0;flex-shrink:0;white-space:nowrap;
 }
 .prop-stat:not(:last-child){border-right:1px solid var(--border);}
 .prop-stat svg{width:14px;height:14px;stroke:var(--text-3);fill:none;stroke-width:1.8;flex-shrink:0}
@@ -534,6 +552,7 @@ ul{list-style:none}
   padding:3px 8px 3px 7px;border-radius:7px;
 }
 .prop-chip svg{width:11px;height:11px;stroke:var(--text-3);fill:none;stroke-width:2;flex-shrink:0}
+.prop-chip-icon{font-size:12px;line-height:1;flex-shrink:0;filter:drop-shadow(0 1px 1px rgba(0,0,0,.12))}
 .prop-chip-lbl{color:var(--brand);font-weight:600}
 .prop-chip-val{color:var(--text);font-weight:600}
 .prop-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
@@ -550,29 +569,29 @@ ul{list-style:none}
 }
 .prop-qa-btn{
   flex:1;
-  display:flex;align-items:center;justify-content:center;gap:5px;
-  padding:8px 6px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  height:36px;border-radius:9px;
   border:1.5px solid var(--border-2);background:var(--bg);
   color:var(--text-2);cursor:pointer;
-  font-size:11.5px;font-weight:600;
   transition:border-color .12s,background .12s,color .12s,transform .1s;
   min-width:0;
 }
+.prop-qa-btn span{display:none}
 .prop-qa-btn:active{transform:scale(.96)}
-.prop-qa-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.9;flex-shrink:0}
+.prop-qa-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.9;flex-shrink:0}
 .prop-qa-btn:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-light)}
 .prop-qa-btn.prop-qa-whatsapp{color:#1ebe5a;border-color:#bfe8cf}
 .prop-qa-btn.prop-qa-whatsapp svg{fill:currentColor;stroke:none}
 .prop-qa-btn.prop-qa-whatsapp:hover{background:#e8faef;border-color:#25D366;color:#1ebe5a}
 .prop-qa-icon{
-  width:34px;height:34px;flex:none;border-radius:9px;
+  flex:1;height:36px;border-radius:9px;
   display:flex;align-items:center;justify-content:center;
   border:1.5px solid var(--border-2);background:var(--bg);
   color:var(--text-2);cursor:pointer;position:relative;
   transition:border-color .12s,background .12s,color .12s,transform .1s;
 }
 .prop-qa-icon:active{transform:scale(.93)}
-.prop-qa-icon svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9}
+.prop-qa-icon svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.9}
 .prop-qa-icon:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-light)}
 .prop-qa-icon.checked{border-color:var(--brand);color:var(--brand);background:var(--brand-light)}
 .prop-qa-icon.disabled{opacity:.4;cursor:not-allowed}
@@ -1467,9 +1486,14 @@ ul{list-style:none}
 .detail-gallery{display:none}
 .add-modal.view-mode .detail-gallery{display:block;margin-bottom:16px}
 .detail-gallery .prop-img{
-  aspect-ratio:16/10;border-radius:14px;
+  aspect-ratio:16/9;border-radius:14px;
   border:1px solid var(--border);
+  background:var(--bg-3);
 }
+/* Cards elsewhere use object-fit:cover (fill + crop) on .img-slide, but in
+   the property-view gallery we want the whole photo visible with nothing
+   cut off, even if that means letterboxing rather than filling the box. */
+.detail-gallery .img-slide{object-fit:contain;background:var(--bg-3)}
 .form-select{
   width:100%;border:1.5px solid var(--border-2);border-radius:9px;
   padding:9px 12px;font-size:13px;color:var(--text);background:var(--bg);
@@ -2044,18 +2068,16 @@ ul{list-style:none}
   .results-header{padding:0 12px}
   .prop-grid{grid-template-columns:1fr 1fr;gap:10px;padding:0 12px}
 
-  /* Quick-action row: text labels ("Contact"/"WhatsApp") don't fit on a
-     2-up mobile card and were overlapping — switch every action to a
-     matching icon-only, raised "3D" button instead. */
-  .prop-quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  /* Quick-action row already renders as equal-size icon-only buttons at
+     every width (see base .prop-qa-btn/.prop-qa-icon rules) — on mobile we
+     additionally give them a raised "3D" look to stand out on the compact
+     2-up card layout. */
   .prop-qa-btn,.prop-qa-icon{
-    width:auto;height:38px;flex:none;border-radius:11px;
+    border-radius:11px;
     background:linear-gradient(145deg,#ffffff,#eef0f1);
     border:1px solid var(--border-2);
     box-shadow:0 2px 3px rgba(20,16,17,.08),inset 0 1px 0 rgba(255,255,255,.9);
   }
-  .prop-qa-btn span{display:none}
-  .prop-qa-btn svg,.prop-qa-icon svg{width:16px;height:16px}
   .prop-qa-btn:active,.prop-qa-icon:active{
     box-shadow:inset 0 1px 3px rgba(20,16,17,.15);transform:scale(.95);
   }
@@ -3082,7 +3104,7 @@ ul{list-style:none}
 <!-- ─── Add Listing Modal (List Your Property) ───────────────────────── -->
 <div class="add-modal-overlay" id="addModal" role="dialog" aria-modal="true" aria-label="Add property listing">
   <div class="add-modal" id="addModalBox" style="max-width:860px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:92vh">
-    <div class="add-modal-header" style="background:linear-gradient(135deg,var(--brand) 0%,var(--brand-hover) 100%);padding:24px 28px;margin-bottom:0;position:relative;flex-shrink:0">
+    <div class="add-modal-header" style="background:linear-gradient(135deg,var(--brand) 0%,var(--brand-hover) 100%);padding:14px 28px;margin-bottom:0;position:relative;flex-shrink:0">
       <div>
         <div class="add-modal-title" style="color:#fff" id="addModalTitleText">List your property</div>
         <div style="color:rgba(255,255,255,.85);font-size:12px;font-weight:600;margin-top:2px;display:none" id="addModalSubtitleText"></div>
@@ -5004,16 +5026,21 @@ function cardHTML(p) {
       <div class="prop-title" title="${esc(p.propertyId)}">
         <span class="prop-title-text">${esc(p.propertyId || 'Untitled listing')}</span>
         ${p.verified ? `<span class="prop-verified-badge" title="Verified listing"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1l3.2 1.6 3.5.4 1.6 3.2 2.7 2.4-.6 3.6 1 3.4-2.7 2.4-1.6 3.2-3.5.4-3.2 1.6-3.2-1.6-3.5-.4-1.6-3.2-2.7-2.4.6-3.6-1-3.4 2.7-2.4 1.6-3.2 3.5-.4z"/><path d="M9 12.5l2 2 4-4.5" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Verified</span>` : ''}
+        ${ptype ? `<span class="prop-title-buildtype" title="${esc(ptype)}">${esc(ptype)}</span>` : ''}
       </div>
-      <div class="prop-price">₹${(p.price?.rent||0).toLocaleString('en-IN')}<span class="prop-price-unit">/ ${pType === 'Lease' ? (leaseDur || 'Lease') : 'Month'}</span></div>
+      <div class="prop-price-row">
+        <div class="prop-price">₹${(p.price?.rent||0).toLocaleString('en-IN')}<span class="prop-price-unit">/ ${pType === 'Lease' ? (leaseDur || 'Lease') : 'Month'}</span></div>
+        <div class="prop-deposit-inline" title="Security deposit">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2"/><circle cx="12" cy="12.5" r="2.5"/></svg>
+          <span class="prop-deposit-val">₹${deposit.toLocaleString('en-IN')}</span><span class="prop-deposit-lbl">Deposit</span>
+        </div>
+      </div>
       <div class="prop-loc">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         <span>${esc(p.location?.area)}</span>
       </div>
 	  
       <div class="prop-chip-row">
-        ${chip('Property type', ptype)}
-        ${chip('Built-up area', areaSqft ? areaSqft + ' sqft' : '')}
         ${video ? `<span class="prop-chip" title="Video walkthrough available">🎥 Video</span>` : ''}
       </div>
       <div class="prop-stats">
@@ -5033,16 +5060,16 @@ function cardHTML(p) {
           <span class="prop-stat-icon">🏍️</span>
           ${bikeCount>0?bikeCount:''}
         </span>
-        <span class="prop-stat" title="Furnishing">
-          <span class="prop-stat-icon">🛋️</span>
-          ${p.property?.furnish}
-        </span>
+        ${areaSqft ? `<span class="prop-stat" title="Built-up area">
+          <span class="prop-stat-icon">📐</span>
+          ${areaSqft} sqft
+        </span>` : ''}
         ${lift ? `<span class="prop-stat" title="Lift available"><span class="prop-stat-icon">🛗</span></span>` : ''}
       </div>
       <div class="prop-chip-row">
-        <span class="prop-chip" title="Security deposit">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2"/><circle cx="12" cy="12.5" r="2.5"/></svg>
-          ₹${deposit.toLocaleString('en-IN')} Advance
+        <span class="prop-chip" title="Furnishing">
+          <span class="prop-chip-icon">🛋️</span>
+          ${p.property?.furnish}
         </span>
         ${maintenance > 0 ? `<span class="prop-chip" title="Monthly maintenance">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -5131,7 +5158,13 @@ function shortlistCardHTML(p) {
       <div class="prop-title" title="${esc(p.propertyId)}">
         <span class="prop-title-text">${esc(p.propertyId || 'Untitled listing')}</span>
       </div>
-      <div class="prop-price">₹${(p.price?.rent||0).toLocaleString('en-IN')}<span class="prop-price-unit">/ ${pType === 'Lease' ? (leaseDur || 'Lease') : 'Month'}</span></div>
+      <div class="prop-price-row">
+        <div class="prop-price">₹${(p.price?.rent||0).toLocaleString('en-IN')}<span class="prop-price-unit">/ ${pType === 'Lease' ? (leaseDur || 'Lease') : 'Month'}</span></div>
+        <div class="prop-deposit-inline" title="Security deposit">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2"/><circle cx="12" cy="12.5" r="2.5"/></svg>
+          <span class="prop-deposit-val">₹${deposit.toLocaleString('en-IN')}</span><span class="prop-deposit-lbl">Deposit</span>
+        </div>
+      </div>
       <div class="prop-loc">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         <span>${esc(p.location?.area)}</span>
@@ -5159,16 +5192,12 @@ function shortlistCardHTML(p) {
         </span>
         ${lift ? `<span class="prop-stat" title="Lift available"><span class="prop-stat-icon">🛗</span></span>` : ''}
       </div>
-      <div class="prop-chip-row">
-        <span class="prop-chip" title="Security deposit">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2"/><circle cx="12" cy="12.5" r="2.5"/></svg>
-          ₹${deposit.toLocaleString('en-IN')} deposit
-        </span>
-        ${maintenance > 0 ? `<span class="prop-chip" title="Monthly maintenance">
+      ${maintenance > 0 ? `<div class="prop-chip-row">
+        <span class="prop-chip" title="Monthly maintenance">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           ₹${maintenance.toLocaleString('en-IN')} maintenance
-        </span>` : ''}
-      </div>
+        </span>
+      </div>` : ''}
       <div class="prop-footer">
         <div class="prop-quick-actions">
           <button class="prop-qa-btn" onclick="event.stopPropagation();showToast('Contact info shown to verified users')" aria-label="Contact owner">
