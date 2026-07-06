@@ -577,6 +577,7 @@ ul{list-style:none}
   min-width:0;
 }
 .prop-qa-btn span{display:none}
+.prop-qa-btn .qa-3d-icon{display:flex}
 .prop-qa-btn:active{transform:scale(.96)}
 .prop-qa-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.9;flex-shrink:0}
 .prop-qa-btn:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-light)}
@@ -600,8 +601,62 @@ ul{list-style:none}
   position:absolute;top:-6px;right:-6px;min-width:16px;height:16px;padding:0 3px;
   border-radius:99px;background:var(--brand);color:#fff;font-size:9.5px;font-weight:700;
   display:flex;align-items:center;justify-content:center;line-height:1;pointer-events:none;
+  z-index:2;
 }
-.prop-meta-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:9px}
+
+/* ─── Colorful 3D quick-action icons (Contact / WhatsApp / Visit / Compare) ─── */
+.prop-qa-btn.prop-qa-3d,
+.prop-qa-icon.prop-qa-3d{
+  background:transparent;border:none;box-shadow:none;
+  flex-direction:column;gap:3px;color:var(--text-2);
+}
+.prop-qa-btn.prop-qa-3d:hover,
+.prop-qa-icon.prop-qa-3d:hover{background:transparent;border:none;color:var(--text-2)}
+.qa-3d-icon{
+  width:34px;height:34px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:
+    0 3px 0 rgba(0,0,0,.16),
+    0 6px 10px rgba(0,0,0,.16),
+    inset 0 1px 1px rgba(255,255,255,.55),
+    inset 0 -3px 4px rgba(0,0,0,.15);
+  transition:transform .12s ease,box-shadow .12s ease,filter .12s ease;
+}
+.qa-3d-icon svg{width:17px;height:17px;stroke:#fff;fill:none;stroke-width:2.1}
+.prop-qa-btn.prop-qa-3d:active .qa-3d-icon,
+.prop-qa-icon.prop-qa-3d:active .qa-3d-icon{
+  transform:translateY(2px);
+  box-shadow:
+    0 1px 0 rgba(0,0,0,.16),
+    0 2px 4px rgba(0,0,0,.16),
+    inset 0 1px 1px rgba(255,255,255,.55),
+    inset 0 -1px 2px rgba(0,0,0,.12);
+}
+.qa-call .qa-3d-icon{background:linear-gradient(150deg,#7db4ff 0%,#3979f6 55%,#1c53d6 100%)}
+.qa-whatsapp .qa-3d-icon{background:linear-gradient(150deg,#5be79a 0%,#22c064 55%,#149248 100%)}
+.qa-whatsapp .qa-3d-icon svg{fill:#fff;stroke:none}
+.qa-visit .qa-3d-icon{background:linear-gradient(150deg,#ffcb73 0%,#ff9a2e 55%,#f27600 100%)}
+.qa-compare .qa-3d-icon{background:linear-gradient(150deg,#ff9dc6 0%,#ef4f8e 55%,#c92768 100%)}
+.qa-compare.checked .qa-3d-icon{background:linear-gradient(150deg,#8ff0ab 0%,#2ecc55 55%,#189a3e 100%)}
+.qa-compare.disabled{cursor:not-allowed}
+.qa-compare.disabled .qa-3d-icon{filter:grayscale(.55) opacity(.55);box-shadow:none}
+.qa-compare.disabled:active .qa-3d-icon{transform:none}
+.prop-qa-btn.prop-qa-3d,
+.prop-qa-icon.prop-qa-3d{outline:none}
+.prop-qa-btn.prop-qa-3d:focus,
+.prop-qa-icon.prop-qa-3d:focus{outline:none}
+.prop-qa-btn.prop-qa-3d:focus-visible .qa-3d-icon,
+.prop-qa-icon.prop-qa-3d:focus-visible .qa-3d-icon{
+  outline:2px solid var(--brand);
+  outline-offset:2px;
+}
+.prop-quick-actions{justify-content:flex-start}
+.prop-quick-actions .prop-qa-btn.prop-qa-3d,
+.prop-quick-actions .prop-qa-icon.prop-qa-3d{
+  flex:0 0 auto;width:34px;
+}
+.prop-meta-row{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:9px}
+.prop-quick-actions{display:flex;align-items:center;gap:6px}
 .prop-views{
   display:flex;align-items:center;
   font-size:11px;color:var(--text-3);
@@ -609,12 +664,18 @@ ul{list-style:none}
 }
 .prop-views-icon{
   position:relative;display:flex;align-items:center;justify-content:center;
-  width:18px;height:18px;
+  width:34px;height:34px;border-radius:11px;
+  background:linear-gradient(150deg,#a78bff 0%,#7c5cff 55%,#5a36e8 100%);
+  box-shadow:
+    0 3px 0 rgba(0,0,0,.16),
+    0 6px 10px rgba(0,0,0,.16),
+    inset 0 1px 1px rgba(255,255,255,.55),
+    inset 0 -3px 4px rgba(0,0,0,.15);
 }
-.prop-views-icon svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8}
+.prop-views-icon svg{width:17px;height:17px;stroke:#fff;fill:none;stroke-width:2.1}
 .prop-views-badge{
-  position:absolute;top:-7px;right:-8px;min-width:15px;height:15px;padding:0 3px;
-  border-radius:99px;background:var(--text-2);color:#fff;font-size:9px;font-weight:700;
+  position:absolute;top:-6px;right:-6px;min-width:16px;height:16px;padding:0 3px;
+  border-radius:99px;background:var(--brand);color:#fff;font-size:9.5px;font-weight:700;
   display:flex;align-items:center;justify-content:center;line-height:1;box-shadow:0 0 0 1.5px var(--bg);
 }
 .prop-posted{font-size:11px;color:var(--text-3);text-align:right;white-space:nowrap;flex-shrink:0}
@@ -5088,29 +5149,29 @@ function cardHTML(p) {
       </div>` : ''}
       <div class="prop-footer">
         <div class="prop-quick-actions">
-          <button class="prop-qa-btn" onclick="event.stopPropagation();showToast('Contact info shown to verified users')" aria-label="Contact owner">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <button class="prop-qa-btn prop-qa-3d qa-call" onclick="event.stopPropagation();showToast('Contact info shown to verified users')" aria-label="Contact owner">
+            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
             <span>Contact</span>
           </button>
-          <button class="prop-qa-btn prop-qa-whatsapp" onclick="event.stopPropagation();openWhatsApp('${p.id}')" aria-label="Contact on WhatsApp">
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg>
+          <button class="prop-qa-btn prop-qa-3d qa-whatsapp" onclick="event.stopPropagation();openWhatsApp('${p.id}')" aria-label="Contact on WhatsApp">
+            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg></span>
             <span>WhatsApp</span>
           </button>
-          <div class="prop-qa-icon" id="prop-qa-icon-${p.id}" data-prop-id="${p.id}" onclick="event.stopPropagation();openScheduleModal('${p.id}')" aria-label="Schedule a visit" title="Schedule a visit">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <div class="prop-qa-icon prop-qa-3d qa-visit" id="prop-qa-icon-${p.id}" data-prop-id="${p.id}" onclick="event.stopPropagation();openScheduleModal('${p.id}')" aria-label="Schedule a visit" title="Schedule a visit">
+            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
             <span class="prop-qa-count" style="${(p.visitCount||0) > 0 ? '' : 'display:none'}">${p.visitCount||0}</span>
           </div>
-          <div class="prop-qa-icon prop-action-compare${compared?' checked':''}${compareDisabled?' disabled':''}" onclick="event.stopPropagation();toggleCompare('${p.id}',this)" aria-label="${compared?'Remove from':'Add to'} compare" title="${compareDisabled?`You're comparing ${lockedType} properties`:'Compare'}">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+          <div class="prop-qa-icon prop-qa-3d qa-compare prop-action-compare${compared?' checked':''}${compareDisabled?' disabled':''}" onclick="event.stopPropagation();toggleCompare('${p.id}',this)" aria-label="${compared?'Remove from':'Add to'} compare" title="${compareDisabled?`You're comparing ${lockedType} properties`:'Compare'}">
+            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></span>
           </div>
-        </div>
-        <div class="prop-meta-row">
           <span class="prop-views" title="${getViews(p).toLocaleString('en-IN')} views">
             <span class="prop-views-icon">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               <span class="prop-views-badge">${formatViews(getViews(p))}</span>
             </span>
           </span>
+        </div>
+        <div class="prop-meta-row">
           <span class="prop-posted" title="${esc(p.posted)}">${esc((p.posted || '').split(' ')[0])}</span>
         </div>
       </div>
@@ -5200,20 +5261,20 @@ function shortlistCardHTML(p) {
       </div>` : ''}
       <div class="prop-footer">
         <div class="prop-quick-actions">
-          <button class="prop-qa-btn" onclick="event.stopPropagation();showToast('Contact info shown to verified users')" aria-label="Contact owner">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <button class="prop-qa-btn prop-qa-3d qa-call" onclick="event.stopPropagation();showToast('Contact info shown to verified users')" aria-label="Contact owner">
+            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
             <span>Contact</span>
           </button>
-          <button class="prop-qa-btn prop-qa-whatsapp" onclick="event.stopPropagation();openWhatsApp('${p.id}')" aria-label="Contact on WhatsApp">
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg>
+          <button class="prop-qa-btn prop-qa-3d qa-whatsapp" onclick="event.stopPropagation();openWhatsApp('${p.id}')" aria-label="Contact on WhatsApp">
+            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg></span>
             <span>WhatsApp</span>
           </button>
-          <div class="prop-qa-icon" id="prop-qa-icon-${p.id}" data-prop-id="${p.id}" onclick="event.stopPropagation();openScheduleModal('${p.id}')" aria-label="Schedule a visit" title="Schedule a visit">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <div class="prop-qa-icon prop-qa-3d qa-visit" id="prop-qa-icon-${p.id}" data-prop-id="${p.id}" onclick="event.stopPropagation();openScheduleModal('${p.id}')" aria-label="Schedule a visit" title="Schedule a visit">
+            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
             <span class="prop-qa-count" style="${(p.visitCount||0) > 0 ? '' : 'display:none'}">${p.visitCount||0}</span>
           </div>
-          <div class="prop-qa-icon prop-action-compare${compared?' checked':''}${compareDisabled?' disabled':''}" onclick="event.stopPropagation();toggleCompare('${p.id}',this)" aria-label="${compared?'Remove from':'Add to'} compare" title="${compareDisabled?`You're comparing ${lockedType} properties`:'Compare'}">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+          <div class="prop-qa-icon prop-qa-3d qa-compare prop-action-compare${compared?' checked':''}${compareDisabled?' disabled':''}" onclick="event.stopPropagation();toggleCompare('${p.id}',this)" aria-label="${compared?'Remove from':'Add to'} compare" title="${compareDisabled?`You're comparing ${lockedType} properties`:'Compare'}">
+            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></span>
           </div>
         </div>
       </div>
