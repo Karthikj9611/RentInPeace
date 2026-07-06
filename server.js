@@ -1029,7 +1029,7 @@ function toApptRow(doc) {
     name:            doc.visitorName  || '',
     mobile:          doc.visitorPhone || '',
     email:           doc.email        || '',
-    propertyId:      doc.propertyId   ? (doc.propertyId._id || doc.propertyId) : null,
+    propertyId:      (prop && prop.propertyId) || '', // human-readable Property.propertyId code (e.g. AAA123), not the Mongo _id
     propertyName,
     propertyArea,
     purpose,
@@ -1050,7 +1050,7 @@ app.get('/api/appointments', requireAdmin, async (req, res) => {
   try {
     const docs = await VisitRequest.find({})
       .sort({ createdAt: -1 })
-      .populate('propertyId', 'basic.status owner.propertyName location.area')
+      .populate('propertyId', 'basic.status owner.propertyName location.area propertyId')
       .lean();
     res.json(docs.map(toApptRow));
   } catch (err) {

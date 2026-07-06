@@ -111,6 +111,23 @@ ul{list-style:none}
   position:relative;
 }
 .nav-tab svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7}
+.nav-tab-icon{
+  font-size:26px;line-height:1;
+  filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.18));
+  transition:transform .15s;
+  transform:scale(1);
+}
+.nav-tab:hover .nav-tab-icon,
+.nav-tab.active .nav-tab-icon{transform:scale(1.12)}
+@keyframes navIconPop{
+  0%{transform:scale(1) rotate(0deg)}
+  35%{transform:scale(1.45) rotate(-10deg)}
+  60%{transform:scale(.9) rotate(6deg)}
+  80%{transform:scale(1.2) rotate(-3deg)}
+  100%{transform:scale(1.12) rotate(0deg)}
+}
+.nav-tab-icon.pop{animation:navIconPop .55s cubic-bezier(.34,1.56,.64,1)}
+.nav-tab:active .nav-tab-icon{transform:scale(.9)}
 .nav-tab.active{color:var(--brand);border-bottom-color:var(--brand)}
 .nav-tab:hover:not(.active){color:var(--text)}
 .nav-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
@@ -205,6 +222,7 @@ ul{list-style:none}
   position:relative;
 }
 .fd-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;transition:transform .15s}
+.fd-icon{font-size:20px;line-height:1;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.15))}
 .fd-btn:hover{border-color:var(--brand);color:var(--brand)}
 .fd-btn.has-sel{background:var(--brand-light);border-color:var(--brand);color:var(--brand)}
 .fd-btn.open{border-color:var(--brand);color:var(--brand)}
@@ -503,7 +521,9 @@ ul{list-style:none}
 }
 .prop-stat:not(:last-child){border-right:1px solid var(--border);}
 .prop-stat svg{width:14px;height:14px;stroke:var(--text-3);fill:none;stroke-width:1.8;flex-shrink:0}
+.prop-stat-icon{font-size:15px;line-height:1;flex-shrink:0;filter:drop-shadow(0 1px 1px rgba(0,0,0,.12))}
 .prop-stat.is-off{color:var(--text-3);font-weight:500}
+.prop-stat.is-off .prop-stat-icon{opacity:.35;filter:none}
 .prop-stat.is-off svg{stroke:var(--border-2)}
 .prop-chip-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
 .prop-id{font-size:11px;font-family:monospace;color:var(--text-3);margin-top:2px;letter-spacing:.02em}
@@ -2271,19 +2291,19 @@ ul{list-style:none}
 
   <div class="nav-tabs" role="tablist">
     <div class="nav-tab active" data-tab="All" role="tab" onclick="switchTab(this)" tabindex="0">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>
+      <span class="nav-tab-icon">🌐</span>
       All
     </div>
     <div class="nav-tab" data-tab="Rent" role="tab" onclick="switchTab(this)" tabindex="0">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 9V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h3m3 0h6m-6 0a2 2 0 1 0 4 0m-4 0a2 2 0 1 1 4 0"/><circle cx="7" cy="17" r="2"/><path d="M1 11h15"/></svg>
+      <span class="nav-tab-icon">🏠</span>
       Rent
     </div>
     <div class="nav-tab" data-tab="Lease" role="tab" onclick="switchTab(this)" tabindex="0">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      <span class="nav-tab-icon">📝</span>
       Lease
     </div>
     <div class="nav-tab" data-tab="PG" role="tab" onclick="switchTab(this)" tabindex="0">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span class="nav-tab-icon">🛏️</span>
       PG
     </div>
   </div>
@@ -2338,6 +2358,7 @@ ul{list-style:none}
 
   <!-- RENT + LEASE: Property Type -->
   <div class="fd-btn fd-rent fd-lease" id="fdb-type" onclick="toggleFd('type',this)">
+    <span class="fd-icon">🏢</span>
     Type <span class="fd-badge" id="fdbc-type" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     <div class="fd-pop" id="fdp-type" onclick="event.stopPropagation()">
@@ -2352,6 +2373,7 @@ ul{list-style:none}
 
   <!-- RENT + LEASE: BHK -->
   <div class="fd-btn fd-rent fd-lease" id="fdb-bhk" onclick="toggleFd('bhk',this)">
+    <span class="fd-icon">🛏️</span>
     BHK <span class="fd-badge" id="fdbc-bhk" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     <div class="fd-pop" id="fdp-bhk" onclick="event.stopPropagation()">
@@ -2366,6 +2388,7 @@ ul{list-style:none}
 
   <!-- RENT: Max Rent -->
   <div class="fd-btn fd-rent" id="fdb-rent" onclick="toggleFd('rent',this)">
+    <span class="fd-icon">💰</span>
     Rent <span class="fd-badge" id="fdbc-rent" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     <div class="fd-pop" id="fdp-rent" onclick="event.stopPropagation()">
@@ -2388,6 +2411,7 @@ ul{list-style:none}
 
   <!-- RENT: Deposit -->
   <div class="fd-btn fd-rent" id="fdb-deposit" onclick="toggleFd('deposit',this)">
+    <span class="fd-icon">🏦</span>
     Deposit <span class="fd-badge" id="fdbc-deposit" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     <div class="fd-pop" id="fdp-deposit" onclick="event.stopPropagation()">
@@ -2409,6 +2433,7 @@ ul{list-style:none}
 
   <!-- RENT + LEASE: Maintenance -->
   <div class="fd-btn fd-rent fd-lease" id="fdb-maintenance" onclick="toggleFd('maintenance',this)">
+    <span class="fd-icon">🛠️</span>
     Maintenance <span class="fd-badge" id="fdbc-maintenance" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     <div class="fd-pop" id="fdp-maintenance" onclick="event.stopPropagation()">
@@ -2429,6 +2454,7 @@ ul{list-style:none}
 
   <!-- RENT + LEASE: Negotiable -->
   <div class="fd-btn fd-rent fd-lease" id="fdb-negotiable" onclick="toggleFd('negotiable',this)">
+    <span class="fd-icon">🤝</span>
     Negotiable <span class="fd-badge" id="fdbc-negotiable" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     <div class="fd-pop" id="fdp-negotiable" onclick="event.stopPropagation()">
@@ -2446,6 +2472,7 @@ ul{list-style:none}
 
   <!-- LEASE: Lease Amount -->
   <div class="fd-btn fd-lease" id="fdb-lease" onclick="toggleFd('lease',this)">
+    <span class="fd-icon">💵</span>
     Lease Amt <span class="fd-badge" id="fdbc-lease" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     <div class="fd-pop" id="fdp-lease" onclick="event.stopPropagation()">
@@ -2468,6 +2495,7 @@ ul{list-style:none}
 
   <!-- RENT + LEASE: Furnishing -->
   <div class="fd-btn fd-rent fd-lease" id="fdb-furnishing" onclick="toggleFd('furnishing',this)">
+    <span class="fd-icon">🛋️</span>
     Furnishing <span class="fd-badge" id="fdbc-furnishing" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     <div class="fd-pop" id="fdp-furnishing" onclick="event.stopPropagation()">
@@ -2482,6 +2510,7 @@ ul{list-style:none}
 
   <!-- RENT + LEASE: Tenant -->
   <div class="fd-btn fd-rent fd-lease" id="fdb-tenant" onclick="toggleFd('tenant',this)">
+    <span class="fd-icon">👤</span>
     Tenant <span class="fd-badge" id="fdbc-tenant" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     <div class="fd-pop" id="fdp-tenant" onclick="event.stopPropagation()">
@@ -2496,6 +2525,7 @@ ul{list-style:none}
 
   <!-- RENT + LEASE: Facing -->
   <div class="fd-btn fd-rent fd-lease" id="fdb-facing" onclick="toggleFd('facing',this)">
+    <span class="fd-icon">🧭</span>
     Facing <span class="fd-badge" id="fdbc-facing" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     <div class="fd-pop" id="fdp-facing" onclick="event.stopPropagation()">
@@ -2510,6 +2540,7 @@ ul{list-style:none}
 
   <!-- RENT + LEASE: Bathrooms -->
   <div class="fd-btn fd-rent fd-lease" id="fdb-bathrooms" onclick="toggleFd('bathrooms',this)">
+    <span class="fd-icon">🚿</span>
     Bathrooms <span class="fd-badge" id="fdbc-bathrooms" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     <div class="fd-pop" id="fdp-bathrooms" onclick="event.stopPropagation()">
@@ -2524,6 +2555,7 @@ ul{list-style:none}
 
   <!-- RENT + LEASE: Age -->
   <div class="fd-btn fd-rent fd-lease" id="fdb-age" onclick="toggleFd('age',this)">
+    <span class="fd-icon">🏗️</span>
     Age <span class="fd-badge" id="fdbc-age" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     <div class="fd-pop" id="fdp-age" onclick="event.stopPropagation()">
@@ -2538,6 +2570,7 @@ ul{list-style:none}
 
   <!-- ALL: Available from -->
   <div class="fd-btn fd-rent fd-lease fd-pg" id="fdb-availFrom" onclick="toggleFd('availFrom',this)">
+    <span class="fd-icon">📅</span>
     Available <span class="fd-badge" id="fdbc-availFrom" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     <div class="fd-pop" id="fdp-availFrom" onclick="event.stopPropagation()">
@@ -2558,6 +2591,7 @@ ul{list-style:none}
 
   <!-- ALL: Amenities -->
   <div class="fd-btn fd-rent fd-lease fd-pg" id="fdb-amenities" onclick="toggleFd('amenities',this)">
+    <span class="fd-icon">✨</span>
     Amenities <span class="fd-badge" id="fdbc-amenities" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     <div class="fd-pop" id="fdp-amenities" onclick="event.stopPropagation()">
@@ -2572,6 +2606,7 @@ ul{list-style:none}
 
   <!-- ALL: Lift & Parking -->
   <div class="fd-btn fd-rent fd-lease fd-pg" id="fdb-facilities" onclick="toggleFd('facilities',this)">
+    <span class="fd-icon">🅿️</span>
     Facilities <span class="fd-badge" id="fdbc-facilities" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     <div class="fd-pop" id="fdp-facilities" onclick="event.stopPropagation()">
@@ -2594,6 +2629,7 @@ ul{list-style:none}
 
   <!-- PG: Gender -->
   <div class="fd-btn fd-pg" id="fdb-pgGender" onclick="toggleFd('pgGender',this)">
+    <span class="fd-icon">🚻</span>
     PG for <span class="fd-badge" id="fdbc-pgGender" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     <div class="fd-pop" id="fdp-pgGender" onclick="event.stopPropagation()">
@@ -2608,6 +2644,7 @@ ul{list-style:none}
 
   <!-- PG: Room type + Meals + Food + Rent -->
   <div class="fd-btn fd-pg" id="fdb-pgRoom" onclick="toggleFd('pgRoom',this)">
+    <span class="fd-icon">🚪</span>
     Room type <span class="fd-badge" id="fdbc-pgRoom" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     <div class="fd-pop" id="fdp-pgRoom" onclick="event.stopPropagation()">
@@ -2621,6 +2658,7 @@ ul{list-style:none}
   </div>
 
   <div class="fd-btn fd-pg" id="fdb-pgMeals" onclick="toggleFd('pgMeals',this)">
+    <span class="fd-icon">🍽️</span>
     Meals <span class="fd-badge" id="fdbc-pgMeals" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     <div class="fd-pop fd-pop right" id="fdp-pgMeals" onclick="event.stopPropagation()">
@@ -2636,6 +2674,7 @@ ul{list-style:none}
   </div>
 
   <div class="fd-btn fd-pg" id="fdb-pgRent" onclick="toggleFd('pgRent',this)">
+    <span class="fd-icon">💰</span>
     PG Rent <span class="fd-badge" id="fdbc-pgRent" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     <div class="fd-pop fd-pop right" id="fdp-pgRent" onclick="event.stopPropagation()">
@@ -4975,26 +5014,26 @@ function cardHTML(p) {
       </div>
       <div class="prop-stats">
         <span class="prop-stat" title="Configuration">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7v11M3 11h18M21 7v11M7 7v4M17 7v4"/></svg>
-          ${p.property?.bhk}
+          <span class="prop-stat-icon">🛏️</span>
+          ${String(p.property?.bhk || '').replace(/\s*BHK\s*$/i, '').trim()}
         </span>
         <span class="prop-stat" title="Bathrooms">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h17a1 1 0 0 1 1 1v1a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4v-9a2 2 0 0 1 2-2 2 2 0 0 1 2 2"/><path d="M9 12V5a2 2 0 0 1 4 0"/></svg>
-          ${bathrooms} Bath${bathrooms==1?'':'s'}
+          <span class="prop-stat-icon">🚿</span>
+          ${bathrooms}
         </span>
         <span class="prop-stat" title="Furnishing">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7v11M21 7v11M3 13h18M5 13V9a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4"/></svg>
+          <span class="prop-stat-icon">🛋️</span>
           ${p.property?.furnish}
         </span>
         <span class="prop-stat${carpark?'':' is-off'}" title="${carCount>0?carCount+' car parking spot'+(carCount>1?'s':''):'No car parking'}">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/><rect x="3" y="11" width="18" height="6" rx="2"/><circle cx="7.5" cy="17" r="1.3"/><circle cx="16.5" cy="17" r="1.3"/></svg>
-          Car${carCount>0?' ×'+carCount:''}
+          <span class="prop-stat-icon">🚗</span>
+          ${carCount>0?carCount:''}
         </span>
         <span class="prop-stat${bikepark?'':' is-off'}" title="${bikeCount>0?bikeCount+' bike parking spot'+(bikeCount>1?'s':''):'No bike parking'}">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="17.5" r="3"/><circle cx="18.5" cy="17.5" r="3"/><path d="M12 17.5l2.5-7.5h3M5.5 17.5L9 9h3l2.5 4"/></svg>
-          Bike${bikeCount>0?' ×'+bikeCount:''}
+          <span class="prop-stat-icon">🏍️</span>
+          ${bikeCount>0?bikeCount:''}
         </span>
-        ${lift ? `<span class="prop-stat" title="Lift available"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M9 9l3-3 3 3M9 15l3 3 3-3"/></svg>Lift</span>` : ''}
+        ${lift ? `<span class="prop-stat" title="Lift available"><span class="prop-stat-icon">🛗</span></span>` : ''}
       </div>
       <div class="prop-chip-row">
         <span class="prop-chip" title="Security deposit">
@@ -5104,26 +5143,26 @@ function shortlistCardHTML(p) {
       </div>
       <div class="prop-stats">
         <span class="prop-stat" title="Configuration">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7v11M3 11h18M21 7v11M7 7v4M17 7v4"/></svg>
-          ${p.property?.bhk}
+          <span class="prop-stat-icon">🛏️</span>
+          ${String(p.property?.bhk || '').replace(/\s*BHK\s*$/i, '').trim()}
         </span>
         <span class="prop-stat" title="Bathrooms">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h17a1 1 0 0 1 1 1v1a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4v-9a2 2 0 0 1 2-2 2 2 0 0 1 2 2"/><path d="M9 12V5a2 2 0 0 1 4 0"/></svg>
-          ${bathrooms} Bath${bathrooms==1?'':'s'}
+          <span class="prop-stat-icon">🚿</span>
+          ${bathrooms}
         </span>
         <span class="prop-stat" title="Furnishing">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7v11M21 7v11M3 13h18M5 13V9a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4"/></svg>
+          <span class="prop-stat-icon">🛋️</span>
           ${p.property?.furnish}
         </span>
         <span class="prop-stat${carpark?'':' is-off'}" title="${carCount>0?carCount+' car parking spot'+(carCount>1?'s':''):'No car parking'}">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/><rect x="3" y="11" width="18" height="6" rx="2"/><circle cx="7.5" cy="17" r="1.3"/><circle cx="16.5" cy="17" r="1.3"/></svg>
-          Car${carCount>0?' ×'+carCount:''}
+          <span class="prop-stat-icon">🚗</span>
+          ${carCount>0?carCount:''}
         </span>
         <span class="prop-stat${bikepark?'':' is-off'}" title="${bikeCount>0?bikeCount+' bike parking spot'+(bikeCount>1?'s':''):'No bike parking'}">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="17.5" r="3"/><circle cx="18.5" cy="17.5" r="3"/><path d="M12 17.5l2.5-7.5h3M5.5 17.5L9 9h3l2.5 4"/></svg>
-          Bike${bikeCount>0?' ×'+bikeCount:''}
+          <span class="prop-stat-icon">🏍️</span>
+          ${bikeCount>0?bikeCount:''}
         </span>
-        ${lift ? `<span class="prop-stat" title="Lift available"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M9 9l3-3 3 3M9 15l3 3 3-3"/></svg>Lift</span>` : ''}
+        ${lift ? `<span class="prop-stat" title="Lift available"><span class="prop-stat-icon">🛗</span></span>` : ''}
       </div>
       <div class="prop-chip-row">
         <span class="prop-chip" title="Security deposit">
@@ -5467,6 +5506,15 @@ function switchTab(el) {
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   currentTab = el.dataset.tab;
+  // Playful bounce on the clicked tab's icon (restart the animation even if
+  // it's already mid-run from a fast double-click).
+  const icon = el.querySelector('.nav-tab-icon');
+  if (icon) {
+    icon.classList.remove('pop');
+    void icon.offsetWidth; // force reflow so the animation restarts
+    icon.classList.add('pop');
+    icon.addEventListener('animationend', () => icon.classList.remove('pop'), { once: true });
+  }
   syncMobileTab();
   syncFdBar();
   clearFiltersHiddenByTab();
