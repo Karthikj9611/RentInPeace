@@ -569,6 +569,15 @@ ul{list-style:none}
 .icon-area{background:linear-gradient(145deg,#f1ecff,#e0d6ff)}
 .icon-lift{background:linear-gradient(145deg,#f5ecff,#e6d5ff)}
 .prop-chip-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+/* Single-row, horizontally slidable variant (Furnished / Maintenance / Available
+   From) — no wrapping to a 2nd line, scrolls sideways instead, same hidden-
+   scrollbar treatment as .prop-stats, and can be auto-advanced by JS. */
+.prop-chip-row-scroll{
+  flex-wrap:nowrap;overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none;
+  scroll-behavior:smooth;
+}
+.prop-chip-row-scroll::-webkit-scrollbar{display:none}
+.prop-chip-row-scroll .prop-chip{flex-shrink:0}
 .prop-id{font-size:11px;font-family:monospace;color:var(--text-3);margin-top:2px;letter-spacing:.02em}
 .prop-desc-preview{margin-top:8px;font-size:12px;line-height:1.4;color:var(--text-3);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .prop-chip{
@@ -631,7 +640,7 @@ ul{list-style:none}
 .prop-qa-btn.prop-qa-whatsapp svg{fill:currentColor;stroke:none}
 .prop-qa-btn.prop-qa-whatsapp:hover{background:#e8faef;border-color:#25D366;color:#1ebe5a}
 .prop-qa-icon{
-  flex:1;height:58px;border-radius:9px;
+  flex:1;height:58px;border-radius:9px;min-width:0;
   display:flex;align-items:center;justify-content:center;
   border:1.5px solid var(--border-2);background:var(--bg);
   color:var(--text-2);cursor:pointer;position:relative;
@@ -659,7 +668,7 @@ ul{list-style:none}
 .prop-qa-btn.prop-qa-3d:hover,
 .prop-qa-icon.prop-qa-3d:hover{background:transparent;border:none;color:var(--text-2)}
 .qa-3d-icon{
-  width:56px;height:56px;border-radius:16px;
+  width:56px;max-width:100%;aspect-ratio:1/1;height:auto;border-radius:16px;
   display:flex;align-items:center;justify-content:center;
   box-shadow:
     0 3px 0 rgba(0,0,0,.16),
@@ -668,7 +677,7 @@ ul{list-style:none}
     inset 0 -3px 4px rgba(0,0,0,.15);
   transition:transform .12s ease,box-shadow .12s ease,filter .12s ease;
 }
-.qa-3d-icon svg{width:23px;height:23px;stroke:#fff;fill:none;stroke-width:2.1}
+.qa-3d-icon svg{width:23px;height:23px;max-width:60%;max-height:60%;stroke:#fff;fill:none;stroke-width:2.1}
 .prop-qa-btn.prop-qa-3d:active .qa-3d-icon,
 .prop-qa-icon.prop-qa-3d:active .qa-3d-icon{
   transform:translateY(2px);
@@ -710,7 +719,7 @@ ul{list-style:none}
 }
 .prop-views-icon{
   position:relative;display:flex;align-items:center;justify-content:center;
-  width:56px;height:56px;border-radius:16px;
+  width:56px;max-width:100%;aspect-ratio:1/1;height:auto;border-radius:16px;
   background:linear-gradient(150deg,#8a68ee 0%,#623ce0 55%,#3f22a8 100%);
   box-shadow:
     0 3px 0 rgba(0,0,0,.16),
@@ -718,7 +727,7 @@ ul{list-style:none}
     inset 0 1px 1px rgba(255,255,255,.55),
     inset 0 -3px 4px rgba(0,0,0,.15);
 }
-.prop-views-icon svg{width:23px;height:23px;stroke:#fff;fill:none;stroke-width:2.1}
+.prop-views-icon svg{width:23px;height:23px;max-width:60%;max-height:60%;stroke:#fff;fill:none;stroke-width:2.1}
 .prop-views-badge{
   position:absolute;top:-6px;right:-6px;min-width:16px;height:16px;padding:0 3px;
   border-radius:99px;background:var(--brand);color:#fff;font-size:9.5px;font-weight:700;
@@ -2230,9 +2239,9 @@ ul{list-style:none}
     border:1px solid var(--border-2);
     box-shadow:0 2px 3px rgba(20,16,17,.08),inset 0 1px 0 rgba(255,255,255,.9);
   }
-  .qa-3d-icon{width:25px;height:25px;max-width:100%;border-radius:8px}
+  .qa-3d-icon{width:25px;max-width:100%;aspect-ratio:1/1;height:auto;border-radius:8px}
   .qa-3d-icon svg{width:12px;height:12px}
-  .prop-views-icon{width:25px;height:25px;max-width:100%;border-radius:8px}
+  .prop-views-icon{width:25px;max-width:100%;aspect-ratio:1/1;height:auto;border-radius:8px}
   .prop-views-icon svg{width:12px;height:12px}
   .prop-qa-btn:active,.prop-qa-icon:active{
     box-shadow:inset 0 1px 3px rgba(20,16,17,.15);transform:scale(.95);
@@ -2274,9 +2283,9 @@ ul{list-style:none}
      size causes the 5 buttons to overlap, so shrink them here only —
      mobile rules above are untouched. */
   .prop-quick-actions{gap:4px}
-  .qa-3d-icon{width:46px;height:46px;border-radius:13px}
+  .qa-3d-icon{width:46px;max-width:100%;aspect-ratio:1/1;height:auto;border-radius:13px}
   .qa-3d-icon svg{width:19px;height:19px}
-  .prop-views-icon{width:46px;height:46px;border-radius:13px}
+  .prop-views-icon{width:46px;max-width:100%;aspect-ratio:1/1;height:auto;border-radius:13px}
   .prop-views-icon svg{width:19px;height:19px}
 }
 
@@ -5239,7 +5248,7 @@ function cardHTML(p) {
         </span>` : ''}
         ${lift ? `<span class="prop-stat" title="Lift available"><span class="prop-stat-icon icon-lift">🛗</span></span>` : ''}
       </div>
-      <div class="prop-chip-row">
+      <div class="prop-chip-row prop-chip-row-scroll">
         <span class="prop-chip chip-furnish" title="Furnishing">
           <span class="prop-chip-icon icon-furnish">🛋️</span>
           ${p.property?.furnish}
@@ -8074,6 +8083,20 @@ document.addEventListener('DOMContentLoaded', function() {
   dots.forEach((d, i) => d.addEventListener('click', e => { e.stopPropagation(); stop(); goTo(i); start(); }));
   start();
 });
+
+/* ─── Auto-slide the property-card icon/chip rows (stats + furnished/
+   maintenance/available chips) every 30s when they overflow their card
+   width. Scrolls one "page" forward each tick and loops back to the start
+   once the end is reached; users can still drag/scroll them manually at
+   any time. Runs globally so it picks up newly rendered cards each tick. */
+function _autoSlidePropRows(){
+  document.querySelectorAll('.prop-stats, .prop-chip-row-scroll').forEach(row => {
+    if (row.scrollWidth <= row.clientWidth + 4) return;
+    const atEnd = row.scrollLeft + row.clientWidth >= row.scrollWidth - 4;
+    row.scrollTo({ left: atEnd ? 0 : row.scrollLeft + row.clientWidth * 0.85, behavior: 'smooth' });
+  });
+}
+setInterval(_autoSlidePropRows, 30000);
 
 document.addEventListener('click', function(e) {
   const dd = document.getElementById('amDropdown');
