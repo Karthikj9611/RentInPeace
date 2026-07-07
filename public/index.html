@@ -2267,6 +2267,17 @@ ul{list-style:none}
 }
 @media(min-width:641px){
   .bottom-nav{display:none}
+
+  /* Desktop-only: the colorful 3D quick-action icons (Call/WhatsApp/Visit/
+     Compare/Views) default to 56px via .qa-3d-icon/.prop-views-icon, sized
+     for the narrower mobile 2-up card. On wider desktop property cards that
+     size causes the 5 buttons to overlap, so shrink them here only —
+     mobile rules above are untouched. */
+  .prop-quick-actions{gap:4px}
+  .qa-3d-icon{width:46px;height:46px;border-radius:13px}
+  .qa-3d-icon svg{width:19px;height:19px}
+  .prop-views-icon{width:46px;height:46px;border-radius:13px}
+  .prop-views-icon svg{width:19px;height:19px}
 }
 
 /* ─── Card image slider ─────────────────────────── */
