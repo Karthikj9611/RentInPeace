@@ -1543,11 +1543,16 @@ ul{list-style:none}
   .services-section{padding:8px 16px 24px}
   .services-title{font-size:23px}
   .services-sub{font-size:13px}
+  /* 2×2 grid that scrolls sideways: two rows fixed, columns auto-flow so
+     each swipe/scroll reveals the next pair of cards (4 visible at once,
+     6 cards → slides to reveal the remaining 2). Scroll-snap makes it
+     settle cleanly on a pair instead of stopping mid-card. */
   .services-scroll{
-    display:grid;grid-template-columns:1fr 1fr;gap:10px;
-    overflow-x:visible;
+    display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,1fr);
+    grid-auto-columns:calc(50% - 5px);gap:10px;
+    overflow-x:auto;scroll-snap-type:x mandatory;
   }
-  .service-card{width:100%;height:190px}
+  .service-card{width:100%;height:170px;scroll-snap-align:start}
   .services-arrow{display:none}
 }
 
@@ -8108,7 +8113,7 @@ function _autoSlidePropRows(){
 }
 setInterval(_autoSlidePropRows, 30000);
 
-/* ─── Auto-slide the reviews row every 2s ───────────────────────────
+/* ─── Auto-slide the reviews row every 10s ──────────────────────────
    Bounces forward one review at a time until the last review is
    reached, then reverses and bounces back to the first, looping
    forever. Only runs when there's more than one review and they
@@ -8128,7 +8133,7 @@ function _autoSlideReviews(){
   const step = card ? (card.getBoundingClientRect().width + 16) : row.clientWidth * 0.9;
   row.scrollTo({ left: row.scrollLeft + step * _reviewsDir, behavior: 'smooth' });
 }
-setInterval(_autoSlideReviews, 2000);
+setInterval(_autoSlideReviews, 10000);
 
 document.addEventListener('click', function(e) {
   const dd = document.getElementById('amDropdown');
