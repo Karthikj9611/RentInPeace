@@ -1455,7 +1455,7 @@ app.post('/api/reviews', async (req, res) => {
 
 // ────────────────────────────────────────────────────────────────────────────
 // ── IMAGE UPLOAD (POST /api/upload-images) ──
-// Accepts up to 8 images (multipart/form-data, field name 'images'), converts
+// Accepts any number of images (multipart/form-data, field name 'images'), converts
 // each to WebP (max 1200px on the long edge, quality 80) via sharp, and saves
 // the resulting bytes as a document in MongoDB (not the local disk — Render's
 // filesystem is wiped on every restart/redeploy/free-tier spin-down, but Mongo
@@ -1489,7 +1489,7 @@ app.get('/uploads/:id', async (req, res) => {
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 8 * 1024 * 1024, files: 8 }, // 8MB per file, 8 files per request
+  limits: { fileSize: 8 * 1024 * 1024 }, // 8MB per file, no cap on file count
   fileFilter: (req, file, cb) => {
     const ok = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif'].includes(file.mimetype);
     cb(ok ? null : new Error('Only image files are allowed'), ok);
@@ -1502,7 +1502,7 @@ const uploadLimiter = rateLimit({
   message: { message: 'Too many upload requests. Please try again later.' }
 });
 
-app.post('/api/upload-images', uploadLimiter, attachUserIfPresent, upload.array('images', 8), async (req, res) => {
+app.post('/api/upload-images', uploadLimiter, attachUserIfPresent, upload.array('images'), async (req, res) => {
   try {
     const files = req.files || [];
     if (!files.length) return res.status(400).json({ message: 'No images uploaded' });
