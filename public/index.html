@@ -1180,6 +1180,18 @@ ul{list-style:none}
   position:sticky;top:0;background:var(--bg);z-index:2;
 }
 .compare-modal-title{font-size:17px;font-weight:700}
+.compare-modal-header-actions{display:flex;align-items:center;gap:8px}
+.compare-share-btn{
+  display:flex;align-items:center;gap:6px;
+  background:linear-gradient(150deg,#3dcc7e,#189e50);color:#fff;
+  border:none;border-radius:99px;padding:8px 14px;
+  font-size:13px;font-weight:700;cursor:pointer;
+  box-shadow:0 2px 8px rgba(24,158,80,.35);
+  transition:transform .12s ease,box-shadow .12s ease;
+}
+.compare-share-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(24,158,80,.42)}
+.compare-share-btn:active{transform:translateY(0)}
+.compare-share-btn svg{width:15px;height:15px;fill:#fff;flex-shrink:0}
 .compare-table-wrap{overflow-x:auto;padding:0 24px 24px;overscroll-behavior-x:contain}
 .compare-table{width:100%;border-collapse:collapse;min-width:560px}
 .compare-table th,.compare-table td{
@@ -1220,6 +1232,17 @@ ul{list-style:none}
 .compare-empty-cell{color:var(--text-3);min-width:170px}
 .compare-yes{color:#1a7d4a;font-weight:600}
 .compare-no{color:var(--text-3)}
+.compare-section-row td{
+  padding:8px 14px;border-bottom:none;
+  font-size:10.5px;font-weight:800;color:var(--brand);
+  text-transform:uppercase;letter-spacing:.06em;
+  background:var(--brand-light);position:sticky;left:0;
+}
+.compare-section-row:first-child td{border-top:none}
+.compare-desc-cell{
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;
+  overflow:hidden;font-size:12px;line-height:1.4;color:var(--text-2);
+}
 .compare-add-slot{
   min-width:170px;max-width:220px;text-align:center;
   color:var(--text-3);font-size:12px;
@@ -4451,9 +4474,15 @@ ul{list-style:none}
   <div class="modal compare-modal" id="compareModalContent">
     <div class="compare-modal-header">
       <span class="compare-modal-title">Compare properties</span>
-      <button class="modal-close" style="position:static" onclick="closeCompareModal()" aria-label="Close comparison">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
+      <div class="compare-modal-header-actions">
+        <button class="compare-share-btn" onclick="shareCompareViaWhatsApp()" aria-label="Share comparison via WhatsApp">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg>
+          <span>Share</span>
+        </button>
+        <button class="modal-close" style="position:static" onclick="closeCompareModal()" aria-label="Close comparison">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
     </div>
     <div class="compare-table-wrap" id="compareTableWrap"></div>
   </div>
@@ -5515,6 +5544,17 @@ function closeCompareModal() {
   document.body.style.overflow = '';
 }
 
+function shareCompareViaWhatsApp() {
+  const ids = [...compareSet];
+  if (ids.length < 2) return;
+  const props = ids.map(id => PROPERTIES.find(p => p.id === id)).filter(Boolean);
+  const compareUrl = `${window.location.origin}${window.location.pathname}?compare=${ids.join(',')}`;
+  const names = props.map(p => p.propertyId).join(', ');
+  const msg = `Check out this comparison of ${props.length} properties on Quatar — ${names}\n\n${compareUrl}`;
+  const url = 'https://wa.me/?text=' + encodeURIComponent(msg);
+  window.open(url, '_blank', 'noopener');
+}
+
 function renderCompareTable() {
   const ids = [...compareSet];
   const props = ids.map(id => PROPERTIES.find(p => p.id === id)).filter(Boolean);
@@ -5524,25 +5564,83 @@ function renderCompareTable() {
   }
 
   const yn = (v) => v ? '<span class="compare-yes">Yes</span>' : '<span class="compare-no">No</span>';
+  const dash = (v) => (v === undefined || v === null || v === '') ? '—' : v;
+  const hasAny = (props, path) => props.some(p => {
+    const v = path.split('.').reduce((o, k) => (o == null ? o : o[k]), p);
+    return v !== undefined && v !== null && v !== '';
+  });
+  const anyPG = props.some(p => pTypeLabel(p) === 'PG');
+  const anyLease = props.some(p => pTypeLabel(p) === 'Lease');
+  const section = (label) => ({ section: label });
+
   const rows = [
+    section('Pricing'),
     { label: 'Rent / Month', get: p => `<span style="font-weight:700;color:var(--text)">₹${(p.price?.rent||0).toLocaleString('en-IN')}</span>` },
     { label: 'Deposit', get: p => `₹${(p.price?.deposit||0).toLocaleString('en-IN')}` },
-    { label: 'Configuration', get: p => p.property?.bhk },
-    { label: 'Furnishing', get: p => p.property?.furnish },
-    { label: 'Floor', get: p => p.property?.floor },
-    { label: 'Bathrooms', get: p => p.property?.bathrooms },
-    { label: 'Facing', get: p => p.property?.facing },
-    { label: 'Tenant preferred', get: p => p.property?.tenant },
+    { label: 'Maintenance', get: p => p.price?.maintenance ? `₹${(p.price.maintenance).toLocaleString('en-IN')}` : 'Included' },
+    { label: 'Electricity', get: p => dash(p.price?.electricity) },
+    { label: 'Water charge', get: p => dash(p.price?.water) },
+    { label: 'Rent negotiable', get: p => dash(p.price?.negotiable) },
+    { label: 'Rent escalation', get: p => p.price?.rentIncrease ? `${p.price.rentIncrease}%` : '—' },
+
+    section('Property Details'),
+    { label: 'Property type', get: p => dash(p.property?.type) },
+    { label: 'Configuration', get: p => dash(p.property?.bhk) },
+    { label: 'Built-up area', get: p => p.property?.area ? `${p.property.area} sqft` : '—' },
+    { label: 'Age of property', get: p => dash(p.property?.age) },
+    { label: 'Furnishing', get: p => dash(p.property?.furnish) },
+    { label: 'Floor', get: p => dash(p.property?.floor) },
+    { label: 'Bathrooms', get: p => dash(p.property?.bathrooms) },
+    { label: 'Facing', get: p => dash(p.property?.facing) },
+    { label: 'Tenant preferred', get: p => dash(p.property?.tenant) },
     { label: 'Lift', get: p => yn(pHasLift(p)) },
     { label: 'Car park', get: p => (parseInt(p.property?.car, 10) || 0) > 0 ? `${parseInt(p.property?.car, 10)}` : 'No' },
     { label: 'Bike park', get: p => (parseInt(p.property?.bike, 10) || 0) > 0 ? `${parseInt(p.property?.bike, 10)}` : 'No' },
-    { label: 'Verified', get: p => yn(!!p.verified) },
+    { label: 'Available from', get: p => dash(p.property?.available) },
+
+    section('Terms'),
+    { label: 'Notice period', get: p => dash(p.terms?.notice) },
+    ...(anyLease ? [
+      { label: 'Lease duration', get: p => dash(p.terms?.lease) },
+      { label: 'Lease type', get: p => dash(p.terms?.leaseType) },
+      { label: 'Lock-in period', get: p => dash(p.terms?.lockIn) },
+    ] : []),
+
+    section('Rules'),
+    { label: 'Pets allowed', get: p => dash(p.rules?.pets) },
+    { label: 'Non-veg allowed', get: p => dash(p.rules?.nonVeg) },
+    ...(hasAny(props, 'rules.gas') ? [{ label: 'Piped gas', get: p => dash(p.rules?.gas) }] : []),
+
+    ...(anyPG ? [
+      section('PG Details'),
+      { label: 'Gender', get: p => dash(p.pg?.gender) },
+      { label: 'Room type', get: p => dash(p.pg?.room) },
+      { label: 'Occupancy', get: p => dash(p.pg?.occupancy) },
+      { label: 'Attached bathroom', get: p => dash(p.pg?.bathroom) },
+      { label: 'Total beds', get: p => dash(p.pg?.beds) },
+      { label: 'Room furnishing', get: p => dash(p.pg?.furnish) },
+      { label: 'Meals included', get: p => dash(p.pg?.meals) },
+      { label: 'Meal cost', get: p => p.pg?.mealCost ? `₹${p.pg.mealCost}` : '—' },
+      { label: 'Food type', get: p => dash(p.pg?.food) },
+      { label: 'Kitchen access', get: p => dash(p.pg?.kitchen) },
+      { label: 'Visitor policy', get: p => dash(p.pg?.visitors) },
+      { label: 'Gate time', get: p => dash(p.pg?.gateTime) },
+    ] : []),
+
+    section('Media & Amenities'),
+    { label: 'Video tour', get: p => p.media?.video ? '<span class="compare-yes">Available</span>' : '<span class="compare-no">Not added</span>' },
+    { label: 'Description', get: p => p.media?.desc ? `<span class="compare-desc-cell">${esc(p.media.desc)}</span>` : '—' },
     { label: 'Amenities', get: p => {
         const list = (p.amenities?.selected || []).slice();
         if (p.amenities?.extra) list.push(...p.amenities.extra.split(',').map(s => s.trim()).filter(Boolean));
         return list.length ? list.join(', ') : '—';
       } },
-    { label: 'Posted', get: p => p.posted },
+
+    section('Listing Info'),
+    { label: 'Verified', get: p => yn(!!p.verified) },
+    { label: 'Location', get: p => dash(p.location?.area) },
+    { label: 'City', get: p => dash(p.location?.city) },
+    { label: 'Posted', get: p => dash(p.posted) },
   ];
 
   const headCells = props.map(p => {
@@ -5563,17 +5661,15 @@ function renderCompareTable() {
     </th>`;
   }).join('');
 
-  const emptySlots = COMPARE_MAX - props.length;
-  const addSlotCells = emptySlots > 0
-    ? Array.from({length: emptySlots}).map(() => `<th class="compare-col"><div class="compare-add-slot">Tap "Compare" on another card to add here</div></th>`).join('')
-    : '';
-
-  const bodyRows = rows.map(r => `
-    <tr>
+  const bodyRows = rows.map(r => {
+    if (r.section) {
+      return `<tr class="compare-section-row"><td colspan="${props.length + 1}">${esc(r.section)}</td></tr>`;
+    }
+    return `<tr>
       <td class="compare-row-label">${r.label}</td>
       ${props.map(p => `<td>${r.get(p)}</td>`).join('')}
-      ${emptySlots > 0 ? Array.from({length: emptySlots}).map(() => '<td class="compare-empty-cell">—</td>').join('') : ''}
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
 
   document.getElementById('compareTableWrap').innerHTML = `
     <table class="compare-table">
@@ -5581,7 +5677,6 @@ function renderCompareTable() {
         <tr>
           <th class="compare-row-label" style="background:var(--bg)"></th>
           ${headCells}
-          ${addSlotCells}
         </tr>
       </thead>
       <tbody>${bodyRows}</tbody>
@@ -7910,6 +8005,19 @@ document.addEventListener('DOMContentLoaded', function() {
     if (_dlParam) {
       const _dlProp = PROPERTIES.find(x => String(x.id) === _dlParam);
       if (_dlProp) openDetail(_dlProp.id);
+    }
+
+    // ── Deep-link: auto-open a shared comparison from URL param ──
+    const _cmpParam = new URLSearchParams(window.location.search).get('compare');
+    if (_cmpParam) {
+      const _cmpIds = _cmpParam.split(',').map(s => s.trim()).filter(Boolean);
+      const _validIds = _cmpIds.filter(id => PROPERTIES.some(p => String(p.id) === id)).slice(0, COMPARE_MAX);
+      if (_validIds.length >= 2) {
+        compareSet = new Set(_validIds);
+        renderCompareBar();
+        renderCards();
+        openCompareModal();
+      }
     }
   })();
 
