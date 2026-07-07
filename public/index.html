@@ -1424,17 +1424,20 @@ ul{list-style:none}
 .review-form-done-title{font-size:14.5px;font-weight:700;color:var(--text);line-height:1.3}
 .review-form-done-sub{font-size:12.5px;color:var(--text-2);margin-top:3px;line-height:1.4}
 
-/* Masonry grid — CSS columns keep variable-length cards packed tightly,
-   scaling cleanly whether there are 3 reviews or 3,000. */
+/* Horizontal auto-sliding row — cards are fixed-width so the container can
+   be smoothly scrolled by JS every 2s (see _autoSlideReviews), bouncing
+   forward to the last review then back to the first, on a loop. */
 .reviews-list{
   max-width:1080px;margin:34px auto 0;
-  column-count:3;column-gap:16px;
+  display:flex;gap:16px;overflow-x:auto;scroll-behavior:smooth;
+  padding:4px 4px 14px;-ms-overflow-style:none;scrollbar-width:none;
 }
+.reviews-list::-webkit-scrollbar{display:none}
 .reviews-loading,.reviews-empty{
-  text-align:center;color:var(--text-3);font-size:13.5px;padding:40px;column-span:all;
+  text-align:center;color:var(--text-3);font-size:13.5px;padding:40px;width:100%;flex-shrink:0;
 }
 .review-card{
-  break-inside:avoid;margin-bottom:16px;display:block;
+  flex:0 0 auto;width:320px;display:block;
   border:1px solid var(--border);border-radius:16px;padding:18px 20px;background:var(--bg-1);
   box-shadow:0 1px 8px rgba(0,0,0,.03);transition:box-shadow .15s,transform .15s;
   border-left:3px solid var(--rc-accent,var(--brand));
@@ -1460,12 +1463,12 @@ ul{list-style:none}
 }
 .reviews-loadmore-btn:hover{background:var(--bg-2);border-color:var(--brand)}
 @media (max-width:900px){
-  .reviews-list{column-count:2}
+  .review-card{width:280px}
 }
 @media (max-width:680px){
   .reviews-section{padding:28px 16px 100px}
   .reviews-title{font-size:23px}
-  .reviews-list{column-count:1}
+  .review-card{width:85vw;max-width:340px}
   .reviews-overview{flex-direction:column}
   .reviews-overview-score{border-right:none;border-bottom:1px solid var(--border);flex-direction:row;gap:10px;padding:14px}
   .review-form-logged-out{flex-direction:column;align-items:flex-start}
@@ -1540,7 +1543,11 @@ ul{list-style:none}
   .services-section{padding:8px 16px 24px}
   .services-title{font-size:23px}
   .services-sub{font-size:13px}
-  .service-card{width:160px;height:240px}
+  .services-scroll{
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;
+    overflow-x:visible;
+  }
+  .service-card{width:100%;height:190px}
   .services-arrow{display:none}
 }
 
@@ -8100,6 +8107,28 @@ function _autoSlidePropRows(){
   });
 }
 setInterval(_autoSlidePropRows, 30000);
+
+/* ─── Auto-slide the reviews row every 2s ───────────────────────────
+   Bounces forward one review at a time until the last review is
+   reached, then reverses and bounces back to the first, looping
+   forever. Only runs when there's more than one review and they
+   actually overflow the visible row. */
+let _reviewsDir = 1;
+function _autoSlideReviews(){
+  const row = document.getElementById('reviewsList');
+  if (!row || row.children.length <= 1) return;
+  if (row.scrollWidth <= row.clientWidth + 4) return;
+  const maxScroll = row.scrollWidth - row.clientWidth;
+  if (_reviewsDir === 1 && row.scrollLeft >= maxScroll - 4) {
+    _reviewsDir = -1;
+  } else if (_reviewsDir === -1 && row.scrollLeft <= 4) {
+    _reviewsDir = 1;
+  }
+  const card = row.querySelector('.review-card');
+  const step = card ? (card.getBoundingClientRect().width + 16) : row.clientWidth * 0.9;
+  row.scrollTo({ left: row.scrollLeft + step * _reviewsDir, behavior: 'smooth' });
+}
+setInterval(_autoSlideReviews, 2000);
 
 document.addEventListener('click', function(e) {
   const dd = document.getElementById('amDropdown');
