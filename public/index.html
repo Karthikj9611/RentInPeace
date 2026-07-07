@@ -1267,7 +1267,7 @@ ul{list-style:none}
 
 /* ─── Toast / Alert ────────────────────────────── */
 .toast-backdrop{
-  position:fixed;inset:0;z-index:499;
+  position:fixed;inset:0;z-index:100000;
   background:rgba(20,16,17,.14);
   opacity:0;pointer-events:none;
   transition:opacity .2s ease;
@@ -1282,7 +1282,7 @@ ul{list-style:none}
   width:max-content;max-width:min(86vw,380px);
   white-space:normal;word-break:break-word;text-align:left;
   opacity:0;transition:opacity .2s ease,transform .2s ease;
-  pointer-events:none;z-index:500;
+  pointer-events:none;z-index:100001;
 }
 .toast.show{opacity:1;transform:translate(-50%,-50%) translateY(0) scale(1)}
 .toast-icon{
