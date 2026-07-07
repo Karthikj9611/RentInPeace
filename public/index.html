@@ -427,14 +427,14 @@ ul{list-style:none}
 .prop-card::before{
   content:'';position:absolute;top:0;left:0;right:0;height:4px;
   border-radius:16px 16px 0 0;z-index:3;pointer-events:none;
-  background:linear-gradient(90deg,#22242c,#8a6d3f);
-  box-shadow:0 1px 4px rgba(0,0,0,.18);
+  background:linear-gradient(90deg,#8a6b7a,#a85c6e);
+  box-shadow:0 1px 4px rgba(0,0,0,.12);
 }
-.prop-card.type-rent::before{background:linear-gradient(90deg,#0f3d2e,#1b6b4f);box-shadow:0 1px 4px rgba(15,61,46,.35)}
-.prop-card.type-lease::before{background:linear-gradient(90deg,#12233f,#2c4870);box-shadow:0 1px 4px rgba(18,35,63,.35)}
-.prop-card.type-pg::before{background:linear-gradient(90deg,#4a1f2f,#7a3450);box-shadow:0 1px 4px rgba(74,31,47,.35)}
+.prop-card.type-rent::before{background:linear-gradient(90deg,#a85c6e,#c98a9a);box-shadow:0 1px 4px rgba(168,92,110,.28)}
+.prop-card.type-lease::before{background:linear-gradient(90deg,#8a6b7a,#a893a0);box-shadow:0 1px 4px rgba(138,107,122,.28)}
+.prop-card.type-pg::before{background:linear-gradient(90deg,#6b3d4a,#8a5c68);box-shadow:0 1px 4px rgba(107,61,74,.28)}
 .prop-card:hover{
-  box-shadow:0 12px 30px rgba(20,20,25,.14),0 4px 10px rgba(20,16,17,.08);
+  box-shadow:0 12px 30px rgba(120,80,90,.12),0 4px 10px rgba(20,16,17,.06);
   transform:translateY(-3px);
   border-color:var(--border-2);
   z-index:2;
@@ -469,24 +469,24 @@ ul{list-style:none}
 }
 .prop-badge-promoted{
   height:23px;display:flex;align-items:center;gap:3px;
-  background:linear-gradient(135deg,#e3c887,#a97e3f);color:#2b2005;
-  box-shadow:0 2px 6px rgba(105,80,30,.35);
-  font-size:10px;font-weight:700;
+  background:linear-gradient(135deg,#eec9c0,#d9a488);color:#4a2418;
+  box-shadow:0 2px 6px rgba(180,120,100,.3);
+  font-size:12px;font-weight:700;
   padding:0 10px;border-radius:99px;box-sizing:border-box;
   letter-spacing:.03em;text-transform:uppercase;
   flex-shrink:0;
 }
 .prop-badge-type{
   height:23px;display:flex;align-items:center;
-  font-size:10px;font-weight:700;
+  font-size:12px;font-weight:700;
   padding:0 10px;border-radius:99px;box-sizing:border-box;
   letter-spacing:.03em;text-transform:uppercase;
   flex-shrink:0;
   backdrop-filter:blur(6px);
 }
-.badge-rent{background:linear-gradient(135deg,#1b6b4f,#0f3d2e);color:#fff;box-shadow:0 2px 6px rgba(15,61,46,.4)}
-.badge-lease{background:linear-gradient(135deg,#2c4870,#12233f);color:#fff;box-shadow:0 2px 6px rgba(18,35,63,.4)}
-.badge-pg{background:linear-gradient(135deg,#7a3450,#4a1f2f);color:#fff;box-shadow:0 2px 6px rgba(74,31,47,.4)}
+.badge-rent{background:linear-gradient(135deg,#c98a9a,#a85c6e);color:#fff;box-shadow:0 2px 6px rgba(168,92,110,.35)}
+.badge-lease{background:linear-gradient(135deg,#a893a0,#8a6b7a);color:#fff;box-shadow:0 2px 6px rgba(138,107,122,.35)}
+.badge-pg{background:linear-gradient(135deg,#8a5c68,#6b3d4a);color:#fff;box-shadow:0 2px 6px rgba(107,61,74,.35)}
 .prop-heart{
   width:30px;height:30px;border-radius:50%;
   background:rgba(255,255,255,.92);backdrop-filter:blur(6px);
@@ -501,37 +501,37 @@ ul{list-style:none}
 .prop-body{padding:13px 14px 12px;flex:1;min-width:0;display:flex;flex-direction:column}
 .prop-price-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:3px;margin-bottom:4px}
 .prop-price{
-  font-size:16px;font-weight:800;
+  font-size:12px;font-weight:800;
   background:linear-gradient(120deg,#ff4d67,#e03a52 60%,#c72e43);
   -webkit-background-clip:text;background-clip:text;color:transparent;
   display:flex;align-items:baseline;gap:4px;letter-spacing:-.01em;
   min-width:0;
 }
-.prop-price-unit{font-size:11px;font-weight:600;color:var(--brand);-webkit-text-fill-color:var(--brand)}
+.prop-price-unit{font-size:12px;font-weight:600;color:var(--brand);-webkit-text-fill-color:var(--brand)}
 .prop-deposit-inline{
   display:flex;align-items:center;gap:4px;flex-shrink:0;
-  font-size:11px;font-weight:600;color:var(--text-2);white-space:nowrap;
+  font-size:12px;font-weight:600;color:var(--text-2);white-space:nowrap;
 }
-.prop-deposit-inline svg{width:12px;height:12px;stroke:#8a6d3f;fill:none;stroke-width:2;flex-shrink:0}
-.prop-deposit-val{color:#8a6d3f;font-weight:700}
-.prop-deposit-lbl{color:#8a6d3f;font-weight:500}
+.prop-deposit-inline svg{width:12px;height:12px;stroke:#a85c6e;fill:none;stroke-width:2;flex-shrink:0}
+.prop-deposit-val{color:#a85c6e;font-weight:700}
+.prop-deposit-lbl{color:#a85c6e;font-weight:500}
 .prop-title{
-  font-size:13.5px;font-weight:600;color:var(--text);margin-top:0;
+  font-size:12px;font-weight:600;color:var(--text);margin-top:0;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   display:flex;align-items:center;gap:5px;min-width:0;
 }
 .prop-title-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .prop-title-buildtype{
   margin-left:auto;flex-shrink:0;
-  font-size:11px;font-weight:700;color:#fff;
-  background:linear-gradient(135deg,#3d3d47,#1e1e24);
-  box-shadow:0 2px 8px rgba(20,20,25,.35);
+  font-size:12px;font-weight:700;color:#fff;
+  background:linear-gradient(135deg,#a893a0,#8a6b7a);
+  box-shadow:0 2px 8px rgba(138,107,122,.3);
   padding:3px 11px;border-radius:99px;
   white-space:nowrap;
 }
 .prop-verified-badge{
   display:inline-flex;align-items:center;gap:2px;flex-shrink:0;
-  font-size:10px;font-weight:600;color:#1b6b4f;
+  font-size:12px;font-weight:600;color:#1b6b4f;
   background:#eaf3ee;border:1px solid #cfe3d7;
   padding:1.5px 7px 1.5px 5px;border-radius:99px;
 }
@@ -541,18 +541,20 @@ ul{list-style:none}
   font-size:12px;color:var(--text-3);margin-top:3px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-.prop-loc svg{width:13px;height:13px;stroke:#8a6d3f;fill:#8a6d3f;fill-opacity:.12;stroke-width:2;flex-shrink:0}
+.prop-loc svg{width:13px;height:13px;stroke:#a85c6e;fill:#a85c6e;fill-opacity:.12;stroke-width:2;flex-shrink:0}
 .prop-loc span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* ── Modern icon stat row (replaces verbose pill tags) ── */
 .prop-stats{
   display:flex;align-items:center;flex-wrap:nowrap;
   gap:3px 0;margin-top:10px;
   overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none;
+  cursor:grab;
 }
+.prop-stats.is-dragging{cursor:grabbing;scroll-behavior:auto;user-select:none}
 .prop-stats::-webkit-scrollbar{display:none}
 .prop-stat{
   display:flex;align-items:center;gap:5px;
-  font-size:11.5px;font-weight:700;color:var(--text-2);
+  font-size:12px;font-weight:700;color:var(--text-2);
   padding:0 9px 0 0;flex-shrink:0;white-space:nowrap;
 }
 .prop-stat:not(:last-child){margin-right:0}
@@ -568,12 +570,12 @@ ul{list-style:none}
 .prop-stat.is-off{color:var(--text-3);font-weight:500}
 .prop-stat.is-off .prop-stat-icon{opacity:.4;filter:grayscale(.4);box-shadow:none}
 .prop-stat.is-off svg{stroke:var(--border-2)}
-.icon-bed{background:linear-gradient(145deg,#f4f2ec,#e6e1d4)}
-.icon-bath{background:linear-gradient(145deg,#f4f2ec,#e6e1d4)}
-.icon-car{background:linear-gradient(145deg,#f4f2ec,#e6e1d4)}
-.icon-bike{background:linear-gradient(145deg,#f4f2ec,#e6e1d4)}
-.icon-area{background:linear-gradient(145deg,#f4f2ec,#e6e1d4)}
-.icon-lift{background:linear-gradient(145deg,#f4f2ec,#e6e1d4)}
+.icon-bed{background:linear-gradient(145deg,#f8f0f0,#efdfe0)}
+.icon-bath{background:linear-gradient(145deg,#f8f0f0,#efdfe0)}
+.icon-car{background:linear-gradient(145deg,#f8f0f0,#efdfe0)}
+.icon-bike{background:linear-gradient(145deg,#f8f0f0,#efdfe0)}
+.icon-area{background:linear-gradient(145deg,#f8f0f0,#efdfe0)}
+.icon-lift{background:linear-gradient(145deg,#f8f0f0,#efdfe0)}
 .prop-chip-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
 /* Single-row, horizontally slidable variant (Furnished / Maintenance / Available
    From) — no wrapping to a 2nd line, scrolls sideways instead, same hidden-
@@ -581,14 +583,16 @@ ul{list-style:none}
 .prop-chip-row-scroll{
   flex-wrap:nowrap;overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none;
   scroll-behavior:smooth;
+  cursor:grab;
 }
+.prop-chip-row-scroll.is-dragging{cursor:grabbing;scroll-behavior:auto;user-select:none}
 .prop-chip-row-scroll::-webkit-scrollbar{display:none}
 .prop-chip-row-scroll .prop-chip{flex-shrink:0}
-.prop-id{font-size:11px;font-family:monospace;color:var(--text-3);margin-top:2px;letter-spacing:.02em}
+.prop-id{font-size:12px;font-family:monospace;color:var(--text-3);margin-top:2px;letter-spacing:.02em}
 .prop-desc-preview{margin-top:8px;font-size:12px;line-height:1.4;color:var(--text-3);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .prop-chip{
   display:inline-flex;align-items:center;gap:6px;
-  font-size:10.5px;font-weight:700;color:var(--text-2);
+  font-size:12px;font-weight:700;color:var(--text-2);
   background:var(--bg-2);border:1.5px solid var(--border);
   padding:3px 10px 3px 4px;border-radius:9px;
 }
@@ -605,20 +609,26 @@ ul{list-style:none}
   box-shadow:0 1px 3px rgba(0,0,0,.10),inset 0 1px 1px rgba(255,255,255,.6);
 }
 .chip-ico-wrap svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2.2}
-.icon-maint svg{stroke:#8a6d3f}
-.icon-avail svg{stroke:#2c4870}
-.icon-furnish{background:linear-gradient(145deg,#f4f2ec,#e6e1d4)}
-.chip-furnish{background:#f7f6f2;border-color:#e2ddd0}
-.icon-maint{background:linear-gradient(145deg,#f4f2ec,#e6e1d4)}
-.chip-maint{background:#f7f6f2;border-color:#e2ddd0;color:#8a6d3f}
-.icon-avail{background:linear-gradient(145deg,#f4f2ec,#e6e1d4)}
-.chip-avail{background:#f7f6f2;border-color:#e2ddd0;color:#2c4870}
-.chip-video{background:#f7f6f2;border-color:#e2ddd0;color:#7a3450;font-weight:700}
+.icon-maint svg{stroke:#a85c6e}
+.icon-avail svg{stroke:#8a6b7a}
+.icon-water svg{stroke:#8a6b7a}
+.icon-electric svg{stroke:#a85c6e}
+.icon-furnish{background:linear-gradient(145deg,#f8f0f0,#efdfe0)}
+.chip-furnish{background:#faf1f2;border-color:#eed9dc}
+.icon-maint{background:linear-gradient(145deg,#f8f0f0,#efdfe0)}
+.chip-maint{background:#faf1f2;border-color:#eed9dc;color:#a85c6e}
+.icon-avail{background:linear-gradient(145deg,#f8f0f0,#efdfe0)}
+.chip-avail{background:#faf1f2;border-color:#eed9dc;color:#8a6b7a}
+.icon-water{background:linear-gradient(145deg,#f8f0f0,#efdfe0)}
+.chip-water{background:#faf1f2;border-color:#eed9dc;color:#8a6b7a}
+.icon-electric{background:linear-gradient(145deg,#f8f0f0,#efdfe0)}
+.chip-electric{background:#faf1f2;border-color:#eed9dc;color:#a85c6e}
+.chip-video{background:#faf1f2;border-color:#eed9dc;color:#c9975c;font-weight:700}
 .prop-chip-lbl{color:var(--brand);font-weight:600}
 .prop-chip-val{color:var(--text);font-weight:600}
 .prop-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
 .prop-tag{
-  font-size:11px;background:var(--bg-2);color:var(--text-2);
+  font-size:12px;background:var(--bg-2);color:var(--text-2);
   padding:3px 9px;border-radius:99px;border:1.5px solid var(--border-2);
 }
 .prop-footer{
@@ -693,12 +703,12 @@ ul{list-style:none}
     inset 0 1px 1px rgba(255,255,255,.55),
     inset 0 -1px 2px rgba(0,0,0,.12);
 }
-.qa-call .qa-3d-icon{background:linear-gradient(150deg,#2c4870 0%,#1c2541 55%,#0d1526 100%)}
-.qa-whatsapp .qa-3d-icon{background:linear-gradient(150deg,#2f6b4f 0%,#1b4d38 55%,#0f3327 100%)}
+.qa-call .qa-3d-icon{background:linear-gradient(150deg,#d9a3ae 0%,#a85c6e 55%,#7a3d4a 100%)}
+.qa-whatsapp .qa-3d-icon{background:linear-gradient(150deg,#5fbd85 0%,#3d9d64 55%,#2c7a4a 100%)}
 .qa-whatsapp .qa-3d-icon svg{fill:#fff;stroke:none}
-.qa-visit .qa-3d-icon{background:linear-gradient(150deg,#c9a96a 0%,#a97e3f 55%,#7a5a26 100%)}
-.qa-compare .qa-3d-icon{background:linear-gradient(150deg,#5a5a63 0%,#38383f 55%,#1e1e24 100%)}
-.qa-compare.checked .qa-3d-icon{background:linear-gradient(150deg,#2f6b4f 0%,#1b4d38 55%,#0f3327 100%)}
+.qa-visit .qa-3d-icon{background:linear-gradient(150deg,#e0b784 0%,#c9975c 55%,#a87540 100%)}
+.qa-compare .qa-3d-icon{background:linear-gradient(150deg,#b89aa3 0%,#8a6b7a 55%,#6b4d57 100%)}
+.qa-compare.checked .qa-3d-icon{background:linear-gradient(150deg,#5fbd85 0%,#3d9d64 55%,#2c7a4a 100%)}
 .qa-compare.disabled{cursor:not-allowed}
 .qa-compare.disabled .qa-3d-icon{filter:grayscale(.55) opacity(.55);box-shadow:none}
 .qa-compare.disabled:active .qa-3d-icon{transform:none}
@@ -720,13 +730,13 @@ ul{list-style:none}
 .prop-quick-actions{display:flex;align-items:center;gap:0}
 .prop-views{
   display:flex;align-items:center;justify-content:center;
-  font-size:11px;color:var(--text-3);
+  font-size:12px;color:var(--text-3);
   white-space:nowrap;flex:1 1 0;
 }
 .prop-views-icon{
   position:relative;display:flex;align-items:center;justify-content:center;
   width:56px;max-width:100%;aspect-ratio:1/1;height:auto;border-radius:16px;
-  background:linear-gradient(150deg,#4a4a52 0%,#2e2e35 55%,#18181c 100%);
+  background:linear-gradient(150deg,#b89aa3 0%,#8a6b7a 55%,#6b4d57 100%);
   box-shadow:
     0 3px 0 rgba(0,0,0,.16),
     0 6px 10px rgba(0,0,0,.16),
@@ -739,7 +749,7 @@ ul{list-style:none}
   border-radius:99px;background:var(--brand);color:#fff;font-size:9.5px;font-weight:700;
   display:flex;align-items:center;justify-content:center;line-height:1;box-shadow:0 0 0 1.5px var(--bg);
 }
-.prop-posted{font-size:11px;color:var(--text-3);text-align:right;white-space:nowrap;flex-shrink:0}
+.prop-posted{font-size:12px;color:var(--text-3);text-align:right;white-space:nowrap;flex-shrink:0}
 
 /* Service pricing modal */
 .svc-pricing-section{margin:14px 0 6px}
@@ -2236,17 +2246,17 @@ ul{list-style:none}
   /* Compact sizing for the 2-up mobile card so title/price/deposit/buttons
      don't get squeezed or overflow the narrower card width. */
   .prop-body{padding:10px 10px 10px}
-  .prop-title{font-size:12.5px}
-  .prop-price{font-size:14px}
-  .prop-price-unit{font-size:10px}
-  .prop-deposit-inline{font-size:9.5px;gap:3px}
+  .prop-title{font-size:11px}
+  .prop-price{font-size:11px}
+  .prop-price-unit{font-size:11px}
+  .prop-deposit-inline{font-size:11px;gap:3px}
   .prop-deposit-inline svg{width:10px;height:10px}
   .prop-price-row{flex-wrap:wrap;row-gap:2px}
   .prop-loc{font-size:11px}
   .prop-stats{gap:2px 0;margin-top:7px}
-  .prop-stat{font-size:10px;padding:0 6px 0 0}
+  .prop-stat{font-size:11px;padding:0 6px 0 0}
   .prop-stat-icon{width:19px;height:19px}
-  .prop-chip{font-size:9.5px;padding:2px 8px 2px 3px}
+  .prop-chip{font-size:11px;padding:2px 8px 2px 3px}
   .prop-chip-icon,.chip-ico-wrap{width:16px;height:16px}
 
   /* Quick-action row already renders as equal-size icon-only buttons at
@@ -2275,7 +2285,7 @@ ul{list-style:none}
     background:linear-gradient(145deg,var(--brand-light),#fbdfe4);border-color:var(--brand);
   }
   .prop-meta-row{gap:6px}
-  .prop-views,.prop-posted{font-size:10.5px}
+  .prop-views,.prop-posted{font-size:11px}
   
   .shortlist-btn span.shortlist-txt{display:none}
   .shortlist-panel{width:100%}
@@ -4809,7 +4819,7 @@ function clearRecentlyViewed() {
 
 function recentlyViewedCardHTML(rv) {
   const thumb = rv.img ? `style="background-image:url('${safeUrl(rv.img)}')"` : '';
-  const rent = rv.rent != null ? '₹' + Number(rv.rent).toLocaleString('en-IN') : '—';
+  const rent = rv.rent != null ? fmtRupee(rv.rent) : '—';
   // Older entries saved before "name" stored the property ID fall back to a
   // live lookup so they don't keep showing the property name until re-viewed.
   const live = PROPERTIES.find(x => x.id === rv.id);
@@ -5197,6 +5207,8 @@ function cardHTML(p) {
   const maintenance = p.price?.maintenance || 0;
   const floor = p.property?.floor || '';
   const available = p.property?.available || '';
+  const waterLabel = p.price?.water || '';
+  const electricLabel = p.price?.electricity || '';
   // ── Extra fields captured on the post-property form but not previously shown on cards ──
   const ptype = p.property?.type || '';
   const areaSqft = p.property?.area || '';
@@ -5235,10 +5247,10 @@ function cardHTML(p) {
         ${ptype ? `<span class="prop-title-buildtype" title="${esc(ptype)}">${esc(ptype)}</span>` : ''}
       </div>
       <div class="prop-price-row">
-        <div class="prop-price">₹${(p.price?.rent||0).toLocaleString('en-IN')}<span class="prop-price-unit">/ ${pType === 'Lease' ? (leaseDur || 'Lease') : 'Month'}</span></div>
+        <div class="prop-price">${fmtRupee(p.price?.rent||0)}<span class="prop-price-unit">/ ${pType === 'Lease' ? (leaseDur || 'Lease') : 'Month'}</span></div>
         <div class="prop-deposit-inline" title="Security deposit">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2"/><circle cx="12" cy="12.5" r="2.5"/></svg>
-          <span class="prop-deposit-val">₹${deposit.toLocaleString('en-IN')}</span><span class="prop-deposit-lbl">Deposit</span>
+          <span class="prop-deposit-val">${fmtRupee(deposit)}</span><span class="prop-deposit-lbl">Deposit</span>
         </div>
       </div>
       <div class="prop-loc">
@@ -5276,7 +5288,15 @@ function cardHTML(p) {
         </span>
         ${maintenance > 0 ? `<span class="prop-chip chip-maint" title="Monthly maintenance">
           <span class="chip-ico-wrap icon-maint"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
-          ₹${maintenance.toLocaleString('en-IN')} Maint.
+          ${fmtRupee(maintenance)} Maint.
+        </span>` : ''}
+        ${waterLabel ? `<span class="prop-chip chip-water" title="Water supply">
+          <span class="chip-ico-wrap icon-water"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.69s-5.5 6.16-5.5 10.31a5.5 5.5 0 0 0 11 0c0-4.15-5.5-10.31-5.5-10.31z"/></svg></span>
+          Water: ${waterLabel}
+        </span>` : ''}
+        ${electricLabel ? `<span class="prop-chip chip-electric" title="Electricity">
+          <span class="chip-ico-wrap icon-electric"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
+          Electricity: ${electricLabel}
         </span>` : ''}
         ${availableFmt ? `<span class="prop-chip chip-avail" title="Available from">
           <span class="chip-ico-wrap icon-avail"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
@@ -5341,6 +5361,8 @@ function shortlistCardHTML(p) {
   const deposit = p.price?.deposit || 0;
   const maintenance = p.price?.maintenance || 0;
   const leaseDur = p.terms?.lease || '';
+  const waterLabel = p.price?.water || '';
+  const electricLabel = p.price?.electricity || '';
   return `<div class="prop-card type-${pType.toLowerCase()}" onclick="openDetail('${p.id}')">
     <div class="prop-img" style="background:${bg}" data-idx="0">
       ${buildImgSlider(p, fg, '-sl')}
@@ -5359,10 +5381,10 @@ function shortlistCardHTML(p) {
         <span class="prop-title-text">${esc(p.propertyId || 'Untitled listing')}</span>
       </div>
       <div class="prop-price-row">
-        <div class="prop-price">₹${(p.price?.rent||0).toLocaleString('en-IN')}<span class="prop-price-unit">/ ${pType === 'Lease' ? (leaseDur || 'Lease') : 'Month'}</span></div>
+        <div class="prop-price">${fmtRupee(p.price?.rent||0)}<span class="prop-price-unit">/ ${pType === 'Lease' ? (leaseDur || 'Lease') : 'Month'}</span></div>
         <div class="prop-deposit-inline" title="Security deposit">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2"/><circle cx="12" cy="12.5" r="2.5"/></svg>
-          <span class="prop-deposit-val">₹${deposit.toLocaleString('en-IN')}</span><span class="prop-deposit-lbl">Deposit</span>
+          <span class="prop-deposit-val">${fmtRupee(deposit)}</span><span class="prop-deposit-lbl">Deposit</span>
         </div>
       </div>
       <div class="prop-loc">
@@ -5392,11 +5414,19 @@ function shortlistCardHTML(p) {
         </span>
         ${lift ? `<span class="prop-stat" title="Lift available"><span class="prop-stat-icon icon-lift">🛗</span></span>` : ''}
       </div>
-      ${maintenance > 0 ? `<div class="prop-chip-row">
-        <span class="prop-chip chip-maint" title="Monthly maintenance">
+      ${(maintenance > 0 || waterLabel || electricLabel) ? `<div class="prop-chip-row prop-chip-row-scroll">
+        ${maintenance > 0 ? `<span class="prop-chip chip-maint" title="Monthly maintenance">
           <span class="chip-ico-wrap icon-maint"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
-          ₹${maintenance.toLocaleString('en-IN')} maintenance
-        </span>
+          ${fmtRupee(maintenance)} maintenance
+        </span>` : ''}
+        ${waterLabel ? `<span class="prop-chip chip-water" title="Water supply">
+          <span class="chip-ico-wrap icon-water"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.69s-5.5 6.16-5.5 10.31a5.5 5.5 0 0 0 11 0c0-4.15-5.5-10.31-5.5-10.31z"/></svg></span>
+          Water: ${waterLabel}
+        </span>` : ''}
+        ${electricLabel ? `<span class="prop-chip chip-electric" title="Electricity">
+          <span class="chip-ico-wrap icon-electric"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
+          Electricity: ${electricLabel}
+        </span>` : ''}
       </div>` : ''}
       <div class="prop-footer">
         <div class="prop-quick-actions">
@@ -5639,9 +5669,9 @@ function renderCompareTable() {
 
   const rows = [
     section('Pricing'),
-    { label: 'Rent / Month', get: p => `<span style="font-weight:700;color:var(--text)">₹${(p.price?.rent||0).toLocaleString('en-IN')}</span>` },
-    { label: 'Deposit', get: p => `₹${(p.price?.deposit||0).toLocaleString('en-IN')}` },
-    { label: 'Maintenance', get: p => p.price?.maintenance ? `₹${(p.price.maintenance).toLocaleString('en-IN')}` : 'Included' },
+    { label: 'Rent / Month', get: p => `<span style="font-weight:700;color:var(--text)">${fmtRupee(p.price?.rent||0)}</span>` },
+    { label: 'Deposit', get: p => `${fmtRupee(p.price?.deposit||0)}` },
+    { label: 'Maintenance', get: p => p.price?.maintenance ? `${fmtRupee(p.price.maintenance)}` : 'Included' },
     { label: 'Electricity', get: p => dash(p.price?.electricity) },
     { label: 'Water charge', get: p => dash(p.price?.water) },
     { label: 'Rent negotiable', get: p => dash(p.price?.negotiable) },
@@ -5721,7 +5751,7 @@ function renderCompareTable() {
       <div class="compare-col-img">${badges}${img}</div>
       <div class="compare-col-title">${esc(p.propertyId)}</div>
       <div class="compare-col-loc">${esc(p.location?.area)}</div>
-      <div class="compare-col-price">₹${(p.price?.rent||0).toLocaleString('en-IN')}</div>
+      <div class="compare-col-price">${fmtRupee(p.price?.rent||0)}</div>
     </th>`;
   }).join('');
 
@@ -6163,9 +6193,11 @@ function clearFilters() {
 }
 
 function fmtRupee(n) {
-  if (n >= 10000000) return '₹' + (n/10000000).toFixed(1).replace('.0','') + 'Cr';
-  if (n >= 100000)   return '₹' + (n/100000).toFixed(1).replace('.0','') + 'L';
-  if (n >= 1000)     return '₹' + Math.round(n/1000) + 'k';
+  n = Number(n) || 0;
+  const trim = x => x.toFixed(2).replace(/\.?0+$/, '');
+  if (n >= 10000000) return '₹' + trim(n/10000000) + 'Cr';
+  if (n >= 100000)   return '₹' + trim(n/100000) + 'L';
+  if (n >= 1000)     return '₹' + trim(n/1000) + 'k';
   return '₹' + n;
 }
 
@@ -7350,7 +7382,7 @@ function renderMyListings() {
   wrap.innerHTML = MY_LISTINGS_CACHE.map(p => {
     const img = (p.media?.images || [])[0];
     const thumb = img ? `style="background-image:url('${safeUrl(img)}')"` : '';
-    const rent = p.price?.rent != null ? '₹' + Number(p.price.rent).toLocaleString('en-IN') : '—';
+    const rent = p.price?.rent != null ? fmtRupee(p.price.rent) : '—';
     return `<div class="profile-mini-card" onclick="closeProfileModal();openDetail('${p.id}')">
       <div class="profile-mini-thumb" ${thumb}>${img ? '' : 'No photo'}</div>
       <div class="profile-mini-body">
@@ -7473,7 +7505,7 @@ function loadSavedListings() {
   wrap.innerHTML = items.map(p => {
     const img = (p.media?.images || [])[0];
     const thumb = img ? `style="background-image:url('${safeUrl(img)}')"` : '';
-    const rent = p.price?.rent != null ? '₹' + Number(p.price.rent).toLocaleString('en-IN') : '—';
+    const rent = p.price?.rent != null ? fmtRupee(p.price.rent) : '—';
     return `<div class="profile-mini-card" onclick="closeProfileModal();openDetail('${p.id}')">
       <div class="profile-mini-thumb" ${thumb}>${img ? '' : 'No photo'}</div>
       <div class="profile-mini-body">
@@ -8103,18 +8135,77 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /* ─── Auto-slide the property-card icon/chip rows (stats + furnished/
-   maintenance/available chips) every 30s when they overflow their card
-   width. Scrolls one "page" forward each tick and loops back to the start
-   once the end is reached; users can still drag/scroll them manually at
-   any time. Runs globally so it picks up newly rendered cards each tick. */
+   maintenance/available chips) every 10s when they overflow their card
+   width. All cards flip together in lockstep — a single global phase
+   toggles between "start" and "end" each tick, so every card's row moves
+   in the same direction at the same time instead of drifting out of sync
+   with each other. Users can still drag/scroll them manually at any time.
+   Runs globally so it picks up newly rendered cards each tick. */
+/* Slowly animate a scrollable row's scrollLeft to a target position over
+   `duration` ms, using an ease-in-out curve. Native `behavior:'smooth'`
+   scrolling is quick (~300ms) and can't be slowed down directly, so we
+   drive it by hand with requestAnimationFrame instead. */
+function _slowScrollTo(row, target, duration){
+  const start = row.scrollLeft;
+  const dist = target - start;
+  if (!dist) return;
+  const prevBehavior = row.style.scrollBehavior;
+  row.style.scrollBehavior = 'auto';
+  const t0 = performance.now();
+  function ease(t){ return t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2, 2)/2; }
+  function step(now){
+    const p = Math.min((now - t0) / duration, 1);
+    row.scrollLeft = start + dist * ease(p);
+    if (p < 1) requestAnimationFrame(step);
+    else row.style.scrollBehavior = prevBehavior;
+  }
+  requestAnimationFrame(step);
+}
+let _propRowPhase = false;
 function _autoSlidePropRows(){
+  _propRowPhase = !_propRowPhase;
   document.querySelectorAll('.prop-stats, .prop-chip-row-scroll').forEach(row => {
     if (row.scrollWidth <= row.clientWidth + 4) return;
-    const atEnd = row.scrollLeft + row.clientWidth >= row.scrollWidth - 4;
-    row.scrollTo({ left: atEnd ? 0 : row.scrollLeft + row.clientWidth * 0.85, behavior: 'smooth' });
+    const target = _propRowPhase ? row.scrollWidth - row.clientWidth : 0;
+    _slowScrollTo(row, target, 5000);
   });
 }
-setInterval(_autoSlidePropRows, 30000);
+/* ─── Manual drag-to-scroll for the stat/chip rows on desktop ───────────
+   These rows already scroll via touch/trackpad; this adds mouse-drag
+   support so desktop users (no touchpad) can slide them by click+drag.
+   A small movement threshold distinguishes a drag from a normal click,
+   and we swallow the click that would otherwise bubble up to the card's
+   onclick="openDetail(...)" only when an actual drag happened. */
+(function(){
+  let drag = null;
+  let justDragged = false;
+  document.addEventListener('mousedown', function(e){
+    const row = e.target.closest('.prop-stats, .prop-chip-row-scroll');
+    if (!row || row.scrollWidth <= row.clientWidth + 4) return;
+    drag = { row, startX: e.pageX, startScroll: row.scrollLeft, moved: false };
+    row.classList.add('is-dragging');
+  });
+  document.addEventListener('mousemove', function(e){
+    if (!drag) return;
+    const dx = e.pageX - drag.startX;
+    if (Math.abs(dx) > 4) drag.moved = true;
+    drag.row.scrollLeft = drag.startScroll - dx;
+  });
+  document.addEventListener('mouseup', function(){
+    if (!drag) return;
+    justDragged = drag.moved;
+    drag.row.classList.remove('is-dragging');
+    drag = null;
+  });
+  window.addEventListener('blur', function(){
+    if (drag) drag.row.classList.remove('is-dragging');
+    drag = null;
+  });
+  document.addEventListener('click', function(e){
+    if (justDragged) { e.stopPropagation(); e.preventDefault(); justDragged = false; }
+  }, true);
+})();
+setInterval(_autoSlidePropRows, 10000);
 
 /* ─── Auto-slide the reviews row every 10s ──────────────────────────
    Bounces forward one review at a time until the last review is

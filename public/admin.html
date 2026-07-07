@@ -343,6 +343,31 @@ table.dataTable.no-footer{border-bottom:none!important}
 .mini-toggle.is-saving{opacity:0.55;pointer-events:none}
 .mini-toggle.promoted-toggle input:checked + .track{background:var(--gold);border-color:var(--gold)}
 
+/* ── BULK SELECT ── */
+.select-col{width:34px;text-align:center !important}
+.row-select-checkbox,.select-all-checkbox{
+  width:16px;height:16px;cursor:pointer;accent-color:var(--gold);vertical-align:middle;
+}
+.bulk-bar{
+  display:flex;align-items:center;gap:12px;padding:9px 16px;margin:0 0 12px;
+  background:var(--gold-light);border:1px solid rgba(52,87,213,0.22);border-radius:var(--radius-sm);
+  animation:bulkBarIn 0.15s ease-out;
+}
+@keyframes bulkBarIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.bulk-bar-count{font-size:0.85rem;font-weight:700;color:var(--gold-dark)}
+.bulk-delete-btn{
+  display:inline-flex;align-items:center;gap:6px;background:var(--red);color:#fff;border:none;
+  padding:7px 14px;border-radius:var(--radius-xs);cursor:pointer;font-size:0.78rem;font-weight:600;
+  transition:all 0.15s;font-family:inherit;
+}
+.bulk-delete-btn:hover{background:#c93a32;box-shadow:0 4px 12px rgba(225,72,63,0.3)}
+.bulk-delete-btn:disabled{opacity:0.5;cursor:not-allowed}
+.bulk-clear-btn{
+  background:none;border:none;color:var(--ink2);font-size:0.78rem;font-weight:600;cursor:pointer;
+  font-family:inherit;text-decoration:underline;padding:4px;margin-left:auto;
+}
+.bulk-clear-btn:hover{color:var(--ink)}
+
 /* ══════════════════════════════════════
    REMARKS — subgrid card design
    ══════════════════════════════════════ */
@@ -1567,10 +1592,16 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
           <div class="card-sub">Tap phone numbers to call · Tap email to compose</div>
         </div>
       </div>
+      <div class="bulk-bar" id="bulkBar-customers" style="display:none">
+        <span class="bulk-bar-count"><span id="bulkCount-customers">0</span> selected</span>
+        <button class="bulk-delete-btn" onclick="bulkDelete('customers')"><i class="fas fa-trash-alt"></i> Delete Selected</button>
+        <button class="bulk-clear-btn" onclick="clearSelection('customers')">Clear</button>
+      </div>
       <div class="table-wrapper">
         <table id="bookingTable" class="display nowrap" style="width:100%">
           <thead>
             <tr>
+              <th class="select-col"><input type="checkbox" class="select-all-checkbox" id="selectAll-customers" onchange="toggleSelectAll('customers', this)"></th>
               <th>User ID</th>
               <th>Customer</th>
               <th>Phone</th>
@@ -1585,7 +1616,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
             </tr>
           </thead>
           <tbody>
-            <tr><td colspan="11" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
+            <tr><td colspan="12" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
           </tbody>
         </table>
       </div>
@@ -1616,10 +1647,16 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
           </button>
         </div>
       </div>
+      <div class="bulk-bar" id="bulkBar-properties" style="display:none">
+        <span class="bulk-bar-count"><span id="bulkCount-properties">0</span> selected</span>
+        <button class="bulk-delete-btn" onclick="bulkDelete('properties')"><i class="fas fa-trash-alt"></i> Delete Selected</button>
+        <button class="bulk-clear-btn" onclick="clearSelection('properties')">Clear</button>
+      </div>
       <div class="table-wrapper">
         <table id="propertyTable" class="display nowrap" style="width:100%">
           <thead>
             <tr>
+              <th class="select-col"><input type="checkbox" class="select-all-checkbox" id="selectAll-properties" onchange="toggleSelectAll('properties', this)"></th>
               <th>Property</th>
               <th>Status</th>
               <th>Price</th>
@@ -1634,7 +1671,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
             </tr>
           </thead>
           <tbody>
-            <tr><td colspan="11" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
+            <tr><td colspan="12" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
           </tbody>
         </table>
       </div>
@@ -1677,10 +1714,16 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
           </button>
         </div>
       </div>
+      <div class="bulk-bar" id="bulkBar-appointments" style="display:none">
+        <span class="bulk-bar-count"><span id="bulkCount-appointments">0</span> selected</span>
+        <button class="bulk-delete-btn" onclick="bulkDelete('appointments')"><i class="fas fa-trash-alt"></i> Delete Selected</button>
+        <button class="bulk-clear-btn" onclick="clearSelection('appointments')">Clear</button>
+      </div>
       <div class="table-wrapper">
         <table id="appointmentTable" class="display nowrap" style="width:100%">
           <thead>
             <tr>
+              <th class="select-col"><input type="checkbox" class="select-all-checkbox" id="selectAll-appointments" onchange="toggleSelectAll('appointments', this)"></th>
               <th>Appointment ID</th>
               <th>Property ID</th>
               <th>User ID</th>
@@ -1697,7 +1740,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
             </tr>
           </thead>
           <tbody>
-            <tr><td colspan="13" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
+            <tr><td colspan="14" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
           </tbody>
         </table>
       </div>
@@ -2172,7 +2215,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
 <script>
 let dataTable, propTable, apptTable;
 
-const BASE = 'https://rentinpeace.onrender.com';
+const BASE = 'http://localhost:5000';
 
 /* ── ADMIN KEY – set after login ── */
 let ADMIN_KEY = sessionStorage.getItem('kr_admin_key') || '';
@@ -2181,6 +2224,115 @@ let ADMIN_KEY = sessionStorage.getItem('kr_admin_key') || '';
 function authHeaders(extra){
   return Object.assign({ 'x-admin-key': ADMIN_KEY }, extra||{});
 }
+
+/* ── BULK SELECT (Customers / Properties / Appointments) ── */
+const _selection = { customers: new Set(), properties: new Set(), appointments: new Set() };
+
+const _ROW_KEY = {
+  customers:    row => row.mobile || String(row._id),
+  properties:   row => String(row._id),
+  appointments: row => String(row._id)
+};
+
+function _bulkTable(table){
+  return table === 'customers' ? dataTable : table === 'properties' ? propTable : apptTable;
+}
+
+// Called from each column's render() to know whether a row's checkbox should be checked
+function isRowSelected(table, key){
+  return _selection[table].has(key);
+}
+
+window.onRowSelectChange = function(table, key, checkbox){
+  if(checkbox.checked) _selection[table].add(key);
+  else _selection[table].delete(key);
+  updateBulkBar(table);
+  syncSelectAllHeader(table);
+};
+
+window.toggleSelectAll = function(table, headerCheckbox){
+  const dt = _bulkTable(table);
+  if(!dt) return;
+  const rows = dt.rows({ search:'applied' }).data().toArray();
+  const keyFn = _ROW_KEY[table];
+  if(headerCheckbox.checked){
+    rows.forEach(r => _selection[table].add(keyFn(r)));
+  } else {
+    rows.forEach(r => _selection[table].delete(keyFn(r)));
+  }
+  dt.rows().invalidate('data').draw(false);
+  updateBulkBar(table);
+};
+
+function syncSelectAllHeader(table){
+  const dt = _bulkTable(table);
+  const headerCb = document.getElementById('selectAll-' + table);
+  if(!dt || !headerCb) return;
+  const rows = dt.rows({ search:'applied' }).data().toArray();
+  const keyFn = _ROW_KEY[table];
+  const total = rows.length;
+  const selectedCount = rows.filter(r => _selection[table].has(keyFn(r))).length;
+  headerCb.checked = total > 0 && selectedCount === total;
+  headerCb.indeterminate = selectedCount > 0 && selectedCount < total;
+}
+
+function updateBulkBar(table){
+  const bar   = document.getElementById('bulkBar-' + table);
+  const count = document.getElementById('bulkCount-' + table);
+  if(!bar || !count) return;
+  const n = _selection[table].size;
+  count.innerText = n;
+  bar.style.display = n > 0 ? 'flex' : 'none';
+  syncSelectAllHeader(table);
+}
+
+window.clearSelection = function(table){
+  _selection[table].clear();
+  const dt = _bulkTable(table);
+  if(dt) dt.rows().invalidate('data').draw(false);
+  updateBulkBar(table);
+};
+
+// Drops ids from the selection that no longer exist after a fresh ajax load
+function pruneSelection(table, validKeys){
+  const valid = new Set(validKeys);
+  Array.from(_selection[table]).forEach(k => { if(!valid.has(k)) _selection[table].delete(k); });
+}
+
+window.bulkDelete = async function(table){
+  const ids = Array.from(_selection[table]);
+  if(!ids.length) return;
+  const label = table === 'customers' ? 'customer' : table === 'properties' ? 'property' : 'appointment';
+  if(!confirm(`Delete ${ids.length} selected ${label}${ids.length>1?'s':''}? This cannot be undone.`)) return;
+
+  const btn = document.querySelector(`#bulkBar-${table} .bulk-delete-btn`);
+  if(btn){ btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Deleting…'; }
+
+  const endpoint = table === 'customers'
+    ? '/api/users/bulk-delete'
+    : table === 'properties'
+    ? '/api/properties/bulk-delete'
+    : '/api/appointments/bulk-delete';
+  const payloadKey = table === 'customers' ? 'mobiles' : 'ids';
+
+  try {
+    const res = await fetch(BASE + endpoint, {
+      method: 'POST',
+      headers: authHeaders({'Content-Type':'application/json'}),
+      body: JSON.stringify({ [payloadKey]: ids })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok) throw new Error(data.message || 'Bulk delete failed');
+    _selection[table].clear();
+    const dt = _bulkTable(table);
+    if(dt) dt.ajax.reload(null, false);
+    updateBulkBar(table);
+  } catch(e){
+    alert(e.message || 'Could not delete the selected items. Please try again.');
+  }
+  if(btn){ btn.disabled = false; btn.innerHTML = '<i class="fas fa-trash-alt"></i> Delete Selected'; }
+};
+
 
 /* ── LOGIN ── */
 function showLogin(){ document.getElementById('loginOverlay').style.display='flex'; }
@@ -2621,17 +2773,25 @@ $(document).ready(function(){
       dataSrc: function(res){
         if(!Array.isArray(res)) return [];
         updateStats(res);
+        pruneSelection('customers', res.map(_ROW_KEY.customers));
         return res;
       }
     },
     columns:[
-      /* 0 – User ID (human-readable User.userId, e.g. USER-000001) */
+      /* 0 – Select checkbox */
+      { data:null, orderable:false, className:'select-col', render:(d,t,row)=>{
+          if(t!=='display') return '';
+          const key = _ROW_KEY.customers(row);
+          const checked = isRowSelected('customers', key) ? 'checked' : '';
+          return `<input type="checkbox" class="row-select-checkbox" onclick="event.stopPropagation()" onchange="onRowSelectChange('customers','${key}',this)" ${checked}>`;
+      }},
+      /* 1 – User ID (human-readable User.userId, e.g. USER-000001) */
       { data:'userId', render:(d,t)=>{
           const id = d ? String(d) : '—';
           if(t==='display') return `<span style="font-family:monospace;font-size:0.76rem;color:var(--ink3)">${id}</span>`;
           return id;
       }},
-      /* 1 – Name */
+      /* 2 – Name */
       { data:'name', render:(d,t,row)=>{
           if(t==='display') return renderName(row);
           return row.name || '—';
@@ -2688,7 +2848,7 @@ $(document).ready(function(){
           </div>`;
       }}
     ],
-    order:[[5,'desc']],
+    order:[[6,'desc']],
     pageLength:10,
     scrollX:true,
     language:{
@@ -2703,38 +2863,38 @@ $(document).ready(function(){
     buttons:[
       {
         extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV', title:'KR Real-Estate Customers',
-        exportOptions:{ columns:[0,1,2,3,4,5,6,7,8,9],
+        exportOptions:{ columns:[1,2,3,4,5,6,7,8,9,10],
           format:{ body:function(data,row,col){
             var rd=dataTable.row(row).data(); if(!rd) return data;
-            if(col===0) return rd.userId ? String(rd.userId) : '—';
-            if(col===1) return rd.name||'—';
-            if(col===2){ var ph=plainPhone(rd); return ph?'=HYPERLINK("tel:'+ph+'","'+ph+'")':'—'; }
-            if(col===3){ var em=plainEmail(rd); return em?'=HYPERLINK("mailto:'+em+'","'+em+'")':'—'; }
-            if(col===4) return rd.contact||'—';
-            if(col===5) return formatKRDateTime(rd.createdAt);
-            if(col===6) return String(rd.listingsCount||0);
-            if(col===7) return String(rd.visitsCount||0);
-            if(col===8) return rd.password||'—';
-            if(col===9) return flattenRemarks(rd.remarks);
+            if(col===1) return rd.userId ? String(rd.userId) : '—';
+            if(col===2) return rd.name||'—';
+            if(col===3){ var ph=plainPhone(rd); return ph?'=HYPERLINK("tel:'+ph+'","'+ph+'")':'—'; }
+            if(col===4){ var em=plainEmail(rd); return em?'=HYPERLINK("mailto:'+em+'","'+em+'")':'—'; }
+            if(col===5) return rd.contact||'—';
+            if(col===6) return formatKRDateTime(rd.createdAt);
+            if(col===7) return String(rd.listingsCount||0);
+            if(col===8) return String(rd.visitsCount||0);
+            if(col===9) return rd.password||'—';
+            if(col===10) return flattenRemarks(rd.remarks);
             return data;
           }}
         }
       },
       {
         extend:'excel', text:'<i class="fas fa-file-excel"></i> Excel', title:'KR Real-Estate Customers',
-        exportOptions:{ columns:[0,1,2,3,4,5,6,7,8,9],
+        exportOptions:{ columns:[1,2,3,4,5,6,7,8,9,10],
           format:{ body:function(data,row,col){
             var rd=dataTable.row(row).data(); if(!rd) return data;
-            if(col===0) return rd.userId ? String(rd.userId) : '—';
-            if(col===1) return rd.name||'—';
-            if(col===2) return rd.mobile||'—';
-            if(col===3) return rd.email||'—';
-            if(col===4) return rd.contact||'—';
-            if(col===5) return formatKRDateTime(rd.createdAt);
-            if(col===6) return String(rd.listingsCount||0);
-            if(col===7) return String(rd.visitsCount||0);
-            if(col===8) return rd.password||'—';
-            if(col===9) return flattenRemarks(rd.remarks);
+            if(col===1) return rd.userId ? String(rd.userId) : '—';
+            if(col===2) return rd.name||'—';
+            if(col===3) return rd.mobile||'—';
+            if(col===4) return rd.email||'—';
+            if(col===5) return rd.contact||'—';
+            if(col===6) return formatKRDateTime(rd.createdAt);
+            if(col===7) return String(rd.listingsCount||0);
+            if(col===8) return String(rd.visitsCount||0);
+            if(col===9) return rd.password||'—';
+            if(col===10) return flattenRemarks(rd.remarks);
             return data;
           }}
         }
@@ -2742,7 +2902,7 @@ $(document).ready(function(){
       {
         extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
         orientation:'landscape', pageSize:'A4', title:'KR Real-Estate — Customers',
-        exportOptions:{columns:[0,1,2,3,4,5,6,7,8,9]},
+        exportOptions:{columns:[1,2,3,4,5,6,7,8,9,10]},
         customize:function(doc){
           doc.styles.tableHeader={fillColor:'#0E1016',color:'white',bold:true,fontSize:9,alignment:'center'};
           doc.defaultStyle={fontSize:8,color:'#0E1016'};
@@ -2759,7 +2919,7 @@ $(document).ready(function(){
       },
       {
         extend:'print', text:'<i class="fas fa-print"></i> Print', title:'KR Real-Estate Customers',
-        exportOptions:{columns:[0,1,2,3,4,5,6,7,8,9]},
+        exportOptions:{columns:[1,2,3,4,5,6,7,8,9,10]},
         customize:function(win){
           $(win.document.head).append('<style>table td a{color:inherit;text-decoration:underline}table td a.ph{color:#12A375}table td a.em{color:#3730A3}</style>');
           $(win.document.body).find('table tbody tr').each(function(){
@@ -2770,7 +2930,7 @@ $(document).ready(function(){
         }
       }
     ],
-    drawCallback:function(){}
+    drawCallback:function(){ syncSelectAllHeader('customers'); updateBulkBar('customers'); }
   });
 
   /* ════════════════════════════════════
@@ -2786,48 +2946,56 @@ $(document).ready(function(){
         document.getElementById('propCount').innerText = res.length;
         document.getElementById('tab-properties-count').innerText = res.length;
         buildPropFilters(res);
+        pruneSelection('properties', res.map(_ROW_KEY.properties));
         return res;
       }
     },
     columns:[
-      /* 0 – Property title + city */
+      /* 0 – Select checkbox */
+      { data:null, orderable:false, className:'select-col', render:(d,t,row)=>{
+          if(t!=='display') return '';
+          const key = _ROW_KEY.properties(row);
+          const checked = isRowSelected('properties', key) ? 'checked' : '';
+          return `<input type="checkbox" class="row-select-checkbox" onclick="event.stopPropagation()" onchange="onRowSelectChange('properties','${key}',this)" ${checked}>`;
+      }},
+      /* 1 – Property title + city */
       { data:null, render:(d,t,row)=>{
           const title = escapeHtml(row.title||'Untitled');
           const city  = escapeHtml(row.city||'');
           if(t==='display') return `<div><div class="prop-title">${title}</div><div class="prop-sub">${city}</div></div>`;
           return (row.title||'').trim();
       }},
-      /* 1 – Status */
+      /* 2 – Status */
       { data:'status', render:(d,t)=> t==='display' ? statusBadge(d) : (d||'—') },
-      /* 2 – Price */
+      /* 3 – Price */
       { data:'displayPrice', render:(d)=> escapeHtml(d||'—') },
-      /* 3 – Owner Name */
+      /* 4 – Owner Name */
       { data:'ownerName', render:(d)=> escapeHtml(d||'—') },
-      /* 4 – Owner Number (clickable) */
+      /* 5 – Owner Number (clickable) */
       { data:null, render:(d,t,row)=>{
           if(t==='display') return renderOwnerPhone(row);
           return row.ownerNumber||'—';
       }},
-      /* 5 – Location */
+      /* 6 – Location */
       { data:'loc', render:(d)=> escapeHtml(d||'—') },
-      /* 6 – Listed On */
+      /* 7 – Listed On */
       { data:'createdAt', render:(d,t)=> t==='display' ? formatDateTime(d) : (d||'—') },
-      /* 7 – Verified */
+      /* 8 – Verified */
       { data:'verified', orderable:false, render:(d,t,row)=>{
           if(t!=='display') return d ? 'Yes' : 'No';
           return propFlagToggleHtml(row._id, 'verified', !!d);
       }},
-      /* 8 – Promoted */
+      /* 9 – Promoted */
       { data:'promoted', orderable:false, render:(d,t,row)=>{
           if(t!=='display') return d ? 'Yes' : 'No';
           return propFlagToggleHtml(row._id, 'promoted', !!d);
       }},
-      /* 9 – Remarks */
+      /* 10 – Remarks */
       { data:'remarks', orderable:false, render:(d,t,row)=>{
           if(t==='display') return remarkCellHtml(row._id, d, 'property');
           return d||'';
       }},
-      /* 10 – Action */
+      /* 11 – Action */
       { data:null, orderable:false, render:(d,t,row)=>{
           _adminPropCache[row._id] = row;
           return `<div style="display:inline-flex;gap:6px;flex-wrap:wrap;justify-content:center">
@@ -2836,7 +3004,7 @@ $(document).ready(function(){
           </div>`;
       }}
     ],
-    order:[[6,'desc']],
+    order:[[7,'desc']],
     pageLength:10,
     scrollX:true,
     language:{
@@ -2851,38 +3019,38 @@ $(document).ready(function(){
     buttons:[
       {
         extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV', title:'KR Properties',
-        exportOptions:{ columns:[0,1,2,3,4,5,6,7,8,9],
+        exportOptions:{ columns:[1,2,3,4,5,6,7,8,9,10],
           format:{ body:function(data,row,col){
             var rd=propTable.row(row).data(); if(!rd) return data;
-            if(col===0) return (rd.title||'').trim()||'—';
-            if(col===1) return rd.status||'—';
-            if(col===2) return rd.displayPrice||'—';
-            if(col===3) return rd.ownerName||'—';
-            if(col===4){ var ph=rd.ownerNumber||''; return ph?'=HYPERLINK("tel:'+ph+'","'+ph+'")':'—'; }
-            if(col===5) return rd.loc||'—';
-            if(col===6) return formatKRDateTime(rd.createdAt);
-            if(col===7) return rd.verified ? 'Yes' : 'No';
-            if(col===8) return rd.promoted ? 'Yes' : 'No';
-            if(col===9) return flattenRemarks(rd.remarks);
+            if(col===1) return (rd.title||'').trim()||'—';
+            if(col===2) return rd.status||'—';
+            if(col===3) return rd.displayPrice||'—';
+            if(col===4) return rd.ownerName||'—';
+            if(col===5){ var ph=rd.ownerNumber||''; return ph?'=HYPERLINK("tel:'+ph+'","'+ph+'")':'—'; }
+            if(col===6) return rd.loc||'—';
+            if(col===7) return formatKRDateTime(rd.createdAt);
+            if(col===8) return rd.verified ? 'Yes' : 'No';
+            if(col===9) return rd.promoted ? 'Yes' : 'No';
+            if(col===10) return flattenRemarks(rd.remarks);
             return data;
           }}
         }
       },
       {
         extend:'excel', text:'<i class="fas fa-file-excel"></i> Excel', title:'KR Properties',
-        exportOptions:{ columns:[0,1,2,3,4,5,6,7,8,9],
+        exportOptions:{ columns:[1,2,3,4,5,6,7,8,9,10],
           format:{ body:function(data,row,col){
             var rd=propTable.row(row).data(); if(!rd) return data;
-            if(col===0) return (rd.title||'').trim()||'—';
-            if(col===1) return rd.status||'—';
-            if(col===2) return rd.displayPrice||'—';
-            if(col===3) return rd.ownerName||'—';
-            if(col===4) return rd.ownerNumber||'—';
-            if(col===5) return rd.loc||'—';
-            if(col===6) return formatKRDateTime(rd.createdAt);
-            if(col===7) return rd.verified ? 'Yes' : 'No';
-            if(col===8) return rd.promoted ? 'Yes' : 'No';
-            if(col===9) return flattenRemarks(rd.remarks);
+            if(col===1) return (rd.title||'').trim()||'—';
+            if(col===2) return rd.status||'—';
+            if(col===3) return rd.displayPrice||'—';
+            if(col===4) return rd.ownerName||'—';
+            if(col===5) return rd.ownerNumber||'—';
+            if(col===6) return rd.loc||'—';
+            if(col===7) return formatKRDateTime(rd.createdAt);
+            if(col===8) return rd.verified ? 'Yes' : 'No';
+            if(col===9) return rd.promoted ? 'Yes' : 'No';
+            if(col===10) return flattenRemarks(rd.remarks);
             return data;
           }}
         }
@@ -2890,7 +3058,7 @@ $(document).ready(function(){
       {
         extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
         orientation:'landscape', pageSize:'A4', title:'KR Real-Estate — Properties',
-        exportOptions:{columns:[0,1,2,3,4,5,6,7,8,9]},
+        exportOptions:{columns:[1,2,3,4,5,6,7,8,9,10]},
         customize:function(doc){
           doc.styles.tableHeader={fillColor:'#0E1016',color:'white',bold:true,fontSize:9,alignment:'center'};
           doc.defaultStyle={fontSize:8,color:'#0E1016'};
@@ -2906,7 +3074,7 @@ $(document).ready(function(){
       },
       {
         extend:'print', text:'<i class="fas fa-print"></i> Print', title:'KR Properties',
-        exportOptions:{columns:[0,1,2,3,4,5,6,7,8,9]},
+        exportOptions:{columns:[1,2,3,4,5,6,7,8,9,10]},
         customize:function(win){
           $(win.document.head).append('<style>table td a{color:#12A375;text-decoration:underline}</style>');
           $(win.document.body).find('table tbody tr').each(function(){
@@ -2917,7 +3085,7 @@ $(document).ready(function(){
         }
       }
     ],
-    drawCallback:function(){}
+    drawCallback:function(){ syncSelectAllHeader('properties'); updateBulkBar('properties'); }
   });
 
   /* ════════════════════════════════════
@@ -2931,40 +3099,48 @@ $(document).ready(function(){
       dataSrc: function(res){
         if(!Array.isArray(res)) return [];
         updateApptStats(res);
+        pruneSelection('appointments', res.map(_ROW_KEY.appointments));
         return res;
       }
     },
     columns:[
-      /* 0 – Appointment ID (human-readable VisitRequest.visitId, e.g. VISIT-000001) */
+      /* 0 – Select checkbox */
+      { data:null, orderable:false, className:'select-col', render:(d,t,row)=>{
+          if(t!=='display') return '';
+          const key = _ROW_KEY.appointments(row);
+          const checked = isRowSelected('appointments', key) ? 'checked' : '';
+          return `<input type="checkbox" class="row-select-checkbox" onclick="event.stopPropagation()" onchange="onRowSelectChange('appointments','${key}',this)" ${checked}>`;
+      }},
+      /* 1 – Appointment ID (human-readable VisitRequest.visitId, e.g. VISIT-000001) */
       { data:'visitId', render:(d,t)=>{
           const val = d ? String(d) : '—';
           if(t!=='display') return val;
           return `<span style="font-family:monospace;font-size:0.72rem;color:var(--ink2);letter-spacing:0.02em;cursor:pointer;border-bottom:1px dashed var(--ink3)" title="Click to copy" onclick="navigator.clipboard.writeText('${val}').then(()=>this.title='Copied!')">${val}</span>`;
       }},
-      /* 1 – Property ID (human-readable Property.propertyId code, e.g. AAA123) */
+      /* 2 – Property ID (human-readable Property.propertyId code, e.g. AAA123) */
       { data:'propertyId', render:(d,t)=>{
           const val = d ? String(d) : '—';
           if(t!=='display') return val;
           if(!d) return '<span style="color:var(--ink3);font-size:0.78rem">—</span>';
           return `<span style="font-family:monospace;font-size:0.72rem;color:var(--ink2);letter-spacing:0.02em;cursor:pointer;border-bottom:1px dashed var(--ink3)" title="Click to copy" onclick="navigator.clipboard.writeText('${String(d)}').then(()=>this.title='Copied!')">${String(d)}</span>`;
       }},
-      /* 2 – User ID (human-readable VisitRequest.userReadableId, e.g. USER-000001) */
+      /* 3 – User ID (human-readable VisitRequest.userReadableId, e.g. USER-000001) */
       { data:'userReadableId', render:(d,t)=>{
           const val = d ? String(d) : '—';
           if(t!=='display') return val;
           if(!d) return '<span style="color:var(--ink3);font-size:0.78rem">Guest</span>';
           return `<span style="font-family:monospace;font-size:0.72rem;color:var(--ink2);letter-spacing:0.02em;cursor:pointer;border-bottom:1px dashed var(--ink3)" title="Click to copy" onclick="navigator.clipboard.writeText('${String(d)}').then(()=>this.title='Copied!')">${String(d)}</span>`;
       }},
-      /* 3 – Purpose */
+      /* 4 – Purpose */
       { data:'purpose', render:(d,t)=>
           t==='display' ? `<span class="purpose-badge">${escapeHtml(d||'—')}</span>` : (d||'—')
       },
-      /* 4 – Customer Name */
+      /* 5 – Customer Name */
       { data:'name', render:(d,t,row)=>{
           if(t==='display') return renderName(row);
           return row.name||'—';
       }},
-      /* 5 – Property */
+      /* 6 – Property */
       { data:'propertyName', render:(d,t,row)=>{
           if(t!=='display') return row.propertyName||row.purpose||'—';
           const name = escapeHtml(row.propertyName||'');
@@ -2975,23 +3151,23 @@ $(document).ready(function(){
             ${area ? `<div style="font-size:0.76rem;color:var(--ink2);margin-top:2px"><i class="fas fa-location-dot" style="color:var(--gold);margin-right:3px;font-size:0.7rem"></i>${area}</div>` : ''}
           </div>`;
       }},
-      /* 6 – Contact */
+      /* 7 – Contact */
       { data:'mobile', orderable:false, render:(d,t,row)=>{
           if(t==='display') return renderApptContact(row);
           return [row.mobile,row.email].filter(Boolean).join(' | ');
       }},
-      /* 7 – Visit Date & Time (merged) */
+      /* 8 – Visit Date & Time (merged) */
       { data:'date', render:(d,t,row)=>{
           if(t!=='display') return `${row.date||'—'} ${row.visitTimeDisplay||row.visitTime||''}`.trim();
           return renderApptDateTime(row);
       }},
-      /* 8 – Message */
+      /* 9 – Message */
       { data:'message', orderable:false, render:(d)=>{
           const msg = escapeHtml(d||'');
           if(!msg) return '<span class="no-contact">—</span>';
           return `<div style="max-width:180px;font-size:0.8rem;color:var(--ink2);white-space:normal;line-height:1.5">${msg}</div>`;
       }},
-      /* 9 – Status (inline change) */
+      /* 10 – Status (inline change) */
       { data:'status', render:(d,t,row)=>{
           if(t==='display'){
             _apptCache[String(row._id)] = row;
@@ -2999,16 +3175,16 @@ $(document).ready(function(){
           }
           return d||'pending';
       }},
-      /* 10 – Booked On */
+      /* 11 – Booked On */
       { data:'createdAt', render:(d,t)=>
           t==='display' ? formatDateTime(d) : (d||'—')
       },
-      /* 11 – Remarks */
+      /* 12 – Remarks */
       { data:'remarks', orderable:false, render:(d,t,row)=>{
           if(t==='display') return remarkCellHtml(String(row._id), d, 'appointment');
           return flattenRemarks(d);
       }},
-      /* 12 – Action */
+      /* 13 – Action */
       { data:null, orderable:false, render:(d,t,row)=>{
           _apptCache[String(row._id)] = row;
           return `<button class="btn-delete" onclick="deleteAppointment('${row._id}')">
@@ -3016,7 +3192,7 @@ $(document).ready(function(){
           </button>`;
       }}
     ],
-    order:[[7,'asc']],
+    order:[[8,'asc']],
     pageLength:10,
     scrollX:true,
     language:{
@@ -3031,42 +3207,42 @@ $(document).ready(function(){
     buttons:[
       {
         extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV', title:'KR Appointments',
-        exportOptions:{ columns:[0,1,2,3,4,5,6,7,8,9,10,11],
+        exportOptions:{ columns:[1,2,3,4,5,6,7,8,9,10,11,12],
           format:{ body:function(data,row,col){
             var rd=apptTable.row(row).data(); if(!rd) return data;
-            if(col===0) return rd.visitId ? String(rd.visitId) : '—';
-            if(col===1) return rd.propertyId ? String(rd.propertyId) : '—';
-            if(col===2) return rd.userReadableId ? String(rd.userReadableId) : 'Guest';
-            if(col===3) return rd.purpose||'—';
-            if(col===4) return rd.name||'—';
-            if(col===5) return [rd.propertyName,rd.propertyArea].filter(Boolean).join(', ')||'—';
-            if(col===6) return [rd.mobile,rd.email].filter(Boolean).join(' | ')||'—';
-            if(col===7) return (rd.date||'—')+' '+(rd.visitTimeDisplay||rd.visitTime||'')+(rd.timeSlot?' ('+rd.timeSlot+')':'');
-            if(col===8) return rd.message||'—';
-            if(col===9) return rd.status||'—';
-            if(col===10) return formatKRDateTime(rd.createdAt);
-            if(col===11) return flattenRemarks(rd.remarks);
+            if(col===1) return rd.visitId ? String(rd.visitId) : '—';
+            if(col===2) return rd.propertyId ? String(rd.propertyId) : '—';
+            if(col===3) return rd.userReadableId ? String(rd.userReadableId) : 'Guest';
+            if(col===4) return rd.purpose||'—';
+            if(col===5) return rd.name||'—';
+            if(col===6) return [rd.propertyName,rd.propertyArea].filter(Boolean).join(', ')||'—';
+            if(col===7) return [rd.mobile,rd.email].filter(Boolean).join(' | ')||'—';
+            if(col===8) return (rd.date||'—')+' '+(rd.visitTimeDisplay||rd.visitTime||'')+(rd.timeSlot?' ('+rd.timeSlot+')':'');
+            if(col===9) return rd.message||'—';
+            if(col===10) return rd.status||'—';
+            if(col===11) return formatKRDateTime(rd.createdAt);
+            if(col===12) return flattenRemarks(rd.remarks);
             return data;
           }}
         }
       },
       {
         extend:'excel', text:'<i class="fas fa-file-excel"></i> Excel', title:'KR Appointments',
-        exportOptions:{ columns:[0,1,2,3,4,5,6,7,8,9,10,11],
+        exportOptions:{ columns:[1,2,3,4,5,6,7,8,9,10,11,12],
           format:{ body:function(data,row,col){
             var rd=apptTable.row(row).data(); if(!rd) return data;
-            if(col===0) return rd.visitId ? String(rd.visitId) : '—';
-            if(col===1) return rd.propertyId ? String(rd.propertyId) : '—';
-            if(col===2) return rd.userReadableId ? String(rd.userReadableId) : 'Guest';
-            if(col===3) return rd.purpose||'—';
-            if(col===4) return rd.name||'—';
-            if(col===5) return [rd.propertyName,rd.propertyArea].filter(Boolean).join(', ')||'—';
-            if(col===6) return [rd.mobile,rd.email].filter(Boolean).join(' | ')||'—';
-            if(col===7) return (rd.date||'—')+' '+(rd.visitTimeDisplay||rd.visitTime||'')+(rd.timeSlot?' ('+rd.timeSlot+')':'');
-            if(col===8) return rd.message||'—';
-            if(col===9) return rd.status||'—';
-            if(col===10) return formatKRDateTime(rd.createdAt);
-            if(col===11) return flattenRemarks(rd.remarks);
+            if(col===1) return rd.visitId ? String(rd.visitId) : '—';
+            if(col===2) return rd.propertyId ? String(rd.propertyId) : '—';
+            if(col===3) return rd.userReadableId ? String(rd.userReadableId) : 'Guest';
+            if(col===4) return rd.purpose||'—';
+            if(col===5) return rd.name||'—';
+            if(col===6) return [rd.propertyName,rd.propertyArea].filter(Boolean).join(', ')||'—';
+            if(col===7) return [rd.mobile,rd.email].filter(Boolean).join(' | ')||'—';
+            if(col===8) return (rd.date||'—')+' '+(rd.visitTimeDisplay||rd.visitTime||'')+(rd.timeSlot?' ('+rd.timeSlot+')':'');
+            if(col===9) return rd.message||'—';
+            if(col===10) return rd.status||'—';
+            if(col===11) return formatKRDateTime(rd.createdAt);
+            if(col===12) return flattenRemarks(rd.remarks);
             return data;
           }}
         }
@@ -3074,7 +3250,7 @@ $(document).ready(function(){
       {
         extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
         orientation:'landscape', pageSize:'A4', title:'KR Real-Estate — Appointments',
-        exportOptions:{columns:[3,4,5,6,7,9,10]},
+        exportOptions:{columns:[4,5,6,7,8,10,11]},
         customize:function(doc){
           doc.styles.tableHeader={fillColor:'#0E1016',color:'white',bold:true,fontSize:8,alignment:'center'};
           doc.defaultStyle={fontSize:7.5,color:'#0E1016'};
@@ -3082,10 +3258,10 @@ $(document).ready(function(){
       },
       {
         extend:'print', text:'<i class="fas fa-print"></i> Print', title:'KR Appointments',
-        exportOptions:{columns:[0,1,2,3,4,5,6,7,8,9,10]}
+        exportOptions:{columns:[1,2,3,4,5,6,7,8,9,10,11]}
       }
     ],
-    drawCallback:function(){}
+    drawCallback:function(){ syncSelectAllHeader('appointments'); updateBulkBar('appointments'); }
   });
 
 });

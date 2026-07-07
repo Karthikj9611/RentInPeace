@@ -981,6 +981,24 @@ app.delete('/api/users/mobile/:mobile', requireAdmin, async (req, res) => {
   }
 });
 
+// ── POST /api/users/bulk-delete (admin: delete many customers at once) ──
+app.post('/api/users/bulk-delete', requireAdmin, async (req, res) => {
+  try {
+    const { mobiles } = req.body || {};
+    if (!Array.isArray(mobiles) || !mobiles.length) {
+      return res.status(400).json({ message: 'mobiles must be a non-empty array' });
+    }
+    const users = await Promise.all(mobiles.map(m => findUserByMobileOrId(m)));
+    const ids = users.filter(Boolean).map(u => u._id);
+    if (!ids.length) return res.status(404).json({ message: 'No matching customers found' });
+    const result = await User.deleteMany({ _id: { $in: ids } });
+    res.json({ message: `${result.deletedCount} customer(s) deleted`, deletedCount: result.deletedCount });
+  } catch (err) {
+    console.error('POST /api/users/bulk-delete error:', err);
+    res.status(500).json({ message: 'Error deleting customers: ' + err.message });
+  }
+});
+
 app.patch('/api/users/mobile/:mobile/remarks', requireAdmin, async (req, res) => {
   try {
     const { remarks } = req.body || {};
@@ -1129,6 +1147,23 @@ app.delete('/api/appointments/:id', requireAdmin, async (req, res) => {
   } catch (err) {
     console.error('DELETE /api/appointments/:id error:', err);
     res.status(500).json({ message: 'Error deleting appointment: ' + err.message });
+  }
+});
+
+// ── POST /api/appointments/bulk-delete (admin: delete many appointments at once) ──
+app.post('/api/appointments/bulk-delete', requireAdmin, async (req, res) => {
+  try {
+    const { ids } = req.body || {};
+    if (!Array.isArray(ids) || !ids.length) {
+      return res.status(400).json({ message: 'ids must be a non-empty array' });
+    }
+    const validIds = ids.filter(id => mongoose.Types.ObjectId.isValid(id));
+    if (!validIds.length) return res.status(400).json({ message: 'No valid appointment ids provided' });
+    const result = await VisitRequest.deleteMany({ _id: { $in: validIds } });
+    res.json({ message: `${result.deletedCount} appointment(s) deleted`, deletedCount: result.deletedCount });
+  } catch (err) {
+    console.error('POST /api/appointments/bulk-delete error:', err);
+    res.status(500).json({ message: 'Error deleting appointments: ' + err.message });
   }
 });
 
@@ -1319,6 +1354,23 @@ app.delete('/api/properties/:id', requireAdmin, async (req, res) => {
   } catch (err) {
     console.error('DELETE /api/properties/:id error:', err);
     res.status(500).json({ message: 'Error deleting property: ' + err.message });
+  }
+});
+
+// ── POST /api/properties/bulk-delete (admin: delete many properties at once) ──
+app.post('/api/properties/bulk-delete', requireAdmin, async (req, res) => {
+  try {
+    const { ids } = req.body || {};
+    if (!Array.isArray(ids) || !ids.length) {
+      return res.status(400).json({ message: 'ids must be a non-empty array' });
+    }
+    const validIds = ids.filter(id => mongoose.Types.ObjectId.isValid(id));
+    if (!validIds.length) return res.status(400).json({ message: 'No valid property ids provided' });
+    const result = await Property.deleteMany({ _id: { $in: validIds } });
+    res.json({ message: `${result.deletedCount} propert${result.deletedCount === 1 ? 'y' : 'ies'} deleted`, deletedCount: result.deletedCount });
+  } catch (err) {
+    console.error('POST /api/properties/bulk-delete error:', err);
+    res.status(500).json({ message: 'Error deleting properties: ' + err.message });
   }
 });
 
