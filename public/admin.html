@@ -324,6 +324,25 @@ table.dataTable.no-footer{border-bottom:none!important}
 .btn-delete:hover{background:var(--red);color:#fff;box-shadow:0 4px 12px rgba(225,72,63,0.3)}
 .btn-delete i{font-size:0.72rem}
 
+/* ── MINI TOGGLE (Verified / Promoted) ── */
+.mini-toggle-wrap{display:flex;align-items:center;justify-content:center}
+.mini-toggle{
+  position:relative;display:inline-block;width:38px;height:21px;flex-shrink:0;cursor:pointer;
+}
+.mini-toggle input{opacity:0;width:0;height:0;position:absolute}
+.mini-toggle .track{
+  position:absolute;inset:0;background:var(--surface3);border:1px solid var(--border2);
+  border-radius:99px;transition:all 0.18s;
+}
+.mini-toggle .knob{
+  position:absolute;top:2px;left:2px;width:15px;height:15px;background:#fff;border-radius:50%;
+  box-shadow:0 1px 3px rgba(11,13,20,0.25);transition:all 0.18s;
+}
+.mini-toggle input:checked + .track{background:var(--green);border-color:var(--green)}
+.mini-toggle input:checked + .track + .knob{transform:translateX(17px)}
+.mini-toggle.is-saving{opacity:0.55;pointer-events:none}
+.mini-toggle.promoted-toggle input:checked + .track{background:var(--gold);border-color:var(--gold)}
+
 /* ══════════════════════════════════════
    REMARKS — subgrid card design
    ══════════════════════════════════════ */
@@ -867,6 +886,573 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
     padding-bottom:max(40px,env(safe-area-inset-bottom));
   }
 }
+
+/* ── Ported from index.html: styles for the property view modal ── */
+
+.fd-btn.open{border-color:var(--brand);color:var(--brand)}
+
+.fd-btn.open svg.chevron{transform:rotate(180deg)}
+
+.fd-pop.open{display:flex}
+
+.sort-modal.open{display:flex}
+
+.prop-img-placeholder{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+}
+
+.prop-img-placeholder svg{width:52px;height:52px;stroke:var(--border-2);fill:none;stroke-width:1.4}
+
+.modal-overlay.open{display:flex}
+
+.modal-img .img-slide{border-radius:0;cursor:zoom-in;position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:none}
+
+.modal-img .img-slide.active{display:block}
+
+/* Modal gallery arrows: always visible (unlike card hover-only arrows), centered vertically */
+.modal-img .slide-arrows{
+  position:absolute;top:50%;left:0;right:0;bottom:auto;transform:translateY(-50%);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 12px;gap:0;opacity:1;z-index:3;
+  pointer-events:none;
+}
+
+.modal-img .slide-prev,.modal-img .slide-next{
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(255,255,255,.92);box-shadow:0 2px 8px rgba(0,0,0,.18);
+  transition:background .15s,transform .15s;
+  pointer-events:auto;
+}
+
+.modal-img .slide-prev:hover,.modal-img .slide-next:hover{background:#fff;transform:scale(1.07)}
+
+.modal-img .slide-prev svg,.modal-img .slide-next svg{width:18px;height:18px;stroke-width:2.4}
+
+.modal-img .slide-dots{bottom:14px}
+
+.modal-close{
+  position:absolute;top:12px;right:12px;z-index:3;
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(255,255,255,.92);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;border:1.5px solid rgba(255,255,255,.5);
+  transition:background .15s,border-color .15s,transform .15s;
+  flex-shrink:0;backdrop-filter:blur(4px);
+}
+
+.modal-close:hover{background:var(--brand);border-color:var(--brand);transform:scale(1.06)}
+
+.modal-close svg{width:18px;height:18px;stroke:var(--brand);fill:none;stroke-width:2.2;transition:stroke .15s}
+
+.modal-close:hover svg{stroke:#fff}
+
+
+.modal-actions{display:flex;gap:10px;margin-top:18px}
+
+/* Sits inline at the end of the property-view modal's scrolling body (see
+   the DOM comment above #viewActionsFooter) — scrolls up with the rest of
+   the listing instead of staying pinned to the bottom. */
+.view-actions-footer{
+  margin-top:18px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+
+.view-actions-footer .modal-actions{margin-top:0}
+
+.modal-btn-primary{
+  flex:1;padding:13px;border-radius:11px;
+  background:var(--brand);color:#fff;font-size:14px;font-weight:600;
+  border:none;cursor:pointer;transition:background .12s,transform .1s;
+}
+
+.modal-btn-primary:hover{background:var(--brand-hover)}
+
+.modal-btn-primary:active{transform:scale(.98)}
+
+.modal-btn-secondary{
+  flex:1;padding:13px;border-radius:11px;
+  background:var(--bg);color:var(--text);font-size:14px;font-weight:600;
+  border:1.5px solid var(--border-2);cursor:pointer;transition:background .12s,transform .1s;
+}
+
+.modal-btn-secondary:hover{background:var(--bg-2)}
+
+.modal-btn-secondary:active{transform:scale(.98)}
+
+.modal-actions-row{display:flex;gap:10px;margin-top:10px}
+
+.modal-btn-whatsapp{
+  flex:1;padding:13px;border-radius:11px;
+  background:#25D366;color:#fff;font-size:14px;font-weight:600;
+  border:none;cursor:pointer;transition:background .12s,transform .1s;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+}
+
+.modal-btn-whatsapp:hover{background:#1ebe5a}
+
+.modal-btn-whatsapp:active{transform:scale(.98)}
+
+.modal-btn-whatsapp svg{width:16px;height:16px;flex-shrink:0}
+
+.modal-btn-outline{
+  flex:1;padding:13px;border-radius:11px;
+  background:var(--bg);color:var(--text);font-size:14px;font-weight:600;
+  border:1.5px solid var(--border-2);cursor:pointer;transition:background .12s,transform .1s;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+}
+
+.modal-btn-outline:hover{background:var(--bg-2)}
+
+.modal-btn-outline:active{transform:scale(.98)}
+
+.modal-btn-outline svg{width:16px;height:16px;stroke:var(--text-2);fill:none;stroke-width:1.8;flex-shrink:0}
+
+.modal-visit-count-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:19px;height:19px;padding:0 5px;border-radius:99px;
+  background:var(--brand-light);color:var(--brand);font-size:10.5px;font-weight:800;
+  margin-left:2px;
+}
+
+
+/* ─── Lightbox (full-image viewer) ─────────────── */
+.lightbox-overlay{
+  position:fixed;inset:0;z-index:400;
+  background:rgba(0,0,0,.92);
+  display:none;align-items:center;justify-content:center;
+  padding:24px;
+}
+
+.lightbox-overlay.open{display:flex}
+
+.lightbox-stage{
+  position:relative;
+  display:inline-flex;align-items:center;justify-content:center;
+  max-width:100%;max-height:100%;
+}
+
+.lightbox-img{
+  max-width:100%;max-height:90vh;
+  object-fit:contain;border-radius:6px;
+  animation:lightboxIn .18s ease;
+  user-select:none;
+  display:block;
+}
+
+.lightbox-close{
+  position:absolute;top:10px;right:10px;z-index:5;
+  width:38px;height:38px;border-radius:50%;
+  background:var(--brand);border:1.5px solid #fff;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:background .15s,transform .15s;
+  box-shadow:0 2px 8px rgba(0,0,0,.35);
+}
+
+.lightbox-close:hover{background:var(--brand-hover);transform:scale(1.06)}
+
+.lightbox-close svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.4}
+
+.lightbox-prev,.lightbox-next{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:5;
+  width:44px;height:44px;border-radius:50%;
+  background:var(--brand);border:1.5px solid #fff;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:background .15s,transform .15s;
+  box-shadow:0 2px 8px rgba(0,0,0,.35);
+}
+
+.lightbox-prev{left:10px}
+
+.lightbox-next{right:10px}
+
+.lightbox-prev:hover,.lightbox-next:hover{background:var(--brand-hover);transform:translateY(-50%) scale(1.07)}
+
+.lightbox-prev svg,.lightbox-next svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.4}
+
+.lightbox-counter{
+  position:absolute;bottom:18px;left:50%;transform:translateX(-50%);z-index:5;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+  color:#fff;font-size:12.5px;font-weight:600;padding:6px 16px;border-radius:99px;
+}
+
+.lightbox-thumbs{
+  position:absolute;bottom:54px;left:50%;transform:translateX(-50%);z-index:5;
+  display:flex;gap:7px;max-width:90vw;overflow-x:auto;padding:2px;
+  overscroll-behavior-x:contain;
+}
+
+.lightbox-thumb{
+  width:48px;height:36px;border-radius:5px;flex-shrink:0;
+  background-size:cover;background-position:center;cursor:pointer;
+  border:2px solid transparent;opacity:.55;transition:opacity .15s,border-color .15s;
+}
+
+.lightbox-thumb.active{opacity:1;border-color:#fff}
+
+@media (max-width:600px){
+  .lightbox-prev,.lightbox-next{width:40px;height:40px}
+  .lightbox-thumbs{display:none}
+}
+
+.shortlist-panel.open{transform:translateX(0)}
+
+.panel-backdrop.open{display:block}
+
+.menu-panel.open{transform:translateX(0)}
+
+
+/* ─── Add Listing Modal ────────────────────────── */
+.add-modal-overlay{
+  position:fixed;inset:0;z-index:350;
+  background:rgba(0,0,0,.45);
+  display:none;align-items:center;justify-content:center;
+  padding:16px;
+}
+
+.add-modal-overlay.open{display:flex}
+
+.add-modal{
+  background:var(--bg);border-radius:var(--radius-xl);
+  width:100%;max-width:520px;max-height:92vh;
+  overflow-y:auto;padding:24px;
+  animation:modalIn .2s ease;
+  position:relative;
+}
+
+.add-modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+
+.add-modal-title{font-size:17px;font-weight:700}
+
+.form-group{margin-bottom:14px}
+
+.form-label{font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:5px;display:block}
+
+.form-input{
+  width:100%;border:1.5px solid var(--border-2);border-radius:9px;
+  padding:9px 12px;font-size:13px;color:var(--text);background:var(--bg);
+  outline:none;transition:border-color .12s;
+}
+
+.form-input:focus{border-color:var(--brand)}
+
+.add-modal.view-mode input:disabled,
+.add-modal.view-mode select:disabled,
+.add-modal.view-mode textarea:disabled{
+  opacity:1;background:var(--bg-2,#f4f4f6);color:var(--brand);cursor:default;-webkit-text-fill-color:var(--brand);font-weight:600;
+}
+
+.add-modal.view-mode input:disabled::placeholder,
+.add-modal.view-mode textarea:disabled::placeholder{
+  color:var(--text-3);-webkit-text-fill-color:var(--text-3);font-weight:400;
+}
+
+.add-modal.view-mode #videoUrlGroup input{display:none}
+
+.video-embed-wrap{
+  position:relative;width:100%;aspect-ratio:16/9;
+  border-radius:12px;overflow:hidden;background:#000;margin-bottom:10px;
+}
+
+.video-embed-wrap iframe,
+.video-embed-wrap video{
+  position:absolute;inset:0;width:100%;height:100%;border:0;display:block;
+}
+
+.video-view-row{display:none;align-items:center;gap:8px}
+
+.video-view-link{
+  display:flex;align-items:center;gap:8px;flex:1;min-width:0;
+  color:var(--brand);font-weight:600;font-size:13px;
+  padding:9px 12px;border:1.5px solid var(--border-2);border-radius:9px;
+  overflow:hidden;
+}
+
+.video-view-link svg{width:16px;height:16px;flex-shrink:0;stroke:var(--brand);fill:none;stroke-width:1.8}
+
+.video-view-link span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.video-view-link:hover{background:var(--brand-light)}
+
+.video-view-copy{
+  width:38px;height:38px;flex-shrink:0;border-radius:9px;
+  border:1.5px solid var(--border-2);display:flex;align-items:center;justify-content:center;
+  color:var(--text-2);transition:border-color .12s,color .12s;
+}
+
+.video-view-copy:hover{border-color:var(--brand);color:var(--brand)}
+
+.video-view-copy svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8}
+
+.add-modal.view-mode .lm-section{cursor:default}
+
+.add-modal.view-mode .lm-section.view-hidden{display:none}
+
+.add-modal.view-mode .img-thumb-del{display:none}
+
+.add-modal.view-mode .form-submit{display:none}
+
+/* View-mode swaps the "add images" controls (paste-URL box + tiny thumb
+   grid) for a real photo gallery — see #detailGallerySlot. */
+.add-modal.view-mode #imgAddControls,
+.add-modal.view-mode #fImgGrid,
+.add-modal.view-mode #fImgHint{display:none}
+
+.add-modal.view-mode #imgFormGroup{display:none}
+
+.add-modal.view-mode #mediaSectionHeader{display:none}
+
+.detail-gallery{display:none}
+
+.add-modal.view-mode .detail-gallery{display:block;margin-bottom:16px}
+
+.detail-gallery .prop-img{
+  aspect-ratio:16/9;border-radius:14px;
+  border:1px solid var(--border);
+  background:var(--bg-3);
+}
+
+/* Cards elsewhere use object-fit:cover (fill + crop) on .img-slide, but in
+   the property-view gallery we want the whole photo visible with nothing
+   cut off, even if that means letterboxing rather than filling the box. */
+.detail-gallery .img-slide{object-fit:contain;background:var(--bg-3)}
+
+.form-select{
+  width:100%;border:1.5px solid var(--border-2);border-radius:9px;
+  padding:9px 12px;font-size:13px;color:var(--text);background:var(--bg);
+  outline:none;transition:border-color .12s;appearance:none;
+  cursor:pointer;
+}
+
+.form-select:focus{border-color:var(--brand)}
+
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+@media (max-width:640px){
+  /* Post Property and View Property share this form — keep every row to
+     exactly 2 fields per line on mobile, even where a row is set to 3+
+     columns inline for desktop. */
+  .form-row{grid-template-columns:1fr 1fr!important;gap:10px}
+  .form-row [style*="grid-column"]{grid-column:1/-1!important}
+}
+
+.lm-section{font-size:10px;font-weight:800;color:var(--text-2);text-transform:uppercase;letter-spacing:.8px;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border-2)}
+
+.form-submit{
+  width:100%;padding:12px;border-radius:10px;
+  background:var(--brand);color:#fff;font-size:14px;font-weight:700;
+  border:none;cursor:pointer;margin-top:8px;transition:background .12s;
+}
+
+.profile-save-row .form-submit{margin-top:0}
+
+.faq-item.open .faq-q svg{transform:rotate(180deg)}
+
+.faq-item.open .faq-a{max-height:300px;padding-bottom:13px}
+
+.form-submit:hover{background:var(--brand-hover)}
+
+
+/* ─── Amenities multi-select dropdown ──────────── */
+.am-dd{position:relative}
+
+.am-dd-trigger{
+  width:100%;border:1.5px solid var(--border-2);border-radius:9px;
+  padding:9px 12px;font-size:13px;color:var(--text-2);background:var(--bg);
+  outline:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  transition:border-color .12s;
+}
+
+.am-dd-trigger:hover,.am-dd.open .am-dd-trigger{border-color:var(--brand)}
+
+.am-dd-trigger svg{width:15px;height:15px;stroke:var(--text-3);fill:none;stroke-width:2;flex-shrink:0;transition:transform .15s}
+
+.am-dd.open .am-dd-trigger svg{transform:rotate(180deg)}
+
+.am-dd-count{
+  background:var(--brand);color:#fff;font-size:11px;font-weight:700;
+  border-radius:99px;padding:1px 7px;min-width:18px;text-align:center;margin-right:4px;
+}
+
+.am-dd-panel{
+  display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:20;
+  background:var(--bg);border:1.5px solid var(--border-2);border-radius:var(--radius);
+  box-shadow:var(--shadow-md);padding:10px;max-height:280px;overflow-y:auto;
+}
+
+.am-dd.open .am-dd-panel{display:block}
+
+.am-dd-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0}
+
+.am-dd-actions{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 2px 8px;margin-bottom:6px;
+  border-bottom:1px solid var(--border);
+}
+
+.am-dd-action-btn{
+  font-size:11.5px;font-weight:600;color:var(--brand);
+  background:none;border:none;cursor:pointer;padding:2px 4px;border-radius:5px;
+  transition:background .1s;
+}
+
+.am-dd-action-btn:hover{background:var(--brand-light)}
+
+.am-dd-action-clear{color:var(--text-3)}
+
+.am-dd-action-clear:hover{background:var(--bg-3);color:var(--text-2)}
+
+.am-dd-item{
+  display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:0;
+  font-size:12.5px;font-weight:500;color:var(--text);cursor:pointer;transition:background .1s;
+  border-bottom:1px solid var(--border);
+}
+
+.am-dd-item:last-child{border-bottom:none}
+
+.am-dd-item:hover{background:var(--bg-2)}
+
+.am-dd-item input{width:15px;height:15px;flex-shrink:0;cursor:pointer;accent-color:var(--brand)}
+
+.am-dd-item input[type="number"]{width:72px;flex:0 0 72px;padding:5px 8px;font-size:12.5px;border-radius:7px;border:1px solid var(--border-2);accent-color:initial;text-align:center;margin-left:auto}
+
+.form-label-hint{
+  display:inline-block;font-size:11px;color:var(--text-3);cursor:help;
+  vertical-align:middle;margin-left:3px;line-height:1;
+  position:relative;
+}
+
+.form-label-hint:hover::after{
+  content:attr(title);
+  position:fixed;transform:translateX(-50%);margin-top:4px;
+  background:var(--text);color:#fff;
+  font-size:11px;font-weight:400;line-height:1.45;
+  padding:6px 10px;border-radius:7px;
+  max-width:220px;white-space:normal;text-align:left;
+  z-index:500;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.18);
+}
+
+.am-selected-box{
+  border:1.5px dashed var(--border-2);border-radius:var(--radius);
+  padding:10px 12px;margin-top:8px;min-height:42px;
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;align-items:start;
+}
+
+.am-tag{
+  display:flex;align-items:center;justify-content:space-between;gap:6px;
+  background:var(--brand-light);color:var(--brand);
+  border:1px solid #f5c0c8;border-radius:99px;
+  padding:5px 6px 5px 12px;font-size:12px;font-weight:600;white-space:nowrap;
+  overflow:hidden;
+}
+
+.am-tag-remove{
+  width:17px;height:17px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(224,58,82,.14);color:var(--brand);cursor:pointer;
+  font-size:11px;line-height:1;border:none;
+}
+
+.am-tag-remove:hover{background:var(--brand);color:#fff}
+
+.am-selected-empty{font-size:12px;color:var(--text-3);grid-column:1/-1}
+
+
+/* ─── Image upload row & thumbnails ────────────── */
+.img-row{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+
+.img-url-input{
+  width:100%;padding:9px 12px;border:1.5px solid var(--border-2);border-radius:9px;
+  font-size:12.5px;font-family:inherit;color:var(--text);background:var(--bg);
+  outline:none;resize:vertical;transition:border-color .12s;
+}
+
+.img-url-input:focus{border-color:var(--brand)}
+
+.img-btns{display:flex;gap:8px;flex-wrap:wrap}
+
+.img-btn-add{
+  padding:9px 16px;border-radius:9px;border:none;
+  background:var(--brand);color:#fff;font-size:12px;font-weight:700;
+  font-family:inherit;cursor:pointer;transition:background .15s;
+}
+
+.img-btn-add:hover{background:var(--brand-hover)}
+
+.img-btn-sec{
+  padding:9px 14px;border-radius:9px;border:1.5px solid var(--border-2);
+  background:var(--bg);color:var(--text-2);font-size:12px;font-weight:600;
+  font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:6px;
+  transition:border-color .12s;
+}
+
+.img-btn-sec:hover{border-color:var(--text)}
+
+.img-thumb-grid{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px}
+
+.img-thumb{position:relative;width:72px;height:72px;border-radius:9px;overflow:hidden;border:1.5px solid var(--border-2);flex-shrink:0}
+
+.img-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+
+.img-thumb-del{
+  position:absolute;top:3px;right:3px;width:18px;height:18px;
+  background:rgba(0,0,0,.65);color:#fff;border:none;border-radius:50%;
+  font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;
+}
+
+.img-hint{font-size:11px;color:var(--text-3);margin-bottom:6px}
+
+
+/* ─── Card image slider ─────────────────────────── */
+.img-slides{position:absolute;inset:0;width:100%;height:100%;overflow:hidden}
+
+.img-slide{display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background-color:var(--bg-3);pointer-events:none;vertical-align:top}
+
+.img-slide.active{display:block}
+
+.img-slide.active{pointer-events:auto}
+
+.img-slide.active{opacity:1}
+
+.slide-arrows{
+  position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 8px;box-sizing:border-box;
+  z-index:3;opacity:0;transition:opacity .15s;pointer-events:none;
+}
+
+.prop-img:hover .slide-arrows{opacity:1}
+
+.slide-prev,.slide-next{
+  width:26px;height:26px;border-radius:50%;
+  background:rgba(255,255,255,.85);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:auto;flex-shrink:0;
+}
+
+.slide-prev svg,.slide-next svg{width:14px;height:14px;stroke:var(--text);fill:none;stroke-width:2.5}
+
+.slide-dots{
+  position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+  display:flex;gap:4px;z-index:3;
+}
+
+.slide-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:rgba(255,255,255,.55);border:none;cursor:pointer;padding:0;
+  transition:background .15s;
+}
+
+.slide-dot.active{background:#fff}
+
+#welcomeModal.open{opacity:1;pointer-events:all}
+
+#welcomeModal.open .welcome-box{transform:scale(1);opacity:1}
+
+#imgZoomOverlay.open{opacity:1;pointer-events:all}
+
+#imgZoomOverlay.open img{transform:scale(1)}
 </style>
 </head>
 <body>
@@ -1041,12 +1627,14 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
               <th>Owner Number</th>
               <th>Location</th>
               <th>Listed On</th>
+              <th>Verified</th>
+              <th>Promoted</th>
               <th>Remarks</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td colspan="9" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
+            <tr><td colspan="11" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
           </tbody>
         </table>
       </div>
@@ -1124,22 +1712,462 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
   </main>
 </div>
 
-<!-- ══ PROPERTY DETAIL MODAL ══ -->
-<div class="prop-modal-wrap" id="adminPropModal" onclick="if(event.target===this)closeAdminPropModal()">
-  <div class="prop-modal">
-    <div class="prop-modal-close-row">
-      <button class="prop-modal-close-btn" onclick="closeAdminPropModal()">✕</button>
+<!-- ══ PROPERTY DETAIL MODAL (ported from index.html's Add-Listing form) ══ -->
+<div class="lightbox-overlay" id="lightboxOverlay" role="dialog" aria-modal="true" aria-label="Image viewer">
+  <div class="lightbox-stage">
+    <img class="lightbox-img" id="lightboxImg" src="" alt="Property photo" />
+    <button class="lightbox-close" onclick="closeLightbox()" aria-label="Close image viewer">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <button class="lightbox-prev" id="lightboxPrev" onclick="lightboxStep(-1)" aria-label="Previous photo">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <button class="lightbox-next" id="lightboxNext" onclick="lightboxStep(1)" aria-label="Next photo">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <div class="lightbox-counter" id="lightboxCounter"></div>
+    <div class="lightbox-thumbs" id="lightboxThumbs"></div>
+  </div>
+</div>
+
+<div class="add-modal-overlay" id="addModal" role="dialog" aria-modal="true" aria-label="Property details" onclick="if(event.target===this)closeAdminPropModal()">
+  <div class="add-modal" id="addModalBox" style="max-width:860px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:92vh">
+    <div class="add-modal-header" style="background:linear-gradient(135deg,var(--brand) 0%,var(--brand-hover) 100%);padding:14px 28px;margin-bottom:0;position:relative;flex-shrink:0">
+      <div>
+        <div class="add-modal-title" style="color:#fff" id="addModalTitleText">List your property</div>
+        <div style="color:rgba(255,255,255,.85);font-size:12px;font-weight:600;margin-top:2px;display:none" id="addModalSubtitleText"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+      <button type="button" id="clearFormBtn" onclick="if(confirm('Clear everything you\'ve filled in for this listing?')) clearAddModalDraft()" style="background:transparent;border:1.5px solid rgba(255,255,255,.4);color:#fff;border-radius:16px;padding:0 12px;height:32px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">Clear form</button>
+      <button class="modal-close" style="position:static;background:rgba(255,255,255,.22);border:1.5px solid rgba(255,255,255,.4);color:#fff;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;transition:background .15s,transform .15s" onmouseover="this.style.background='rgba(255,255,255,.35)';this.style.transform='scale(1.06)'" onmouseout="this.style.background='rgba(255,255,255,.22)';this.style.transform='scale(1)'" onclick="closeAdminPropModal()" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true" stroke="#fff" style="width:18px;height:18px;stroke-width:2.2;stroke:#fff !important"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      </div>
     </div>
-    <div class="prop-modal-body">
-      <div id="adminModalImgSlot"></div>
-      <div class="prop-modal-price" id="adminModalPrice"></div>
-      <div class="prop-modal-title" id="adminModalTitle"></div>
-      <div class="prop-modal-loc" id="adminModalLoc"></div>
-      <div id="adminModalSections"></div>
-      <div id="adminModalNavSlot"></div>
+
+    <div style="overflow-y:auto;padding:20px 28px 28px;flex:1" id="addModalScrollBody">
+
+    <!-- ===== 0. IMPORT EXISTING DATA (file upload or pasted JSON) ===== -->
+    <div class="lm-section" id="importSectionHeader" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between" onclick="toggleImportPanel()">
+      <span>📥 Import property data (optional)</span>
+      <span id="importPanelToggleTxt" style="font-size:12px;color:var(--brand);font-weight:700">Show</span>
+    </div>
+    <div id="importPanelBody" style="display:none;background:var(--bg-2,#f7f7f9);border:1px dashed var(--border-2,#ddd);border-radius:12px;padding:14px;margin-bottom:6px">
+      <div style="font-size:12.5px;color:var(--text-2);margin-bottom:10px">
+        Already have the property details somewhere — a JSON export, a database record, an old listing doc? Upload the file or paste it below and the form fields will be filled in automatically. You can still review and edit everything before submitting.
+      </div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr;align-items:end">
+        <div class="form-group">
+          <label class="form-label">Upload a file (.json / .txt)</label>
+          <input class="form-input" type="file" id="f-importFile" accept=".json,.txt,application/json,text/plain" onchange="handleImportFile(this)" />
+        </div>
+        <div class="form-group">
+          <button type="button" class="form-submit" style="margin:0;height:40px" onclick="applyPastedImportText()">Autofill form from pasted text</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">…or paste JSON / database text here</label>
+        <textarea class="form-input" id="f-importText" rows="6" placeholder='Paste a property JSON object here, e.g. { "basic": {...}, "location": {...}, "owner": {...}, ... }' style="resize:vertical;font-family:monospace;font-size:12px"></textarea>
+      </div>
+      <div id="importStatusMsg" style="font-size:12px;min-height:16px;margin-top:2px"></div>
+    </div>
+
+    <!-- ===== 1. BASIC INFORMATION ===== -->
+    <div class="lm-section">📋 Basic Information</div>
+    <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="form-group">
+        <label class="form-label">For <span style="color:var(--brand)">*</span></label>
+        <select class="form-select" id="f-type" onchange="onFTypeChange(this.value)">
+          <option value="Rent">Rent</option><option value="Lease">Lease</option><option value="PG">PG / Co-living</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Listed By <span style="color:var(--brand)">*</span></label>
+        <select class="form-select" id="f-listedBy">
+          <option>Owner</option><option>Agent</option><option>Builder</option>
+        </select>
+      </div>
+    </div>
+    
+
+    <!-- ===== 2. LOCATION ===== -->
+    <div class="lm-section">📍 Location</div>
+    <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+	  <div class="form-group">
+        <label class="form-label">Area <span style="color:var(--brand)">*</span></label>
+        <input class="form-input" type="text" id="f-location" placeholder="e.g. Koramangala 6th Block" />
+      </div>
+	  
+      <div class="form-group">
+        <label class="form-label">City <span style="color:var(--brand)">*</span></label>
+        <input class="form-input" type="text" id="f-city" value="Bengaluru" />
+      </div>
+      <div class="form-group" id="fullAddressGroup" style="grid-column:span 3">
+        <label class="form-label">Building Live Address <span style="color:var(--brand)">*</span></label>
+        <div style="display:flex;gap:7px;align-items:flex-start">
+          <textarea class="form-input" id="f-fullAddress" rows="2" placeholder="House No., Building Name, Street, Landmark, Pincode" style="flex:1;min-width:0;resize:vertical"></textarea>
+          <button type="button" onclick="fCaptureLocation()"
+            style="flex-shrink:0;padding:9px 12px;border-radius:9px;border:1.5px solid var(--text);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;height:40px;margin-top:1px">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg>
+            <span id="f-locBtnTxt">Live</span>
+          </button>
+        </div>
+        <div id="f-locStatus" style="font-size:11px;color:var(--text-2);min-height:14px;margin-top:2px">Live auto-fills from GPS</div>
+      </div>
+      <div class="form-group" id="latLngGroup">
+        <label class="form-label">Latitude / Longitude (Auto)</label>
+        <input class="form-input" type="text" id="f-latLngDisplay" placeholder="12.9716° N, 77.5946° E or auto-detected" readonly />
+      </div>
+      <div class="form-group" id="mapsLinkGroup">
+        <label class="form-label">Google Maps link</label>
+        <input class="form-input" type="url" id="f-googleMapsLink" placeholder="https://maps.app.goo.gl/..." />
+      </div>
+    </div>
+    <input type="hidden" id="f-latitude"/><input type="hidden" id="f-longitude"/>
+
+    <!-- ===== 3. OWNER DETAILS ===== -->
+    <div id="ownerDetailsSection">
+    <div class="lm-section">👤 Owner Details</div>
+    <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+	<div class="form-group">
+      <label class="form-label">Property Name</label>
+      <input class="form-input" type="text" id="f-title" placeholder="e.g. Prestige Shantiniketan, Whitefield" />
+    </div>
+      <div class="form-group"><label class="form-label">Owner Name <span style="color:var(--brand)">*</span></label><input class="form-input" type="text" id="f-ownerName" placeholder="e.g. Ramesh Kumar"/></div>
+      <div class="form-group"><label class="form-label">Phone Number <span style="color:var(--brand)">*</span></label><input class="form-input" type="tel" id="f-ownerPhone" placeholder="e.g. 9876543210"/></div>
+      <div class="form-group"><label class="form-label">Email Id</label><input class="form-input" type="email" id="f-ownerEmail" placeholder="owner@example.com"/></div>
+      <div class="form-group"><label class="form-label">Alternate Number</label><input class="form-input" type="tel" id="f-ownerAltPhone" placeholder="optional"/></div>
+      <div class="form-group">
+        <label class="form-label">Contact Time</label>
+        <select class="form-select" id="f-contactTime"><option>Any</option><option>Morning</option><option>Afternoon</option><option>Evening</option></select>
+      </div>
+      <div class="form-group" style="grid-column:span 3">
+        <label class="form-label">Owner Address</label>
+        <textarea class="form-input" id="f-ownerAddress" rows="2" placeholder="Street, city, pincode" style="resize:vertical"></textarea>
+      </div>
+      <!-- Agent-only fields — shown when Listed by = Agent -->
+      <div id="f-agentFields" style="grid-column:span 3">
+        <div class="form-row" style="grid-template-columns:1fr 1fr;margin-top:4px">
+          <div class="form-group">
+            <label class="form-label">Agent Phone Number</label>
+            <input class="form-input" type="tel" id="f-agentPhone" placeholder="e.g. 9876543210" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Agent Service Area</label>
+            <input class="form-input" type="text" id="f-agentArea" placeholder="e.g. Koramangala, HSR Layout, BTM" />
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <!-- ===== 4. PRICING ===== -->
+    <div id="addPricingSection">
+    <div class="lm-section">💰 Pricing</div>
+    <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="form-group"><label class="form-label" id="f-rentLabel">Monthly Rent (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-rent" placeholder="e.g. 22000" min="0" max="9999999" /></div>
+      <div class="form-group" id="f-depositWrap"><label class="form-label">Security Deposit (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-deposit" placeholder="e.g. 44000" min="0" max="9999999" /></div>
+      <div class="form-group"><label class="form-label">Maintenance (₹/ Month)</label><input class="form-input" type="number" id="f-maintenance" placeholder="e.g. 2000" /></div>
+      <div class="form-group"><label class="form-label">Annual Rent Escalation (%)</label><input class="form-input" type="number" step="0.5" id="f-escalation" placeholder="e.g. 5" /></div>
+      <div class="form-group">
+        <label class="form-label">Electricity Included?</label>
+        <select class="form-select" id="f-electricityIncluded"><option>No</option><option>Yes</option><option>Shared meter</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Water Charges</label>
+        <select class="form-select" id="f-waterCharge"><option>Included</option><option>Separate</option><option>Tanker</option></select>
+      </div>
+	  <div class="form-group">
+        <label class="form-label">Price Negotiable</label>
+        <select class="form-select" id="f-negotiable"><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select>
+      </div>
+    </div>
+    </div>
+
+    <!-- ===== 5. PROPERTY DETAILS ===== -->
+    <div id="addPropDetailsSection">
+    <div class="lm-section">🏢 Property Details</div>
+    <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="form-group">
+        <label class="form-label">Property Type</label>
+        <select class="form-select" id="f-propertyType">
+          <option>Apartment</option><option>Independent</option><option>Villa</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">BHK</label>
+        <select class="form-select" id="f-bhk">
+          <option>1 RK</option><option>1 BHK</option><option>2 BHK</option><option>3 BHK</option><option>4 BHK</option>
+        </select>
+      </div>
+	  
+	  <div class="form-group">
+        <label class="form-label">Bike Parking</label>
+        <select class="form-select" id="f-bikepark">
+          <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
+        </select>
+      </div>
+	  
+	  <div class="form-group">
+        <label class="form-label">Car Parking</label>
+        <select class="form-select" id="f-carpark">
+          <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
+        </select>
+      </div>
+	  
+      <div class="form-group">
+        <label class="form-label">Floor</label>
+        <input class="form-input" type="text" id="f-floor" placeholder="e.g. 3rd Floor" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Area (SQFT)</label>
+        <input class="form-input" type="number" id="f-area" placeholder="e.g. 1250" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Bathrooms</label>
+        <select class="form-select" id="f-baths"><option>1</option><option>2</option><option>3</option><option>4+</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Furnishing</label>
+        <select class="form-select" id="f-furnishing">
+          <option>Furnished</option><option>Semi-Furnished</option><option>Unfurnished</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Facing</label>
+        <select class="form-select" id="f-facing">
+          <option>North</option><option>South</option><option>East</option><option>West</option><option>North-East</option><option>North-West</option><option>South-East</option><option>South-West</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Age Of Building</label>
+        <select class="form-select" id="f-age">
+          <option value="">Select</option><option>New (0–2 yrs)</option><option>3–5 yrs</option><option>6–10 yrs</option><option>10+ yrs</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tenant Preference</label>
+        <select class="form-select" id="f-tenant"><option>Any</option><option>Family</option><option>Bachelor</option><option>Female only</option></select>
+      </div>
+      <div class="form-group" id="f-availWrap">
+        <label class="form-label">Available From</label>
+        <input class="form-input" type="date" id="f-avail" />
+      </div>
+    </div>
+    </div>
+
+    <!-- ===== 6. AMENITIES ===== -->
+    <div id="addAmenitiesSection">
+    <div class="lm-section">✨ Amenities</div>
+    <div class="form-group">
+      <label class="form-label">Select Amenities</label>
+      <div class="am-dd" id="amDropdown">
+        <button type="button" class="am-dd-trigger" onclick="toggleAmDropdown(event)">
+          <span><span class="am-dd-count" id="amDdCount" style="display:none">0</span><span id="amDdLabel">Choose Amenities…</span></span>
+          <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="am-dd-panel" id="amDdPanel">
+          <div class="am-dd-actions">
+            <button type="button" class="am-dd-action-btn" onclick="amSelectAll()">Select all</button>
+            <button type="button" class="am-dd-action-btn am-dd-action-clear" onclick="amClearAll()">Clear all</button>
+          </div>
+          <div class="am-dd-grid">
+            <label class="am-dd-item"><input type="checkbox" id="am-wifi" onchange="onAmCheck()"/> Wi-Fi <input type="number" id="f-wifiUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-ac" onchange="onAmCheck()"/> AC <input type="number" id="f-acUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-washing" onchange="onAmCheck()"/> Washing machine <input type="number" id="f-washingUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-fridge" onchange="onAmCheck()"/> Refrigerator <input type="number" id="f-fridgeUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-microwave" onchange="onAmCheck()"/> Microwave <input type="number" id="f-microwaveUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-geyser" onchange="onAmCheck()"/> Geyser <input type="number" id="f-geyserUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-wardrobe" onchange="onAmCheck()"/> Cupboards <input type="number" id="f-wardrobeUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-bed" onchange="onAmCheck()"/> Bed &amp; mattress <input type="number" id="f-bedUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-sofa" onchange="onAmCheck()"/> Sofa <input type="number" id="f-sofaUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-lift" onchange="onAmCheck()"/> Elevator <input type="number" id="f-liftUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-balcony" onchange="onAmCheck()"/> Balcony <input type="number" id="f-balconyUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-gym" onchange="onAmCheck()"/> Gym <input type="number" id="f-gymUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-security" onchange="onAmCheck()"/> CCTV <input type="number" id="f-securityUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-power" onchange="onAmCheck()"/> Power backup <input type="number" id="f-powerUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-garden" onchange="onAmCheck()"/> Garden <input type="number" id="f-gardenUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-laundry" onchange="onAmCheck()"/> Laundry <input type="number" id="f-laundryUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-meals" onchange="onAmCheck()"/> Meals included <input type="number" id="f-mealsUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-pipedgas" onchange="onAmCheck()"/> Piped gas connection <input type="number" id="f-pipedgasUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-ro" onchange="onAmCheck()"/> RO water filter <input type="number" id="f-roUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Selected Amenities</label>
+      <div class="am-selected-box" id="amSelectedBox">
+        <span class="am-selected-empty" id="amSelectedEmpty">No amenities selected yet</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Additional Amenities (comma-separated)</label>
+      <input class="form-input" type="text" id="f-amenities-extra" placeholder="Intercom, study table, servant quarter, etc."/>
+    </div>
+    </div>
+
+    <!-- ===== 7. STATUS-SPECIFIC SECTIONS ===== -->
+
+    <!-- FOR RENT extras -->
+    <div id="addRentSection">
+      <div class="lm-section">📅 Availability &amp; Terms</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-noticePeriod"><option value="">Select</option><option>15 Days</option><option>1 Month</option><option>2 Months</option><option>3 Months</option></select></div>
+        <div class="form-group"><label class="form-label">Lease duration</label><select class="form-select" id="f-leaseDuration"><option value="">Any</option><option>6 Months</option><option>11 Months</option><option>12 Months</option><option>24+ Months</option></select></div>
+      </div>
+      <div class="lm-section">⚖️ Tenant Rules</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Pets allowed</label><select class="form-select" id="f-petsAllowed"><option value="">Select</option><option>Yes</option><option>No</option><option>Restricted</option></select></div>
+        <div class="form-group"><label class="form-label">Non-veg allowed</label><select class="form-select" id="f-nonVegAllowed"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
+        <div class="form-group"><label class="form-label">Piped gas</label><select class="form-select" id="f-pipedGas"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
+      </div>
+    </div>
+
+    <!-- LEASE extras -->
+    <div id="addLeaseSection" style="display:none">
+      <div class="lm-section">💼 Lease Pricing</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Lease amount (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-leaseAmount" placeholder="e.g. 2500000" /></div>
+        <div class="form-group"><label class="form-label">Monthly rent (₹) <span class="form-label-hint" title="Optional recurring rent on top of the lease corpus — most lease agreements set this to ₹0">ⓘ</span></label><input class="form-input" type="number" id="f-leaseMonthlyRent" placeholder="e.g. 0 (leave blank if none)" /></div>
+        <div class="form-group"><label class="form-label">Maintenance (₹/ Month)</label><input class="form-input" type="number" id="f-leaseMaintenance" placeholder="e.g. 2000" /></div>
+      </div>
+      <div class="lm-section">📋 Lease Terms</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Lease duration</label><select class="form-select" id="f-leaseDurationVal"><option value="">Select</option><option>1 Year</option><option>2 Years</option><option>3 Years</option><option>5 Years</option><option>9 Years</option><option>15 Years</option><option>30 Years</option></select></div>
+        <div class="form-group"><label class="form-label">Lease type</label><select class="form-select" id="f-leaseType"><option value="">Select</option><option>Residential</option><option>Commercial</option><option>Industrial</option><option>Mixed Use</option></select></div>
+        <div class="form-group"><label class="form-label">Lock-in period</label><select class="form-select" id="f-lockInPeriod"><option value="">None</option><option>1 Year</option><option>2 Years</option><option>3 Years</option></select></div>
+        <div class="form-group"><label class="form-label">Available from</label><input class="form-input" type="date" id="f-leaseAvailableFrom" /></div>
+        <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-leaseNoticePeriod"><option value="">Select</option><option>1 Month</option><option>2 Months</option><option>3 Months</option></select></div>
+        <div class="form-group"><label class="form-label">Rent escalation</label><select class="form-select" id="f-rentEscalation"><option value="">None</option><option>5% per year</option><option>10% per year</option><option>15% per year</option></select></div>
+      </div>
+      <div class="lm-section">⚖️ House Rules</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Pets allowed</label><select class="form-select" id="f-leasePets"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
+        <div class="form-group"><label class="form-label">Non-veg allowed</label><select class="form-select" id="f-leaseNonVeg"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
+      </div>
+    </div>
+
+    <!-- ===== 7b. PG-ONLY FIELDS ===== -->
+    <div id="addPgSection" style="display:none">
+      <div class="lm-section">🛏 Room Details</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group">
+          <label class="form-label">Gender preference</label>
+          <select class="form-select" id="f-pgGender"><option>Any</option><option>Boys</option><option>Girls</option><option>Co-ed</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Room type</label>
+          <select class="form-select" id="f-pgRoomType"><option>Single</option><option>Double Sharing</option><option>Triple Sharing</option><option>Dormitory</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Attached bathroom</label><select class="form-select" id="f-pgBathroom"><option>Yes</option><option>Shared</option></select></div>
+        <div class="form-group"><label class="form-label">Occupancy available</label><input class="form-input" type="number" id="f-pgOccupancy" placeholder="e.g. 2" /></div>
+        <div class="form-group"><label class="form-label">Total beds</label><input class="form-input" type="number" id="f-pgTotalBeds" placeholder="e.g. 20" /></div>
+        <div class="form-group"><label class="form-label">Meals cost (₹/ Month)</label><input class="form-input" type="number" id="f-pgMealsCost" placeholder="e.g. 3000" /></div>
+        <div class="form-group"><label class="form-label">Room furnishing</label><select class="form-select" id="f-pgRoomFurnishing"><option value="">Select</option><option>Fully Furnished</option><option>Semi-Furnished</option><option>Unfurnished</option></select></div>
+        <div class="form-group"><label class="form-label">Kitchen access</label><select class="form-select" id="f-pgKitchenAccess"><option value="">Select</option><option>Shared Kitchen</option><option>No Kitchen</option><option>Private Kitchen</option></select></div>
+      </div>
+      <div class="lm-section">📅 Availability &amp; Terms</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Available from</label><input class="form-input" type="date" id="f-pgAvailableFrom" /></div>
+        <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-pgNotice"><option value="">Select</option><option>15 Days</option><option>1 Month</option><option>2 Months</option><option>3 Months</option></select></div>
+      </div>
+      <div class="lm-section">🍽 Meals &amp; Rules</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group">
+          <label class="form-label">Meals Included</label>
+          <select class="form-select" id="f-pgMeals"><option value="">Select</option><option>No Meals</option><option>Breakfast Only</option><option>Dinner Only</option><option>Lunch + Dinner</option><option>All 3 Meals</option><option>On Request</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Food type</label><select class="form-select" id="f-pgFoodType"><option value="">Select</option><option>Veg Only</option><option>Veg + Non-veg</option></select></div>
+        <div class="form-group"><label class="form-label">Gate closing time</label><select class="form-select" id="f-pgGateTime"><option value="">No Curfew</option><option>9 PM</option><option>10 PM</option><option>11 PM</option></select></div>
+        <div class="form-group"><label class="form-label">Visitor policy</label><select class="form-select" id="f-pgVisitorPolicy"><option value="">Select</option><option>Allowed</option><option>Lobby Only</option><option>Not Allowed</option></select></div>
+        <div class="form-group"><label class="form-label">Non-veg allowed</label><select class="form-select" id="f-pgNonVeg"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
+        <div class="form-group"><label class="form-label">Pets allowed</label><select class="form-select" id="f-pgPets"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
+      </div>
+    </div>
+
+    <!-- ===== 8. MEDIA & DESCRIPTION ===== -->
+    <!-- Anchor marks this section's normal spot in the posting flow — in
+         property VIEW mode, #mediaSection gets moved to the top of the
+         scroll body instead (see openDetail/closeDetail) so photos/video
+         are the first thing a visitor sees, not the last. -->
+    <div id="mediaSectionAnchor"></div>
+    <div id="mediaSection">
+    <div class="lm-section" id="mediaSectionHeader">📸 Media &amp; Description</div>
+    <!-- View-mode only: a real photo gallery (same slider used on the property
+         card) instead of the raw "paste a URL" add-listing controls. Hidden
+         while actually creating/editing a listing — see openDetail(). -->
+    <div class="detail-gallery" id="detailGallerySlot"></div>
+    <div class="form-group" id="videoUrlGroup">
+      <label class="form-label">Video Tour URL</label>
+      <input class="form-input" type="url" id="f-videoUrl" placeholder="https://youtube.com/..." />
+      <!-- View-mode only: an actual playable embed when the URL is a
+           recognizable YouTube/Vimeo link or direct video file — see
+           buildVideoDisplay()/openDetail(). Falls back to just the link
+           row below when the URL can't be embedded. -->
+      <div class="video-embed-wrap" id="videoEmbedWrap" style="display:none"></div>
+      <!-- View-mode only: disabled inputs can't be clicked or selected for
+           copying, so show the link as a real anchor plus a copy button
+           instead — see openDetail(). -->
+      <div class="video-view-row" id="videoViewRow" style="display:none">
+        <a href="#" id="videoViewLink" target="_blank" rel="noopener noreferrer" class="video-view-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+          <span id="videoViewLinkText"></span>
+        </a>
+        <button type="button" class="video-view-copy" onclick="copyVideoLink()" aria-label="Copy video link" title="Copy link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="form-group" id="imgFormGroup">
+      <label class="form-label">Property Images</label>
+      <div class="img-row" id="imgAddControls">
+        <textarea class="img-url-input" id="f-imgUrlInput" rows="2" placeholder="Paste image URLs, one per line or comma-separated…"></textarea>
+        <div class="img-btns">
+          <button type="button" class="img-btn-add" onclick="addImageFromUrl()">+ Add URL(s)</button>
+          <button type="button" class="img-btn-sec" onclick="document.getElementById('f-imgFileInput').click()">📁 Upload</button>
+          <button type="button" class="img-btn-sec" onclick="document.getElementById('f-imgCameraInput').click()">📷 Camera</button>
+        </div>
+        <input type="file" id="f-imgFileInput" accept="image/*" multiple style="display:none" onchange="addImagesFromFiles(this)"/>
+        <input type="file" id="f-imgCameraInput" accept="image/*" capture="environment" style="display:none" onchange="addImagesFromFiles(this)"/>
+      </div>
+      <div class="img-thumb-grid" id="fImgGrid"></div>
+      <div class="img-hint" id="fImgHint">No images added yet.</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea class="form-input" id="f-desc" rows="3" placeholder="Describe the property, nearby landmarks, special features…" style="resize:vertical"></textarea>
+    </div>
+    </div>
+
+    <button class="form-submit" onclick="submitListing()">Submit Listing</button>
+
+    <!-- View-mode only: quick actions carried over from the old detail view (save,
+         contact, schedule a visit, WhatsApp). Sits inline at the end of the
+         scrolling body — not pinned — so it scrolls up with the rest of the
+         content instead of staying stuck to the bottom. Hidden while actually
+         listing a property. -->
+    <div class="view-actions-footer" id="viewActionsFooter" style="display:none">
+      <div class="modal-actions" id="viewActionsRow">
+        <button class="modal-btn-secondary" id="modal-save-btn">♡ Save</button>
+        <button class="modal-btn-primary" onclick="showToast('Contact shown to verified users')">Contact</button>
+      </div>
+      <div class="modal-actions-row" id="viewActionsRow2" style="margin-top:10px">
+        <button class="modal-btn-outline" id="viewScheduleBtn">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Schedule Visit
+          <span class="modal-visit-count-badge" id="modal-visit-count" style="display:none">0</span>
+        </button>
+        <button class="modal-btn-whatsapp" id="viewWhatsappBtn">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg>
+          WhatsApp
+        </button>
+      </div>
+    </div>
     </div>
   </div>
 </div>
+
 
 <script>
 let dataTable, propTable, apptTable;
@@ -1347,6 +2375,37 @@ window.deleteProperty = async function(id){
   } else {
     alert(data.message || 'Delete failed');
   }
+};
+
+/* ── VERIFIED / PROMOTED TOGGLES ── */
+function propFlagToggleHtml(id, field, checked){
+  const cls = field === 'promoted' ? 'mini-toggle promoted-toggle' : 'mini-toggle';
+  return `<div class="mini-toggle-wrap">
+    <label class="${cls}" onclick="event.stopPropagation()">
+      <input type="checkbox" ${checked ? 'checked' : ''} onchange="togglePropFlag(this,'${id}','${field}')">
+      <span class="track"></span>
+      <span class="knob"></span>
+    </label>
+  </div>`;
+}
+
+window.togglePropFlag = async function(input, id, field){
+  const label = input.closest('.mini-toggle');
+  const desired = input.checked;
+  label.classList.add('is-saving');
+  try {
+    const res = await fetch(`${BASE}/api/properties/${id}/${field}`, {
+      method: 'PATCH',
+      headers: authHeaders({'Content-Type':'application/json'}),
+      body: JSON.stringify({ [field]: desired })
+    });
+    if(!res.ok) throw new Error('Save failed');
+    if(propTable) propTable.ajax.reload(null, false);
+  } catch(e){
+    input.checked = !desired;
+    alert(`Could not update ${field}. Please try again.`);
+  }
+  label.classList.remove('is-saving');
 };
 
 /* ── REMARKS ── */
@@ -1566,9 +2625,9 @@ $(document).ready(function(){
       }
     },
     columns:[
-      /* 0 – User ID (_id) */
-      { data:'_id', render:(d,t)=>{
-          const id = String(d||'—');
+      /* 0 – User ID (human-readable User.userId, e.g. USER-000001) */
+      { data:'userId', render:(d,t)=>{
+          const id = d ? String(d) : '—';
           if(t==='display') return `<span style="font-family:monospace;font-size:0.76rem;color:var(--ink3)">${id}</span>`;
           return id;
       }},
@@ -1647,7 +2706,7 @@ $(document).ready(function(){
         exportOptions:{ columns:[0,1,2,3,4,5,6,7,8,9],
           format:{ body:function(data,row,col){
             var rd=dataTable.row(row).data(); if(!rd) return data;
-            if(col===0) return String(rd._id||'—');
+            if(col===0) return rd.userId ? String(rd.userId) : '—';
             if(col===1) return rd.name||'—';
             if(col===2){ var ph=plainPhone(rd); return ph?'=HYPERLINK("tel:'+ph+'","'+ph+'")':'—'; }
             if(col===3){ var em=plainEmail(rd); return em?'=HYPERLINK("mailto:'+em+'","'+em+'")':'—'; }
@@ -1666,7 +2725,7 @@ $(document).ready(function(){
         exportOptions:{ columns:[0,1,2,3,4,5,6,7,8,9],
           format:{ body:function(data,row,col){
             var rd=dataTable.row(row).data(); if(!rd) return data;
-            if(col===0) return String(rd._id||'—');
+            if(col===0) return rd.userId ? String(rd.userId) : '—';
             if(col===1) return rd.name||'—';
             if(col===2) return rd.mobile||'—';
             if(col===3) return rd.email||'—';
@@ -1753,12 +2812,22 @@ $(document).ready(function(){
       { data:'loc', render:(d)=> escapeHtml(d||'—') },
       /* 6 – Listed On */
       { data:'createdAt', render:(d,t)=> t==='display' ? formatDateTime(d) : (d||'—') },
-      /* 7 – Remarks */
+      /* 7 – Verified */
+      { data:'verified', orderable:false, render:(d,t,row)=>{
+          if(t!=='display') return d ? 'Yes' : 'No';
+          return propFlagToggleHtml(row._id, 'verified', !!d);
+      }},
+      /* 8 – Promoted */
+      { data:'promoted', orderable:false, render:(d,t,row)=>{
+          if(t!=='display') return d ? 'Yes' : 'No';
+          return propFlagToggleHtml(row._id, 'promoted', !!d);
+      }},
+      /* 9 – Remarks */
       { data:'remarks', orderable:false, render:(d,t,row)=>{
           if(t==='display') return remarkCellHtml(row._id, d, 'property');
           return d||'';
       }},
-      /* 8 – Action */
+      /* 10 – Action */
       { data:null, orderable:false, render:(d,t,row)=>{
           _adminPropCache[row._id] = row;
           return `<div style="display:inline-flex;gap:6px;flex-wrap:wrap;justify-content:center">
@@ -1782,7 +2851,7 @@ $(document).ready(function(){
     buttons:[
       {
         extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV', title:'KR Properties',
-        exportOptions:{ columns:[0,1,2,3,4,5,6,7],
+        exportOptions:{ columns:[0,1,2,3,4,5,6,7,8,9],
           format:{ body:function(data,row,col){
             var rd=propTable.row(row).data(); if(!rd) return data;
             if(col===0) return (rd.title||'').trim()||'—';
@@ -1792,14 +2861,16 @@ $(document).ready(function(){
             if(col===4){ var ph=rd.ownerNumber||''; return ph?'=HYPERLINK("tel:'+ph+'","'+ph+'")':'—'; }
             if(col===5) return rd.loc||'—';
             if(col===6) return formatKRDateTime(rd.createdAt);
-            if(col===7) return flattenRemarks(rd.remarks);
+            if(col===7) return rd.verified ? 'Yes' : 'No';
+            if(col===8) return rd.promoted ? 'Yes' : 'No';
+            if(col===9) return flattenRemarks(rd.remarks);
             return data;
           }}
         }
       },
       {
         extend:'excel', text:'<i class="fas fa-file-excel"></i> Excel', title:'KR Properties',
-        exportOptions:{ columns:[0,1,2,3,4,5,6,7],
+        exportOptions:{ columns:[0,1,2,3,4,5,6,7,8,9],
           format:{ body:function(data,row,col){
             var rd=propTable.row(row).data(); if(!rd) return data;
             if(col===0) return (rd.title||'').trim()||'—';
@@ -1809,7 +2880,9 @@ $(document).ready(function(){
             if(col===4) return rd.ownerNumber||'—';
             if(col===5) return rd.loc||'—';
             if(col===6) return formatKRDateTime(rd.createdAt);
-            if(col===7) return flattenRemarks(rd.remarks);
+            if(col===7) return rd.verified ? 'Yes' : 'No';
+            if(col===8) return rd.promoted ? 'Yes' : 'No';
+            if(col===9) return flattenRemarks(rd.remarks);
             return data;
           }}
         }
@@ -1817,7 +2890,7 @@ $(document).ready(function(){
       {
         extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
         orientation:'landscape', pageSize:'A4', title:'KR Real-Estate — Properties',
-        exportOptions:{columns:[0,1,2,3,4,5,6,7]},
+        exportOptions:{columns:[0,1,2,3,4,5,6,7,8,9]},
         customize:function(doc){
           doc.styles.tableHeader={fillColor:'#0E1016',color:'white',bold:true,fontSize:9,alignment:'center'};
           doc.defaultStyle={fontSize:8,color:'#0E1016'};
@@ -1833,7 +2906,7 @@ $(document).ready(function(){
       },
       {
         extend:'print', text:'<i class="fas fa-print"></i> Print', title:'KR Properties',
-        exportOptions:{columns:[0,1,2,3,4,5,6,7]},
+        exportOptions:{columns:[0,1,2,3,4,5,6,7,8,9]},
         customize:function(win){
           $(win.document.head).append('<style>table td a{color:#12A375;text-decoration:underline}</style>');
           $(win.document.body).find('table tbody tr').each(function(){
@@ -1862,21 +2935,21 @@ $(document).ready(function(){
       }
     },
     columns:[
-      /* 0 – Appointment ID */
-      { data:'_id', render:(d,t)=>{
+      /* 0 – Appointment ID (human-readable VisitRequest.visitId, e.g. VISIT-000001) */
+      { data:'visitId', render:(d,t)=>{
           const val = d ? String(d) : '—';
           if(t!=='display') return val;
           return `<span style="font-family:monospace;font-size:0.72rem;color:var(--ink2);letter-spacing:0.02em;cursor:pointer;border-bottom:1px dashed var(--ink3)" title="Click to copy" onclick="navigator.clipboard.writeText('${val}').then(()=>this.title='Copied!')">${val}</span>`;
       }},
-      /* 1 – Property ID */
+      /* 1 – Property ID (human-readable Property.propertyId code, e.g. AAA123) */
       { data:'propertyId', render:(d,t)=>{
           const val = d ? String(d) : '—';
           if(t!=='display') return val;
           if(!d) return '<span style="color:var(--ink3);font-size:0.78rem">—</span>';
           return `<span style="font-family:monospace;font-size:0.72rem;color:var(--ink2);letter-spacing:0.02em;cursor:pointer;border-bottom:1px dashed var(--ink3)" title="Click to copy" onclick="navigator.clipboard.writeText('${String(d)}').then(()=>this.title='Copied!')">${String(d)}</span>`;
       }},
-      /* 2 – User ID */
-      { data:'userId', render:(d,t)=>{
+      /* 2 – User ID (human-readable VisitRequest.userReadableId, e.g. USER-000001) */
+      { data:'userReadableId', render:(d,t)=>{
           const val = d ? String(d) : '—';
           if(t!=='display') return val;
           if(!d) return '<span style="color:var(--ink3);font-size:0.78rem">Guest</span>';
@@ -1961,9 +3034,9 @@ $(document).ready(function(){
         exportOptions:{ columns:[0,1,2,3,4,5,6,7,8,9,10,11],
           format:{ body:function(data,row,col){
             var rd=apptTable.row(row).data(); if(!rd) return data;
-            if(col===0) return rd._id ? String(rd._id) : '—';
+            if(col===0) return rd.visitId ? String(rd.visitId) : '—';
             if(col===1) return rd.propertyId ? String(rd.propertyId) : '—';
-            if(col===2) return rd.userId   ? String(rd.userId)   : 'Guest';
+            if(col===2) return rd.userReadableId ? String(rd.userReadableId) : 'Guest';
             if(col===3) return rd.purpose||'—';
             if(col===4) return rd.name||'—';
             if(col===5) return [rd.propertyName,rd.propertyArea].filter(Boolean).join(', ')||'—';
@@ -1982,9 +3055,9 @@ $(document).ready(function(){
         exportOptions:{ columns:[0,1,2,3,4,5,6,7,8,9,10,11],
           format:{ body:function(data,row,col){
             var rd=apptTable.row(row).data(); if(!rd) return data;
-            if(col===0) return rd._id ? String(rd._id) : '—';
+            if(col===0) return rd.visitId ? String(rd.visitId) : '—';
             if(col===1) return rd.propertyId ? String(rd.propertyId) : '—';
-            if(col===2) return rd.userId   ? String(rd.userId)   : 'Guest';
+            if(col===2) return rd.userReadableId ? String(rd.userReadableId) : 'Guest';
             if(col===3) return rd.purpose||'—';
             if(col===4) return rd.name||'—';
             if(col===5) return [rd.propertyName,rd.propertyArea].filter(Boolean).join(', ')||'—';
@@ -2017,319 +3090,708 @@ $(document).ready(function(){
 
 });
 
-/* ════════════════════════════════════
-   ADMIN PROPERTY DETAIL MODAL
-════════════════════════════════════ */
 const _adminPropCache = {};
 const _customerCache = {};
 
-/* Fields to show in the modal — ordered, with human labels */
-const MODAL_FIELD_GROUPS = [
-  {
-    label: 'Basic Info',
-    fields: [
-      ['title',      'Building / Project Name'],
-      ['status',     'Listing Type'],
-      ['price',      'Price (₹)'],
-      ['displayPrice','Display Price'],
-      ['city',       'City'],
-      ['loc',        'Area / Location'],
-      ['facing',     'Facing'],
-      ['age',        'Property Age'],
-    ]
-  },
-  {
-    label: 'Property Details',
-    fields: [
-      ['bhk',        'BHK'],
-      ['area',       'Area (sqft)'],
-      ['floor',      'Floor'],
-      ['floorLevel', 'Floor Level'],
-      ['furnishing', 'Furnishing'],
-      ['parking',    'Parking'],
-      ['carparking', 'Car Parking'],
-      ['bikeparking','Bike Parking'],
-      ['toilet',     'Bathrooms'],
-      ['toilet_type','Toilet Type'],
-      ['deposit',    'Security Deposit (₹)'],
-    ]
-  },
-  {
-    label: 'PG Details',
-    fields: [
-      ['pgGender',   'Gender Preference'],
-      ['pgRoomType', 'Room Type'],
-      ['pgMeals',    'Meals Included'],
-      ['pgOccupancy','Occupancy Available'],
-      ['pgNotice',   'Notice Period'],
-      ['pgBathroom', 'Attached Bathroom'],
-    ]
-  },
-  {
-    label: 'Owner Info',
-    fields: [
-      ['ownerName',  'Owner Name'],
-      ['ownerNumber','Owner Number'],
-    ]
-  },
-  {
-    label: 'Admin',
-    fields: [
-      ['remarks',    'Remarks'],
-      ['createdAt',  'Listed On'],
-    ]
-  }
-];
-
-const STATUS_COLOR_MAP = {
-  'For Sale' : 'background:#EAF1FE;color:#2F6FE4',
-  'For Rent' : 'background:#E3F8EF;color:#0F9D6B',
-  'New Launch': 'background:#EAF0FE;color:#1E3A9E',
-  'Sold'     : 'background:#E4E2D9;color:#8A8FA3',
-  'Lease'    : 'background:#FBF0DC;color:#C67D0F',
-  'PG'       : 'background:#FAE8F1;color:#C23B82',
-};
-
+/* Generic HTML-escape helper used across the admin panel (property filter
+   dropdowns, the customer detail modal, etc.) — kept from the previous
+   property-modal code since other features still depend on it. */
 function _adminModalEsc(str){
   if(str==null) return '—';
   return String(str).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
-/* Turn a camelCase / lowercase key into a human label, e.g. "promotedPriority" -> "Promoted Priority" */
-function _humanizeKey(k){
-  const spaced = String(k).replace(/([a-z])([A-Z])/g,'$1 $2').replace(/[_-]+/g,' ');
-  return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+
+/* ════════════════════════════════════════════════════════════════
+   PROPERTY VIEW MODAL — ported from index.html's Add-Listing form +
+   openDetail()/closeDetail(), locked read-only for the admin panel.
+   Everything below (through closeAdminPropModal) is index.html code,
+   adapted only where noted, so it can run against admin's own
+   _adminPropCache instead of the customer-side PROPERTIES array.
+════════════════════════════════════════════════════════════════ */
+function esc(v) {
+  if (v === null || v === undefined) return '';
+  return String(v).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+// Escapes text but preserves line breaks as <br> (for free-text fields like description).
+function escMultiline(v) {
+  return esc(v).replace(/\n/g, '<br>');
+}
+// Only allows http/https URLs through to an href/src; anything else (javascript:, data:, etc.) is dropped.
+function safeUrl(v) {
+  if (!v) return '';
+  const s = String(v).trim();
+  try {
+    const u = new URL(s, window.location.origin);
+    if (u.protocol === 'http:' || u.protocol === 'https:') return u.href;
+  } catch {}
+  return '';
 }
 
-/* Recursively flatten p.full (the complete raw DB record sent by the server)
-   into [label, value] pairs, so every field — including ones not covered by
-   MODAL_FIELD_GROUPS or added to the schema later — shows up in the modal. */
-function _flattenFull(obj, parentLabel){
-  let rows = [];
-  if(!obj || typeof obj !== 'object') return rows;
-  Object.entries(obj).forEach(([k, v]) => {
-    if(v == null || v === '') return;
-    const label = parentLabel ? `${parentLabel} – ${_humanizeKey(k)}` : _humanizeKey(k);
-    if(Array.isArray(v)){
-      if(!v.length) return;
-      if(typeof v[0] === 'object' && v[0] !== null){
-        rows.push([label, v.map(o => JSON.stringify(o)).join('; ')]);
-      } else {
-        rows.push([label, v.join(', ')]);
+function getVideoEmbedInfo(url) {
+  let u;
+  try { u = new URL(url); } catch { return null; }
+  const host = u.hostname.replace(/^www\./, '');
+  if (host === 'youtu.be') {
+    const id = u.pathname.slice(1).split('/')[0];
+    if (id) return { type: 'youtube', id };
+  }
+  if (host === 'youtube.com' || host === 'm.youtube.com') {
+    if (u.pathname === '/watch' && u.searchParams.get('v')) {
+      return { type: 'youtube', id: u.searchParams.get('v') };
+    }
+    const m = u.pathname.match(/^\/(embed|shorts)\/([^/?]+)/);
+    if (m) return { type: 'youtube', id: m[2] };
+  }
+  if (host === 'vimeo.com' || host === 'player.vimeo.com') {
+    const m = u.pathname.match(/(\d+)/);
+    if (m) return { type: 'vimeo', id: m[1] };
+  }
+  if (/\.(mp4|webm|ogg|mov)$/i.test(u.pathname)) {
+    return { type: 'file', src: url };
+  }
+  return null;
+}
+
+// Builds a playable embed for the property-view video field; returns '' when
+// the URL isn't a recognizable embeddable format (caller keeps the link row).
+function buildVideoEmbed(url) {
+  const info = getVideoEmbedInfo(url);
+  if (!info) return '';
+  if (info.type === 'youtube') {
+    return `<iframe src="https://www.youtube.com/embed/${info.id}" title="Video tour" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+  }
+  if (info.type === 'vimeo') {
+    return `<iframe src="https://player.vimeo.com/video/${info.id}" title="Video tour" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+  }
+  if (info.type === 'file') {
+    return `<video controls preload="metadata" src="${safeUrl(info.src)}"></video>`;
+  }
+  return '';
+}
+
+function pTypeLabel(p) {
+  const status = p.basic?.status;
+  if (status === 'For Rent') return 'Rent';
+  if (status === 'Lease') return 'Lease';
+  if (status === 'PG') return 'PG';
+  return status || 'Rent';
+}
+
+function buildImgSlider(p, fg, uidSuffix) {
+  const imgs = (p.media?.images && p.media.images.length) ? p.media.images : [];
+  if (imgs.length === 0) {
+    return `<div class="prop-img-placeholder"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="${fg}" opacity=".3"/><polyline points="9 22 9 12 15 12 15 22" stroke="${fg}" opacity=".3"/></svg></div>`;
+  }
+  const uid = 'sl' + p.id + (uidSuffix || '');
+  const slides = imgs.map((url, i) =>
+    `<img class="img-slide${i===0?' active':''}" src="${safeUrl(url)}" loading="lazy" alt="" onclick="event.stopPropagation();openLightbox('${p.id}',${i})" />`
+  ).join('');
+  const dots = imgs.length > 1 ? `<div class="slide-dots">${imgs.map((_,i)=>
+    `<button class="slide-dot${i===0?' active':''}" onclick="event.stopPropagation();slideGo('${uid}',${i})"></button>`
+  ).join('')}</div>` : '';
+  const arrows = imgs.length > 1 ? `
+    <div class="slide-arrows">
+      <button class="slide-prev" onclick="event.stopPropagation();slideStep('${uid}',-1)">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button class="slide-next" onclick="event.stopPropagation();slideStep('${uid}',1)">
+        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>` : '';
+  return `<div class="img-slides" id="${uid}">${slides}${arrows}${dots}</div>`;
+}
+
+function slideGo(uid, idx) {
+  const c = document.getElementById(uid);
+  if (!c) return;
+  c.querySelectorAll('.img-slide').forEach((s,i) => s.classList.toggle('active', i===idx));
+  c.querySelectorAll('.slide-dot').forEach((d,i) => d.classList.toggle('active', i===idx));
+}
+
+function slideStep(uid, dir) {
+  const c = document.getElementById(uid);
+  if (!c) return;
+  const slides = c.querySelectorAll('.img-slide');
+  let cur = [...slides].findIndex(s => s.classList.contains('active'));
+  const next = (cur + dir + slides.length) % slides.length;
+  slideGo(uid, next);
+}
+
+/* Swipe-to-change-photo for every .img-slides gallery (property cards,
+   shortlist panel cards, and the property-view gallery all share this
+   markup, so one delegated listener covers all of them). A horizontal
+   drag past a small threshold steps the slide; anything more vertical
+   than horizontal is left alone so the page can still scroll normally. */
+(function(){
+  let sx = 0, sy = 0, active = null;
+  document.addEventListener('touchstart', function(e){
+    const el = e.target.closest('.img-slides');
+    if (!el || !el.id) { active = null; return; }
+    if (el.querySelectorAll('.img-slide').length < 2) { active = null; return; }
+    active = el;
+    sx = e.touches[0].clientX;
+    sy = e.touches[0].clientY;
+  }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    if (!active) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - sx;
+    const dy = t.clientY - sy;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+      slideStep(active.id, dx < 0 ? 1 : -1);
+    }
+    active = null;
+  }, {passive:true});
+})();
+
+let lightboxImgs = [];
+let lightboxIdx = 0;
+
+function openLightbox(propId, idx) {
+  const row = _adminPropCache[propId];
+  const p = row && row.full;
+  if (!p || !p.media?.images || !p.media.images.length) return;
+  lightboxImgs = p.media.images;
+  lightboxIdx = idx || 0;
+  renderLightbox();
+  document.getElementById('lightboxOverlay').classList.add('open');
+}
+
+function closeLightbox() {
+  document.getElementById('lightboxOverlay').classList.remove('open');
+}
+
+function lightboxStep(dir) {
+  if (!lightboxImgs.length) return;
+  lightboxIdx = (lightboxIdx + dir + lightboxImgs.length) % lightboxImgs.length;
+  renderLightbox();
+}
+
+function lightboxGo(idx) {
+  lightboxIdx = idx;
+  renderLightbox();
+}
+
+function renderLightbox() {
+  if (!lightboxImgs.length) return;
+  document.getElementById('lightboxImg').src = lightboxImgs[lightboxIdx];
+  document.getElementById('lightboxCounter').textContent = (lightboxIdx + 1) + ' / ' + lightboxImgs.length;
+  const multi = lightboxImgs.length > 1;
+  document.getElementById('lightboxPrev').style.display = multi ? 'flex' : 'none';
+  document.getElementById('lightboxNext').style.display = multi ? 'flex' : 'none';
+  document.getElementById('lightboxThumbs').innerHTML = multi
+    ? lightboxImgs.map((url, i) => `<div class="lightbox-thumb${i===lightboxIdx?' active':''}" style="background-image:url('${safeUrl(url)}')" onclick="lightboxGo(${i})"></div>`).join('')
+    : '';
+}
+
+/* Swipe-to-change-photo inside the fullscreen lightbox — separate from the
+   card sliders since the lightbox swaps a single <img> src rather than
+   toggling .img-slide elements. */
+(function(){
+  let lsx = 0, lsy = 0, lactive = false;
+  const stage = document.querySelector('.lightbox-stage');
+  if (stage) {
+    stage.addEventListener('touchstart', function(e){
+      if (lightboxImgs.length < 2) { lactive = false; return; }
+      lactive = true;
+      lsx = e.touches[0].clientX;
+      lsy = e.touches[0].clientY;
+    }, {passive:true});
+    stage.addEventListener('touchend', function(e){
+      if (!lactive) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - lsx;
+      const dy = t.clientY - lsy;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+        lightboxStep(dx < 0 ? 1 : -1);
       }
-    } else if(typeof v === 'object'){
-      rows = rows.concat(_flattenFull(v, label));
-    } else if(typeof v === 'boolean'){
-      rows.push([label, v ? 'Yes' : 'No']);
-    } else {
-      rows.push([label, String(v)]);
-    }
-  });
-  return rows;
-}
-
-/* ── Gallery ── */
-let _adminGalIdx = 0, _adminGalTotal = 0;
-
-function _adminStepGal(dir){
-  _adminGalIdx = (_adminGalIdx + dir + _adminGalTotal) % _adminGalTotal;
-  _adminSlideGal(_adminGalIdx);
-}
-function _adminSlideGal(idx){
-  _adminGalIdx = idx;
-  const track = document.getElementById('adminGalTrack');
-  const counter = document.getElementById('adminGalCounter');
-  if(track) track.style.transform = `translateX(-${idx*100}%)`;
-  if(counter) counter.textContent = `${idx+1} / ${_adminGalTotal}`;
-  document.querySelectorAll('#adminModalImgSlot .gallery-dot')
-    .forEach((d,i) => d.classList.toggle('active', i===idx));
-}
-
-/* ── Touch / swipe ── */
-let _galTouchX = null;
-function _galTouchStart(e){ _galTouchX = e.touches[0].clientX; }
-function _galTouchEnd(e){
-  if(_galTouchX === null) return;
-  const dx = e.changedTouches[0].clientX - _galTouchX;
-  _galTouchX = null;
-  if(Math.abs(dx) > 40) _adminStepGal(dx < 0 ? 1 : -1);
-}
-
-function openAdminPropModal(id){
-  const p = _adminPropCache[id];
-  if(!p) return;
-
-  /* ── Gallery ── */
-  const imgs = Array.isArray(p.images) && p.images.length ? p.images : [];
-  const imgSlot = document.getElementById('adminModalImgSlot');
-
-  if(imgs.length > 1){
-    _adminGalIdx = 0; _adminGalTotal = imgs.length;
-    const slides = imgs.map(src =>
-      `<div class="gallery-slide"><img src="${src}" loading="lazy"/></div>`
-    ).join('');
-    const dots = imgs.map((_,i) =>
-      `<button class="gallery-dot${i===0?' active':''}" onclick="_adminSlideGal(${i})"></button>`
-    ).join('');
-    imgSlot.innerHTML = `
-      <div class="prop-modal-gallery"
-        ontouchstart="_galTouchStart(event)" ontouchend="_galTouchEnd(event)">
-        <div class="gallery-track" id="adminGalTrack">${slides}</div>
-        <span class="gallery-counter" id="adminGalCounter">1 / ${imgs.length}</span>
-        <button class="gallery-prev" onclick="_adminStepGal(-1)">&#8249;</button>
-        <button class="gallery-next" onclick="_adminStepGal(1)">&#8250;</button>
-        <div class="gallery-dots">${dots}</div>
-      </div>`;
-  } else if(imgs.length === 1){
-    imgSlot.innerHTML = `
-      <div class="prop-modal-gallery">
-        <div class="gallery-track" id="adminGalTrack">
-          <div class="gallery-slide"><img src="${imgs[0]}" loading="lazy"/></div>
-        </div>
-      </div>`;
-  } else {
-    imgSlot.innerHTML = `<div class="prop-modal-img-wrap">🏠</div>`;
+      lactive = false;
+    }, {passive:true});
   }
+})();
 
-  /* ── Price + status badge ── */
-  const sStyle = STATUS_COLOR_MAP[p.status] || 'background:#EAF0FE;color:#1E3A9E';
-  document.getElementById('adminModalPrice').innerHTML =
-    `${_adminModalEsc(p.displayPrice || p.price || '—')}
-     <span class="prop-modal-status" style="${sStyle}">${_adminModalEsc(p.status||'')}</span>`;
+function resetListingForm() {
+  // Reset all standard inputs/selects/textareas inside the modal
+  document.querySelectorAll('#addModal input:not([type="checkbox"]), #addModal select, #addModal textarea').forEach(el => { el.value = ''; });
+  // Uncheck all checkboxes (amenities + misc toggles)
+  document.querySelectorAll('#addModal input[type="checkbox"]').forEach(el => { el.checked = false; });
+  // Clear amenity unit qty fields and re-render
+  amClearAll();
+  // Reset image previews
+  fImages = [];
+  renderFImages();
+  // Undo any empty-field hiding from a previous property view (see
+  // hideEmptyViewFields) so a fresh "List your property" form always shows
+  // every field.
+  resetFieldVisibility();
+}
 
-  document.getElementById('adminModalTitle').textContent = p.title || 'Untitled';
-  document.getElementById('adminModalLoc').innerHTML =
-    `<i class="fas fa-location-dot" style="color:var(--gold)"></i>&nbsp;${_adminModalEsc(p.loc || p.city || '—')}`;
-
-  /* ── Sections ── */
-  let sectionsHtml = '';
-
-  MODAL_FIELD_GROUPS.forEach(group => {
-    const rows = group.fields
-      .filter(([k]) => {
-        const v = p[k];
-        return v != null && v !== '' && !(Array.isArray(v) && !v.length);
-      })
-      .map(([k, label]) => {
-        let val = p[k];
-        if(k === 'bhk') val = val + ' BHK';
-        if(k === 'createdAt') val = formatKRDateTime(val);
-        if(k === 'remarks'){
-          // Render remarks as numbered list inside the modal card.
-          // Each entry can be a plain string (current schema) or an
-          // object with a .remark property (older shape) — handle both.
-          let entries = [];
-          if(Array.isArray(val) && val.length)
-            entries = val
-              .map(r => (typeof r === 'string' ? r : (r && r.remark) || ''))
-              .map(s => s.trim())
-              .filter(Boolean);
-          else if(typeof val === 'string' && val.trim())
-            entries = [val.trim()];
-          if(!entries.length) return ''; // skip if empty
-          const listHtml = entries.map((t,i)=>`<div style="display:flex;gap:6px;align-items:baseline;margin-bottom:4px"><span style="min-width:18px;background:var(--gold-light);color:var(--gold-dark);border-radius:99px;font-size:0.62rem;font-weight:800;text-align:center;padding:1px 5px;">${i+1}</span><span style="font-size:0.84rem;word-break:break-word">${_adminModalEsc(t)}</span></div>`).join('');
-          return `<div class="prop-modal-detail" style="grid-column:1/-1">
-            <div class="prop-modal-detail-label">${_adminModalEsc(label)}</div>
-            <div style="margin-top:6px">${listHtml}</div>
-          </div>`;
+/* Property view only: hide any field whose value is empty so a viewer only
+   sees the specs that were actually filled in, instead of a form full of
+   blank boxes. Reversed by resetFieldVisibility() whenever the form resets. */
+function resetFieldVisibility() {
+  document.querySelectorAll('#addModalScrollBody .form-group').forEach(group => {
+    group.style.display = '';
+  });
+  document.querySelectorAll('#addModalScrollBody .lm-section').forEach(header => {
+    header.classList.remove('view-hidden');
+  });
+}
+const VIEW_ALWAYS_HIDDEN_GROUPS = ['imgFormGroup']; // admin view keeps full address / lat-lng visible
+const VIEW_SECTION_HEADERS_SKIP = ['importSectionHeader', 'mediaSectionHeader']; // hidden by their own logic already
+function hideEmptyViewFields() {
+  document.querySelectorAll('#addModalScrollBody .form-group').forEach(group => {
+    if (VIEW_ALWAYS_HIDDEN_GROUPS.includes(group.id)) return; // already force-hidden elsewhere
+    const controls = group.querySelectorAll('input, select, textarea');
+    if (!controls.length) return; // not a field group — leave as-is
+    let hasValue = false;
+    controls.forEach(el => {
+      if (el.type === 'checkbox' || el.type === 'radio') {
+        if (el.checked) hasValue = true;
+      } else if (String(el.value || '').trim() !== '') {
+        hasValue = true;
+      }
+    });
+    group.style.display = hasValue ? '' : 'none';
+  });
+  // A form-row with every field hidden shouldn't leave an empty gap.
+  document.querySelectorAll('#addModalScrollBody .form-row').forEach(row => {
+    const groups = [...row.children].filter(c => c.classList && c.classList.contains('form-group'));
+    const anyVisible = groups.some(g => g.style.display !== 'none');
+    row.style.display = (groups.length && !anyVisible) ? 'none' : '';
+  });
+  // A section heading ("Lease Terms", "House Rules", etc.) with every field
+  // underneath it hidden shouldn't sit there with nothing under it — walk
+  // each header's siblings up to the next header and hide it if none of
+  // that section's fields ended up visible.
+  document.querySelectorAll('#addModalScrollBody .lm-section').forEach(header => {
+    if (VIEW_SECTION_HEADERS_SKIP.includes(header.id)) return;
+    let sib = header.nextElementSibling;
+    let anyVisible = false;
+    while (sib && !sib.classList.contains('lm-section')) {
+      if (sib.style.display !== 'none') {
+        const fields = sib.matches('.form-group, .form-row') ? [sib] : [...sib.querySelectorAll('.form-group, .form-row')];
+        if (fields.length) {
+          if (fields.some(f => f.style.display !== 'none')) anyVisible = true;
+        } else {
+          anyVisible = true; // non-field content (e.g. an info box) — leave the header be
         }
-        if(Array.isArray(val)) val = val.join(', ');
-        return `<div class="prop-modal-detail">
-          <div class="prop-modal-detail-label">${_adminModalEsc(label)}</div>
-          <div class="prop-modal-detail-val">${_adminModalEsc(String(val))}</div>
-        </div>`;
-      }).join('');
-
-    if(!rows) return; // skip empty sections
-    sectionsHtml += `<div class="prop-modal-section-label">${group.label}</div>
-      <div class="prop-modal-grid">${rows}</div>`;
+      }
+      sib = sib.nextElementSibling;
+    }
+    header.classList.toggle('view-hidden', !anyVisible);
   });
+}
 
-  /* ── Description ── */
-  if(p.desc && p.desc.trim()){
-    sectionsHtml += `<div class="prop-modal-section-label">Description</div>
-      <div class="prop-modal-desc-box">${_adminModalEsc(p.desc)}</div>`;
+function applyImportedProperty(p) {
+  function sv(id, val) { const el = document.getElementById(id); if (el && val !== undefined && val !== null) el.value = val; }
+  const basic = p.basic || {}, location = p.location || {}, owner = p.owner || {}, price = p.price || {},
+        property = p.property || {}, amenities = p.amenities || {}, terms = p.terms || {}, rules = p.rules || {},
+        media = p.media || {}, pg = p.pg || {};
+
+  // Map schema status back → the dropdown's own value set
+  const reverseStatusMap = { 'For Rent': 'Rent', 'Lease': 'Lease', 'PG': 'PG' };
+  const typeVal = reverseStatusMap[basic.status] || (basic.status || 'Rent');
+  sv('f-type', typeVal);
+  sv('f-listedBy', basic.listedBy);
+  const isPG = typeVal === 'PG', isLease = typeVal === 'Lease';
+
+  // Location
+  sv('f-location', location.area);
+  sv('f-city', location.city || 'Bengaluru');
+  sv('f-fullAddress', location.address);
+  if (location.lat != null) sv('f-latitude', location.lat);
+  if (location.lng != null) sv('f-longitude', location.lng);
+  if (location.lat != null && location.lng != null) {
+    sv('f-latLngDisplay', Number(location.lat).toFixed(6) + '° N, ' + Number(location.lng).toFixed(6) + '° E');
+  }
+  sv('f-googleMapsLink', location.mapLink);
+
+  // Owner
+  sv('f-title', owner.propertyName);
+  sv('f-ownerName', owner.name);
+  sv('f-ownerPhone', owner.phone);
+  sv('f-ownerEmail', owner.email);
+  sv('f-ownerAltPhone', owner.altPhone);
+  sv('f-contactTime', owner.contactTime);
+  sv('f-ownerAddress', owner.address);
+  sv('f-agentPhone', owner.agentPhone);
+  sv('f-agentArea', owner.agentArea);
+
+  // Pricing
+  if (isLease) {
+    sv('f-leaseAmount', price.rent);
+    sv('f-leaseMonthlyRent', price.monthlyRent);
+    sv('f-leaseMaintenance', price.maintenance);
+    sv('f-rentEscalation', price.rentIncrease);
+  } else {
+    sv('f-rent', price.rent);
+    sv('f-deposit', price.deposit);
+    sv('f-maintenance', price.maintenance);
+    if (price.rentIncrease) sv('f-escalation', parseFloat(price.rentIncrease));
+    sv('f-electricityIncluded', price.electricity);
+    sv('f-waterCharge', price.water);
+    sv('f-negotiable', (price.negotiable || '').toLowerCase() === 'yes' ? 'yes' : (price.negotiable || '').toLowerCase() === 'no' ? 'no' : '');
   }
 
-  /* ── Amenities ── */
-  let amenArr = [];
-  if(Array.isArray(p.amenities) && p.amenities.length) amenArr = p.amenities;
-  else if(typeof p.amenities === 'string' && p.amenities.trim())
-    amenArr = p.amenities.split(',').map(s=>s.trim()).filter(Boolean);
+  // Property details
+  if (!isPG) {
+    sv('f-propertyType', property.type);
+    sv('f-bhk', property.bhk);
+    sv('f-area', property.area);
+    sv('f-age', property.age);
+    sv('f-tenant', property.tenant);
+    sv('f-facing', property.facing);
+  }
+  sv('f-bikepark', isPG ? '0' : property.bike);
+  sv('f-carpark', isPG ? '0' : property.car);
+  sv('f-floor', property.floor);
+  sv('f-baths', isPG ? '1' : property.bathrooms);
+  sv('f-furnishing', property.furnish);
+  if (isPG) sv('f-pgAvailableFrom', property.available);
+  else if (isLease) sv('f-leaseAvailableFrom', property.available);
+  else sv('f-avail', property.available);
 
-  if(amenArr.length){
-    sectionsHtml += `<div class="prop-modal-section-label">Amenities</div>
-      <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:0.5rem">
-        ${amenArr.map(a=>`<span class="prop-modal-chip">${_adminModalEsc(a)}</span>`).join('')}
-      </div>`;
+  // Amenities — check the boxes whose label matches, parsing any "Label ×N" qty suffix
+  const selected = Array.isArray(amenities.selected) ? amenities.selected : [];
+  AM_LIST.forEach(([checkId, label, unitId]) => {
+    const match = selected.find(s => s === label || s.indexOf(label + ' ×') === 0 || s.indexOf(label + ' x') === 0);
+    const cb = document.getElementById(checkId);
+    if (cb) cb.checked = !!match;
+    if (match && unitId) {
+      const qtyMatch = match.match(/[×x]\s*(\d+)/i);
+      if (qtyMatch) sv(unitId, qtyMatch[1]);
+    }
+  });
+  sv('f-amenities-extra', amenities.extra);
+  if (typeof onAmCheck === 'function') onAmCheck();
+  if (typeof renderAmSelected === 'function') renderAmSelected();
+
+  // Terms
+  if (isPG) {
+    sv('f-pgNotice', terms.notice);
+  } else if (isLease) {
+    sv('f-leaseNoticePeriod', terms.notice);
+    sv('f-leaseDurationVal', terms.lease);
+    sv('f-leaseType', terms.leaseType);
+    sv('f-lockInPeriod', terms.lockIn);
+  } else {
+    sv('f-noticePeriod', terms.notice);
+    sv('f-leaseDuration', terms.lease);
   }
 
-  /* ── Any extra fields not in our groups ── */
-  const coveredKeys = new Set([
-    '_id','__v','images','color','icon',
-    ...MODAL_FIELD_GROUPS.flatMap(g=>g.fields.map(f=>f[0])),
-    'amenities','desc','latitude','longitude'
-  ]);
-  const extraRows = Object.entries(p)
-    .filter(([k,v]) => !coveredKeys.has(k) && v!=null && v!=='' && !(Array.isArray(v)&&!v.length))
-    .map(([k,v]) => {
-      const label = k.charAt(0).toUpperCase() + k.slice(1).replace(/([A-Z])/g,' $1');
-      const val = Array.isArray(v) ? v.join(', ') : String(v);
-      return `<div class="prop-modal-detail">
-        <div class="prop-modal-detail-label">${_adminModalEsc(label)}</div>
-        <div class="prop-modal-detail-val">${_adminModalEsc(val)}</div>
-      </div>`;
-    }).join('');
-  if(extraRows){
-    sectionsHtml += `<div class="prop-modal-section-label">More Details</div>
-      <div class="prop-modal-grid">${extraRows}</div>`;
+  // Rules
+  if (isPG) {
+    sv('f-pgPets', rules.pets);
+    sv('f-pgNonVeg', rules.nonVeg);
+  } else if (isLease) {
+    sv('f-leasePets', rules.pets);
+    sv('f-leaseNonVeg', rules.nonVeg);
+  } else {
+    sv('f-petsAllowed', rules.pets);
+    sv('f-nonVegAllowed', rules.nonVeg);
+    sv('f-pipedGas', rules.gas);
   }
 
-  /* ── All Fields (complete raw DB record, incl. anything not shown above) ── */
-  if(p.full && typeof p.full === 'object'){
-    const fullRows = _flattenFull(p.full, '');
-    if(fullRows.length){
-      const fullHtml = fullRows.map(([label, val]) => `<div class="prop-modal-detail">
-          <div class="prop-modal-detail-label">${_adminModalEsc(label)}</div>
-          <div class="prop-modal-detail-val">${_adminModalEsc(val)}</div>
-        </div>`).join('');
-      sectionsHtml += `<div class="prop-modal-section-label">All Fields (Full Record)</div>
-        <div class="prop-modal-grid">${fullHtml}</div>`;
+  // Media
+  sv('f-videoUrl', media.video);
+  sv('f-desc', media.desc);
+  if (Array.isArray(media.images) && media.images.length) {
+    fImages = media.images.slice();
+    renderFImages();
+    const looksStale = media.images.some(u => /^\/uploads\/\d+-[0-9a-f]+\.webp$/i.test(u));
+    if (looksStale) setImportStatus('Imported image links look like old/expired uploads — you may need to re-upload photos.', true);
+  }
+
+  // PG-specific block
+  if (isPG) {
+    sv('f-pgGender', pg.gender);
+    sv('f-pgRoomType', pg.room);
+    sv('f-pgMeals', pg.meals);
+    sv('f-pgOccupancy', pg.occupancy);
+    sv('f-pgBathroom', pg.bathroom);
+    sv('f-pgMealsCost', pg.mealCost);
+    sv('f-pgTotalBeds', pg.beds);
+    sv('f-pgRoomFurnishing', pg.furnish);
+    sv('f-pgFoodType', pg.food);
+    sv('f-pgKitchenAccess', pg.kitchen);
+    sv('f-pgVisitorPolicy', pg.visitors);
+    sv('f-pgGateTime', pg.gateTime);
+  }
+
+  onFTypeChange(typeVal);
+}
+
+
+function copyVideoLink() {
+  const url = document.getElementById('videoViewLink').dataset.url || '';
+  if (!url) return;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(() => showToast('Video link copied!'));
+  } else {
+    showToast('Video link: ' + url);
+  }
+}
+
+const AM_LIST = [
+  ['am-wifi',     'Wi-Fi',                  'f-wifiUnits'],
+  ['am-ac',       'AC',                     'f-acUnits'],
+  ['am-washing',  'Washing machine',        'f-washingUnits'],
+  ['am-fridge',   'Refrigerator',           'f-fridgeUnits'],
+  ['am-microwave','Microwave',       'f-microwaveUnits'],
+  ['am-geyser',   'Geyser',  'f-geyserUnits'],
+  ['am-wardrobe', 'Cupboards',   'f-wardrobeUnits'],
+  ['am-bed',      'Bed',         'f-bedUnits'],
+  ['am-sofa',     'Sofa',         'f-sofaUnits'],
+  ['am-lift',     'Elevator',        'f-liftUnits'],
+  ['am-balcony',  'Balcony',      'f-balconyUnits'],
+  ['am-gym',      'Gym',             'f-gymUnits'],
+  ['am-security', 'CCTV',        'f-securityUnits'],
+  ['am-power',    'Power backup',           'f-powerUnits'],
+  ['am-garden',   'Garden',                 'f-gardenUnits'],
+  ['am-laundry',  'Laundry',                'f-laundryUnits'],
+  ['am-meals',    'Meals included',         'f-mealsUnits'],
+  ['am-pipedgas', 'Piped gas connection',   'f-pipedgasUnits'],
+  ['am-ro',       'RO water filter',        'f-roUnits'],
+];
+
+function toggleAmDropdown(e) {
+  e.stopPropagation();
+  document.getElementById('amDropdown').classList.toggle('open');
+}
+
+function amSelectAll() {
+  AM_LIST.forEach(([id]) => { const cb = document.getElementById(id); if (cb) cb.checked = true; });
+  renderAmSelected();
+}
+
+function amClearAll() {
+  AM_LIST.forEach(([id, , unitId]) => {
+    const cb = document.getElementById(id); if (cb) cb.checked = false;
+    if (unitId) { const u = document.getElementById(unitId); if (u) u.value = ''; }
+  });
+  renderAmSelected();
+}
+
+function onAmCheck() {
+  renderAmSelected();
+}
+
+function amRemove(id) {
+  const cb = document.getElementById(id);
+  if (cb) cb.checked = false;
+  const entry = AM_LIST.find(([eid]) => eid === id);
+  if (entry && entry[2]) { const u = document.getElementById(entry[2]); if (u) u.value = ''; }
+  renderAmSelected();
+}
+
+function renderAmSelected() {
+  const box = document.getElementById('amSelectedBox');
+  const empty = document.getElementById('amSelectedEmpty');
+  const ddLabel = document.getElementById('amDdLabel');
+  const ddCount = document.getElementById('amDdCount');
+
+  const selected = AM_LIST.filter(([id]) => document.getElementById(id).checked);
+
+  box.querySelectorAll('.am-tag').forEach(t => t.remove());
+  if (!selected.length) {
+    empty.style.display = '';
+  } else {
+    empty.style.display = 'none';
+    selected.forEach(([id, label, unitId]) => {
+      let text = label;
+      if (unitId) {
+        const u = document.getElementById(unitId);
+        const qty = u ? u.value.trim() : '';
+        text += ' ×' + (qty && parseInt(qty) > 0 ? qty : '1');
+      }
+      const tag = document.createElement('span');
+      tag.className = 'am-tag';
+      tag.innerHTML = '<span>' + text + '</span><button type="button" class="am-tag-remove" aria-label="Remove">✕</button>';
+      tag.querySelector('.am-tag-remove').onclick = function() { amRemove(id); };
+      box.appendChild(tag);
+    });
+  }
+
+  ddLabel.textContent = selected.length ? selected.length + ' selected' : 'Choose amenities…';
+  ddCount.style.display = selected.length ? '' : 'none';
+  ddCount.textContent = selected.length;
+}
+
+
+let fImages = [];
+function renderFImages() {
+  const grid = document.getElementById('fImgGrid');
+  const hint = document.getElementById('fImgHint');
+  grid.innerHTML = fImages.map((src, i) =>
+    '<div class="img-thumb"><img src="' + src + '" alt="img"/><button type="button" class="img-thumb-del" onclick="removeFImage(' + i + ')">✕</button></div>'
+  ).join('');
+  hint.style.display = fImages.length ? 'none' : 'block';
+}
+function removeFImage(i) {
+  fImages.splice(i, 1);
+  renderFImages();
+}
+
+function onFTypeChange(val) {
+  const isPG = val === 'PG';
+  const isLease = val === 'Lease';
+  document.getElementById('addPgSection').style.display = isPG ? '' : 'none';
+  document.getElementById('addRentSection').style.display = (!isPG && !isLease) ? '' : 'none';
+  document.getElementById('addLeaseSection').style.display = isLease ? '' : 'none';
+  document.getElementById('addPropDetailsSection').style.display = isPG ? 'none' : '';
+  document.getElementById('addAmenitiesSection').style.display = isPG ? 'none' : '';
+  document.getElementById('addPricingSection').style.display = isLease ? 'none' : '';
+  document.getElementById('f-depositWrap').style.display = isPG ? 'none' : '';
+  // Lease has its own "Available from" dropdown in addLeaseSection — hide the
+  // Property-Details date field for Lease so there isn't a second, unused one.
+  document.getElementById('f-availWrap').style.display = isLease ? 'none' : '';
+  const lbl = document.getElementById('f-rentLabel');
+  if (lbl) lbl.innerHTML = (val === 'For Rent' || val === 'Rent') ? 'Monthly rent (₹) <span style="color:var(--brand)">*</span>' : isLease ? 'Token rent (₹) <span style="color:var(--brand)">*</span>' : 'Monthly charge (₹) <span style="color:var(--brand)">*</span>';
+}
+
+let propertyViewMode = false;
+
+/* Minimal toast — admin.html has no toast system of its own; copyVideoLink()
+   (ported from index.html) needs one to confirm the copy succeeded. */
+function showToast(msg) {
+  let el = document.getElementById('_adminToast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = '_adminToast';
+    el.style.cssText = 'position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);' +
+      'background:#1a1a1a;color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;' +
+      'z-index:99999;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.25)';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.opacity = '1';
+  el.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(-50%) translateY(20px)';
+  }, 2200);
+}
+
+// Not available in the read-only admin view — the "Live" GPS button is
+// hidden (see openAdminPropModal), this just prevents a stray click from erroring.
+function fCaptureLocation() {}
+
+// Admin view is read-only — nothing to persist, so this is a no-op stand-in
+// for the customer-side draft autosave that applyImportedProperty() calls.
+function queueListingDraftSave() {}
+function setImportStatus() {}
+
+/* ════════════════════════════════════
+   ADMIN PROPERTY DETAIL MODAL
+   (ported from index.html's openDetail()/closeDetail() — reuses the full
+   Add-Listing form, locked read-only, instead of a separate hand-built
+   view. Unlike the customer-facing version: owner details, full address,
+   and lat/lng stay visible here, and there's no save/schedule/WhatsApp
+   footer since admin has no use for those actions.)
+════════════════════════════════════ */
+function openAdminPropModal(id) {
+  const row = _adminPropCache[id];
+  if (!row || !row.full) return;
+  const p = row.full;
+  p.id = id; // buildImgSlider()/openLightbox() key off p.id
+
+  propertyViewMode = true;
+  resetListingForm();
+  applyImportedProperty(p);
+  onFTypeChange(document.getElementById('f-type').value);
+
+  document.querySelectorAll('#addModalBox input, #addModalBox select, #addModalBox textarea')
+    .forEach(el => { el.disabled = true; });
+  // Only the import panel and clear-form button get hidden — admin keeps
+  // owner details, full address, and lat/lng visible (unlike the customer view).
+  ['importSectionHeader', 'importPanelBody', 'clearFormBtn'].forEach(elId => {
+    const el = document.getElementById(elId);
+    if (el) el.style.display = 'none';
+  });
+  // The GPS "Live" button isn't disabled by the loop above (it's a <button>,
+  // not an input) and would otherwise sit there clickable but non-functional.
+  const gpsBtn = document.querySelector('#fullAddressGroup button');
+  if (gpsBtn) gpsBtn.style.display = 'none';
+
+  document.getElementById('addModalTitleText').textContent = row.propertyId || row.title || 'Property details';
+  const sub = document.getElementById('addModalSubtitleText');
+  const subArea = p.location?.area || '';
+  if (sub) { sub.textContent = subArea; sub.style.display = subArea ? '' : 'none'; }
+
+  // Same read-only photo slider used on the customer side, sourced from
+  // the admin's own cached record instead of the customer PROPERTIES array.
+  const gallerySlot = document.getElementById('detailGallerySlot');
+  if (gallerySlot) {
+    const pType = pTypeLabel(p);
+    const colors = {Rent:'#e8f5ee:#1a6640',Lease:'#dde9fa:#1a4680',PG:'#eee8fa:#4a2a9a'};
+    const [gbg, gfg] = (colors[pType]||'#f0f0f0:#333').split(':');
+    gallerySlot.innerHTML = `<div class="prop-img" style="background:${gbg}" data-idx="0">${buildImgSlider(p, gfg, '-admin')}</div>`;
+  }
+
+  const videoUrl = p.media?.video || '';
+  const videoRow = document.getElementById('videoViewRow');
+  const videoEmbedWrap = document.getElementById('videoEmbedWrap');
+  if (videoRow) {
+    const safeVideoUrl = safeUrl(videoUrl);
+    if (safeVideoUrl) {
+      const link = document.getElementById('videoViewLink');
+      link.href = safeVideoUrl;
+      document.getElementById('videoViewLinkText').textContent = videoUrl;
+      link.dataset.url = videoUrl;
+      videoRow.style.display = 'flex';
+      if (videoEmbedWrap) {
+        const embedHtml = buildVideoEmbed(safeVideoUrl);
+        videoEmbedWrap.innerHTML = embedHtml;
+        videoEmbedWrap.style.display = embedHtml ? 'block' : 'none';
+      }
+    } else {
+      videoRow.style.display = 'none';
+      if (videoEmbedWrap) { videoEmbedWrap.innerHTML = ''; videoEmbedWrap.style.display = 'none'; }
     }
   }
 
-  document.getElementById('adminModalSections').innerHTML = sectionsHtml || '<p style="color:var(--ink3);font-size:0.85rem">No details available.</p>';
+  // No save/schedule/WhatsApp actions for admin — this is a read-only record.
+  const footer = document.getElementById('viewActionsFooter');
+  if (footer) footer.style.display = 'none';
 
-  /* ── Navigate ── */
-  const navSlot = document.getElementById('adminModalNavSlot');
-  if(p.latitude && p.longitude){
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${p.latitude},${p.longitude}`;
-    navSlot.innerHTML = `
-      <a href="${url}" target="_blank" rel="noopener"
-        style="display:flex;align-items:center;justify-content:center;gap:8px;
-          width:100%;padding:12px;border-radius:10px;background:#1a73e8;color:#fff;
-          font-size:0.86rem;font-weight:700;text-decoration:none;margin-top:14px;
-          transition:background 0.18s;font-family:inherit;"
-        onmouseover="this.style.background='#1558c0'" onmouseout="this.style.background='#1a73e8'">
-        <i class="fas fa-location-arrow"></i> Navigate on Google Maps
-      </a>`;
-  } else {
-    navSlot.innerHTML = `
-      <div style="margin-top:12px;padding:9px 12px;border-radius:10px;
-        background:var(--surface2);border:1px dashed var(--border2);
-        font-size:0.75rem;color:var(--ink3);text-align:center;">
-        📍 No coordinates saved for this property
-      </div>`;
-  }
-
-  document.getElementById('adminPropModal').classList.add('open');
+  document.getElementById('addModalBox').classList.add('view-mode');
+  document.getElementById('addModal').classList.add('view-mode');
+  document.getElementById('addModal').classList.add('open');
   document.body.style.overflow = 'hidden';
+
+  // Media block moves to the top for viewing, same as the customer side.
+  const mediaSection = document.getElementById('mediaSection');
+  const scrollBody = document.getElementById('addModalScrollBody');
+  if (mediaSection && scrollBody && scrollBody.firstElementChild !== mediaSection) {
+    scrollBody.insertBefore(mediaSection, scrollBody.firstElementChild);
+  }
+  scrollBody.scrollTop = 0;
+  hideEmptyViewFields();
 }
 
-function closeAdminPropModal(){
-  document.getElementById('adminPropModal').classList.remove('open');
+function closeAdminPropModal() {
+  document.getElementById('addModal').classList.remove('open');
+  document.getElementById('addModalBox').classList.remove('view-mode');
+  document.getElementById('addModal').classList.remove('view-mode');
   document.body.style.overflow = '';
+  propertyViewMode = false;
+  const gallerySlot = document.getElementById('detailGallerySlot');
+  if (gallerySlot) gallerySlot.innerHTML = '';
+  const videoRow = document.getElementById('videoViewRow');
+  if (videoRow) videoRow.style.display = 'none';
+  const videoEmbedWrap = document.getElementById('videoEmbedWrap');
+  if (videoEmbedWrap) { videoEmbedWrap.innerHTML = ''; videoEmbedWrap.style.display = 'none'; }
+  // Put the media block back to its normal spot in the form for next time.
+  const mediaSection = document.getElementById('mediaSection');
+  const mediaAnchor = document.getElementById('mediaSectionAnchor');
+  if (mediaSection && mediaAnchor) mediaAnchor.insertAdjacentElement('afterend', mediaSection);
 }
+
 
 /* ════════════════════════════════════
    DYNAMIC PROPERTY FILTERS
@@ -2572,7 +4034,7 @@ function openCustomerModal(id){
     { label:'Registered On', value: c.createdAt
         ? formatKRDateTime(c.createdAt)
         : '—' },
-    { label:'User ID',       value: String(c._id || '—') },
+    { label:'User ID',       value: c.userId || '—' },
   ];
 
   document.getElementById('customerModalDetails').innerHTML =

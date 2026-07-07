@@ -547,6 +547,7 @@ const PropertySchema = new mongoose.Schema({
   propertyId:       { type: String, unique: true, sparse: true, index: true }, // random alphanumeric code, e.g. AAA123
   userId:           { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true }, // owner of this listing, null = posted while logged out
   userReadableId:   { type: String, default: null, index: true }, // human-readable User.userId (e.g. USER-000001), stamped at creation for admin readability — same pattern as UserSession.userId
+  verified:         { type: Boolean, default: false },
   promoted:         { type: Boolean, default: false },
   promotedPriority: { type: Number,  default: 3 },
   views:            { type: Number,  default: 0 },
@@ -782,7 +783,7 @@ app.get('/api/properties', async (req, res) => {
       posted:       doc.createdAt
                       ? formatPostedDateTime(doc.createdAt)
                       : 'Recently',
-      verified:     false,
+      verified:     !!doc.verified,
     }));
 
     res.json({ properties: mapped, total: mapped.length });
@@ -1168,6 +1169,7 @@ app.get('/api/admin/properties', requireAdmin, async (req, res) => {
           basic, location, owner, price, property,
           amenities, terms: doc.terms || {}, rules: doc.rules || {},
           media, pg,
+          verified:         !!doc.verified,
           promoted:         !!doc.promoted,
           promotedPriority: doc.promotedPriority != null ? doc.promotedPriority : null,
           views:            doc.views != null ? doc.views : 0,
@@ -1184,6 +1186,8 @@ app.get('/api/admin/properties', requireAdmin, async (req, res) => {
         facing:       property.facing || '',
         age:          property.age || '',
         visitCount:   doc.visitCount != null ? doc.visitCount : 0,
+        verified:     !!doc.verified,
+        promoted:     !!doc.promoted,
 
         // Property Details
         bhk:          property.bhk || '',
@@ -1263,6 +1267,46 @@ app.delete('/api/properties/:id/remarks/:idx', requireAdmin, async (req, res) =>
   } catch (err) {
     console.error('DELETE /api/properties/:id/remarks/:idx error:', err);
     res.status(500).json({ message: 'Error deleting remark: ' + err.message });
+  }
+});
+
+// ── PATCH /api/properties/:id/verified (admin: toggle verified flag) ──
+app.patch('/api/properties/:id/verified', requireAdmin, async (req, res) => {
+  try {
+    const { verified } = req.body || {};
+    if (typeof verified !== 'boolean') {
+      return res.status(400).json({ message: 'verified must be a boolean' });
+    }
+    const prop = await Property.findByIdAndUpdate(
+      req.params.id,
+      { verified },
+      { new: true }
+    );
+    if (!prop) return res.status(404).json({ message: 'Property not found' });
+    res.json({ message: 'Verified status updated', verified: prop.verified });
+  } catch (err) {
+    console.error('PATCH /api/properties/:id/verified error:', err);
+    res.status(500).json({ message: 'Error updating verified status: ' + err.message });
+  }
+});
+
+// ── PATCH /api/properties/:id/promoted (admin: toggle promoted flag) ──
+app.patch('/api/properties/:id/promoted', requireAdmin, async (req, res) => {
+  try {
+    const { promoted } = req.body || {};
+    if (typeof promoted !== 'boolean') {
+      return res.status(400).json({ message: 'promoted must be a boolean' });
+    }
+    const prop = await Property.findByIdAndUpdate(
+      req.params.id,
+      { promoted },
+      { new: true }
+    );
+    if (!prop) return res.status(404).json({ message: 'Property not found' });
+    res.json({ message: 'Promoted status updated', promoted: prop.promoted });
+  } catch (err) {
+    console.error('PATCH /api/properties/:id/promoted error:', err);
+    res.status(500).json({ message: 'Error updating promoted status: ' + err.message });
   }
 });
 
