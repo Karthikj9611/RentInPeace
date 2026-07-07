@@ -336,13 +336,12 @@ ul{list-style:none}
   display:flex;align-items:center;justify-content:space-between;
   margin-bottom:16px;gap:12px;
 }
-.results-count{font-size:13px;color:var(--text-2);white-space:nowrap}
-.results-count strong{color:var(--text);font-weight:600}
+.results-count{display:none}
 
 /* ── Ad Banner ── */
 .ad-banner{
-  flex:1;min-width:0;overflow:hidden;border-radius:10px;
-  position:relative;height:36px;cursor:pointer;
+  flex:1;min-width:0;overflow:hidden;border-radius:12px;
+  position:relative;height:60px;cursor:pointer;
 }
 .ad-track{
   display:flex;height:100%;
@@ -351,14 +350,14 @@ ul{list-style:none}
 }
 .ad-slide{
   min-width:100%;height:100%;display:flex;align-items:center;
-  padding:0 14px;gap:10px;border-radius:10px;
-  font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;
+  padding:0 22px;gap:14px;border-radius:12px;
+  font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;
 }
-.ad-slide-icon{font-size:15px;flex-shrink:0}
+.ad-slide-icon{font-size:22px;flex-shrink:0}
 .ad-slide-text{overflow:hidden;text-overflow:ellipsis;flex:1}
 .ad-slide-cta{
-  flex-shrink:0;font-size:11px;font-weight:700;
-  padding:3px 10px;border-radius:20px;margin-left:6px;
+  flex-shrink:0;font-size:13px;font-weight:700;
+  padding:6px 16px;border-radius:22px;margin-left:8px;
 }
 /* slide themes */
 .ad-slide-1{background:linear-gradient(90deg,#fff5f7,#ffe8ec);color:#c0294a}
@@ -2224,6 +2223,10 @@ ul{list-style:none}
   .topnav{padding:0 14px;justify-content:space-between}
   .main{padding:14px 0 80px}
   .results-header{padding:0 12px}
+  .ad-banner{height:52px}
+  .ad-slide{padding:0 14px;gap:10px;font-size:12.5px}
+  .ad-slide-icon{font-size:18px}
+  .ad-slide-cta{font-size:11px;padding:5px 12px}
   .prop-grid{grid-template-columns:1fr 1fr;gap:10px;padding:0 12px}
   .view-toggle{display:none}
   .prop-grid.list-view,.prop-grid{grid-template-columns:1fr 1fr;gap:10px}
@@ -2930,22 +2933,22 @@ ul{list-style:none}
     <!-- Ad Banner -->
     <div class="ad-banner" id="adBanner">
       <div class="ad-track" id="adTrack">
-        <div class="ad-slide ad-slide-1">
+        <div class="ad-slide ad-slide-1" onclick="openAddModal()">
           <span class="ad-slide-icon">🏠</span>
           <span class="ad-slide-text">List your property for free — reach 10,000+ tenants in Bangalore</span>
           <span class="ad-slide-cta">List now</span>
         </div>
-        <div class="ad-slide ad-slide-2">
+        <div class="ad-slide ad-slide-2" onclick="window.location.href='tel:9611459960'">
           <span class="ad-slide-icon">✅</span>
           <span class="ad-slide-text">Get verified badge for your listing — builds trust instantly</span>
           <span class="ad-slide-cta">Verify</span>
         </div>
-        <div class="ad-slide ad-slide-3">
+        <div class="ad-slide ad-slide-3" onclick="document.getElementById('premiumServicesSection').scrollIntoView({behavior:'smooth',block:'start'})">
           <span class="ad-slide-icon">📋</span>
           <span class="ad-slide-text">Rental agreement drafting starting ₹499 — legally vetted</span>
           <span class="ad-slide-cta">Know more</span>
         </div>
-        <div class="ad-slide ad-slide-4">
+        <div class="ad-slide ad-slide-4" onclick="window.location.href='tel:9611459960'">
           <span class="ad-slide-icon">⭐</span>
           <span class="ad-slide-text">Promote your listing to the top — 3× more views guaranteed</span>
           <span class="ad-slide-cta">Promote</span>
@@ -2998,7 +3001,7 @@ ul{list-style:none}
 </main>
 
 <!-- ─── Premium Services Section ────────────────── -->
-<section class="services-section" aria-label="Our premium services">
+<section class="services-section" id="premiumServicesSection" aria-label="Our premium services">
   <div class="services-head">
     <div class="services-title">Our <span>Premium Services</span></div>
     <p class="services-sub">From home repairs to digital solutions — one call gets it all done in Bangalore</p>
@@ -8091,7 +8094,7 @@ document.addEventListener('DOMContentLoaded', function() {
     track.style.transform = 'translateX(-' + (cur * 100) + '%)';
     dots.forEach((d, i) => d.classList.toggle('active', i === cur));
   }
-  function start() { timer = setInterval(() => goTo(cur + 1), 3500); }
+  function start() { timer = setInterval(() => goTo(cur + 1), 10000); }
   function stop()  { clearInterval(timer); }
   document.getElementById('adBanner').addEventListener('mouseenter', stop);
   document.getElementById('adBanner').addEventListener('mouseleave', start);
