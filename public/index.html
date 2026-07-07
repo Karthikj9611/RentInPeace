@@ -394,8 +394,8 @@ ul{list-style:none}
 }
 @media(max-width:768px){
   .prop-grid.list-view{
-    grid-template-columns:1fr 1fr;
-    gap:10px;
+    grid-template-columns:1fr;
+    gap:12px;
   }
   .prop-card.list-view{
     flex-direction:column;
@@ -696,10 +696,10 @@ ul{list-style:none}
   outline:2px solid var(--brand);
   outline-offset:2px;
 }
-.prop-quick-actions{justify-content:flex-start}
+.prop-quick-actions{justify-content:space-between}
 .prop-quick-actions .prop-qa-btn.prop-qa-3d,
 .prop-quick-actions .prop-qa-icon.prop-qa-3d{
-  flex:0 0 auto;width:34px;
+  flex:1 1 0;width:auto;
 }
 .prop-meta-row{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:9px}
 .prop-quick-actions{display:flex;align-items:center;gap:6px}
@@ -1447,7 +1447,7 @@ ul{list-style:none}
   .reviews-list{column-count:2}
 }
 @media (max-width:680px){
-  .reviews-section{padding:28px 16px 36px}
+  .reviews-section{padding:28px 16px 100px}
   .reviews-title{font-size:23px}
   .reviews-list{column-count:1}
   .reviews-overview{flex-direction:column}
@@ -2196,7 +2196,7 @@ ul{list-style:none}
   .topnav{padding:0 14px;justify-content:space-between}
   .main{padding:14px 0 80px}
   .results-header{padding:0 12px}
-  .prop-grid{grid-template-columns:1fr 1fr;gap:10px;padding:0 12px}
+  .prop-grid{grid-template-columns:1fr;gap:12px;padding:0 12px}
 
   /* Quick-action row already renders as equal-size icon-only buttons at
      every width (see base .prop-qa-btn/.prop-qa-icon rules) — on mobile we
