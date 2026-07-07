@@ -752,6 +752,21 @@ app.get('/api/properties', async (req, res) => {
     }
 
     const docs = await Property.find(filter)
+      .select(
+        // Internal/admin-only fields — never read by the public frontend
+        '-remarks -userId -userReadableId -promotedPriority -__v ' +
+        // Owner PII that only ever populated hidden form inputs in the read-only
+        // detail view (VIEW_ALWAYS_HIDDEN_GROUPS on the frontend). owner.phone is
+        // excluded too — Call/WhatsApp now read owner.agentPhone only (dynamically),
+        // so the owner's personal number never needs to leave the server.
+        // owner.propertyName excluded too (client-side search no longer matches on
+        // it — search now matches area/BHK only). owner.agentPhone is kept for
+        // Call/WhatsApp.
+        '-owner.name -owner.propertyName -owner.email -owner.phone -owner.altPhone -owner.contactTime -owner.address -owner.agentArea ' +
+        // Location detail that's likewise only used to fill the always-hidden
+        // full-address/lat-lng/Google-Maps-link form groups
+        '-location.address -location.lat -location.lng -location.mapLink'
+      )
       .sort({ promoted: -1, promotedPriority: 1, createdAt: -1 })
       .skip(Number(skip))
       .limit(Number(limit))

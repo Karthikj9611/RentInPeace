@@ -6200,10 +6200,9 @@ function getFiltered() {
     if (currentTab !== 'All' && pType !== currentTab) return false;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      const name = (p.owner?.propertyName || '').toLowerCase();
       const area = (p.location?.area || '').toLowerCase();
       const bhk = (p.property?.bhk || '').toLowerCase();
-      if (!name.includes(q) && !area.includes(q) && !bhk.includes(q)) return false;
+      if (!area.includes(q) && !bhk.includes(q)) return false;
     }
     if (!hasFilters) return true;
 
@@ -6603,7 +6602,7 @@ async function submitScheduleVisit() {
 function openCall(propId) {
   const p = PROPERTIES.find(x => x.id === propId);
   if (!p) return;
-  const rawPhone = (p.owner?.agentPhone || p.owner?.phone || '').replace(/\D/g, '');
+  const rawPhone = (p.owner?.agentPhone || '').replace(/\D/g, '');
   if (!rawPhone) {
     showToast('No agent phone number added for this listing');
     return;
@@ -6618,9 +6617,9 @@ function openCall(propId) {
 function openWhatsApp(propId) {
   const p = PROPERTIES.find(x => x.id === propId);
   if (!p) return;
-  const rawPhone = (p.owner?.phone || '').replace(/\D/g, '');
+  const rawPhone = (p.owner?.agentPhone || '').replace(/\D/g, '');
   if (!rawPhone) {
-    showToast('Owner has not added a WhatsApp number for this listing');
+    showToast('No agent phone number added for this listing');
     return;
   }
   const phone = rawPhone.length === 10 ? '91' + rawPhone : rawPhone;
