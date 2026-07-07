@@ -7640,20 +7640,25 @@ let reviewsTotalCount = 0;
 
 async function initReviewForm() {
   const user = getLoggedInUser();
+  const card = document.getElementById('reviewFormCard');
   const loggedOut = document.getElementById('reviewFormLoggedOut');
   const loggedIn = document.getElementById('reviewFormLoggedIn');
   const done = document.getElementById('reviewFormDone');
-  if (!loggedOut || !loggedIn || !done) return;
+  if (!card || !loggedOut || !loggedIn || !done) return;
 
   if (!user) {
+    card.style.display = '';
     loggedOut.style.display = '';
     loggedIn.style.display = 'none';
     done.style.display = 'none';
     return;
   }
 
+  card.style.display = '';
   loggedOut.style.display = 'none';
-  // Default to showing the form while we check; swap to 'done' if needed.
+  // Default to showing the form while we check; hide the card entirely if
+  // they've already reviewed (the thank-you box is only shown right after
+  // an active submit, not on every subsequent visit).
   loggedIn.style.display = '';
   done.style.display = 'none';
 
@@ -7662,8 +7667,7 @@ async function initReviewForm() {
     if (res.ok) {
       const data = await res.json();
       if (data.hasReviewed) {
-        loggedIn.style.display = 'none';
-        done.style.display = 'flex';
+        card.style.display = 'none';
       }
     }
   } catch (err) {
