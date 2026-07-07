@@ -418,8 +418,17 @@ ul{list-style:none}
   height:100%;
   min-width:0;
 }
+.prop-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:5px;
+  border-radius:16px 16px 0 0;z-index:3;pointer-events:none;
+  background:linear-gradient(90deg,#5a36e8,#7c5cff);
+  box-shadow:0 1px 4px rgba(0,0,0,.18);
+}
+.prop-card.type-rent::before{background:linear-gradient(90deg,#149248,#3ddc78);box-shadow:0 1px 4px rgba(20,146,72,.35)}
+.prop-card.type-lease::before{background:linear-gradient(90deg,#1c53d6,#5a9bff);box-shadow:0 1px 4px rgba(28,83,214,.35)}
+.prop-card.type-pg::before{background:linear-gradient(90deg,#c92768,#ef4f8e);box-shadow:0 1px 4px rgba(201,39,104,.35)}
 .prop-card:hover{
-  box-shadow:0 10px 28px rgba(20,16,17,.10);
+  box-shadow:0 12px 30px rgba(90,54,232,.16),0 4px 10px rgba(20,16,17,.08);
   transform:translateY(-3px);
   border-color:var(--border-2);
   z-index:2;
@@ -454,7 +463,8 @@ ul{list-style:none}
 }
 .prop-badge-promoted{
   height:23px;display:flex;align-items:center;gap:3px;
-  background:rgba(20,16,17,.78);backdrop-filter:blur(6px);color:#fff;
+  background:linear-gradient(135deg,#ffd166,#f2994a);color:#fff;
+  box-shadow:0 2px 6px rgba(242,153,74,.4);
   font-size:10px;font-weight:700;
   padding:0 10px;border-radius:99px;box-sizing:border-box;
   letter-spacing:.03em;text-transform:uppercase;
@@ -468,9 +478,9 @@ ul{list-style:none}
   flex-shrink:0;
   backdrop-filter:blur(6px);
 }
-.badge-rent{background:rgba(223,240,232,.92);color:#1a6640}
-.badge-lease{background:rgba(221,233,250,.92);color:#1a4680}
-.badge-pg{background:rgba(238,232,250,.92);color:#4a2a9a}
+.badge-rent{background:linear-gradient(135deg,#3ddc78,#149248);color:#fff;box-shadow:0 2px 6px rgba(20,146,72,.35)}
+.badge-lease{background:linear-gradient(135deg,#5a9bff,#1c53d6);color:#fff;box-shadow:0 2px 6px rgba(28,83,214,.35)}
+.badge-pg{background:linear-gradient(135deg,#ef4f8e,#c92768);color:#fff;box-shadow:0 2px 6px rgba(201,39,104,.35)}
 .prop-heart{
   width:30px;height:30px;border-radius:50%;
   background:rgba(255,255,255,.92);backdrop-filter:blur(6px);
@@ -485,18 +495,20 @@ ul{list-style:none}
 .prop-body{padding:13px 14px 12px;flex:1;min-width:0;display:flex;flex-direction:column}
 .prop-price-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:3px;margin-bottom:4px}
 .prop-price{
-  font-size:15.5px;font-weight:600;color:var(--brand);
+  font-size:16px;font-weight:800;
+  background:linear-gradient(120deg,#ff4d67,#e03a52 60%,#c72e43);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
   display:flex;align-items:baseline;gap:4px;letter-spacing:-.01em;
   min-width:0;
 }
-.prop-price-unit{font-size:11px;font-weight:500;color:var(--brand)}
+.prop-price-unit{font-size:11px;font-weight:600;color:var(--brand);-webkit-text-fill-color:var(--brand)}
 .prop-deposit-inline{
   display:flex;align-items:center;gap:4px;flex-shrink:0;
   font-size:11px;font-weight:600;color:var(--text-2);white-space:nowrap;
 }
-.prop-deposit-inline svg{width:12px;height:12px;stroke:var(--text-3);fill:none;stroke-width:2;flex-shrink:0}
-.prop-deposit-val{color:var(--brand);font-weight:600}
-.prop-deposit-lbl{color:var(--brand);font-weight:500}
+.prop-deposit-inline svg{width:12px;height:12px;stroke:#5a36e8;fill:none;stroke-width:2;flex-shrink:0}
+.prop-deposit-val{color:#5a36e8;font-weight:700}
+.prop-deposit-lbl{color:#5a36e8;font-weight:500}
 .prop-title{
   font-size:13.5px;font-weight:600;color:var(--text);margin-top:0;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
@@ -505,9 +517,10 @@ ul{list-style:none}
 .prop-title-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .prop-title-buildtype{
   margin-left:auto;flex-shrink:0;
-  font-size:11px;font-weight:600;color:var(--text-2);
-  background:var(--bg-3);border:1px solid var(--border-2);
-  padding:2px 9px;border-radius:99px;
+  font-size:11px;font-weight:700;color:#fff;
+  background:linear-gradient(135deg,#a374f5,#5a36e8);
+  box-shadow:0 2px 8px rgba(90,54,232,.45);
+  padding:3px 11px;border-radius:99px;
   white-space:nowrap;
 }
 .prop-verified-badge{
@@ -522,7 +535,7 @@ ul{list-style:none}
   font-size:12px;color:var(--text-3);margin-top:3px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-.prop-loc svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
+.prop-loc svg{width:13px;height:13px;stroke:#ef4f8e;fill:#ef4f8e;fill-opacity:.12;stroke-width:2;flex-shrink:0}
 .prop-loc span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* ── Modern icon stat row (replaces verbose pill tags) ── */
 .prop-stats{
@@ -532,33 +545,66 @@ ul{list-style:none}
 }
 .prop-stats::-webkit-scrollbar{display:none}
 .prop-stat{
-  display:flex;align-items:center;gap:4px;
-  font-size:11.5px;font-weight:600;color:var(--text-2);
+  display:flex;align-items:center;gap:5px;
+  font-size:11.5px;font-weight:700;color:var(--text-2);
   padding:0 9px 0 0;flex-shrink:0;white-space:nowrap;
 }
-.prop-stat:not(:last-child){border-right:1px solid var(--border);}
+.prop-stat:not(:last-child){margin-right:0}
 .prop-stat svg{width:14px;height:14px;stroke:var(--text-3);fill:none;stroke-width:1.8;flex-shrink:0}
-.prop-stat-icon{font-size:15px;line-height:1;flex-shrink:0;filter:drop-shadow(0 1px 1px rgba(0,0,0,.12))}
+.prop-stat-icon{
+  font-size:12px;line-height:1;flex-shrink:0;
+  width:23px;height:23px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:
+    0 1px 3px rgba(0,0,0,.10),
+    inset 0 1px 1px rgba(255,255,255,.6);
+}
 .prop-stat.is-off{color:var(--text-3);font-weight:500}
-.prop-stat.is-off .prop-stat-icon{opacity:.35;filter:none}
+.prop-stat.is-off .prop-stat-icon{opacity:.4;filter:grayscale(.4);box-shadow:none}
 .prop-stat.is-off svg{stroke:var(--border-2)}
+.icon-bed{background:linear-gradient(145deg,#ecf3ff,#d3e2ff)}
+.icon-bath{background:linear-gradient(145deg,#e2f9f5,#c4efe7)}
+.icon-car{background:linear-gradient(145deg,#fff2df,#ffe2b8)}
+.icon-bike{background:linear-gradient(145deg,#ffeaf1,#ffd4e3)}
+.icon-area{background:linear-gradient(145deg,#f1ecff,#e0d6ff)}
+.icon-lift{background:linear-gradient(145deg,#f5ecff,#e6d5ff)}
 .prop-chip-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
 .prop-id{font-size:11px;font-family:monospace;color:var(--text-3);margin-top:2px;letter-spacing:.02em}
 .prop-desc-preview{margin-top:8px;font-size:12px;line-height:1.4;color:var(--text-3);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .prop-chip{
-  display:inline-flex;align-items:center;gap:4px;
-  font-size:10.5px;font-weight:600;color:var(--text-2);
-  background:var(--bg-2);border:1px solid var(--border);
-  padding:3px 8px 3px 7px;border-radius:7px;
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:10.5px;font-weight:700;color:var(--text-2);
+  background:var(--bg-2);border:1.5px solid var(--border);
+  padding:3px 10px 3px 4px;border-radius:9px;
 }
 .prop-chip svg{width:11px;height:11px;stroke:var(--text-3);fill:none;stroke-width:2;flex-shrink:0}
-.prop-chip-icon{font-size:12px;line-height:1;flex-shrink:0;filter:drop-shadow(0 1px 1px rgba(0,0,0,.12))}
+.prop-chip-icon{
+  font-size:11px;line-height:1;flex-shrink:0;
+  width:20px;height:20px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 1px 3px rgba(0,0,0,.10),inset 0 1px 1px rgba(255,255,255,.6);
+}
+.chip-ico-wrap{
+  width:20px;height:20px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  box-shadow:0 1px 3px rgba(0,0,0,.10),inset 0 1px 1px rgba(255,255,255,.6);
+}
+.chip-ico-wrap svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2.2}
+.icon-maint svg{stroke:#a5540a}
+.icon-avail svg{stroke:#1c53d6}
+.icon-furnish{background:linear-gradient(145deg,#e5f9ea,#cdf1d7)}
+.chip-furnish{background:#f2fcf5;border-color:#bce9c8}
+.icon-maint{background:linear-gradient(145deg,#fff3dd,#ffe4b8)}
+.chip-maint{background:#fff8ec;border-color:#ffdda0;color:#a5540a}
+.icon-avail{background:linear-gradient(145deg,#ecf3ff,#d6e5ff)}
+.chip-avail{background:#f1f6ff;border-color:#c7dbff;color:#1c53d6}
+.chip-video{background:#ffeef6;border-color:#ffbcd6;color:#c92768;font-weight:700}
 .prop-chip-lbl{color:var(--brand);font-weight:600}
 .prop-chip-val{color:var(--text);font-weight:600}
 .prop-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
 .prop-tag{
   font-size:11px;background:var(--bg-2);color:var(--text-2);
-  padding:3px 9px;border-radius:99px;border:1px solid var(--border);
+  padding:3px 9px;border-radius:99px;border:1.5px solid var(--border-2);
 }
 .prop-footer{
   display:flex;flex-direction:column;gap:8px;
@@ -632,12 +678,12 @@ ul{list-style:none}
     inset 0 1px 1px rgba(255,255,255,.55),
     inset 0 -1px 2px rgba(0,0,0,.12);
 }
-.qa-call .qa-3d-icon{background:linear-gradient(150deg,#7db4ff 0%,#3979f6 55%,#1c53d6 100%)}
-.qa-whatsapp .qa-3d-icon{background:linear-gradient(150deg,#5be79a 0%,#22c064 55%,#149248 100%)}
+.qa-call .qa-3d-icon{background:linear-gradient(150deg,#5a94f0 0%,#2a5fe0 55%,#153fa8 100%)}
+.qa-whatsapp .qa-3d-icon{background:linear-gradient(150deg,#3dcc7e 0%,#189e50 55%,#0e7838 100%)}
 .qa-whatsapp .qa-3d-icon svg{fill:#fff;stroke:none}
-.qa-visit .qa-3d-icon{background:linear-gradient(150deg,#ffcb73 0%,#ff9a2e 55%,#f27600 100%)}
-.qa-compare .qa-3d-icon{background:linear-gradient(150deg,#ff9dc6 0%,#ef4f8e 55%,#c92768 100%)}
-.qa-compare.checked .qa-3d-icon{background:linear-gradient(150deg,#8ff0ab 0%,#2ecc55 55%,#189a3e 100%)}
+.qa-visit .qa-3d-icon{background:linear-gradient(150deg,#f0ab52 0%,#e07c14 55%,#b85800 100%)}
+.qa-compare .qa-3d-icon{background:linear-gradient(150deg,#e87fab 0%,#d13a72 55%,#9e1c50 100%)}
+.qa-compare.checked .qa-3d-icon{background:linear-gradient(150deg,#6ed690 0%,#22a847 55%,#127a2e 100%)}
 .qa-compare.disabled{cursor:not-allowed}
 .qa-compare.disabled .qa-3d-icon{filter:grayscale(.55) opacity(.55);box-shadow:none}
 .qa-compare.disabled:active .qa-3d-icon{transform:none}
@@ -665,7 +711,7 @@ ul{list-style:none}
 .prop-views-icon{
   position:relative;display:flex;align-items:center;justify-content:center;
   width:34px;height:34px;border-radius:11px;
-  background:linear-gradient(150deg,#a78bff 0%,#7c5cff 55%,#5a36e8 100%);
+  background:linear-gradient(150deg,#8a68ee 0%,#623ce0 55%,#3f22a8 100%);
   box-shadow:
     0 3px 0 rgba(0,0,0,.16),
     0 6px 10px rgba(0,0,0,.16),
@@ -3209,13 +3255,13 @@ ul{list-style:none}
     <div class="lm-section">📋 Basic Information</div>
     <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
       <div class="form-group">
-        <label class="form-label">For <span style="color:var(--brand)">*</span></label>
+        <label class="form-label">Status <span style="color:var(--brand)">*</span></label>
         <select class="form-select" id="f-type" onchange="onFTypeChange(this.value)">
           <option value="Rent">Rent</option><option value="Lease">Lease</option><option value="PG">PG / Co-living</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Listed By <span style="color:var(--brand)">*</span></label>
+        <label class="form-label">Listed by</label>
         <select class="form-select" id="f-listedBy">
           <option>Owner</option><option>Agent</option><option>Builder</option>
         </select>
@@ -3232,11 +3278,11 @@ ul{list-style:none}
       </div>
 	  
       <div class="form-group">
-        <label class="form-label">City <span style="color:var(--brand)">*</span></label>
+        <label class="form-label">City</label>
         <input class="form-input" type="text" id="f-city" value="Bengaluru" />
       </div>
       <div class="form-group" id="fullAddressGroup" style="grid-column:span 3">
-        <label class="form-label">Building Live Address <span style="color:var(--brand)">*</span></label>
+        <label class="form-label">Building Live Address</label>
         <div style="display:flex;gap:7px;align-items:flex-start">
           <textarea class="form-input" id="f-fullAddress" rows="2" placeholder="House No., Building Name, Street, Landmark, Pincode" style="flex:1;min-width:0;resize:vertical"></textarea>
           <button type="button" onclick="fCaptureLocation()"
@@ -3248,11 +3294,11 @@ ul{list-style:none}
         <div id="f-locStatus" style="font-size:11px;color:var(--text-2);min-height:14px;margin-top:2px">Live auto-fills from GPS</div>
       </div>
       <div class="form-group" id="latLngGroup">
-        <label class="form-label">Latitude / Longitude (Auto)</label>
+        <label class="form-label">Latitude / Longitude (auto)</label>
         <input class="form-input" type="text" id="f-latLngDisplay" placeholder="12.9716° N, 77.5946° E or auto-detected" readonly />
       </div>
       <div class="form-group" id="mapsLinkGroup">
-        <label class="form-label">Google Maps link</label>
+        <label class="form-label">Google Maps link (optional)</label>
         <input class="form-input" type="url" id="f-googleMapsLink" placeholder="https://maps.app.goo.gl/..." />
       </div>
     </div>
@@ -3263,30 +3309,30 @@ ul{list-style:none}
     <div class="lm-section">👤 Owner Details</div>
     <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
 	<div class="form-group">
-      <label class="form-label">Property Name</label>
+      <label class="form-label">Property name</label>
       <input class="form-input" type="text" id="f-title" placeholder="e.g. Prestige Shantiniketan, Whitefield" />
     </div>
-      <div class="form-group"><label class="form-label">Owner Name <span style="color:var(--brand)">*</span></label><input class="form-input" type="text" id="f-ownerName" placeholder="e.g. Ramesh Kumar"/></div>
-      <div class="form-group"><label class="form-label">Phone Number <span style="color:var(--brand)">*</span></label><input class="form-input" type="tel" id="f-ownerPhone" placeholder="e.g. 9876543210"/></div>
-      <div class="form-group"><label class="form-label">Email Id</label><input class="form-input" type="email" id="f-ownerEmail" placeholder="owner@example.com"/></div>
-      <div class="form-group"><label class="form-label">Alternate Number</label><input class="form-input" type="tel" id="f-ownerAltPhone" placeholder="optional"/></div>
+      <div class="form-group"><label class="form-label">Owner name <span style="color:var(--brand)">*</span></label><input class="form-input" type="text" id="f-ownerName" placeholder="e.g. Ramesh Kumar"/></div>
+      <div class="form-group"><label class="form-label">Phone number <span style="color:var(--brand)">*</span></label><input class="form-input" type="tel" id="f-ownerPhone" placeholder="e.g. 9876543210"/></div>
+      <div class="form-group"><label class="form-label">Email (optional)</label><input class="form-input" type="email" id="f-ownerEmail" placeholder="owner@example.com"/></div>
+      <div class="form-group"><label class="form-label">Alternate number</label><input class="form-input" type="tel" id="f-ownerAltPhone" placeholder="optional"/></div>
       <div class="form-group">
-        <label class="form-label">Contact Time</label>
+        <label class="form-label">Preferred contact time</label>
         <select class="form-select" id="f-contactTime"><option>Any</option><option>Morning</option><option>Afternoon</option><option>Evening</option></select>
       </div>
       <div class="form-group" style="grid-column:span 3">
-        <label class="form-label">Owner Address</label>
-        <textarea class="form-input" id="f-ownerAddress" rows="2" placeholder="Street, city, pincode" style="resize:vertical"></textarea>
+        <label class="form-label">Owner address (optional)</label>
+        <textarea class="form-input" id="f-ownerAddress" rows="2" placeholder="Street, city, pincode (optional)" style="resize:vertical"></textarea>
       </div>
       <!-- Agent-only fields — shown when Listed by = Agent -->
       <div id="f-agentFields" style="grid-column:span 3">
         <div class="form-row" style="grid-template-columns:1fr 1fr;margin-top:4px">
           <div class="form-group">
-            <label class="form-label">Agent Phone Number</label>
+            <label class="form-label">Agent phone number</label>
             <input class="form-input" type="tel" id="f-agentPhone" placeholder="e.g. 9876543210" />
           </div>
           <div class="form-group">
-            <label class="form-label">Agent Service Area</label>
+            <label class="form-label">Agent service area</label>
             <input class="form-input" type="text" id="f-agentArea" placeholder="e.g. Koramangala, HSR Layout, BTM" />
           </div>
         </div>
@@ -3298,20 +3344,20 @@ ul{list-style:none}
     <div id="addPricingSection">
     <div class="lm-section">💰 Pricing</div>
     <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
-      <div class="form-group"><label class="form-label" id="f-rentLabel">Monthly Rent (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-rent" placeholder="e.g. 22000" min="0" max="9999999" /></div>
-      <div class="form-group" id="f-depositWrap"><label class="form-label">Security Deposit (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-deposit" placeholder="e.g. 44000" min="0" max="9999999" /></div>
+      <div class="form-group"><label class="form-label" id="f-rentLabel">Monthly rent (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-rent" placeholder="e.g. 22000" min="0" max="9999999" /></div>
+      <div class="form-group" id="f-depositWrap"><label class="form-label">Security deposit (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-deposit" placeholder="e.g. 44000" min="0" max="9999999" /></div>
       <div class="form-group"><label class="form-label">Maintenance (₹/ Month)</label><input class="form-input" type="number" id="f-maintenance" placeholder="e.g. 2000" /></div>
-      <div class="form-group"><label class="form-label">Annual Rent Escalation (%)</label><input class="form-input" type="number" step="0.5" id="f-escalation" placeholder="e.g. 5" /></div>
+      <div class="form-group"><label class="form-label">Annual rent escalation (%)</label><input class="form-input" type="number" step="0.5" id="f-escalation" placeholder="e.g. 5" /></div>
       <div class="form-group">
-        <label class="form-label">Electricity Included?</label>
+        <label class="form-label">Electricity included?</label>
         <select class="form-select" id="f-electricityIncluded"><option>No</option><option>Yes</option><option>Shared meter</option></select>
       </div>
       <div class="form-group">
-        <label class="form-label">Water Charges</label>
+        <label class="form-label">Water / borewell charges</label>
         <select class="form-select" id="f-waterCharge"><option>Included</option><option>Separate</option><option>Tanker</option></select>
       </div>
 	  <div class="form-group">
-        <label class="form-label">Price Negotiable</label>
+        <label class="form-label">Price negotiable</label>
         <select class="form-select" id="f-negotiable"><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select>
       </div>
     </div>
@@ -3322,9 +3368,9 @@ ul{list-style:none}
     <div class="lm-section">🏢 Property Details</div>
     <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
       <div class="form-group">
-        <label class="form-label">Property Type</label>
+        <label class="form-label">Property type</label>
         <select class="form-select" id="f-propertyType">
-          <option>Apartment</option><option>Independent</option><option>Villa</option>
+          <option>Apartment</option><option>Independent House</option><option>Villa</option><option>Studio</option>
         </select>
       </div>
       <div class="form-group">
@@ -3349,11 +3395,11 @@ ul{list-style:none}
       </div>
 	  
       <div class="form-group">
-        <label class="form-label">Floor</label>
-        <input class="form-input" type="text" id="f-floor" placeholder="e.g. 3rd Floor" />
+        <label class="form-label">Floor (out of total)</label>
+        <input class="form-input" type="text" id="f-floor" placeholder="e.g. 3rd / 10 floors" />
       </div>
       <div class="form-group">
-        <label class="form-label">Area (SQFT)</label>
+        <label class="form-label">Area (sqft)</label>
         <input class="form-input" type="number" id="f-area" placeholder="e.g. 1250" />
       </div>
       <div class="form-group">
@@ -3373,17 +3419,17 @@ ul{list-style:none}
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Age Of Building</label>
+        <label class="form-label">Age of property</label>
         <select class="form-select" id="f-age">
           <option value="">Select</option><option>New (0–2 yrs)</option><option>3–5 yrs</option><option>6–10 yrs</option><option>10+ yrs</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Tenant Preference</label>
+        <label class="form-label">Tenant preference</label>
         <select class="form-select" id="f-tenant"><option>Any</option><option>Family</option><option>Bachelor</option><option>Female only</option></select>
       </div>
       <div class="form-group" id="f-availWrap">
-        <label class="form-label">Available From</label>
+        <label class="form-label">Available from</label>
         <input class="form-input" type="date" id="f-avail" />
       </div>
     </div>
@@ -3393,10 +3439,10 @@ ul{list-style:none}
     <div id="addAmenitiesSection">
     <div class="lm-section">✨ Amenities</div>
     <div class="form-group">
-      <label class="form-label">Select Amenities</label>
+      <label class="form-label">Select amenities</label>
       <div class="am-dd" id="amDropdown">
         <button type="button" class="am-dd-trigger" onclick="toggleAmDropdown(event)">
-          <span><span class="am-dd-count" id="amDdCount" style="display:none">0</span><span id="amDdLabel">Choose Amenities…</span></span>
+          <span><span class="am-dd-count" id="amDdCount" style="display:none">0</span><span id="amDdLabel">Choose amenities…</span></span>
           <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
         <div class="am-dd-panel" id="amDdPanel">
@@ -3429,13 +3475,13 @@ ul{list-style:none}
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Selected Amenities</label>
+      <label class="form-label">Selected amenities</label>
       <div class="am-selected-box" id="amSelectedBox">
         <span class="am-selected-empty" id="amSelectedEmpty">No amenities selected yet</span>
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Additional Amenities (comma-separated)</label>
+      <label class="form-label">Additional amenities (comma-separated)</label>
       <input class="form-input" type="text" id="f-amenities-extra" placeholder="Intercom, study table, servant quarter, etc."/>
     </div>
     </div>
@@ -3508,7 +3554,7 @@ ul{list-style:none}
       <div class="lm-section">🍽 Meals &amp; Rules</div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
         <div class="form-group">
-          <label class="form-label">Meals Included</label>
+          <label class="form-label">Meals included</label>
           <select class="form-select" id="f-pgMeals"><option value="">Select</option><option>No Meals</option><option>Breakfast Only</option><option>Dinner Only</option><option>Lunch + Dinner</option><option>All 3 Meals</option><option>On Request</option></select>
         </div>
         <div class="form-group"><label class="form-label">Food type</label><select class="form-select" id="f-pgFoodType"><option value="">Select</option><option>Veg Only</option><option>Veg + Non-veg</option></select></div>
@@ -3532,7 +3578,7 @@ ul{list-style:none}
          while actually creating/editing a listing — see openDetail(). -->
     <div class="detail-gallery" id="detailGallerySlot"></div>
     <div class="form-group" id="videoUrlGroup">
-      <label class="form-label">Video Tour URL</label>
+      <label class="form-label">Video tour URL (optional)</label>
       <input class="form-input" type="url" id="f-videoUrl" placeholder="https://youtube.com/..." />
       <!-- View-mode only: an actual playable embed when the URL is a
            recognizable YouTube/Vimeo link or direct video file — see
@@ -3553,7 +3599,7 @@ ul{list-style:none}
       </div>
     </div>
     <div class="form-group" id="imgFormGroup">
-      <label class="form-label">Property Images</label>
+      <label class="form-label">Property images (optional)</label>
       <div class="img-row" id="imgAddControls">
         <textarea class="img-url-input" id="f-imgUrlInput" rows="2" placeholder="Paste image URLs, one per line or comma-separated…"></textarea>
         <div class="img-btns">
@@ -3568,12 +3614,12 @@ ul{list-style:none}
       <div class="img-hint" id="fImgHint">No images added yet.</div>
     </div>
     <div class="form-group">
-      <label class="form-label">Description</label>
+      <label class="form-label">Description (optional)</label>
       <textarea class="form-input" id="f-desc" rows="3" placeholder="Describe the property, nearby landmarks, special features…" style="resize:vertical"></textarea>
     </div>
     </div>
 
-    <button class="form-submit" onclick="submitListing()">Submit Listing</button>
+    <button class="form-submit" onclick="submitListing()">Submit listing</button>
 
     <!-- View-mode only: quick actions carried over from the old detail view (save,
          contact, schedule a visit, WhatsApp). Sits inline at the end of the
@@ -3588,7 +3634,7 @@ ul{list-style:none}
       <div class="modal-actions-row" id="viewActionsRow2" style="margin-top:10px">
         <button class="modal-btn-outline" id="viewScheduleBtn">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          Schedule Visit
+          Schedule visit
           <span class="modal-visit-count-badge" id="modal-visit-count" style="display:none">0</span>
         </button>
         <button class="modal-btn-whatsapp" id="viewWhatsappBtn">
@@ -5070,7 +5116,7 @@ function cardHTML(p) {
     const yyyy = d.getFullYear();
     return `${dd}-${mm}-${yyyy}`;
   })() : '';
-  return `<div class="prop-card${listClass}" onclick="openDetail('${p.id}')">
+  return `<div class="prop-card${listClass} type-${pType.toLowerCase()}" onclick="openDetail('${p.id}')">
     <div class="prop-img" style="background:${bg}" data-idx="0">
       ${buildImgSlider(p, fg, '-grid')}
       <div class="prop-card-top-row">
@@ -5102,42 +5148,42 @@ function cardHTML(p) {
       </div>
 	  
       <div class="prop-chip-row">
-        ${video ? `<span class="prop-chip" title="Video walkthrough available">🎥 Video</span>` : ''}
+        ${video ? `<span class="prop-chip chip-video" title="Video walkthrough available">🎥 Video</span>` : ''}
       </div>
       <div class="prop-stats">
         <span class="prop-stat" title="Configuration">
-          <span class="prop-stat-icon">🛏️</span>
+          <span class="prop-stat-icon icon-bed">🛏️</span>
           ${String(p.property?.bhk || '').replace(/\s*BHK\s*$/i, '').trim()}
         </span>
         <span class="prop-stat" title="Bathrooms">
-          <span class="prop-stat-icon">🚿</span>
+          <span class="prop-stat-icon icon-bath">🚿</span>
           ${bathrooms}
         </span>
         <span class="prop-stat${carpark?'':' is-off'}" title="${carCount>0?carCount+' car parking spot'+(carCount>1?'s':''):'No car parking'}">
-          <span class="prop-stat-icon">🚗</span>
+          <span class="prop-stat-icon icon-car">🚗</span>
           ${carCount>0?carCount:''}
         </span>
         <span class="prop-stat${bikepark?'':' is-off'}" title="${bikeCount>0?bikeCount+' bike parking spot'+(bikeCount>1?'s':''):'No bike parking'}">
-          <span class="prop-stat-icon">🏍️</span>
+          <span class="prop-stat-icon icon-bike">🏍️</span>
           ${bikeCount>0?bikeCount:''}
         </span>
         ${areaSqft ? `<span class="prop-stat" title="Built-up area">
-          <span class="prop-stat-icon">📐</span>
+          <span class="prop-stat-icon icon-area">📐</span>
           ${areaSqft} sqft
         </span>` : ''}
-        ${lift ? `<span class="prop-stat" title="Lift available"><span class="prop-stat-icon">🛗</span></span>` : ''}
+        ${lift ? `<span class="prop-stat" title="Lift available"><span class="prop-stat-icon icon-lift">🛗</span></span>` : ''}
       </div>
       <div class="prop-chip-row">
-        <span class="prop-chip" title="Furnishing">
-          <span class="prop-chip-icon">🛋️</span>
+        <span class="prop-chip chip-furnish" title="Furnishing">
+          <span class="prop-chip-icon icon-furnish">🛋️</span>
           ${p.property?.furnish}
         </span>
-        ${maintenance > 0 ? `<span class="prop-chip" title="Monthly maintenance">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        ${maintenance > 0 ? `<span class="prop-chip chip-maint" title="Monthly maintenance">
+          <span class="chip-ico-wrap icon-maint"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
           ₹${maintenance.toLocaleString('en-IN')} Maint.
         </span>` : ''}
-        ${availableFmt ? `<span class="prop-chip" title="Available from">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        ${availableFmt ? `<span class="prop-chip chip-avail" title="Available from">
+          <span class="chip-ico-wrap icon-avail"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
           Available From ${availableFmt}
         </span>` : ''}
       </div>
@@ -5202,7 +5248,7 @@ function shortlistCardHTML(p) {
   const deposit = p.price?.deposit || 0;
   const maintenance = p.price?.maintenance || 0;
   const leaseDur = p.terms?.lease || '';
-  return `<div class="prop-card" onclick="openDetail('${p.id}')">
+  return `<div class="prop-card type-${pType.toLowerCase()}" onclick="openDetail('${p.id}')">
     <div class="prop-img" style="background:${bg}" data-idx="0">
       ${buildImgSlider(p, fg, '-sl')}
       <div class="prop-card-top-row">
@@ -5232,30 +5278,30 @@ function shortlistCardHTML(p) {
       </div>
       <div class="prop-stats">
         <span class="prop-stat" title="Configuration">
-          <span class="prop-stat-icon">🛏️</span>
+          <span class="prop-stat-icon icon-bed">🛏️</span>
           ${String(p.property?.bhk || '').replace(/\s*BHK\s*$/i, '').trim()}
         </span>
         <span class="prop-stat" title="Bathrooms">
-          <span class="prop-stat-icon">🚿</span>
+          <span class="prop-stat-icon icon-bath">🚿</span>
           ${bathrooms}
         </span>
         <span class="prop-stat" title="Furnishing">
-          <span class="prop-stat-icon">🛋️</span>
+          <span class="prop-stat-icon icon-furnish">🛋️</span>
           ${p.property?.furnish}
         </span>
         <span class="prop-stat${carpark?'':' is-off'}" title="${carCount>0?carCount+' car parking spot'+(carCount>1?'s':''):'No car parking'}">
-          <span class="prop-stat-icon">🚗</span>
+          <span class="prop-stat-icon icon-car">🚗</span>
           ${carCount>0?carCount:''}
         </span>
         <span class="prop-stat${bikepark?'':' is-off'}" title="${bikeCount>0?bikeCount+' bike parking spot'+(bikeCount>1?'s':''):'No bike parking'}">
-          <span class="prop-stat-icon">🏍️</span>
+          <span class="prop-stat-icon icon-bike">🏍️</span>
           ${bikeCount>0?bikeCount:''}
         </span>
-        ${lift ? `<span class="prop-stat" title="Lift available"><span class="prop-stat-icon">🛗</span></span>` : ''}
+        ${lift ? `<span class="prop-stat" title="Lift available"><span class="prop-stat-icon icon-lift">🛗</span></span>` : ''}
       </div>
       ${maintenance > 0 ? `<div class="prop-chip-row">
-        <span class="prop-chip" title="Monthly maintenance">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span class="prop-chip chip-maint" title="Monthly maintenance">
+          <span class="chip-ico-wrap icon-maint"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
           ₹${maintenance.toLocaleString('en-IN')} maintenance
         </span>
       </div>` : ''}
