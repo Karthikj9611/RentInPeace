@@ -5222,9 +5222,6 @@ function cardHTML(p) {
         <span>${esc(p.location?.area)}</span>
       </div>
 	  
-      <div class="prop-chip-row">
-        ${video ? `<span class="prop-chip chip-video" title="Video walkthrough available">🎥 Video</span>` : ''}
-      </div>
       <div class="prop-stats">
         <span class="prop-stat" title="Configuration">
           <span class="prop-stat-icon icon-bed">🛏️</span>
@@ -5291,9 +5288,6 @@ function cardHTML(p) {
               <span class="prop-views-badge">${formatViews(getViews(p))}</span>
             </span>
           </span>
-        </div>
-        <div class="prop-meta-row">
-          <span class="prop-posted" title="${esc(p.posted)}">${esc((p.posted || '').split(' ')[0])}</span>
         </div>
       </div>
     </div>
