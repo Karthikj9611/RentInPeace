@@ -75,6 +75,13 @@ ul{list-style:none}
   padding:4px 12px;border-radius:99px;
   border:1px solid #f5c0c8;
 }
+.section-divider-count{
+  margin-left:7px;font-weight:700;font-size:11px;
+  background:var(--brand);color:#fff;
+  padding:1px 8px;border-radius:99px;
+  letter-spacing:normal;text-transform:none;
+}
+.section-divider-count:empty{display:none}
 /* ─── Scrollbar ────────────────────────────────── */
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -2957,7 +2964,7 @@ ul{list-style:none}
       <div class="section-divider-inner">
         <span class="section-divider-label promoted-label">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          Promoted listings
+          Promoted listings<span class="section-divider-count" id="promotedCount"></span>
         </span>
       </div>
     </div>
@@ -2966,7 +2973,7 @@ ul{list-style:none}
   <div id="normalSection">
     <div class="section-divider" id="normalDivider" style="display:none">
       <div class="section-divider-inner">
-        <span class="section-divider-label promoted-label">All listings</span>
+        <span class="section-divider-label promoted-label">All listings<span class="section-divider-count" id="normalCount"></span></span>
       </div>
     </div>
     <div class="prop-grid" id="normalGrid"></div>
@@ -4894,6 +4901,7 @@ function renderCards() {
 
   if (promoted.length > 0) {
     document.getElementById('promotedDivider').style.display = '';
+    document.getElementById('promotedCount').textContent = promoted.length;
     promotedPage = Math.min(promotedPage, Math.floor((promoted.length - 1) / PAGE_SIZE));
     const slice = promoted.slice(promotedPage * PAGE_SIZE, (promotedPage + 1) * PAGE_SIZE);
     pg.innerHTML = slice.map(p => cardHTML(p)).join('') +
@@ -4905,6 +4913,7 @@ function renderCards() {
 
   if (normal.length > 0) {
     document.getElementById('normalDivider').style.display = '';
+    document.getElementById('normalCount').textContent = normal.length;
     normalPage = Math.min(normalPage, Math.floor((normal.length - 1) / PAGE_SIZE));
     const slice = normal.slice(normalPage * PAGE_SIZE, (normalPage + 1) * PAGE_SIZE);
     ng.innerHTML = slice.map(p => cardHTML(p)).join('') +
