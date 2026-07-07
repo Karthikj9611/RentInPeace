@@ -3629,7 +3629,7 @@ ul{list-style:none}
     <div class="view-actions-footer" id="viewActionsFooter" style="display:none">
       <div class="modal-actions" id="viewActionsRow">
         <button class="modal-btn-secondary" id="modal-save-btn">♡ Save</button>
-        <button class="modal-btn-primary" onclick="showToast('Contact shown to verified users')">Contact</button>
+        <button class="modal-btn-primary" id="viewCallBtn">Call</button>
       </div>
       <div class="modal-actions-row" id="viewActionsRow2" style="margin-top:10px">
         <button class="modal-btn-outline" id="viewScheduleBtn">
@@ -5195,7 +5195,7 @@ function cardHTML(p) {
       </div>` : ''}
       <div class="prop-footer">
         <div class="prop-quick-actions">
-          <button class="prop-qa-btn prop-qa-3d qa-call" onclick="event.stopPropagation();showToast('Contact info shown to verified users')" aria-label="Contact owner">
+          <button class="prop-qa-btn prop-qa-3d qa-call" onclick="event.stopPropagation();openCall('${p.id}')" aria-label="Call owner">
             <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
             <span>Contact</span>
           </button>
@@ -5307,7 +5307,7 @@ function shortlistCardHTML(p) {
       </div>` : ''}
       <div class="prop-footer">
         <div class="prop-quick-actions">
-          <button class="prop-qa-btn prop-qa-3d qa-call" onclick="event.stopPropagation();showToast('Contact info shown to verified users')" aria-label="Contact owner">
+          <button class="prop-qa-btn prop-qa-3d qa-call" onclick="event.stopPropagation();openCall('${p.id}')" aria-label="Call owner">
             <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
             <span>Contact</span>
           </button>
@@ -6278,6 +6278,7 @@ function openDetail(id) {
   saveBtn.dataset.propId = String(p.id);
   saveBtn.onclick = () => toggleShortlistFromModal(String(p.id));
   document.getElementById('viewScheduleBtn').onclick = () => openScheduleModal(p.id);
+  document.getElementById('viewCallBtn').onclick = () => openCall(p.id);
   document.getElementById('viewWhatsappBtn').onclick = () => openWhatsApp(p.id);
   const visitBadge = document.getElementById('modal-visit-count');
   visitBadge.dataset.propId = String(p.id);
@@ -6473,6 +6474,21 @@ async function submitScheduleVisit() {
     btn.disabled = false;
     btn.textContent = 'Request visit';
   }
+}
+
+/* ═══════════════════════════════════════════════
+   CALL CONTACT — open to any visitor, no login/verification gate
+═══════════════════════════════════════════════ */
+function openCall(propId) {
+  const p = PROPERTIES.find(x => x.id === propId);
+  if (!p) return;
+  const rawPhone = (p.owner?.agentPhone || p.owner?.phone || '').replace(/\D/g, '');
+  if (!rawPhone) {
+    showToast('No agent phone number added for this listing');
+    return;
+  }
+  const phone = rawPhone.length === 10 ? '+91' + rawPhone : ('+' + rawPhone);
+  window.location.href = 'tel:' + phone;
 }
 
 /* ═══════════════════════════════════════════════
