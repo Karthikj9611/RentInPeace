@@ -2999,13 +2999,29 @@ ul{list-style:none}
     </div>
     <div class="prop-grid" id="promotedGrid"></div>
   </div>
-  <div id="normalSection">
-    <div class="section-divider" id="normalDivider" style="display:none">
+  <div id="rentSection">
+    <div class="section-divider" id="rentDivider" style="display:none">
       <div class="section-divider-inner">
-        <span class="section-divider-label promoted-label">All listings<span class="section-divider-count" id="normalCount"></span></span>
+        <span class="section-divider-label promoted-label">Rent<span class="section-divider-count" id="rentCount"></span></span>
       </div>
     </div>
-    <div class="prop-grid" id="normalGrid"></div>
+    <div class="prop-grid" id="rentGrid"></div>
+  </div>
+  <div id="leaseSection">
+    <div class="section-divider" id="leaseDivider" style="display:none">
+      <div class="section-divider-inner">
+        <span class="section-divider-label promoted-label">Lease<span class="section-divider-count" id="leaseCount"></span></span>
+      </div>
+    </div>
+    <div class="prop-grid" id="leaseGrid"></div>
+  </div>
+  <div id="pgSection">
+    <div class="section-divider" id="pgDivider" style="display:none">
+      <div class="section-divider-inner">
+        <span class="section-divider-label promoted-label">PG<span class="section-divider-count" id="pgCount"></span></span>
+      </div>
+    </div>
+    <div class="prop-grid" id="pgGrid"></div>
   </div>
   <div class="empty-state" id="emptyState">
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -4901,56 +4917,70 @@ function injectPaginationDividers(arr) {
 }
 
 let promotedPage = 0;
-let normalPage = 0;
+let rentPage = 0;
+let leasePage = 0;
+let pgPage = 0;
 const PAGE_SIZE = 8;
+
+// Which of the four on-page sections a (non-promoted) listing belongs in,
+// mirroring the backend's rent/lease/pg collection split.
+function sectionKeyFor(p) {
+  const t = pTypeLabel(p);
+  if (t === 'Lease') return 'lease';
+  if (t === 'PG') return 'pg';
+  return 'rent';
+}
 
 function renderCards() {
   const empty = document.getElementById('emptyState');
   const list = getFiltered();
   document.getElementById('resultCount').textContent = list.length;
 
+  const SECTIONS = ['promoted', 'rent', 'lease', 'pg'];
+
   if (list.length === 0) {
-    document.getElementById('promotedGrid').innerHTML = '';
-    document.getElementById('normalGrid').innerHTML = '';
-    document.getElementById('promotedDivider').style.display = 'none';
-    document.getElementById('normalDivider').style.display = 'none';
+    SECTIONS.forEach(key => {
+      document.getElementById(key + 'Grid').innerHTML = '';
+      document.getElementById(key + 'Divider').style.display = 'none';
+    });
     empty.classList.add('show');
     return;
   }
   empty.classList.remove('show');
 
   const promoted = list.filter(p => p.promoted);
-  const normal = list.filter(p => !p.promoted);
+  const rest = list.filter(p => !p.promoted);
+  const groups = {
+    promoted,
+    rent:  rest.filter(p => sectionKeyFor(p) === 'rent'),
+    lease: rest.filter(p => sectionKeyFor(p) === 'lease'),
+    pg:    rest.filter(p => sectionKeyFor(p) === 'pg'),
+  };
+
   const gridClass = 'prop-grid' + (isListView ? ' list-view' : '');
+  const pageGetters = { promoted: () => promotedPage, rent: () => rentPage, lease: () => leasePage, pg: () => pgPage };
+  const pageSetters = { promoted: v => promotedPage = v, rent: v => rentPage = v, lease: v => leasePage = v, pg: v => pgPage = v };
 
-  const pg = document.getElementById('promotedGrid');
-  const ng = document.getElementById('normalGrid');
-  pg.className = gridClass;
-  ng.className = gridClass;
+  SECTIONS.forEach(key => {
+    const items = groups[key];
+    const grid = document.getElementById(key + 'Grid');
+    const divider = document.getElementById(key + 'Divider');
+    grid.className = gridClass;
 
-  if (promoted.length > 0) {
-    document.getElementById('promotedDivider').style.display = '';
-    document.getElementById('promotedCount').textContent = promoted.length;
-    promotedPage = Math.min(promotedPage, Math.floor((promoted.length - 1) / PAGE_SIZE));
-    const slice = promoted.slice(promotedPage * PAGE_SIZE, (promotedPage + 1) * PAGE_SIZE);
-    pg.innerHTML = slice.map(p => cardHTML(p)).join('') +
-      paginationHTML('promoted', promotedPage, promoted.length);
-  } else {
-    document.getElementById('promotedDivider').style.display = 'none';
-    pg.innerHTML = '';
-  }
+    if (items.length === 0) {
+      divider.style.display = 'none';
+      grid.innerHTML = '';
+      return;
+    }
 
-  if (normal.length > 0) {
-    document.getElementById('normalDivider').style.display = '';
-    document.getElementById('normalCount').textContent = normal.length;
-    normalPage = Math.min(normalPage, Math.floor((normal.length - 1) / PAGE_SIZE));
-    const slice = normal.slice(normalPage * PAGE_SIZE, (normalPage + 1) * PAGE_SIZE);
-    ng.innerHTML = slice.map(p => cardHTML(p)).join('') +
-      paginationHTML('normal', normalPage, normal.length);
-  } else {
-    document.getElementById('normalDivider').style.display = 'none';
-    ng.innerHTML = '';
-  }
+    divider.style.display = '';
+    document.getElementById(key + 'Count').textContent = items.length;
+    let page = Math.min(pageGetters[key](), Math.floor((items.length - 1) / PAGE_SIZE));
+    pageSetters[key](page);
+    const slice = items.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+    grid.innerHTML = slice.map(p => cardHTML(p)).join('') +
+      paginationHTML(key, page, items.length);
+  });
 }
 
 function pageNumberButtons(section, page, totalPages) {
@@ -5005,42 +5035,39 @@ function paginationHTML(section, page, total) {
     </div>`;
 }
 
-function changePage(section, dir) {
+function sectionItems(section) {
   const list = getFiltered();
-  const promoted = list.filter(p => p.promoted);
-  const normal = list.filter(p => !p.promoted);
-  if (section === 'promoted') {
-    const max = Math.ceil(promoted.length / PAGE_SIZE) - 1;
-    promotedPage = Math.max(0, Math.min(promotedPage + dir, max));
-  } else {
-    const max = Math.ceil(normal.length / PAGE_SIZE) - 1;
-    normalPage = Math.max(0, Math.min(normalPage + dir, max));
-  }
+  if (section === 'promoted') return list.filter(p => p.promoted);
+  return list.filter(p => !p.promoted && sectionKeyFor(p) === section);
+}
+
+const SECTION_PAGE_GETTERS = { promoted: () => promotedPage, rent: () => rentPage, lease: () => leasePage, pg: () => pgPage };
+const SECTION_PAGE_SETTERS = { promoted: v => promotedPage = v, rent: v => rentPage = v, lease: v => leasePage = v, pg: v => pgPage = v };
+
+function changePage(section, dir) {
+  const items = sectionItems(section);
+  const max = Math.ceil(items.length / PAGE_SIZE) - 1;
+  SECTION_PAGE_SETTERS[section](Math.max(0, Math.min(SECTION_PAGE_GETTERS[section]() + dir, max)));
   renderCards();
   // scroll to the section top
-  const el = document.getElementById(section === 'promoted' ? 'promotedDivider' : 'normalDivider');
+  const el = document.getElementById(section + 'Divider');
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function goToPage(section, pageIndex) {
-  const list = getFiltered();
-  const promoted = list.filter(p => p.promoted);
-  const normal = list.filter(p => !p.promoted);
-  if (section === 'promoted') {
-    const max = Math.ceil(promoted.length / PAGE_SIZE) - 1;
-    promotedPage = Math.max(0, Math.min(pageIndex, max));
-  } else {
-    const max = Math.ceil(normal.length / PAGE_SIZE) - 1;
-    normalPage = Math.max(0, Math.min(pageIndex, max));
-  }
+  const items = sectionItems(section);
+  const max = Math.ceil(items.length / PAGE_SIZE) - 1;
+  SECTION_PAGE_SETTERS[section](Math.max(0, Math.min(pageIndex, max)));
   renderCards();
-  const el = document.getElementById(section === 'promoted' ? 'promotedDivider' : 'normalDivider');
+  const el = document.getElementById(section + 'Divider');
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function resetPages() {
   promotedPage = 0;
-  normalPage = 0;
+  rentPage = 0;
+  leasePage = 0;
+  pgPage = 0;
 }
 
 function buildImgSlider(p, fg, uidSuffix) {
@@ -8083,10 +8110,14 @@ loadReviews();
    one of their own listings from the My Listings tab.
 ═══════════════════════════════════════════════ */
 async function fetchProperties() {
-  const ng = document.getElementById('normalGrid');
-  const pg = document.getElementById('promotedGrid');
-  if (ng) ng.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--text-2)">Loading listings…</div>';
-  if (pg) pg.innerHTML = '';
+  const rentGrid = document.getElementById('rentGrid');
+  const leaseGrid = document.getElementById('leaseGrid');
+  const pgGrid = document.getElementById('pgGrid');
+  const promotedGrid = document.getElementById('promotedGrid');
+  if (rentGrid) rentGrid.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--text-2)">Loading listings…</div>';
+  if (leaseGrid) leaseGrid.innerHTML = '';
+  if (pgGrid) pgGrid.innerHTML = '';
+  if (promotedGrid) promotedGrid.innerHTML = '';
   try {
     const res = await fetch('/api/properties');
     if (!res.ok) throw new Error('Server returned ' + res.status);
@@ -8106,8 +8137,8 @@ async function fetchProperties() {
     }
   } catch (err) {
     console.error('Could not load properties from server:', err.message);
-    const ng2 = document.getElementById('normalGrid');
-    if (ng2) ng2.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--text-2)">⚠️ Could not connect to server. Please refresh the page.</div>';
+    const rentGrid2 = document.getElementById('rentGrid');
+    if (rentGrid2) rentGrid2.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--text-2)">⚠️ Could not connect to server. Please refresh the page.</div>';
     return false;
   }
   buildFilterOptions();

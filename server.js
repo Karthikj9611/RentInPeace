@@ -526,44 +526,148 @@ async function nextPropertyId() {
   let id, exists = true, attempts = 0;
   while (exists && attempts < 10) {
     id = randomCode();
-    exists = await Property.exists({ propertyId: id });
+    const [inRent, inLease, inPg] = await Promise.all([
+      Rent.exists({ propertyId: id }),
+      Lease.exists({ propertyId: id }),
+      Pg.exists({ propertyId: id }),
+    ]);
+    exists = !!(inRent || inLease || inPg);
     attempts++;
   }
   return id;
 }
 
-const PropertySchema = new mongoose.Schema({
-  basic:      { type: BasicSchema,            required: true },
-  location:   { type: LocationSchema,         required: true },
-  owner:      { type: OwnerSchema,            required: true },
-  price:      { type: PriceSchema,            required: true },
-  property:   { type: PropertyDetailsSchema,  default: () => ({}) },
-  amenities:  { type: AmenitiesSchema,        default: () => ({}) },
-  terms:      { type: TermsSchema,            default: () => ({}) },
-  rules:      { type: RulesSchema,            default: () => ({}) },
-  media:      { type: MediaSchema,            default: () => ({}) },
-  pg:         { type: PgSchema }, // no default — left unset for non-PG listings so we don't store an all-null subdocument
-  // ── Meta (kept top-level / flat — not part of the submitted payload) ──
-  propertyId:       { type: String, unique: true, sparse: true, index: true }, // random alphanumeric code, e.g. AAA123
-  userId:           { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true }, // owner of this listing, null = posted while logged out
-  userReadableId:   { type: String, default: null, index: true }, // human-readable User.userId (e.g. USER-000001), stamped at creation for admin readability — same pattern as UserSession.userId
-  verified:         { type: Boolean, default: false },
-  promoted:         { type: Boolean, default: false },
-  promotedPriority: { type: Number,  default: 3 },
-  views:            { type: Number,  default: 0 },
-  visitCount:       { type: Number,  default: 0 }, // # of "Schedule a Visit" requests made for this listing
-  remarks:          { type: [String], default: [] }, // admin-panel notes
-  createdAt:        { type: Date,    default: Date.now },
-});
-PropertySchema.index({ createdAt: -1 });
-PropertySchema.index({ 'basic.status': 1, createdAt: -1 });
-const Property = mongoose.model('Property', PropertySchema);
+// ────────────────────────────────────────────────────────────────────────────
+// ── LISTING MODELS: split across three collections by category ──
+// A listing is stored in exactly one of three collections based on its
+// basic.status: 'Lease' → the `lease` collection, 'PG' → the `pg` collection,
+// and everything else (For Rent / For Sale / New Launch / Sold / Booked) →
+// the `rent` collection. All three share the identical schema shape below —
+// only the collection (and therefore the Mongoose model) differs — so a
+// listing's category can be switched later by moving the document between
+// models (see moveListingIfNeeded below) rather than needing a migration.
+// ────────────────────────────────────────────────────────────────────────────
+function buildListingSchema() {
+  const schema = new mongoose.Schema({
+    basic:      { type: BasicSchema,            required: true },
+    location:   { type: LocationSchema,         required: true },
+    owner:      { type: OwnerSchema,            required: true },
+    price:      { type: PriceSchema,            required: true },
+    property:   { type: PropertyDetailsSchema,  default: () => ({}) },
+    amenities:  { type: AmenitiesSchema,        default: () => ({}) },
+    terms:      { type: TermsSchema,            default: () => ({}) },
+    rules:      { type: RulesSchema,            default: () => ({}) },
+    media:      { type: MediaSchema,            default: () => ({}) },
+    pg:         { type: PgSchema }, // no default — left unset for non-PG listings so we don't store an all-null subdocument
+    // ── Meta (kept top-level / flat — not part of the submitted payload) ──
+    propertyId:       { type: String, unique: true, sparse: true, index: true }, // random alphanumeric code, e.g. AAA123
+    userId:           { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true }, // owner of this listing, null = posted while logged out
+    userReadableId:   { type: String, default: null, index: true }, // human-readable User.userId (e.g. USER-000001), stamped at creation for admin readability — same pattern as UserSession.userId
+    verified:         { type: Boolean, default: false },
+    promoted:         { type: Boolean, default: false },
+    promotedPriority: { type: Number,  default: 3 },
+    views:            { type: Number,  default: 0 },
+    visitCount:       { type: Number,  default: 0 }, // # of "Schedule a Visit" requests made for this listing
+    remarks:          { type: [String], default: [] }, // admin-panel notes
+    createdAt:        { type: Date,    default: Date.now },
+  });
+  schema.index({ createdAt: -1 });
+  schema.index({ 'basic.status': 1, createdAt: -1 });
+  return schema;
+}
+
+// Explicit 3rd arg pins the exact collection name — 'rent' / 'lease' / 'pg' —
+// instead of Mongoose's default pluralization.
+const Rent  = mongoose.model('Rent',  buildListingSchema(), 'rent');
+const Lease = mongoose.model('Lease', buildListingSchema(), 'lease');
+const Pg    = mongoose.model('Pg',    buildListingSchema(), 'pg');
+
+// Keyed by the same names used for VisitRequest.propertyType (refPath target).
+const LISTING_MODELS = { Rent, Lease, Pg };
+const LISTING_MODEL_LIST = Object.values(LISTING_MODELS);
+
+// A listing's basic.status decides which collection it belongs in.
+function modelForStatus(status) {
+  if (status === 'Lease') return Lease;
+  if (status === 'PG')    return Pg;
+  return Rent; // For Rent, For Sale, New Launch, Sold, Booked
+}
+// Finds a listing by Mongo _id without knowing in advance which of the three
+// collections it lives in — tries all three in parallel (a given ObjectId can
+// only ever exist in one, since each collection mints its own _ids).
+async function findListingById(id, { lean = false } = {}) {
+  if (!mongoose.Types.ObjectId.isValid(id)) return { doc: null, model: null, type: null };
+  const types = Object.keys(LISTING_MODELS);
+  const results = await Promise.all(types.map(t => {
+    const q = LISTING_MODELS[t].findById(id);
+    return lean ? q.lean() : q;
+  }));
+  for (let i = 0; i < types.length; i++) {
+    if (results[i]) return { doc: results[i], model: LISTING_MODELS[types[i]], type: types[i] };
+  }
+  return { doc: null, model: null, type: null };
+}
+
+// Same idea, scoped to a specific owner — used by the user-owned-listing routes.
+async function findUserListingById(id, userId, { lean = false } = {}) {
+  if (!mongoose.Types.ObjectId.isValid(id)) return { doc: null, model: null, type: null };
+  const types = Object.keys(LISTING_MODELS);
+  const results = await Promise.all(types.map(t => {
+    const q = LISTING_MODELS[t].findOne({ _id: id, userId });
+    return lean ? q.lean() : q;
+  }));
+  for (let i = 0; i < types.length; i++) {
+    if (results[i]) return { doc: results[i], model: LISTING_MODELS[types[i]], type: types[i] };
+  }
+  return { doc: null, model: null, type: null };
+}
+
+// Tries findByIdAndUpdate against each collection in turn, stopping at the
+// first hit — used by the admin verified/promoted toggles, which only have
+// an _id to go on.
+async function updateListingById(id, update, options = { new: true }) {
+  if (!mongoose.Types.ObjectId.isValid(id)) return null;
+  for (const M of LISTING_MODEL_LIST) {
+    const result = await M.findByIdAndUpdate(id, update, options);
+    if (result) return result;
+  }
+  return null;
+}
+
+async function deleteListingById(id) {
+  if (!mongoose.Types.ObjectId.isValid(id)) return null;
+  for (const M of LISTING_MODEL_LIST) {
+    const deleted = await M.findByIdAndDelete(id);
+    if (deleted) return deleted;
+  }
+  return null;
+}
+
+// If an edit changes basic.status into a different category (e.g. Rent →
+// Lease), the document needs to move to the matching collection rather than
+// just being saved in place. Re-creates it in the target collection with the
+// same _id and deletes the original; returns the (possibly new) document.
+async function moveListingIfNeeded(doc, currentModel) {
+  const targetModel = modelForStatus(doc.basic && doc.basic.status);
+  if (targetModel === currentModel) {
+    await doc.save();
+    return doc;
+  }
+  const plain = doc.toObject();
+  const moved = new targetModel(plain); // same _id, since plain._id is preserved
+  await moved.save();
+  await currentModel.findByIdAndDelete(doc._id);
+  return moved;
+}
 
 // ── Visit Request Schema (from the "Schedule a Visit" modal) ──
 const VisitRequestSchema = new mongoose.Schema({
   // Human-readable unique id, same pattern as Property.propertyId (e.g. VISIT-000001).
   visitId:      { type: String, unique: true, sparse: true, index: true },
-  propertyId:   { type: mongoose.Schema.Types.ObjectId, ref: 'Property', required: true, index: true },
+  propertyId:   { type: mongoose.Schema.Types.ObjectId, refPath: 'propertyType', required: true, index: true },
+  // Which of the three listing collections propertyId points into — stamped
+  // at creation (see POST /api/visits) so populate() can resolve it dynamically.
+  propertyType: { type: String, enum: ['Rent', 'Lease', 'Pg'], default: 'Rent' },
   userId:       { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true },
   userReadableId: { type: String, default: null, index: true }, // human-readable User.userId (e.g. USER-000001), stamped at creation for admin readability — same pattern as UserSession.userId
   visitorName:  { type: String, required: true, trim: true },
@@ -714,7 +818,8 @@ app.post('/api/properties', listingLimiter, requireUser, async (req, res) => {
     const displayPrice = formatPrice(fields.price.rent, status);
     const propertyId = await nextPropertyId();
 
-    const prop = new Property({
+    const ListingModel = modelForStatus(status); // Rent, Lease, or Pg — decided by basic.status
+    const prop = new ListingModel({
       propertyId,
       userId:         req.userId || null, // links the listing to its creator when logged in
       userReadableId: req.userReadableId || null, // e.g. USER-000001, for admin readability
@@ -752,26 +857,41 @@ app.get('/api/properties', async (req, res) => {
       filter.$or = [{ 'owner.propertyName': re }, { 'location.area': re }, { 'media.desc': re }];
     }
 
-    const docs = await Property.find(filter)
-      .select(
-        // Internal/admin-only fields — never read by the public frontend
-        '-remarks -userId -userReadableId -promotedPriority -__v ' +
-        // Owner PII that only ever populated hidden form inputs in the read-only
-        // detail view (VIEW_ALWAYS_HIDDEN_GROUPS on the frontend). owner.phone is
-        // excluded too — Call/WhatsApp now read owner.agentPhone only (dynamically),
-        // so the owner's personal number never needs to leave the server.
-        // owner.propertyName excluded too (client-side search no longer matches on
-        // it — search now matches area/BHK only). owner.agentPhone is kept for
-        // Call/WhatsApp.
-        '-owner.name -owner.propertyName -owner.email -owner.phone -owner.altPhone -owner.contactTime -owner.address -owner.agentArea ' +
-        // Location detail that's likewise only used to fill the always-hidden
-        // full-address/lat-lng/Google-Maps-link form groups
-        '-location.address -location.lat -location.lng -location.mapLink'
-      )
-      .sort({ promoted: -1, promotedPriority: 1, createdAt: -1 })
-      .skip(Number(skip))
-      .limit(Number(limit))
-      .lean();
+    // Internal/admin-only fields — never read by the public frontend
+    const PUBLIC_SELECT =
+      '-remarks -userId -userReadableId -promotedPriority -__v ' +
+      // Owner PII that only ever populated hidden form inputs in the read-only
+      // detail view (VIEW_ALWAYS_HIDDEN_GROUPS on the frontend). owner.phone is
+      // excluded too — Call/WhatsApp now read owner.agentPhone only (dynamically),
+      // so the owner's personal number never needs to leave the server.
+      // owner.propertyName excluded too (client-side search no longer matches on
+      // it — search now matches area/BHK only). owner.agentPhone is kept for
+      // Call/WhatsApp.
+      '-owner.name -owner.propertyName -owner.email -owner.phone -owner.altPhone -owner.contactTime -owner.address -owner.agentArea ' +
+      // Location detail that's likewise only used to fill the always-hidden
+      // full-address/lat-lng/Google-Maps-link form groups
+      '-location.address -location.lat -location.lng -location.mapLink';
+
+    // If a status was requested, we already know exactly which single
+    // collection to query. Otherwise we need to fan out to all three and
+    // merge, since listings now live in separate rent/lease/pg collections.
+    const modelsToQuery = (status && typeof status === 'string')
+      ? [modelForStatus(status)]
+      : LISTING_MODEL_LIST;
+
+    const docArrays = await Promise.all(
+      modelsToQuery.map(M => M.find(filter).select(PUBLIC_SELECT).lean())
+    );
+    let docs = docArrays.flat();
+
+    // Sort/paginate in memory across the merged set (same ordering as before:
+    // promoted first, then promotedPriority, then newest).
+    docs.sort((a, b) =>
+      (Number(b.promoted) - Number(a.promoted)) ||
+      ((a.promotedPriority ?? 3) - (b.promotedPriority ?? 3)) ||
+      (new Date(b.createdAt) - new Date(a.createdAt))
+    );
+    docs = docs.slice(Number(skip), Number(skip) + Number(limit));
 
     // Attach id + computed displayPrice + posted label; the nested shape itself
     // (basic/location/owner/price/property/amenities/terms/rules/media/pg)
@@ -820,7 +940,7 @@ app.post('/api/visits', visitLimiter, requireUser, async (req, res) => {
       return res.status(400).json({ message: 'A valid visit time is required' });
     }
 
-    const property = await Property.findById(propertyId).lean();
+    const { doc: property, model: propertyModel, type: propertyType } = await findListingById(propertyId, { lean: true });
     if (!property) return res.status(404).json({ message: 'Property not found' });
 
     // Block a second visit request from the same user for the same property on the
@@ -843,6 +963,7 @@ app.post('/api/visits', visitLimiter, requireUser, async (req, res) => {
     const visit = await VisitRequest.create({
       visitId,
       propertyId,
+      propertyType,
       userId:         req.userId || null,
       userReadableId: req.userReadableId || null, // e.g. USER-000001, for admin readability
       visitorName:  String(visitorName).trim(),
@@ -855,7 +976,7 @@ app.post('/api/visits', visitLimiter, requireUser, async (req, res) => {
 
     // Bump the property's visit-request counter. $inc is atomic, so concurrent
     // requests for the same property can't race and undercount each other.
-    const updatedProperty = await Property.findByIdAndUpdate(
+    const updatedProperty = await propertyModel.findByIdAndUpdate(
       propertyId,
       { $inc: { visitCount: 1 } },
       { new: true, select: 'visitCount' }
@@ -924,18 +1045,26 @@ app.get('/api/users', requireAdmin, async (req, res) => {
     const users = await User.find({}).sort({ createdAt: -1 }).lean();
     const userIds = users.map(u => u._id);
 
-    const [propAgg, visitAgg] = await Promise.all([
-      Property.aggregate([
+    const [propAggByModel, visitAgg] = await Promise.all([
+      Promise.all(LISTING_MODEL_LIST.map(M => M.aggregate([
         { $match: { userId: { $in: userIds } } },
         { $group: { _id: '$userId', count: { $sum: 1 } } }
-      ]),
+      ]))),
       VisitRequest.aggregate([
         { $match: { userId: { $in: userIds } } },
         { $group: { _id: '$userId', count: { $sum: 1 } } }
       ])
     ]);
 
-    const propMap  = Object.fromEntries(propAgg.map(x  => [String(x._id), x.count]));
+    // Sum counts per user across the three collections (a user's listings can
+    // be split between rent/lease/pg).
+    const propMap = {};
+    for (const agg of propAggByModel) {
+      for (const x of agg) {
+        const key = String(x._id);
+        propMap[key] = (propMap[key] || 0) + x.count;
+      }
+    }
     const visitMap = Object.fromEntries(visitAgg.map(x => [String(x._id), x.count]));
 
     const rows = users.map(u => ({
@@ -1175,9 +1304,12 @@ app.post('/api/appointments/bulk-delete', requireAdmin, async (req, res) => {
 // nested shape stays untouched for whatever already consumes it.
 app.get('/api/admin/properties', requireAdmin, async (req, res) => {
   try {
-    const docs = await Property.find({})
-      .sort({ promoted: -1, promotedPriority: 1, createdAt: -1 })
-      .lean();
+    const docArrays = await Promise.all(LISTING_MODEL_LIST.map(M => M.find({}).lean()));
+    const docs = docArrays.flat().sort((a, b) =>
+      (Number(b.promoted) - Number(a.promoted)) ||
+      ((a.promotedPriority ?? 3) - (b.promotedPriority ?? 3)) ||
+      (new Date(b.createdAt) - new Date(a.createdAt))
+    );
 
     const flat = docs.map(doc => {
       const basic    = doc.basic    || {};
@@ -1273,7 +1405,7 @@ app.patch('/api/properties/:id/remarks', requireAdmin, async (req, res) => {
     if (!remarks || !String(remarks).trim()) {
       return res.status(400).json({ message: 'remarks is required' });
     }
-    const prop = await Property.findById(req.params.id);
+    const { doc: prop } = await findListingById(req.params.id);
     if (!prop) return res.status(404).json({ message: 'Property not found' });
     if (prop.remarks.length >= 200) {
       return res.status(400).json({ message: 'This property already has the maximum number of remarks (200). Delete an old one first.' });
@@ -1291,7 +1423,7 @@ app.patch('/api/properties/:id/remarks', requireAdmin, async (req, res) => {
 app.delete('/api/properties/:id/remarks/:idx', requireAdmin, async (req, res) => {
   try {
     const idx = Number(req.params.idx);
-    const prop = await Property.findById(req.params.id);
+    const { doc: prop } = await findListingById(req.params.id);
     if (!prop) return res.status(404).json({ message: 'Property not found' });
     if (idx < 0 || idx >= prop.remarks.length) {
       return res.status(400).json({ message: 'Invalid remark index' });
@@ -1312,11 +1444,7 @@ app.patch('/api/properties/:id/verified', requireAdmin, async (req, res) => {
     if (typeof verified !== 'boolean') {
       return res.status(400).json({ message: 'verified must be a boolean' });
     }
-    const prop = await Property.findByIdAndUpdate(
-      req.params.id,
-      { verified },
-      { new: true }
-    );
+    const prop = await updateListingById(req.params.id, { verified }, { new: true });
     if (!prop) return res.status(404).json({ message: 'Property not found' });
     res.json({ message: 'Verified status updated', verified: prop.verified });
   } catch (err) {
@@ -1332,11 +1460,7 @@ app.patch('/api/properties/:id/promoted', requireAdmin, async (req, res) => {
     if (typeof promoted !== 'boolean') {
       return res.status(400).json({ message: 'promoted must be a boolean' });
     }
-    const prop = await Property.findByIdAndUpdate(
-      req.params.id,
-      { promoted },
-      { new: true }
-    );
+    const prop = await updateListingById(req.params.id, { promoted }, { new: true });
     if (!prop) return res.status(404).json({ message: 'Property not found' });
     res.json({ message: 'Promoted status updated', promoted: prop.promoted });
   } catch (err) {
@@ -1348,7 +1472,7 @@ app.patch('/api/properties/:id/promoted', requireAdmin, async (req, res) => {
 // ── DELETE /api/properties/:id (example admin-protected route) ──
 app.delete('/api/properties/:id', requireAdmin, async (req, res) => {
   try {
-    const deleted = await Property.findByIdAndDelete(req.params.id);
+    const deleted = await deleteListingById(req.params.id);
     if (!deleted) return res.status(404).json({ message: 'Property not found' });
     res.json({ message: 'Property deleted' });
   } catch (err) {
@@ -1366,8 +1490,9 @@ app.post('/api/properties/bulk-delete', requireAdmin, async (req, res) => {
     }
     const validIds = ids.filter(id => mongoose.Types.ObjectId.isValid(id));
     if (!validIds.length) return res.status(400).json({ message: 'No valid property ids provided' });
-    const result = await Property.deleteMany({ _id: { $in: validIds } });
-    res.json({ message: `${result.deletedCount} propert${result.deletedCount === 1 ? 'y' : 'ies'} deleted`, deletedCount: result.deletedCount });
+    const results = await Promise.all(LISTING_MODEL_LIST.map(M => M.deleteMany({ _id: { $in: validIds } })));
+    const deletedCount = results.reduce((sum, r) => sum + r.deletedCount, 0);
+    res.json({ message: `${deletedCount} propert${deletedCount === 1 ? 'y' : 'ies'} deleted`, deletedCount });
   } catch (err) {
     console.error('POST /api/properties/bulk-delete error:', err);
     res.status(500).json({ message: 'Error deleting properties: ' + err.message });
@@ -1387,9 +1512,8 @@ app.post('/api/properties/bulk-delete', requireAdmin, async (req, res) => {
 // ── GET /api/user/my-listings ──
 app.get('/api/user/my-listings', requireUser, async (req, res) => {
   try {
-    const docs = await Property.find({ userId: req.userId })
-      .sort({ createdAt: -1 })
-      .lean();
+    const docArrays = await Promise.all(LISTING_MODEL_LIST.map(M => M.find({ userId: req.userId }).lean()));
+    const docs = docArrays.flat().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     const mapped = docs.map(doc => ({
       ...doc,
@@ -1407,7 +1531,7 @@ app.get('/api/user/my-listings', requireUser, async (req, res) => {
 // ── PUT /api/user/listings/:id (edit a listing the user owns) ──
 app.put('/api/user/listings/:id', requireUser, async (req, res) => {
   try {
-    const prop = await Property.findOne({ _id: req.params.id, userId: req.userId });
+    const { doc: prop, model: currentModel } = await findUserListingById(req.params.id, req.userId);
     if (!prop) return res.status(404).json({ message: 'Listing not found, or you do not have permission to edit it' });
 
     const body = req.body || {};
@@ -1428,8 +1552,8 @@ app.put('/api/user/listings/:id', requireUser, async (req, res) => {
       prop[section] = Object.assign({}, prop[section]?.toObject ? prop[section].toObject() : prop[section], fields[section]);
     }
 
-    await prop.save();
-    const saved = prop.toObject();
+    const savedDoc = await moveListingIfNeeded(prop, currentModel);
+    const saved = savedDoc.toObject();
     saved.displayPrice = formatPrice((saved.price || {}).rent, (saved.basic || {}).status);
 
     res.json({ message: 'Listing updated successfully', property: saved });
@@ -1442,7 +1566,11 @@ app.put('/api/user/listings/:id', requireUser, async (req, res) => {
 // ── DELETE /api/user/listings/:id (delete a listing the user owns) ──
 app.delete('/api/user/listings/:id', requireUser, async (req, res) => {
   try {
-    const deleted = await Property.findOneAndDelete({ _id: req.params.id, userId: req.userId });
+    let deleted = null;
+    for (const M of LISTING_MODEL_LIST) {
+      deleted = await M.findOneAndDelete({ _id: req.params.id, userId: req.userId });
+      if (deleted) break;
+    }
     if (!deleted) return res.status(404).json({ message: 'Listing not found, or you do not have permission to delete it' });
     res.json({ message: 'Listing deleted' });
   } catch (err) {
