@@ -460,7 +460,7 @@ ul{list-style:none}
 .prop-img-placeholder svg{width:52px;height:52px;stroke:var(--border-2);fill:none;stroke-width:1.4}
 .prop-card-top-row{
   position:absolute;top:10px;left:10px;right:10px;
-  display:flex;align-items:center;justify-content:space-between;
+  display:flex;align-items:flex-start;justify-content:space-between;
   z-index:2;pointer-events:none;
 }
 .prop-card-top-row > *{pointer-events:auto}
@@ -498,6 +498,21 @@ ul{list-style:none}
 .prop-heart:hover{background:#fff;transform:scale(1.07)}
 .prop-heart svg{width:14px;height:14px;stroke:var(--brand);fill:none;stroke-width:2;transition:fill .12s}
 .prop-heart.liked svg{fill:var(--brand)}
+/* ─── Right-side icon stack (shortlist heart, then promoted/verified icons below it) ─── */
+.prop-right-badges{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  flex-shrink:0;
+}
+.prop-icon-badge{
+  width:26px;height:26px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 6px rgba(20,16,17,.15);
+  flex-shrink:0;
+}
+.prop-icon-promoted{background:linear-gradient(135deg,#eec9c0,#d9a488)}
+.prop-icon-promoted svg{width:13px;height:13px;fill:#4a2418;stroke:none}
+.prop-icon-verified{background:linear-gradient(135deg,#3fb87a,#2a8f5c)}
+.prop-icon-verified svg{width:14px;height:14px;fill:#fff;stroke:none}
 .prop-body{padding:13px 14px 12px;flex:1;min-width:0;display:flex;flex-direction:column}
 .prop-price-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:3px;margin-bottom:4px}
 .prop-price{
@@ -1231,26 +1246,28 @@ ul{list-style:none}
   white-space:nowrap;position:sticky;left:0;background:var(--bg);
 }
 .compare-col-head{position:relative;padding-top:14px!important}
-.compare-col-remove{
-  position:absolute;top:6px;right:6px;
-  width:22px;height:22px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  color:var(--text-3);background:var(--bg-2);
-}
-.compare-col-remove:hover{background:var(--brand-light);color:var(--brand)}
-.compare-col-remove svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.4}
 .compare-col-img{
-  width:100%;aspect-ratio:16/10;border-radius:8px;
-  background:var(--bg-3);margin-bottom:8px;
+  width:170px;height:106px;aspect-ratio:16/10;border-radius:8px;
+  background:var(--bg-3);margin:0 auto 8px;
   display:flex;align-items:center;justify-content:center;
-  overflow:hidden;position:relative;
+  overflow:hidden;position:relative;flex-shrink:0;
 }
 .compare-col-img img{width:100%;height:100%;object-fit:cover}
-.compare-col-badges{
-  position:absolute;top:8px;left:8px;right:8px;
-  display:flex;align-items:center;gap:6px;
+.compare-col-top-row{
+  position:absolute;top:6px;left:6px;right:6px;
+  display:flex;align-items:flex-start;justify-content:space-between;
   z-index:2;
 }
+.compare-col-left-badges{display:flex;align-items:center;gap:6px}
+.compare-col-right-badges{display:flex;flex-direction:column;align-items:center;gap:5px}
+.compare-col-remove{
+  width:22px;height:22px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text-3);background:rgba(255,255,255,.92);cursor:pointer;
+  flex-shrink:0;
+}
+.compare-col-remove:hover{background:#fff;color:var(--brand)}
+.compare-col-remove svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.4}
 .compare-col-title{font-size:13px;font-weight:600;line-height:1.35;margin-bottom:2px}
 .compare-col-loc{font-size:11.5px;color:var(--text-3)}
 .compare-col-price{font-size:16px;font-weight:700;color:var(--brand);margin-top:6px}
@@ -2322,25 +2339,12 @@ ul{list-style:none}
 }
 
 /* ─── Card image slider ─────────────────────────── */
-.img-slides{position:absolute;inset:0;width:100%;height:100%;overflow:hidden}
+.img-slides{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;cursor:grab}
+.img-slides:active{cursor:grabbing}
 .img-slide{display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background-color:var(--bg-3);pointer-events:none;vertical-align:top}
 .img-slide.active{display:block}
 .img-slide.active{pointer-events:auto}
 .img-slide.active{opacity:1}
-.slide-arrows{
-  position:absolute;top:50%;left:0;right:0;transform:translateY(-50%);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 8px;box-sizing:border-box;
-  z-index:3;opacity:0;transition:opacity .15s;pointer-events:none;
-}
-.prop-img:hover .slide-arrows{opacity:1}
-.slide-prev,.slide-next{
-  width:26px;height:26px;border-radius:50%;
-  background:rgba(255,255,255,.85);border:none;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  pointer-events:auto;flex-shrink:0;
-}
-.slide-prev svg,.slide-next svg{width:14px;height:14px;stroke:var(--text);fill:none;stroke-width:2.5}
 .slide-dots{
   position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
   display:flex;gap:4px;z-index:3;
@@ -5051,16 +5055,7 @@ function buildImgSlider(p, fg, uidSuffix) {
   const dots = imgs.length > 1 ? `<div class="slide-dots">${imgs.map((_,i)=>
     `<button class="slide-dot${i===0?' active':''}" onclick="event.stopPropagation();slideGo('${uid}',${i})"></button>`
   ).join('')}</div>` : '';
-  const arrows = imgs.length > 1 ? `
-    <div class="slide-arrows">
-      <button class="slide-prev" onclick="event.stopPropagation();slideStep('${uid}',-1)">
-        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-      </button>
-      <button class="slide-next" onclick="event.stopPropagation();slideStep('${uid}',1)">
-        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
-    </div>` : '';
-  return `<div class="img-slides" id="${uid}">${slides}${arrows}${dots}</div>`;
+  return `<div class="img-slides" id="${uid}">${slides}${dots}</div>`;
 }
 
 function slideGo(uid, idx) {
@@ -5104,6 +5099,31 @@ function slideStep(uid, dir) {
     }
     active = null;
   }, {passive:true});
+})();
+
+/* Mouse-drag swipe for desktop — same threshold/logic as the touch handler
+   above, so trackpad/mouse users can swipe through photos without arrow
+   buttons. A plain click (no meaningful drag) still falls through to the
+   image's own onclick (opens the lightbox). */
+(function(){
+  let mx = 0, my = 0, active = null;
+  document.addEventListener('mousedown', function(e){
+    const el = e.target.closest('.img-slides');
+    if (!el || !el.id) { active = null; return; }
+    if (el.querySelectorAll('.img-slide').length < 2) { active = null; return; }
+    active = el;
+    mx = e.clientX;
+    my = e.clientY;
+  });
+  document.addEventListener('mouseup', function(e){
+    if (!active) return;
+    const dx = e.clientX - mx;
+    const dy = e.clientY - my;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+      slideStep(active.id, dx < 0 ? 1 : -1);
+    }
+    active = null;
+  });
 })();
 
 /* ═══════════════════════════════════════════════
@@ -5232,18 +5252,20 @@ function cardHTML(p) {
       ${buildImgSlider(p, fg, '-grid')}
       <div class="prop-card-top-row">
         <div class="prop-left-badges">
-          ${p.promoted ? '<span class="prop-badge-promoted">★ Promoted</span>' : ''}
           <span class="prop-badge-type badge-${pType.toLowerCase()}">${pType}</span>
         </div>
-        <div class="prop-heart${liked?' liked':''}" onclick="event.stopPropagation();toggleShortlist('${p.id}',this)" aria-label="${liked?'Remove from':'Add to'} shortlist">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <div class="prop-right-badges">
+          <div class="prop-heart${liked?' liked':''}" onclick="event.stopPropagation();toggleShortlist('${p.id}',this)" aria-label="${liked?'Remove from':'Add to'} shortlist">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </div>
+          ${p.promoted ? '<div class="prop-icon-badge prop-icon-promoted" title="Promoted"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.26 6.9.8-5.1 4.7 1.4 6.84L12 17.3l-6.1 3.3 1.4-6.84-5.1-4.7 6.9-.8z"/></svg></div>' : ''}
+          ${p.verified ? '<div class="prop-icon-badge prop-icon-verified" title="Verified"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l6.5 2.8v5.4c0 4.8-2.8 8.9-6.5 10.8-3.7-1.9-6.5-6-6.5-10.8V5.3z" fill="#fff"/><path d="M8.7 12l2.3 2.3 4.3-4.6" stroke="#2a8f5c" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' : ''}
         </div>
       </div>
     </div>
     <div class="prop-body">
       <div class="prop-title" title="${esc(p.propertyId)}">
         <span class="prop-title-text">${esc(p.propertyId || 'Untitled listing')}</span>
-        ${p.verified ? `<span class="prop-verified-badge" title="Verified listing"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1l3.2 1.6 3.5.4 1.6 3.2 2.7 2.4-.6 3.6 1 3.4-2.7 2.4-1.6 3.2-3.5.4-3.2 1.6-3.2-1.6-3.5-.4-1.6-3.2-2.7-2.4.6-3.6-1-3.4 2.7-2.4 1.6-3.2 3.5-.4z"/><path d="M9 12.5l2 2 4-4.5" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Verified</span>` : ''}
         ${ptype ? `<span class="prop-title-buildtype" title="${esc(ptype)}">${esc(ptype)}</span>` : ''}
       </div>
       <div class="prop-price-row">
@@ -5320,11 +5342,11 @@ function cardHTML(p) {
             <span>WhatsApp</span>
           </button>
           <div class="prop-qa-icon prop-qa-3d qa-visit" id="prop-qa-icon-${p.id}" data-prop-id="${p.id}" onclick="event.stopPropagation();openScheduleModal('${p.id}')" aria-label="Schedule a visit" title="Schedule a visit">
-            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4" width="14" height="15" rx="2"/><line x1="6" y1="1.5" x2="6" y2="6.5"/><line x1="13" y1="1.5" x2="13" y2="6.5"/><line x1="2.5" y1="9" x2="16.5" y2="9"/><circle cx="16.5" cy="16.5" r="6.2" fill="#c9975c"/><path d="M16.5 12.8v3.7l2.6 1.5"/></svg></span>
             <span class="prop-qa-count" style="${(p.visitCount||0) > 0 ? '' : 'display:none'}">${p.visitCount||0}</span>
           </div>
           <div class="prop-qa-icon prop-qa-3d qa-compare prop-action-compare${compared?' checked':''}${compareDisabled?' disabled':''}" onclick="event.stopPropagation();toggleCompare('${p.id}',this)" aria-label="${compared?'Remove from':'Add to'} compare" title="${compareDisabled?`You're comparing ${lockedType} properties`:'Compare'}">
-            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></span>
+            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="8" height="16" rx="1.5"/><rect x="13" y="4" width="8" height="16" rx="1.5" opacity="0.55"/></svg></span>
           </div>
           <span class="prop-views" title="${getViews(p).toLocaleString('en-IN')} views">
             <span class="prop-views-icon">
@@ -5368,11 +5390,14 @@ function shortlistCardHTML(p) {
       ${buildImgSlider(p, fg, '-sl')}
       <div class="prop-card-top-row">
         <div class="prop-left-badges">
-          ${p.promoted ? '<span class="prop-badge-promoted">★ Promoted</span>' : ''}
           <span class="prop-badge-type badge-${pType.toLowerCase()}">${pType}</span>
         </div>
-        <div class="prop-heart${liked?' liked':''}" onclick="event.stopPropagation();toggleShortlist('${p.id}',this)" aria-label="${liked?'Remove from':'Add to'} shortlist">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <div class="prop-right-badges">
+          <div class="prop-heart${liked?' liked':''}" onclick="event.stopPropagation();toggleShortlist('${p.id}',this)" aria-label="${liked?'Remove from':'Add to'} shortlist">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </div>
+          ${p.promoted ? '<div class="prop-icon-badge prop-icon-promoted" title="Promoted"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.26 6.9.8-5.1 4.7 1.4 6.84L12 17.3l-6.1 3.3 1.4-6.84-5.1-4.7 6.9-.8z"/></svg></div>' : ''}
+          ${p.verified ? '<div class="prop-icon-badge prop-icon-verified" title="Verified"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l6.5 2.8v5.4c0 4.8-2.8 8.9-6.5 10.8-3.7-1.9-6.5-6-6.5-10.8V5.3z" fill="#fff"/><path d="M8.7 12l2.3 2.3 4.3-4.6" stroke="#2a8f5c" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' : ''}
         </div>
       </div>
     </div>
@@ -5439,11 +5464,11 @@ function shortlistCardHTML(p) {
             <span>WhatsApp</span>
           </button>
           <div class="prop-qa-icon prop-qa-3d qa-visit" id="prop-qa-icon-${p.id}" data-prop-id="${p.id}" onclick="event.stopPropagation();openScheduleModal('${p.id}')" aria-label="Schedule a visit" title="Schedule a visit">
-            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4" width="14" height="15" rx="2"/><line x1="6" y1="1.5" x2="6" y2="6.5"/><line x1="13" y1="1.5" x2="13" y2="6.5"/><line x1="2.5" y1="9" x2="16.5" y2="9"/><circle cx="16.5" cy="16.5" r="6.2" fill="#c9975c"/><path d="M16.5 12.8v3.7l2.6 1.5"/></svg></span>
             <span class="prop-qa-count" style="${(p.visitCount||0) > 0 ? '' : 'display:none'}">${p.visitCount||0}</span>
           </div>
           <div class="prop-qa-icon prop-qa-3d qa-compare prop-action-compare${compared?' checked':''}${compareDisabled?' disabled':''}" onclick="event.stopPropagation();toggleCompare('${p.id}',this)" aria-label="${compared?'Remove from':'Add to'} compare" title="${compareDisabled?`You're comparing ${lockedType} properties`:'Compare'}">
-            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></span>
+            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="8" height="16" rx="1.5"/><rect x="13" y="4" width="8" height="16" rx="1.5" opacity="0.55"/></svg></span>
           </div>
         </div>
       </div>
@@ -5740,15 +5765,20 @@ function renderCompareTable() {
   const headCells = props.map(p => {
     const img = (p.media?.images && p.media.images[0]) ? `<img src="${safeUrl(p.media.images[0])}" alt="${esc(p.propertyId)}" loading="lazy">` : '';
     const pType = pTypeLabel(p);
-    const badges = `<div class="compare-col-badges">
-        ${p.promoted ? '<span class="prop-badge-promoted">Promoted</span>' : ''}
-        <span class="prop-badge-type badge-${pType.toLowerCase()}">${pType}</span>
+    const topRow = `<div class="compare-col-top-row">
+        <div class="compare-col-left-badges">
+          <span class="prop-badge-type badge-${pType.toLowerCase()}">${pType}</span>
+        </div>
+        <div class="compare-col-right-badges">
+          <div class="compare-col-remove" onclick="event.stopPropagation();removeFromCompare('${p.id}')" title="Remove from comparison">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </div>
+          ${p.promoted ? '<div class="prop-icon-badge prop-icon-promoted" title="Promoted"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.26 6.9.8-5.1 4.7 1.4 6.84L12 17.3l-6.1 3.3 1.4-6.84-5.1-4.7 6.9-.8z"/></svg></div>' : ''}
+          ${p.verified ? '<div class="prop-icon-badge prop-icon-verified" title="Verified"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l6.5 2.8v5.4c0 4.8-2.8 8.9-6.5 10.8-3.7-1.9-6.5-6-6.5-10.8V5.3z" fill="#fff"/><path d="M8.7 12l2.3 2.3 4.3-4.6" stroke="#2a8f5c" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' : ''}
+        </div>
       </div>`;
     return `<th class="compare-col compare-col-head">
-      <div class="compare-col-remove" onclick="removeFromCompare('${p.id}')" title="Remove from comparison">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </div>
-      <div class="compare-col-img">${badges}${img}</div>
+      <div class="compare-col-img">${img}${topRow}</div>
       <div class="compare-col-title">${esc(p.propertyId)}</div>
       <div class="compare-col-loc">${esc(p.location?.area)}</div>
       <div class="compare-col-price">${fmtRupee(p.price?.rent||0)}</div>
