@@ -154,6 +154,58 @@ body{
   background:var(--gold-light);color:var(--gold-dark);
 }
 
+/* ── PROPERTY CATEGORY SUB-TABS ── */
+.cat-tab-bar{
+  display:flex;align-items:center;gap:6px;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:calc(var(--radius) - 2px);padding:5px;
+  width:fit-content;margin-bottom:16px;flex-wrap:wrap;
+}
+.cat-tab-btn{
+  display:flex;align-items:center;gap:7px;
+  padding:7px 16px;border-radius:calc(var(--radius) - 6px);
+  border:none;background:transparent;cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:0.78rem;font-weight:700;color:var(--ink3);
+  transition:all 0.2s;white-space:nowrap;
+}
+.cat-tab-btn i{font-size:0.75rem}
+.cat-tab-btn:hover{color:var(--ink);background:var(--surface)}
+.cat-tab-btn.active{
+  background:var(--ink);color:#fff;
+  box-shadow:0 3px 10px rgba(12,13,16,0.16);
+}
+.cat-tab-btn .cat-count{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:19px;height:17px;padding:0 5px;
+  border-radius:99px;font-size:0.65rem;font-weight:700;
+  background:rgba(255,255,255,0.15);color:inherit;
+}
+.cat-tab-btn:not(.active) .cat-count{
+  background:rgba(12,13,16,0.08);color:var(--ink3);
+}
+
+/* ── PROMOTED / VERIFIED MINI TOGGLES ── */
+.mini-toggle-wrap{display:flex;align-items:center;justify-content:center}
+.mini-toggle{
+  position:relative;display:inline-block;width:38px;height:22px;flex-shrink:0;
+}
+.mini-toggle input{opacity:0;width:0;height:0}
+.mini-toggle .slider{
+  position:absolute;cursor:pointer;inset:0;
+  background:#d8d8d8;border-radius:99px;transition:background 0.2s;
+}
+.mini-toggle .slider::before{
+  content:"";position:absolute;height:16px;width:16px;left:3px;top:3px;
+  background:#fff;border-radius:50%;transition:transform 0.2s;
+  box-shadow:0 1px 3px rgba(0,0,0,0.25);
+}
+.mini-toggle input:checked + .slider{background:var(--gold, #c9a227)}
+.mini-toggle input:checked + .slider::before{transform:translateX(16px)}
+.mini-toggle.verified-toggle input:checked + .slider{background:var(--green, #1a7a5e)}
+.mini-toggle input:disabled + .slider{opacity:0.55;cursor:wait}
+.mini-toggle input:focus-visible + .slider{outline:2px solid var(--ink3);outline-offset:2px}
+
 /* ── TAB PANELS ── */
 .tab-panel{display:none}
 .tab-panel.active{display:block;animation:fadeIn 0.2s ease}
@@ -944,6 +996,53 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
 }
 .logout-btn:hover{background:var(--red-light);color:var(--red);border-color:rgba(224,68,68,0.25)}
 
+/* ── CONFIRM MODAL ── */
+#confirmOverlay{
+  display:none;position:fixed;inset:0;z-index:10000;
+  background:rgba(12,13,16,0.68);
+  align-items:center;justify-content:center;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  padding:20px;
+}
+.confirm-card{
+  background:#fff;border-radius:20px;
+  padding:32px 30px 26px;width:100%;max-width:380px;
+  box-shadow:0 32px 80px rgba(0,0,0,0.35);
+  border:1px solid var(--border);
+  animation:confirmPop 0.22s cubic-bezier(.25,1.4,.5,1);
+  text-align:center;
+}
+@keyframes confirmPop{
+  from{opacity:0;transform:translateY(10px) scale(0.96)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+.confirm-icon{
+  width:56px;height:56px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 18px;font-size:1.4rem;
+  background:var(--red-light);color:var(--red);
+}
+.confirm-icon.info{background:var(--gold-light);color:var(--gold-dark)}
+.confirm-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.35rem;font-weight:700;color:var(--ink);margin-bottom:8px;
+}
+.confirm-msg{
+  font-size:0.88rem;color:var(--ink3);line-height:1.5;margin-bottom:26px;
+}
+.confirm-actions{display:flex;gap:10px;justify-content:center}
+.confirm-actions button{
+  flex:1;padding:12px;border-radius:var(--radius-xs);border:none;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:0.86rem;font-weight:700;
+  cursor:pointer;transition:all 0.18s;letter-spacing:0.2px;
+}
+.confirm-cancel-btn{background:var(--surface2);color:var(--ink2)}
+.confirm-cancel-btn:hover{background:var(--border);color:var(--ink)}
+.confirm-ok-btn{background:var(--red);color:#fff}
+.confirm-ok-btn:hover{background:#c73a3a;box-shadow:0 6px 20px rgba(224,68,68,0.3)}
+.confirm-ok-btn.info{background:var(--ink)}
+.confirm-ok-btn.info:hover{background:#2a2d38;box-shadow:0 6px 20px rgba(12,13,16,0.25)}
+
 </style>
 </head>
 <body>
@@ -971,6 +1070,19 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
     </div>
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" id="loginBtn" onclick="doLogin()">Sign In</button>
+  </div>
+</div>
+
+<!-- ══ CONFIRM MODAL ══ -->
+<div id="confirmOverlay">
+  <div class="confirm-card">
+    <div class="confirm-icon" id="confirmIcon"><i class="fas fa-trash-alt"></i></div>
+    <div class="confirm-title" id="confirmTitle">Are you sure?</div>
+    <div class="confirm-msg" id="confirmMsg">This action cannot be undone.</div>
+    <div class="confirm-actions">
+      <button class="confirm-cancel-btn" id="confirmCancelBtn">Cancel</button>
+      <button class="confirm-ok-btn" id="confirmOkBtn">Delete</button>
+    </div>
   </div>
 </div>
 
@@ -1065,6 +1177,27 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
 
   <!-- ══ PROPERTIES PANEL ══ -->
   <div class="tab-panel active" id="panel-properties">
+    <!-- Category sub-tabs: All / Rent / Lease / PG -->
+    <div class="cat-tab-bar" id="propCatTabs">
+      <button class="cat-tab-btn active" data-cat="all" onclick="switchPropCategory('all')">
+        <i class="fas fa-layer-group"></i><span>All</span><span class="cat-count" id="cat-count-all">—</span>
+      </button>
+      <button class="cat-tab-btn" data-cat="Promoted" onclick="switchPropCategory('Promoted')">
+        <i class="fas fa-star"></i><span>Promoted</span><span class="cat-count" id="cat-count-Promoted">—</span>
+      </button>
+      <button class="cat-tab-btn" data-cat="Verified" onclick="switchPropCategory('Verified')">
+        <i class="fas fa-circle-check"></i><span>Verified</span><span class="cat-count" id="cat-count-Verified">—</span>
+      </button>
+      <button class="cat-tab-btn" data-cat="Rent" onclick="switchPropCategory('Rent')">
+        <i class="fas fa-key"></i><span>Rent</span><span class="cat-count" id="cat-count-Rent">—</span>
+      </button>
+      <button class="cat-tab-btn" data-cat="Lease" onclick="switchPropCategory('Lease')">
+        <i class="fas fa-file-signature"></i><span>Lease</span><span class="cat-count" id="cat-count-Lease">—</span>
+      </button>
+      <button class="cat-tab-btn" data-cat="PG" onclick="switchPropCategory('PG')">
+        <i class="fas fa-bed"></i><span>PG</span><span class="cat-count" id="cat-count-PG">—</span>
+      </button>
+    </div>
     <div class="card">
       <div class="card-header">
         <div>
@@ -1098,12 +1231,14 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
               <th>Owner Number</th>
               <th>Location</th>
               <th>Listed On</th>
+              <th>Promoted</th>
+              <th>Verified</th>
               <th>Remarks</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            <tr><td colspan="9" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
+            <tr><td colspan="11" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
           </tbody>
         </table>
       </div>
@@ -1204,6 +1339,52 @@ let ADMIN_KEY = sessionStorage.getItem('kr_admin_key') || '';
 /* Helper: auth headers for all fetch() calls */
 function authHeaders(extra){
   return Object.assign({ 'x-admin-key': ADMIN_KEY }, extra||{});
+}
+
+/* ── CONFIRM MODAL ──
+   Promise-based replacement for window.confirm(). Usage:
+     if(!await showConfirmModal({ message:'Delete this property?' })) return;
+   Options: title, message, okText, cancelText, variant ('danger'|'info') */
+function showConfirmModal({ title='Are you sure?', message='This action cannot be undone.', okText='Delete', cancelText='Cancel', variant='danger' } = {}){
+  return new Promise(resolve=>{
+    const overlay  = document.getElementById('confirmOverlay');
+    const iconEl   = document.getElementById('confirmIcon');
+    const titleEl  = document.getElementById('confirmTitle');
+    const msgEl    = document.getElementById('confirmMsg');
+    const okBtn    = document.getElementById('confirmOkBtn');
+    const cancelBtn= document.getElementById('confirmCancelBtn');
+
+    titleEl.textContent = title;
+    msgEl.textContent = message;
+    okBtn.textContent = okText;
+    cancelBtn.textContent = cancelText;
+
+    const isInfo = variant === 'info';
+    iconEl.className = 'confirm-icon' + (isInfo ? ' info' : '');
+    iconEl.innerHTML = `<i class="fas ${isInfo ? 'fa-circle-info' : 'fa-trash-alt'}"></i>`;
+    okBtn.className = 'confirm-ok-btn' + (isInfo ? ' info' : '');
+
+    function cleanup(result){
+      overlay.style.display = 'none';
+      okBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+      overlay.removeEventListener('click', onOverlayClick);
+      document.removeEventListener('keydown', onKeydown);
+      resolve(result);
+    }
+    function onOk(){ cleanup(true); }
+    function onCancel(){ cleanup(false); }
+    function onOverlayClick(e){ if(e.target === overlay) cleanup(false); }
+    function onKeydown(e){ if(e.key === 'Escape') cleanup(false); if(e.key === 'Enter') cleanup(true); }
+
+    okBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+    overlay.addEventListener('click', onOverlayClick);
+    document.addEventListener('keydown', onKeydown);
+
+    overlay.style.display = 'flex';
+    okBtn.focus();
+  });
 }
 
 /* ── LOGIN ── */
@@ -1351,7 +1532,7 @@ function updateStats(data){
 
 /* ── DELETE HANDLERS ── */
 window.deleteBooking = async function(mobile){
-  if(!confirm('Delete this customer?')) return;
+  if(!await showConfirmModal({ title:'Delete customer?', message:'This customer\'s registration will be permanently removed.' })) return;
   const res = await fetch(`${BASE}/api/users/mobile/${mobile}`, { method:'DELETE', headers: authHeaders() });
   const data = await res.json().catch(()=>({}));
   if(res.ok){
@@ -1368,7 +1549,7 @@ window.deleteBooking = async function(mobile){
 };
 
 window.deleteProperty = async function(id){
-  if(!confirm('Delete this property?')) return;
+  if(!await showConfirmModal({ title:'Delete property?', message:'This listing will be permanently removed from your site.' })) return;
   const res = await fetch(`${BASE}/api/properties/${id}`, { method:'DELETE', headers: authHeaders() });
   const data = await res.json().catch(()=>({}));
   if(res.ok){
@@ -1380,6 +1561,46 @@ window.deleteProperty = async function(id){
     }, 600);
   } else {
     alert(data.message || 'Delete failed');
+  }
+};
+
+/* ── PROMOTED / VERIFIED TOGGLES ── */
+window.togglePropFlag = async function(id, field, checkboxEl){
+  const desired = checkboxEl.checked;
+  checkboxEl.disabled = true;
+  try{
+    const res = await fetch(`${BASE}/api/properties/${id}/${field}`, {
+      method: 'PATCH',
+      headers: authHeaders({'Content-Type':'application/json'}),
+      body: JSON.stringify({ [field]: desired })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok){
+      checkboxEl.checked = !desired; // revert
+      alert(data.message || `Failed to update ${field} status`);
+      return;
+    }
+    // Reflect the confirmed value into the row's underlying data so filters/
+    // counts (Promoted/Verified sub-tabs) and re-draws stay accurate without
+    // a full ajax.reload().
+    const confirmedVal = typeof data[field] === 'boolean' ? data[field] : desired;
+    checkboxEl.checked = confirmedVal;
+    if(_adminPropCache[id]) _adminPropCache[id][field] = confirmedVal;
+    propTable.rows().every(function(){
+      const rd = this.data();
+      if(rd && rd._id === id){ rd[field] = confirmedVal; }
+    });
+    updatePropCategoryCounts(propTable.rows().data().toArray());
+    // If the currently active sub-tab is Promoted/Verified and this row no
+    // longer belongs there, redraw so it disappears from the filtered view.
+    if(_propCategoryState === 'Promoted' || _propCategoryState === 'Verified'){
+      propTable.draw(false);
+    }
+  } catch(err){
+    checkboxEl.checked = !desired; // revert on network error
+    alert(`Failed to update ${field} status`);
+  } finally {
+    checkboxEl.disabled = false;
   }
 };
 
@@ -1507,7 +1728,7 @@ async function saveRemark(cell, id, type){
 }
 
 window.deleteRemark = async function(btn, id, type, idx){
-  if(!confirm('Delete this remark?')) return;
+  if(!await showConfirmModal({ title:'Delete remark?', message:'This remark will be removed permanently.' })) return;
   const cell = btn.closest('.remark-cell');
   cell.classList.add('remark-saving');
   try {
@@ -1746,12 +1967,28 @@ $(document).ready(function(){
       { data:'loc', render:(d)=> escapeHtml(d||'—') },
       /* 6 – Listed On */
       { data:'createdAt', render:(d,t)=> t==='display' ? formatDateTime(d) : (d||'—') },
-      /* 7 – Remarks */
+      /* 7 – Promoted (toggle) */
+      { data:'promoted', orderable:false, className:'dt-body-center', render:(d,t,row)=>{
+          if(t!=='display') return d ? 'Yes' : 'No';
+          return `<label class="mini-toggle-wrap"><span class="mini-toggle promoted-toggle">
+            <input type="checkbox" ${d?'checked':''} onchange="togglePropFlag('${row._id}','promoted',this)">
+            <span class="slider"></span>
+          </span></label>`;
+      }},
+      /* 8 – Verified (toggle) */
+      { data:'verified', orderable:false, className:'dt-body-center', render:(d,t,row)=>{
+          if(t!=='display') return d ? 'Yes' : 'No';
+          return `<label class="mini-toggle-wrap"><span class="mini-toggle verified-toggle">
+            <input type="checkbox" ${d?'checked':''} onchange="togglePropFlag('${row._id}','verified',this)">
+            <span class="slider"></span>
+          </span></label>`;
+      }},
+      /* 9 – Remarks */
       { data:'remarks', orderable:false, render:(d,t,row)=>{
           if(t==='display') return remarkCellHtml(row._id, d, 'property');
           return d||'';
       }},
-      /* 8 – Action */
+      /* 10 – Action */
       { data:null, orderable:false, render:(d,t,row)=>{
           _adminPropCache[row._id] = row;
           return `<div style="display:inline-flex;gap:6px;flex-wrap:wrap;justify-content:center">
@@ -1775,7 +2012,7 @@ $(document).ready(function(){
     buttons:[
       {
         extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV', title:'KR Properties',
-        exportOptions:{ columns:[0,1,2,3,4,5,6,7],
+        exportOptions:{ columns:[0,1,2,3,4,5,6,7,8,9],
           format:{ body:function(data,row,col){
             var rd=propTable.row(row).data(); if(!rd) return data;
             if(col===0) return (rd.title||'').trim()||'—';
@@ -1785,14 +2022,16 @@ $(document).ready(function(){
             if(col===4){ var ph=rd.ownerNumber||''; return ph?'=HYPERLINK("tel:'+ph+'","'+ph+'")':'—'; }
             if(col===5) return rd.loc||'—';
             if(col===6){ if(!rd.createdAt) return '—'; const d=new Date(rd.createdAt); return d.toLocaleDateString('en-GB')+' '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}); }
-            if(col===7) return flattenRemarks(rd.remarks);
+            if(col===7) return rd.promoted ? 'Yes' : 'No';
+            if(col===8) return rd.verified ? 'Yes' : 'No';
+            if(col===9) return flattenRemarks(rd.remarks);
             return data;
           }}
         }
       },
       {
         extend:'excel', text:'<i class="fas fa-file-excel"></i> Excel', title:'KR Properties',
-        exportOptions:{ columns:[0,1,2,3,4,5,6,7],
+        exportOptions:{ columns:[0,1,2,3,4,5,6,7,8,9],
           format:{ body:function(data,row,col){
             var rd=propTable.row(row).data(); if(!rd) return data;
             if(col===0) return (rd.title||'').trim()||'—';
@@ -1802,7 +2041,9 @@ $(document).ready(function(){
             if(col===4) return rd.ownerNumber||'—';
             if(col===5) return rd.loc||'—';
             if(col===6){ if(!rd.createdAt) return '—'; return new Date(rd.createdAt).toLocaleString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true}); }
-            if(col===7) return flattenRemarks(rd.remarks);
+            if(col===7) return rd.promoted ? 'Yes' : 'No';
+            if(col===8) return rd.verified ? 'Yes' : 'No';
+            if(col===9) return flattenRemarks(rd.remarks);
             return data;
           }}
         }
@@ -1810,7 +2051,14 @@ $(document).ready(function(){
       {
         extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
         orientation:'landscape', pageSize:'A4', title:'KR Real-Estate — Properties',
-        exportOptions:{columns:[0,1,2,3,4,5,6,7]},
+        exportOptions:{columns:[0,1,2,3,4,5,6,7,8,9],
+          format:{ body:function(data,row,col){
+            var rd=propTable.row(row).data(); if(!rd) return data;
+            if(col===7) return rd.promoted ? 'Yes' : 'No';
+            if(col===8) return rd.verified ? 'Yes' : 'No';
+            return data;
+          }}
+        },
         customize:function(doc){
           doc.styles.tableHeader={fillColor:'#0c0d10',color:'white',bold:true,fontSize:9,alignment:'center'};
           doc.defaultStyle={fontSize:8,color:'#0c0d10'};
@@ -1826,7 +2074,14 @@ $(document).ready(function(){
       },
       {
         extend:'print', text:'<i class="fas fa-print"></i> Print', title:'KR Properties',
-        exportOptions:{columns:[0,1,2,3,4,5,6,7]},
+        exportOptions:{columns:[0,1,2,3,4,5,6,7,8,9],
+          format:{ body:function(data,row,col){
+            var rd=propTable.row(row).data(); if(!rd) return data;
+            if(col===7) return rd.promoted ? 'Yes' : 'No';
+            if(col===8) return rd.verified ? 'Yes' : 'No';
+            return data;
+          }}
+        },
         customize:function(win){
           $(win.document.head).append('<style>table td a{color:#1a7a5e;text-decoration:underline}</style>');
           $(win.document.body).find('table tbody tr').each(function(){
@@ -2248,6 +2503,7 @@ function closeAdminPropModal(){
    DYNAMIC PROPERTY FILTERS
 ════════════════════════════════════ */
 function buildPropFilters(data){
+  updatePropCategoryCounts(data);
   const statuses = [...new Set(data.map(r=>r.status).filter(Boolean))].sort();
   const cities   = [...new Set(data.map(r=>r.city||r.loc).filter(Boolean))].sort();
   const bhks     = [...new Set(data.map(r=>r.bhk).filter(v=>v!=null&&v!==''))].sort((a,b)=>Number(a)-Number(b));
@@ -2300,10 +2556,48 @@ function clearPropFilters(){
 
 const _propFilterState = {status:'', city:'', bhk:''};
 
+// Which of the 3 backend collections (rent / lease / pg) a row belongs to,
+// mirrors server.js's modelForStatus(): Lease->Lease, PG->PG, else->Rent.
+function propCategoryOf(status){
+  if(status === 'Lease') return 'Lease';
+  if(status === 'PG')    return 'PG';
+  return 'Rent';
+}
+
+let _propCategoryState = 'all';
+
+function switchPropCategory(cat){
+  _propCategoryState = cat;
+  document.querySelectorAll('#propCatTabs .cat-tab-btn').forEach(btn=>{
+    btn.classList.toggle('active', btn.getAttribute('data-cat') === cat);
+  });
+  if(propTable) propTable.draw();
+}
+
+function updatePropCategoryCounts(data){
+  const counts = {all:data.length, Promoted:0, Verified:0, Rent:0, Lease:0, PG:0};
+  data.forEach(r=>{
+    counts[propCategoryOf(r.status)]++;
+    if(r.promoted) counts.Promoted++;
+    if(r.verified) counts.Verified++;
+  });
+  ['all','Promoted','Verified','Rent','Lease','PG'].forEach(cat=>{
+    const el = document.getElementById('cat-count-'+cat);
+    if(el) el.innerText = counts[cat];
+  });
+}
+
 $.fn.dataTable.ext.search.push(function(settings, data, dataIndex){
   if(settings.nTable.id !== 'propertyTable') return true;
   const row = propTable ? propTable.row(dataIndex).data() : null;
   if(!row) return true;
+  if(_propCategoryState === 'Promoted'){
+    if(!row.promoted) return false;
+  } else if(_propCategoryState === 'Verified'){
+    if(!row.verified) return false;
+  } else if(_propCategoryState !== 'all' && propCategoryOf(row.status) !== _propCategoryState){
+    return false;
+  }
   const {status, city, bhk} = _propFilterState;
   if(status && (row.status||'') !== status) return false;
   const rowCity = row.city || row.loc || '';
@@ -2380,7 +2674,7 @@ window.updateApptStatus = async function(sel){
 };
 
 window.deleteAppointment = async function(id){
-  if(!confirm('Delete this appointment?')) return;
+  if(!await showConfirmModal({ title:'Delete appointment?', message:'This appointment will be permanently removed.' })) return;
   const res  = await fetch(`${BASE}/api/appointments/${id}`, { method:'DELETE', headers: authHeaders() });
   const data = await res.json().catch(()=>({}));
   if(res.ok){
