@@ -1685,6 +1685,7 @@ ul{list-style:none}
   cursor:pointer;
 }
 .form-select:focus{border-color:var(--brand)}
+.form-select:disabled{background:var(--bg-2);color:var(--text-2);cursor:not-allowed;opacity:1}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media (max-width:640px){
   /* Post Property and View Property share this form — keep every row to
@@ -3390,7 +3391,7 @@ ul{list-style:none}
     <!-- ===== 1. BASIC INFORMATION ===== -->
     <div class="lm-section">📋 Basic Information</div>
     <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
-      <div class="form-group">
+      <div class="form-group" id="f-typeWrap">
         <label class="form-label">Status <span style="color:var(--brand)">*</span></label>
         <select class="form-select" id="f-type" onchange="onFTypeChange(this.value)">
           <option value="Rent">Rent</option><option value="Lease">Lease</option><option value="PG">PG / Co-living</option>
@@ -4491,9 +4492,17 @@ ul{list-style:none}
     </div>
     <div class="menu-divider"></div>
     <div class="menu-section-label">Manage</div>
-    <div class="menu-item" onclick="toggleMenuPanel(); openAddModal();">
+    <div class="menu-item" onclick="toggleMenuPanel(); openAddModal('Rent');">
       <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Post a Property
+      List Rent Property
+    </div>
+    <div class="menu-item" onclick="toggleMenuPanel(); openAddModal('Lease');">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      List Lease Property
+    </div>
+    <div class="menu-item" onclick="toggleMenuPanel(); openAddModal('PG');">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      List PG Property
     </div>
     <div class="menu-divider"></div>
     <div class="menu-section-label">Support</div>
@@ -6857,10 +6866,15 @@ function restoreListingDraft() {
   return true;
 }
 
-function openAddModal() {
+function openAddModal(presetType) {
   if (!getLoggedInUser()) { showToast('Please log in to list your property'); openAuthModal(); return; }
   const restored = restoreListingDraft();
   if (!restored) resetListingForm();
+  if (presetType) {
+    document.getElementById('f-type').value = presetType;
+  }
+  const typeSelect = document.getElementById('f-type');
+  if (typeSelect) typeSelect.disabled = !!presetType;
   document.getElementById('addModal').classList.add('open');
   document.body.style.overflow = 'hidden';
   onFTypeChange(document.getElementById('f-type').value);
