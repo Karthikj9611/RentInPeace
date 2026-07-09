@@ -212,6 +212,30 @@ body{
   width:16px;height:16px;cursor:pointer;accent-color:var(--ink);
 }
 
+/* ── PER-COLUMN HEADER SEARCH FILTERS ── */
+table.dataTable thead tr.col-filter-row th{
+  padding:6px 8px!important;background:var(--surface2);
+  border-top:1px solid var(--border);
+}
+.col-filter-input,.col-filter-select{
+  width:100%;box-sizing:border-box;
+  padding:5px 8px;border:1.3px solid var(--border);border-radius:7px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:0.72rem;font-weight:500;
+  color:var(--ink);background:#fff;outline:none;
+  transition:border-color 0.15s,box-shadow 0.15s;
+}
+.col-filter-input::placeholder{color:var(--ink3);font-weight:400}
+.col-filter-input:focus,.col-filter-select:focus{
+  border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,144,60,0.12);
+}
+.col-filter-input.active-col-filter,.col-filter-select.active-col-filter{
+  border-color:var(--gold);background:var(--gold-light);
+}
+.col-filter-select{cursor:pointer;appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%238a6820'/></svg>");
+  background-repeat:no-repeat;background-position:right 8px center;padding-right:22px;
+}
+
 /* ── PROMOTED / VERIFIED MINI TOGGLES ── */
 .mini-toggle-wrap{display:flex;align-items:center;justify-content:center}
 .mini-toggle{
@@ -1187,15 +1211,29 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
           <thead>
             <tr>
               <th>Customer</th>
+              <th>User ID</th>
               <th>Phone</th>
               <th>Email</th>
+              <th>Listings</th>
+              <th>Visits</th>
               <th>Registered</th>
               <th>Remarks</th>
               <th>Action</th>
             </tr>
+            <tr class="col-filter-row">
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onCustColumnFilter('name', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onCustColumnFilter('userId', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onCustColumnFilter('mobile', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onCustColumnFilter('email', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="e.g. 3" oninput="onCustColumnFilter('listings', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="e.g. 0" oninput="onCustColumnFilter('visits', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="dd/mm/yyyy" oninput="onCustColumnFilter('registered', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onCustColumnFilter('remarks', this.value, this)"></th>
+              <th></th>
+            </tr>
           </thead>
           <tbody>
-            <tr><td colspan="6" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
+            <tr><td colspan="9" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
           </tbody>
         </table>
       </div>
@@ -1283,6 +1321,20 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
               <th>Remarks</th>
               <th>Action</th>
             </tr>
+            <tr class="col-filter-row">
+              <th></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('title', this.value, this)"></th>
+              <th><select class="col-filter-select" id="colFilterStatus" onchange="onPropColumnFilter('status', this.value, this)"><option value="">All</option></select></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('displayPrice', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('ownerName', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('ownerNumber', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('loc', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="dd/mm/yyyy" oninput="onPropColumnFilter('listedOn', this.value, this)"></th>
+              <th><select class="col-filter-select" onchange="onPropColumnFilter('promoted', this.value, this)"><option value="">All</option><option value="yes">Yes</option><option value="no">No</option></select></th>
+              <th><select class="col-filter-select" onchange="onPropColumnFilter('verified', this.value, this)"><option value="">All</option><option value="yes">Yes</option><option value="no">No</option></select></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('remarks', this.value, this)"></th>
+              <th></th>
+            </tr>
           </thead>
           <tbody>
             <tr><td colspan="12" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
@@ -1343,9 +1395,45 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
               <th>Remarks</th>
               <th>Action</th>
             </tr>
+            <tr class="col-filter-row">
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('customer', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('contact', this.value, this)"></th>
+              <th>
+                <select class="col-filter-select" onchange="onApptColumnFilter('purpose', this.value, this)">
+                  <option value="">All</option>
+                  <option value="For Sale">For Sale</option>
+                  <option value="For Rent">For Rent</option>
+                  <option value="Lease">Lease</option>
+                  <option value="PG">PG</option>
+                  <option value="General Enquiry">General Enquiry</option>
+                </select>
+              </th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('date', this.value, this)"></th>
+              <th>
+                <select class="col-filter-select" onchange="onApptColumnFilter('timeSlot', this.value, this)">
+                  <option value="">All</option>
+                  <option value="Morning">Morning</option>
+                  <option value="Afternoon">Afternoon</option>
+                  <option value="Evening">Evening</option>
+                </select>
+              </th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('message', this.value, this)"></th>
+              <th>
+                <select class="col-filter-select" onchange="onApptColumnFilter('status', this.value, this)">
+                  <option value="">All</option>
+                  <option value="pending">Pending</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="cancelled">Cancelled</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </th>
+              <th><input type="text" class="col-filter-input" placeholder="dd/mm/yyyy" oninput="onApptColumnFilter('bookedOn', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('remarks', this.value, this)"></th>
+              <th></th>
+            </tr>
           </thead>
           <tbody>
-            <tr><td colspan="9" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
+            <tr><td colspan="10" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
           </tbody>
         </table>
       </div>
@@ -1537,6 +1625,36 @@ function renderEmail(row){
 }
 function plainPhone(row){ return row.mobile||''; }
 function plainEmail(row){ return row.email||''; }
+
+/* ── CUSTOMERS: PER-COLUMN HEADER SEARCH FILTERS ── */
+const _custColumnFilters = { name:'', userId:'', mobile:'', email:'', listings:'', visits:'', registered:'', remarks:'' };
+
+window.onCustColumnFilter = function(field, value, inputEl){
+  _custColumnFilters[field] = (value||'').trim();
+  if(inputEl) inputEl.classList.toggle('active-col-filter', !!_custColumnFilters[field]);
+  if(dataTable) dataTable.draw();
+};
+
+$.fn.dataTable.ext.search.push(function(settings, data, dataIndex){
+  if(settings.nTable.id !== 'bookingTable') return true;
+  const row = dataTable ? dataTable.row(dataIndex).data() : null;
+  if(!row) return true;
+  const cf = _custColumnFilters;
+  const contains = (val, needle) => String(val||'').toLowerCase().includes(needle.toLowerCase());
+  const fullName = row.name || ((row.firstName||'')+' '+(row.lastName||'')).trim();
+  if(cf.name && !contains(fullName, cf.name)) return false;
+  if(cf.userId && !contains(row.userId, cf.userId)) return false;
+  if(cf.mobile && !contains(row.mobile, cf.mobile)) return false;
+  if(cf.email && !contains(row.email, cf.email)) return false;
+  if(cf.listings && !contains(row.listingsCount ?? 0, cf.listings)) return false;
+  if(cf.visits && !contains(row.visitsCount ?? 0, cf.visits)) return false;
+  if(cf.registered){
+    const formatted = row.createdAt ? new Date(row.createdAt).toLocaleDateString('en-GB') : '';
+    if(!formatted.includes(cf.registered)) return false;
+  }
+  if(cf.remarks && !contains(flattenRemarks(row.remarks||[]), cf.remarks)) return false;
+  return true;
+});
 
 function formatDateTime(createdAt){
   if(!createdAt) return '—';
@@ -2016,15 +2134,26 @@ $(document).ready(function(){
       }
     },
     columns:[
+      /* 0 – Customer name */
       { data:null, render:(d,t,row)=> t==='display' ? renderName(row) : ((row.firstName||'')+' '+(row.lastName||'')).trim() },
+      /* 1 – User ID */
+      { data:'userId', render:(d)=> escapeHtml(d||'—') },
+      /* 2 – Phone */
       { data:null, render:(d,t,row)=>{ if(t==='display') return renderPhone(row); return plainPhone(row); }},
+      /* 3 – Email */
       { data:null, render:(d,t,row)=>{ if(t==='display') return renderEmail(row); return plainEmail(row); }},
+      /* 4 – Property Listings (count) */
+      { data:'listingsCount', className:'dt-body-center', render:(d)=> String(d ?? 0) },
+      /* 5 – Visit Requests (count) */
+      { data:'visitsCount', className:'dt-body-center', render:(d)=> String(d ?? 0) },
+      /* 6 – Registered */
       { data:'createdAt', render:(d,t)=> t==='display' ? formatDateTime(d) : (d||'—') },
-      /* 4 – Remarks */
+      /* 7 – Remarks */
       { data:'remarks', orderable:false, render:(d,t,row)=>{
           if(t==='display') return remarkCellHtml(row.mobile||row._id, d, 'customer');
           return d||'';
       }},
+      /* 8 – Action */
       { 
 		  data:null, 
 		  orderable:false, 
@@ -2048,7 +2177,8 @@ $(document).ready(function(){
 		  }
 		}
     ],
-    order:[[3,'desc']],
+    order:[[6,'desc']],
+    orderCellsTop:true,
     pageLength:10,
     scrollX:true,
     language:{
@@ -2063,28 +2193,34 @@ $(document).ready(function(){
     buttons:[
       {
         extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV', title:'KR Real-Estate Leads',
-        exportOptions:{ columns:[0,1,2,3,4],
+        exportOptions:{ columns:[0,1,2,3,4,5,6,7],
           format:{ body:function(data,row,col){
             var rd=dataTable.row(row).data(); if(!rd) return data;
             if(col===0) return ((rd.firstName||'')+' '+(rd.lastName||'')).trim()||'—';
-            if(col===1){ var ph=plainPhone(rd); return ph?'=HYPERLINK("tel:'+ph+'","'+ph+'")':'—'; }
-            if(col===2){ var em=plainEmail(rd); return em?'=HYPERLINK("mailto:'+em+'","'+em+'")':'—'; }
-            if(col===3){ if(!rd.createdAt) return '—'; const d=new Date(rd.createdAt); return d.toLocaleDateString('en-GB')+' '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}); }
-            if(col===4) return flattenRemarks(rd.remarks);
+            if(col===1) return rd.userId||'—';
+            if(col===2){ var ph=plainPhone(rd); return ph?'=HYPERLINK("tel:'+ph+'","'+ph+'")':'—'; }
+            if(col===3){ var em=plainEmail(rd); return em?'=HYPERLINK("mailto:'+em+'","'+em+'")':'—'; }
+            if(col===4) return String(rd.listingsCount ?? 0);
+            if(col===5) return String(rd.visitsCount ?? 0);
+            if(col===6){ if(!rd.createdAt) return '—'; const d=new Date(rd.createdAt); return d.toLocaleDateString('en-GB')+' '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}); }
+            if(col===7) return flattenRemarks(rd.remarks);
             return data;
           }}
         }
       },
       {
         extend:'excel', text:'<i class="fas fa-file-excel"></i> Excel', title:'KR Real-Estate Leads',
-        exportOptions:{ columns:[0,1,2,3,4],
+        exportOptions:{ columns:[0,1,2,3,4,5,6,7],
           format:{ body:function(data,row,col){
             var rd=dataTable.row(row).data(); if(!rd) return data;
             if(col===0) return ((rd.firstName||'')+' '+(rd.lastName||'')).trim()||'—';
-            if(col===1) return rd.mobile||'—';
-            if(col===2) return rd.email||'—';
-            if(col===3){ if(!rd.createdAt) return '—'; return new Date(rd.createdAt).toLocaleString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true}); }
-            if(col===4) return flattenRemarks(rd.remarks);
+            if(col===1) return rd.userId||'—';
+            if(col===2) return rd.mobile||'—';
+            if(col===3) return rd.email||'—';
+            if(col===4) return String(rd.listingsCount ?? 0);
+            if(col===5) return String(rd.visitsCount ?? 0);
+            if(col===6){ if(!rd.createdAt) return '—'; return new Date(rd.createdAt).toLocaleString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true}); }
+            if(col===7) return flattenRemarks(rd.remarks);
             return data;
           }}
         }
@@ -2092,7 +2228,7 @@ $(document).ready(function(){
       {
         extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
         orientation:'landscape', pageSize:'A4', title:'KR Real-Estate — Customer Leads',
-        exportOptions:{columns:[0,1,2,3,4]},
+        exportOptions:{columns:[0,1,2,3,4,5,6,7]},
         customize:function(doc){
           doc.styles.tableHeader={fillColor:'#0c0d10',color:'white',bold:true,fontSize:10,alignment:'center'};
           doc.defaultStyle={fontSize:9,color:'#0c0d10'};
@@ -2102,20 +2238,20 @@ $(document).ready(function(){
           rows.forEach(function(rd,i){
             var pdfRow=tableBody[i+1]; if(!pdfRow) return;
             var phone=plainPhone(rd); var email=plainEmail(rd);
-            if(phone&&pdfRow[1]) pdfRow[1]={text:phone,link:'tel:'+phone,color:'#1a7a5e',decoration:'underline',fontSize:9};
-            if(email&&pdfRow[2]) pdfRow[2]={text:email,link:'mailto:'+email,color:'#8a6820',decoration:'underline',fontSize:9};
+            if(phone&&pdfRow[2]) pdfRow[2]={text:phone,link:'tel:'+phone,color:'#1a7a5e',decoration:'underline',fontSize:9};
+            if(email&&pdfRow[3]) pdfRow[3]={text:email,link:'mailto:'+email,color:'#8a6820',decoration:'underline',fontSize:9};
           });
         }
       },
       {
         extend:'print', text:'<i class="fas fa-print"></i> Print', title:'KR Real-Estate Leads',
-        exportOptions:{columns:[0,1,2,3,4]},
+        exportOptions:{columns:[0,1,2,3,4,5,6,7]},
         customize:function(win){
           $(win.document.head).append('<style>table td a{color:inherit;text-decoration:underline}table td a.ph{color:#1a7a5e}table td a.em{color:#8a6820}</style>');
           $(win.document.body).find('table tbody tr').each(function(){
             var cells=$(this).find('td');
-            var phText=cells.eq(1).text().trim(); if(phText&&phText!=='—') cells.eq(1).html('<a class="ph" href="tel:'+phText+'">'+phText+'</a>');
-            var emText=cells.eq(2).text().trim(); if(emText&&emText!=='—') cells.eq(2).html('<a class="em" href="mailto:'+emText+'">'+emText+'</a>');
+            var phText=cells.eq(2).text().trim(); if(phText&&phText!=='—') cells.eq(2).html('<a class="ph" href="tel:'+phText+'">'+phText+'</a>');
+            var emText=cells.eq(3).text().trim(); if(emText&&emText!=='—') cells.eq(3).html('<a class="em" href="mailto:'+emText+'">'+emText+'</a>');
           });
         }
       }
@@ -2201,6 +2337,7 @@ $(document).ready(function(){
       }}
     ],
     order:[[7,'desc']],
+    orderCellsTop:true,
     pageLength:10,
     scrollX:true,
     language:{
@@ -2369,6 +2506,7 @@ $(document).ready(function(){
       }}
     ],
     order:[[3,'asc']],
+    orderCellsTop:true,
     pageLength:10,
     scrollX:true,
     language:{
@@ -2725,6 +2863,7 @@ function buildPropFilters(data){
   populate('filterStatus', statuses);
   populate('filterCity',   cities);
   populate('filterBhk',    bhks, '');
+  populate('colFilterStatus', statuses);
 }
 
 function applyPropFilters(){
@@ -2762,6 +2901,19 @@ function clearPropFilters(){
 }
 
 const _propFilterState = {status:'', city:'', bhk:''};
+
+// Per-column header search filters (Property, Status, Price, Owner Name,
+// Owner Number, Location, Listed On, Promoted, Verified, Remarks).
+const _propColumnFilters = {
+  title:'', status:'', displayPrice:'', ownerName:'', ownerNumber:'',
+  loc:'', listedOn:'', promoted:'', verified:'', remarks:''
+};
+
+window.onPropColumnFilter = function(field, value, inputEl){
+  _propColumnFilters[field] = (value||'').trim();
+  if(inputEl) inputEl.classList.toggle('active-col-filter', !!_propColumnFilters[field]);
+  if(propTable) propTable.draw();
+};
 
 // Which of the 3 backend collections (rent / lease / pg) a row belongs to,
 // mirrors server.js's modelForStatus(): Lease->Lease, PG->PG, else->Rent.
@@ -2810,6 +2962,26 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex){
   const rowCity = row.city || row.loc || '';
   if(city && rowCity !== city) return false;
   if(bhk && String(row.bhk||'') !== String(bhk)) return false;
+
+  // Per-column header search filters
+  const cf = _propColumnFilters;
+  const contains = (val, needle) => String(val||'').toLowerCase().includes(needle.toLowerCase());
+  if(cf.title && !contains(row.title, cf.title)) return false;
+  if(cf.status && (row.status||'') !== cf.status) return false;
+  if(cf.displayPrice && !contains(row.displayPrice, cf.displayPrice)) return false;
+  if(cf.ownerName && !contains(row.ownerName, cf.ownerName)) return false;
+  if(cf.ownerNumber && !contains(row.ownerNumber, cf.ownerNumber)) return false;
+  if(cf.loc && !contains((row.loc||'')+' '+(row.city||''), cf.loc)) return false;
+  if(cf.listedOn){
+    const formatted = row.createdAt ? new Date(row.createdAt).toLocaleDateString('en-GB') : '';
+    if(!formatted.includes(cf.listedOn)) return false;
+  }
+  if(cf.promoted === 'yes' && !row.promoted) return false;
+  if(cf.promoted === 'no'  && row.promoted)  return false;
+  if(cf.verified === 'yes' && !row.verified) return false;
+  if(cf.verified === 'no'  && row.verified)  return false;
+  if(cf.remarks && !contains(flattenRemarks(row.remarks||[]), cf.remarks)) return false;
+
   return true;
 });
 
@@ -2902,6 +3074,18 @@ function updateApptStats(data){
 const _apptCache = {};
 const _apptFilterState = {status:'', purpose:'', slot:''};
 
+/* ── APPOINTMENTS: PER-COLUMN HEADER SEARCH FILTERS ── */
+const _apptColumnFilters = {
+  customer:'', contact:'', purpose:'', date:'', timeSlot:'',
+  message:'', status:'', bookedOn:'', remarks:''
+};
+
+window.onApptColumnFilter = function(field, value, inputEl){
+  _apptColumnFilters[field] = (value||'').trim();
+  if(inputEl) inputEl.classList.toggle('active-col-filter', !!_apptColumnFilters[field]);
+  if(apptTable) apptTable.draw();
+};
+
 function applyApptFilters(){
   ['filterApptStatus','filterApptPurpose','filterApptSlot'].forEach(id=>{
     document.getElementById(id).classList.toggle('active-filter', !!document.getElementById(id).value);
@@ -2936,6 +3120,30 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex){
   if(status  && (row.status ||'') !== status)  return false;
   if(purpose && (row.purpose||'') !== purpose) return false;
   if(slot    && (row.timeSlot||'') !== slot)   return false;
+
+  // Per-column header search filters
+  const cf = _apptColumnFilters;
+  const contains = (val, needle) => String(val||'').toLowerCase().includes(needle.toLowerCase());
+  const fullName = row.name || ((row.firstName||'')+' '+(row.lastName||'')).trim();
+  if(cf.customer && !contains(fullName, cf.customer)) return false;
+  if(cf.contact){
+    const contactBlob = [row.mobile, row.altMobile, row.email].filter(Boolean).join(' ');
+    if(!contains(contactBlob, cf.contact)) return false;
+  }
+  if(cf.purpose && (row.purpose||'') !== cf.purpose) return false;
+  if(cf.date){
+    const formatted = row.date ? new Date(row.date+'T00:00:00').toLocaleDateString('en-GB', {weekday:'short',day:'2-digit',month:'short',year:'numeric'}) : '';
+    if(!contains(formatted, cf.date)) return false;
+  }
+  if(cf.timeSlot && (row.timeSlot||'') !== cf.timeSlot) return false;
+  if(cf.message && !contains(row.message, cf.message)) return false;
+  if(cf.status && (row.status||'pending') !== cf.status) return false;
+  if(cf.bookedOn){
+    const formatted = row.createdAt ? new Date(row.createdAt).toLocaleDateString('en-GB') : '';
+    if(!formatted.includes(cf.bookedOn)) return false;
+  }
+  if(cf.remarks && !contains(flattenRemarks(row.remarks||[]), cf.remarks)) return false;
+
   return true;
 });
 
@@ -2949,9 +3157,17 @@ function openCustomerModal(id){
     `${c.firstName || ''} ${c.lastName || ''}`.trim();
 
   document.getElementById('customerModalName').innerHTML =
-    _adminModalEsc(fullName || 'Customer');
+    _adminModalEsc(fullName || c.name || 'Customer');
 
   const details = [
+    {
+      label:'User ID',
+      value:c.userId || '—'
+    },
+    {
+      label:'Full Name',
+      value:c.name || fullName || '—'
+    },
     {
       label:'First Name',
       value:c.firstName || '—'
@@ -2969,6 +3185,14 @@ function openCustomerModal(id){
       value:c.email || '—'
     },
     {
+      label:'Property Listings',
+      value:String(c.listingsCount ?? 0)
+    },
+    {
+      label:'Visit Requests',
+      value:String(c.visitsCount ?? 0)
+    },
+    {
       label:'Remarks',
       value:(()=>{
         const r = c.remarks;
@@ -2983,6 +3207,10 @@ function openCustomerModal(id){
       value:c.createdAt
         ? new Date(c.createdAt).toLocaleString('en-GB')
         : '—'
+    },
+    {
+      label:'Database ID',
+      value:c._id || '—'
     }
   ];
 
