@@ -185,6 +185,33 @@ body{
   background:rgba(12,13,16,0.08);color:var(--ink3);
 }
 
+/* ── BULK DELETE TOOLBAR ── */
+.bulk-toolbar{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  padding:12px 20px;border-bottom:1px solid var(--border);
+  background:var(--surface2);
+}
+.bulk-toolbar-left,.bulk-toolbar-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.bulk-selected-count{
+  font-size:0.82rem;font-weight:700;color:var(--gold-dark);
+  display:inline-flex;align-items:center;gap:6px;
+}
+.bulk-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:8px 16px;border-radius:99px;border:1.5px solid transparent;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:0.78rem;font-weight:700;
+  cursor:pointer;transition:all 0.18s;white-space:nowrap;
+}
+.bulk-btn-clear{background:transparent;color:var(--ink3);border-color:var(--border)}
+.bulk-btn-clear:hover{background:var(--border);color:var(--ink)}
+.bulk-btn-danger{background:var(--red);color:#fff}
+.bulk-btn-danger:hover{background:#c73a3a;box-shadow:0 4px 14px rgba(224,68,68,0.3)}
+.bulk-btn-outline-danger{background:#fff;color:var(--red);border-color:rgba(224,68,68,0.35)}
+.bulk-btn-outline-danger:hover{background:var(--red);color:#fff;box-shadow:0 4px 14px rgba(224,68,68,0.3)}
+#propSelectAllCheckbox,.prop-select-all-checkbox,.prop-row-check{
+  width:16px;height:16px;cursor:pointer;accent-color:var(--ink);
+}
+
 /* ── PROMOTED / VERIFIED MINI TOGGLES ── */
 .mini-toggle-wrap{display:flex;align-items:center;justify-content:center}
 .mini-toggle{
@@ -1220,10 +1247,30 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
           </button>
         </div>
       </div>
+      <!-- Bulk delete toolbar -->
+      <div class="bulk-toolbar" id="bulkToolbar">
+        <div class="bulk-toolbar-left">
+          <span class="bulk-selected-count" id="bulkSelectedCount" style="display:none">
+            <i class="fas fa-check-circle"></i> <span id="bulkSelectedNum">0</span> selected
+          </span>
+          <button class="bulk-btn bulk-btn-clear" id="bulkClearBtn" style="display:none" onclick="clearPropSelection()">
+            <i class="fas fa-xmark"></i> Clear selection
+          </button>
+        </div>
+        <div class="bulk-toolbar-right">
+          <button class="bulk-btn bulk-btn-danger" id="bulkDeleteSelectedBtn" style="display:none" onclick="deleteSelectedProperties()">
+            <i class="fas fa-trash-alt"></i> Delete Selected (<span id="bulkDeleteCount">0</span>)
+          </button>
+          <button class="bulk-btn bulk-btn-outline-danger" onclick="deleteAllProperties()">
+            <i class="fas fa-triangle-exclamation"></i> Delete All Properties
+          </button>
+        </div>
+      </div>
       <div class="table-wrapper">
         <table id="propertyTable" class="display nowrap" style="width:100%">
           <thead>
             <tr>
+              <th><input type="checkbox" class="prop-select-all-checkbox" id="propSelectAllCheckbox" onchange="onPropSelectAllChange(this)"></th>
               <th>Property</th>
               <th>Status</th>
               <th>Price</th>
@@ -1238,7 +1285,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
             </tr>
           </thead>
           <tbody>
-            <tr><td colspan="11" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
+            <tr><td colspan="12" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
           </tbody>
         </table>
       </div>
@@ -1553,6 +1600,8 @@ window.deleteProperty = async function(id){
   const res = await fetch(`${BASE}/api/properties/${id}`, { method:'DELETE', headers: authHeaders() });
   const data = await res.json().catch(()=>({}));
   if(res.ok){
+    _selectedPropIds.delete(id);
+    if(typeof updateBulkToolbarUI === 'function') updateBulkToolbarUI();
     propTable.ajax.reload(null,false);
     setTimeout(()=>{
       const total = propTable.data().count();
@@ -1601,6 +1650,151 @@ window.togglePropFlag = async function(id, field, checkboxEl){
     alert(`Failed to update ${field} status`);
   } finally {
     checkboxEl.disabled = false;
+  }
+};
+
+/* ── PROPERTY SELECTION & BULK DELETE ── */
+window.onPropRowCheck = function(checkboxEl, id){
+  if(checkboxEl.checked) _selectedPropIds.add(id);
+  else _selectedPropIds.delete(id);
+  updateBulkToolbarUI();
+  syncPropSelectionUI();
+};
+
+// Header checkbox selects/deselects every row matching the CURRENT filters
+// (search box, Status/City/BHK dropdowns, and the Promoted/Verified/Rent/
+// Lease/PG sub-tabs) — not just the current page.
+window.onPropSelectAllChange = function(headerCheckboxEl){
+  const filteredRows = propTable.rows({search:'applied'}).data().toArray();
+  if(headerCheckboxEl.checked){
+    filteredRows.forEach(r => _selectedPropIds.add(r._id));
+  } else {
+    filteredRows.forEach(r => _selectedPropIds.delete(r._id));
+  }
+  propTable.draw(false);
+  updateBulkToolbarUI();
+  // DataTables (with scrollX) re-clones the <thead> on every draw for
+  // column-width syncing, which can silently reset a header checkbox's
+  // checked/indeterminate state right after we set it. Re-apply on the
+  // next tick (after any such re-clone has settled) as a safety net, in
+  // addition to the immediate sync below.
+  syncPropSelectionUI();
+  setTimeout(syncPropSelectionUI, 0);
+};
+
+// Directly sets every row checkbox currently in the DOM to match
+// _selectedPropIds — independent of whether DataTables has finished
+// re-rendering via draw(), so selection is always reflected instantly.
+function syncVisibleRowCheckboxes(){
+  document.querySelectorAll('#propertyTable tbody .prop-row-check').forEach(cb=>{
+    cb.checked = _selectedPropIds.has(cb.getAttribute('data-id'));
+  });
+}
+
+// Updates every select-all checkbox in the DOM (there can be more than one:
+// DataTables' scrollX feature clones the <thead> into a separate scrolling
+// header element, so both the visible clone and the original need updating).
+function syncPropSelectAllCheckbox(){
+  if(typeof propTable === 'undefined' || !propTable) return;
+  const headerCbs = document.querySelectorAll('.prop-select-all-checkbox');
+  if(!headerCbs.length) return;
+  const filteredRows = propTable.rows({search:'applied'}).data().toArray();
+  let checked, indeterminate;
+  if(!filteredRows.length){
+    checked = false; indeterminate = false;
+  } else {
+    const selectedCount = filteredRows.filter(r => _selectedPropIds.has(r._id)).length;
+    checked = selectedCount === filteredRows.length;
+    indeterminate = selectedCount > 0 && selectedCount < filteredRows.length;
+  }
+  headerCbs.forEach(cb=>{ cb.checked = checked; cb.indeterminate = indeterminate; });
+}
+
+function syncPropSelectionUI(){
+  syncVisibleRowCheckboxes();
+  syncPropSelectAllCheckbox();
+}
+
+function updateBulkToolbarUI(){
+  const n = _selectedPropIds.size;
+  const countEl   = document.getElementById('bulkSelectedCount');
+  const numEl     = document.getElementById('bulkSelectedNum');
+  const clearBtn  = document.getElementById('bulkClearBtn');
+  const delBtn    = document.getElementById('bulkDeleteSelectedBtn');
+  const delCountEl= document.getElementById('bulkDeleteCount');
+  const show = n > 0;
+  countEl.style.display = show ? 'inline-flex' : 'none';
+  clearBtn.style.display = show ? 'inline-flex' : 'none';
+  delBtn.style.display = show ? 'inline-flex' : 'none';
+  numEl.textContent = n;
+  delCountEl.textContent = n;
+}
+
+window.clearPropSelection = function(){
+  _selectedPropIds.clear();
+  propTable.draw(false);
+  updateBulkToolbarUI();
+  syncPropSelectionUI();
+  setTimeout(syncPropSelectionUI, 0);
+};
+
+window.deleteSelectedProperties = async function(){
+  const ids = Array.from(_selectedPropIds);
+  if(!ids.length) return;
+  const ok = await showConfirmModal({
+    title: `Delete ${ids.length} propert${ids.length===1?'y':'ies'}?`,
+    message: 'This will permanently remove the selected listings. This cannot be undone.'
+  });
+  if(!ok) return;
+  try{
+    const res = await fetch(`${BASE}/api/properties/bulk-delete`, {
+      method:'POST',
+      headers: authHeaders({'Content-Type':'application/json'}),
+      body: JSON.stringify({ ids })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok){ alert(data.message || 'Bulk delete failed'); return; }
+    _selectedPropIds.clear();
+    propTable.ajax.reload(null, false);
+    setTimeout(()=>{
+      const total = propTable.data().count();
+      document.getElementById('tab-properties-count').innerText = total;
+      document.getElementById('propCount').innerText = total;
+    }, 600);
+    updateBulkToolbarUI();
+  } catch(err){
+    alert('Bulk delete failed. Please try again.');
+  }
+};
+
+window.deleteAllProperties = async function(){
+  const allRows = propTable.rows().data().toArray();
+  if(!allRows.length){ alert('There are no properties to delete.'); return; }
+  const ok = await showConfirmModal({
+    title: `Delete all ${allRows.length} properties?`,
+    message: 'Every property listing — Rent, Lease, and PG — will be permanently deleted. This cannot be undone.',
+    okText: 'Delete All'
+  });
+  if(!ok) return;
+  try{
+    const ids = allRows.map(r => r._id);
+    const res = await fetch(`${BASE}/api/properties/bulk-delete`, {
+      method:'POST',
+      headers: authHeaders({'Content-Type':'application/json'}),
+      body: JSON.stringify({ ids })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok){ alert(data.message || 'Bulk delete failed'); return; }
+    _selectedPropIds.clear();
+    propTable.ajax.reload(null, false);
+    setTimeout(()=>{
+      const total = propTable.data().count();
+      document.getElementById('tab-properties-count').innerText = total;
+      document.getElementById('propCount').innerText = total;
+    }, 600);
+    updateBulkToolbarUI();
+  } catch(err){
+    alert('Bulk delete failed. Please try again.');
   }
 };
 
@@ -1809,6 +2003,7 @@ $(document).ready(function(){
   /* ════════════════════════════════════
      CUSTOMERS TABLE
   ════════════════════════════════════ */
+  try{
   dataTable = $('#bookingTable').DataTable({
     ajax:{
       url: BASE+'/api/users',
@@ -1927,10 +2122,12 @@ $(document).ready(function(){
     ],
     drawCallback:function(){}
   });
+  } catch(e){ console.error('Customers table failed to initialize:', e); }
 
   /* ════════════════════════════════════
      PROPERTIES TABLE
   ════════════════════════════════════ */
+  try{
   propTable = $('#propertyTable').DataTable({
     ajax:{
       url: BASE+'/api/admin/properties',
@@ -1945,29 +2142,35 @@ $(document).ready(function(){
       }
     },
     columns:[
-      /* 0 – Property title + city */
+      /* 0 – Select checkbox */
+      { data:null, orderable:false, className:'dt-body-center', render:(d,t,row)=>{
+          if(t!=='display') return '';
+          const checked = _selectedPropIds.has(row._id) ? 'checked' : '';
+          return `<input type="checkbox" class="prop-row-check" data-id="${row._id}" onchange="onPropRowCheck(this,'${row._id}')" ${checked}>`;
+      }},
+      /* 1 – Property title + city */
       { data:null, render:(d,t,row)=>{
           const title = escapeHtml(row.title||'Untitled');
           const city  = escapeHtml(row.city||'');
           if(t==='display') return `<div><div class="prop-title">${title}</div><div class="prop-sub">${city}</div></div>`;
           return (row.title||'').trim();
       }},
-      /* 1 – Status */
+      /* 2 – Status */
       { data:'status', render:(d,t)=> t==='display' ? statusBadge(d) : (d||'—') },
-      /* 2 – Price */
+      /* 3 – Price */
       { data:'displayPrice', render:(d)=> escapeHtml(d||'—') },
-      /* 3 – Owner Name */
+      /* 4 – Owner Name */
       { data:'ownerName', render:(d)=> escapeHtml(d||'—') },
-      /* 4 – Owner Number (clickable) */
+      /* 5 – Owner Number (clickable) */
       { data:null, render:(d,t,row)=>{
           if(t==='display') return renderOwnerPhone(row);
           return row.ownerNumber||'—';
       }},
-      /* 5 – Location */
+      /* 6 – Location */
       { data:'loc', render:(d)=> escapeHtml(d||'—') },
-      /* 6 – Listed On */
+      /* 7 – Listed On */
       { data:'createdAt', render:(d,t)=> t==='display' ? formatDateTime(d) : (d||'—') },
-      /* 7 – Promoted (toggle) */
+      /* 8 – Promoted (toggle) */
       { data:'promoted', orderable:false, className:'dt-body-center', render:(d,t,row)=>{
           if(t!=='display') return d ? 'Yes' : 'No';
           return `<label class="mini-toggle-wrap"><span class="mini-toggle promoted-toggle">
@@ -1975,7 +2178,7 @@ $(document).ready(function(){
             <span class="slider"></span>
           </span></label>`;
       }},
-      /* 8 – Verified (toggle) */
+      /* 9 – Verified (toggle) */
       { data:'verified', orderable:false, className:'dt-body-center', render:(d,t,row)=>{
           if(t!=='display') return d ? 'Yes' : 'No';
           return `<label class="mini-toggle-wrap"><span class="mini-toggle verified-toggle">
@@ -1983,12 +2186,12 @@ $(document).ready(function(){
             <span class="slider"></span>
           </span></label>`;
       }},
-      /* 9 – Remarks */
+      /* 10 – Remarks */
       { data:'remarks', orderable:false, render:(d,t,row)=>{
           if(t==='display') return remarkCellHtml(row._id, d, 'property');
           return d||'';
       }},
-      /* 10 – Action */
+      /* 11 – Action */
       { data:null, orderable:false, render:(d,t,row)=>{
           _adminPropCache[row._id] = row;
           return `<div style="display:inline-flex;gap:6px;flex-wrap:wrap;justify-content:center">
@@ -1997,7 +2200,7 @@ $(document).ready(function(){
           </div>`;
       }}
     ],
-    order:[[6,'desc']],
+    order:[[7,'desc']],
     pageLength:10,
     scrollX:true,
     language:{
@@ -2012,38 +2215,38 @@ $(document).ready(function(){
     buttons:[
       {
         extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV', title:'KR Properties',
-        exportOptions:{ columns:[0,1,2,3,4,5,6,7,8,9],
+        exportOptions:{ columns:[1,2,3,4,5,6,7,8,9,10],
           format:{ body:function(data,row,col){
             var rd=propTable.row(row).data(); if(!rd) return data;
-            if(col===0) return (rd.title||'').trim()||'—';
-            if(col===1) return rd.status||'—';
-            if(col===2) return rd.displayPrice||'—';
-            if(col===3) return rd.ownerName||'—';
-            if(col===4){ var ph=rd.ownerNumber||''; return ph?'=HYPERLINK("tel:'+ph+'","'+ph+'")':'—'; }
-            if(col===5) return rd.loc||'—';
-            if(col===6){ if(!rd.createdAt) return '—'; const d=new Date(rd.createdAt); return d.toLocaleDateString('en-GB')+' '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}); }
-            if(col===7) return rd.promoted ? 'Yes' : 'No';
-            if(col===8) return rd.verified ? 'Yes' : 'No';
-            if(col===9) return flattenRemarks(rd.remarks);
+            if(col===1) return (rd.title||'').trim()||'—';
+            if(col===2) return rd.status||'—';
+            if(col===3) return rd.displayPrice||'—';
+            if(col===4) return rd.ownerName||'—';
+            if(col===5){ var ph=rd.ownerNumber||''; return ph?'=HYPERLINK("tel:'+ph+'","'+ph+'")':'—'; }
+            if(col===6) return rd.loc||'—';
+            if(col===7){ if(!rd.createdAt) return '—'; const d=new Date(rd.createdAt); return d.toLocaleDateString('en-GB')+' '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}); }
+            if(col===8) return rd.promoted ? 'Yes' : 'No';
+            if(col===9) return rd.verified ? 'Yes' : 'No';
+            if(col===10) return flattenRemarks(rd.remarks);
             return data;
           }}
         }
       },
       {
         extend:'excel', text:'<i class="fas fa-file-excel"></i> Excel', title:'KR Properties',
-        exportOptions:{ columns:[0,1,2,3,4,5,6,7,8,9],
+        exportOptions:{ columns:[1,2,3,4,5,6,7,8,9,10],
           format:{ body:function(data,row,col){
             var rd=propTable.row(row).data(); if(!rd) return data;
-            if(col===0) return (rd.title||'').trim()||'—';
-            if(col===1) return rd.status||'—';
-            if(col===2) return rd.displayPrice||'—';
-            if(col===3) return rd.ownerName||'—';
-            if(col===4) return rd.ownerNumber||'—';
-            if(col===5) return rd.loc||'—';
-            if(col===6){ if(!rd.createdAt) return '—'; return new Date(rd.createdAt).toLocaleString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true}); }
-            if(col===7) return rd.promoted ? 'Yes' : 'No';
-            if(col===8) return rd.verified ? 'Yes' : 'No';
-            if(col===9) return flattenRemarks(rd.remarks);
+            if(col===1) return (rd.title||'').trim()||'—';
+            if(col===2) return rd.status||'—';
+            if(col===3) return rd.displayPrice||'—';
+            if(col===4) return rd.ownerName||'—';
+            if(col===5) return rd.ownerNumber||'—';
+            if(col===6) return rd.loc||'—';
+            if(col===7){ if(!rd.createdAt) return '—'; return new Date(rd.createdAt).toLocaleString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true}); }
+            if(col===8) return rd.promoted ? 'Yes' : 'No';
+            if(col===9) return rd.verified ? 'Yes' : 'No';
+            if(col===10) return flattenRemarks(rd.remarks);
             return data;
           }}
         }
@@ -2051,11 +2254,11 @@ $(document).ready(function(){
       {
         extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
         orientation:'landscape', pageSize:'A4', title:'KR Real-Estate — Properties',
-        exportOptions:{columns:[0,1,2,3,4,5,6,7,8,9],
+        exportOptions:{columns:[1,2,3,4,5,6,7,8,9,10],
           format:{ body:function(data,row,col){
             var rd=propTable.row(row).data(); if(!rd) return data;
-            if(col===7) return rd.promoted ? 'Yes' : 'No';
-            if(col===8) return rd.verified ? 'Yes' : 'No';
+            if(col===8) return rd.promoted ? 'Yes' : 'No';
+            if(col===9) return rd.verified ? 'Yes' : 'No';
             return data;
           }}
         },
@@ -2074,11 +2277,11 @@ $(document).ready(function(){
       },
       {
         extend:'print', text:'<i class="fas fa-print"></i> Print', title:'KR Properties',
-        exportOptions:{columns:[0,1,2,3,4,5,6,7,8,9],
+        exportOptions:{columns:[1,2,3,4,5,6,7,8,9,10],
           format:{ body:function(data,row,col){
             var rd=propTable.row(row).data(); if(!rd) return data;
-            if(col===7) return rd.promoted ? 'Yes' : 'No';
-            if(col===8) return rd.verified ? 'Yes' : 'No';
+            if(col===8) return rd.promoted ? 'Yes' : 'No';
+            if(col===9) return rd.verified ? 'Yes' : 'No';
             return data;
           }}
         },
@@ -2092,12 +2295,14 @@ $(document).ready(function(){
         }
       }
     ],
-    drawCallback:function(){}
+    drawCallback:function(){ try{ syncPropSelectionUI(); }catch(e){ /* table not fully initialized yet */ } }
   });
+  } catch(e){ console.error('Properties table failed to initialize:', e); }
 
   /* ════════════════════════════════════
      APPOINTMENTS TABLE
   ════════════════════════════════════ */
+  try{
   apptTable = $('#appointmentTable').DataTable({
     ajax:{
       url: BASE+'/api/appointments',
@@ -2228,6 +2433,7 @@ $(document).ready(function(){
     ],
     drawCallback:function(){}
   });
+  } catch(e){ console.error('Appointments table failed to initialize:', e); }
 
 });
 
@@ -2236,6 +2442,7 @@ $(document).ready(function(){
 ════════════════════════════════════ */
 const _adminPropCache = {};
 const _customerCache = {};
+const _selectedPropIds = new Set();
 
 /* Fields to show in the modal — ordered, with human labels */
 const MODAL_FIELD_GROUPS = [

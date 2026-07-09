@@ -433,6 +433,25 @@ ul{list-style:none}
 .prop-card.type-rent::before{background:linear-gradient(90deg,#a85c6e,#c98a9a);box-shadow:0 1px 4px rgba(168,92,110,.28)}
 .prop-card.type-lease::before{background:linear-gradient(90deg,#8a6b7a,#a893a0);box-shadow:0 1px 4px rgba(138,107,122,.28)}
 .prop-card.type-pg::before{background:linear-gradient(90deg,#6b3d4a,#8a5c68);box-shadow:0 1px 4px rgba(107,61,74,.28)}
+.prop-card.prop-card-promoted.type-rent::before{background:linear-gradient(90deg,#e63950,#ff7a8f);box-shadow:0 1px 4px rgba(230,57,80,.3)}
+.prop-card.prop-card-promoted.type-lease::before{background:linear-gradient(90deg,#2f5fd1,#6f9bff);box-shadow:0 1px 4px rgba(47,95,209,.3)}
+.prop-card.prop-card-promoted.type-pg::before{background:linear-gradient(90deg,#6b3fc7,#a67bf0);box-shadow:0 1px 4px rgba(107,63,199,.3)}
+/* ─── Promoted cards get their own gold/rose gradient treatment, overriding
+   the type-based top strip, plus a matching border glow so they read as a
+   tier above regular listings ─── */
+.prop-card.prop-card-promoted{
+  border:1px solid #e0b088;
+  box-shadow:0 2px 14px rgba(210,150,100,.18);
+}
+.prop-card.prop-card-promoted:hover{
+  box-shadow:0 14px 32px rgba(210,150,100,.28),0 4px 10px rgba(20,16,17,.06);
+  border-color:#d9a488;
+}
+.prop-card.prop-card-promoted::before{
+  background:linear-gradient(90deg,#d9a488,#eec9c0,#c98a9a);
+  box-shadow:0 1px 4px rgba(200,140,100,.35);
+  height:5px;
+}
 .prop-card:hover{
   box-shadow:0 12px 30px rgba(120,80,90,.12),0 4px 10px rgba(20,16,17,.06);
   transform:translateY(-3px);
@@ -453,6 +472,12 @@ ul{list-style:none}
 }
 
 .prop-card.list-view .prop-img{width:230px;aspect-ratio:unset;height:auto;min-height:150px;border-radius:16px 0 0 16px}
+/* ─── Compact card: used for regular (non-promoted) grid listings so only
+   Promoted cards get the full "grand" spec-sheet treatment ─── */
+.prop-card.compact .prop-img{aspect-ratio:16/10}
+.prop-card.compact .prop-body{padding:11px 12px 10px}
+.prop-card.compact .prop-stats{margin-top:6px}
+.prop-card.compact .prop-loc{margin-top:2px}
 .prop-img-placeholder{
   position:absolute;inset:0;
   display:flex;align-items:center;justify-content:center;
@@ -487,6 +512,9 @@ ul{list-style:none}
 .badge-rent{background:linear-gradient(135deg,#c98a9a,#a85c6e);color:#fff;box-shadow:0 2px 6px rgba(168,92,110,.35)}
 .badge-lease{background:linear-gradient(135deg,#a893a0,#8a6b7a);color:#fff;box-shadow:0 2px 6px rgba(138,107,122,.35)}
 .badge-pg{background:linear-gradient(135deg,#8a5c68,#6b3d4a);color:#fff;box-shadow:0 2px 6px rgba(107,61,74,.35)}
+.prop-card.prop-card-promoted .badge-rent{background:linear-gradient(135deg,#ff7a8f,#e63950);box-shadow:0 2px 6px rgba(230,57,80,.35)}
+.prop-card.prop-card-promoted .badge-lease{background:linear-gradient(135deg,#6f9bff,#2f5fd1);box-shadow:0 2px 6px rgba(47,95,209,.35)}
+.prop-card.prop-card-promoted .badge-pg{background:linear-gradient(135deg,#a67bf0,#6b3fc7);box-shadow:0 2px 6px rgba(107,63,199,.35)}
 .prop-heart{
   width:30px;height:30px;border-radius:50%;
   background:rgba(255,255,255,.92);backdrop-filter:blur(6px);
@@ -513,6 +541,9 @@ ul{list-style:none}
 .prop-icon-promoted svg{width:13px;height:13px;fill:#4a2418;stroke:none}
 .prop-icon-verified{background:linear-gradient(135deg,#3fb87a,#2a8f5c)}
 .prop-icon-verified svg{width:14px;height:14px;fill:#fff;stroke:none}
+.prop-card.prop-card-promoted .prop-icon-promoted{background:linear-gradient(135deg,#ffd166,#f4a300)}
+.prop-card.prop-card-promoted .prop-icon-promoted svg{fill:#7a4a00}
+.prop-card.prop-card-promoted .prop-icon-verified{background:linear-gradient(135deg,#4fd88f,#1f9e5c)}
 .prop-body{padding:13px 14px 12px;flex:1;min-width:0;display:flex;flex-direction:column}
 .prop-price-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:3px;margin-bottom:4px}
 .prop-price{
@@ -543,6 +574,10 @@ ul{list-style:none}
   box-shadow:0 2px 8px rgba(138,107,122,.3);
   padding:3px 11px;border-radius:99px;
   white-space:nowrap;
+}
+.prop-card.prop-card-promoted .prop-title-buildtype{
+  background:linear-gradient(135deg,#7b6bf0,#4c3bc7);
+  box-shadow:0 2px 8px rgba(76,59,199,.3);
 }
 .prop-verified-badge{
   display:inline-flex;align-items:center;gap:2px;flex-shrink:0;
@@ -727,6 +762,10 @@ ul{list-style:none}
 .qa-compare.disabled{cursor:not-allowed}
 .qa-compare.disabled .qa-3d-icon{filter:grayscale(.55) opacity(.55);box-shadow:none}
 .qa-compare.disabled:active .qa-3d-icon{transform:none}
+.prop-card.prop-card-promoted .qa-call .qa-3d-icon{background:linear-gradient(150deg,#ff8a7a 0%,#ff4d3d 55%,#c9291a 100%)}
+.prop-card.prop-card-promoted .qa-visit .qa-3d-icon{background:linear-gradient(150deg,#ffcc66 0%,#f4a300 55%,#c47f00 100%)}
+.prop-card.prop-card-promoted .qa-compare .qa-3d-icon{background:linear-gradient(150deg,#7ea8ff 0%,#3f6fe0 55%,#2648a8 100%)}
+.prop-card.prop-card-promoted .qa-compare.checked .qa-3d-icon{background:linear-gradient(150deg,#5fbd85 0%,#3d9d64 55%,#2c7a4a 100%)}
 .prop-qa-btn.prop-qa-3d,
 .prop-qa-icon.prop-qa-3d{outline:none}
 .prop-qa-btn.prop-qa-3d:focus,
@@ -759,6 +798,7 @@ ul{list-style:none}
     inset 0 -3px 4px rgba(0,0,0,.15);
 }
 .prop-views-icon svg{width:23px;height:23px;max-width:60%;max-height:60%;stroke:#fff;fill:none;stroke-width:2.1}
+.prop-card.prop-card-promoted .prop-views-icon{background:linear-gradient(150deg,#b98af0 0%,#8b3fe0 55%,#6423b0 100%)}
 .prop-views-badge{
   position:absolute;top:-6px;right:-6px;min-width:16px;height:16px;padding:0 3px;
   border-radius:99px;background:var(--brand);color:#fff;font-size:9.5px;font-weight:700;
@@ -4983,7 +5023,7 @@ function renderCards() {
     let page = Math.min(pageGetters[key](), Math.floor((items.length - 1) / PAGE_SIZE));
     pageSetters[key](page);
     const slice = items.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
-    grid.innerHTML = slice.map(p => cardHTML(p)).join('') +
+    grid.innerHTML = slice.map(p => cardHTML(p, key !== 'promoted')).join('') +
       paginationHTML(key, page, items.length);
   });
 }
@@ -5250,7 +5290,7 @@ function pHasLift(p) {
   return (p.amenities?.selected || []).some(a => /lift/i.test(a));
 }
 
-function cardHTML(p) {
+function cardHTML(p, compact) {
   const liked = shortlisted.has(String(p.id));
   const compared = compareSet.has(p.id);
   const lockedType = getCompareType();
@@ -5289,7 +5329,9 @@ function cardHTML(p) {
     const yyyy = d.getFullYear();
     return `${dd}-${mm}-${yyyy}`;
   })() : '';
-  return `<div class="prop-card${listClass} type-${pType.toLowerCase()}" onclick="openDetail('${p.id}')">
+  const compactClass = compact ? ' compact' : '';
+  const promotedClass = p.promoted ? ' prop-card-promoted' : '';
+  return `<div class="prop-card${listClass}${compactClass}${promotedClass} type-${pType.toLowerCase()}" onclick="openDetail('${p.id}')">
     <div class="prop-img" style="background:${bg}" data-idx="0">
       ${buildImgSlider(p, fg, '-grid')}
       <div class="prop-card-top-row">
@@ -5345,7 +5387,7 @@ function cardHTML(p) {
         </span>` : ''}
         ${lift ? `<span class="prop-stat" title="Lift available"><span class="prop-stat-icon icon-lift">🛗</span></span>` : ''}
       </div>
-      <div class="prop-chip-row prop-chip-row-scroll">
+      ${compact ? '' : `<div class="prop-chip-row prop-chip-row-scroll">
         <span class="prop-chip chip-furnish" title="Furnishing">
           <span class="prop-chip-icon icon-furnish">🛋️</span>
           ${p.property?.furnish}
@@ -5372,7 +5414,7 @@ function cardHTML(p) {
         ${chip('Room type', pg.room)}
         ${chip('Meals', pg.meals)}
         ${chip('Occupancy', pg.occupancy)}
-      </div>` : ''}
+      </div>` : ''}`}
       <div class="prop-footer">
         <div class="prop-quick-actions">
           <button class="prop-qa-btn prop-qa-3d qa-call" onclick="event.stopPropagation();openCall('${p.id}')" aria-label="Call owner">
