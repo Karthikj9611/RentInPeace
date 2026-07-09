@@ -2541,6 +2541,14 @@ ul{list-style:none}
       <span class="nav-tab-icon">🌐</span>
       All
     </div>
+    <div class="nav-tab" data-tab="Promoted" role="tab" onclick="switchTab(this)" tabindex="0">
+      <span class="nav-tab-icon">⭐</span>
+      Promoted
+    </div>
+    <div class="nav-tab" data-tab="Verified" role="tab" onclick="switchTab(this)" tabindex="0">
+      <span class="nav-tab-icon">✅</span>
+      Verified
+    </div>
     <div class="nav-tab" data-tab="Rent" role="tab" onclick="switchTab(this)" tabindex="0">
       <span class="nav-tab-icon">🏠</span>
       Rent
@@ -4872,6 +4880,10 @@ function renderRecentlyViewed() {
     const rv = recentlyViewedData[id];
     if (!rv) return false;
     if (currentTab === 'All') return true;
+    if (currentTab === 'Promoted' || currentTab === 'Verified') {
+      const live = PROPERTIES.find(x => x.id === id);
+      return live ? matchesTab(live, currentTab) : false;
+    }
     // Older entries saved before "type" was tracked fall back to a live
     // lookup so they don't just vanish under a specific tab.
     const type = rv.type || pTypeLabel(PROPERTIES.find(x => x.id === id) || {});
@@ -5223,6 +5235,16 @@ function pTypeLabel(p) {
   return status || 'Rent';
 }
 
+/* Promoted/Verified are attribute-based tabs, not property types — this
+   centralises the special-casing so every tab-filtered list (cards,
+   recently-viewed, shortlist panel) stays in sync. */
+function matchesTab(p, tab) {
+  if (tab === 'All') return true;
+  if (tab === 'Promoted') return !!p.promoted;
+  if (tab === 'Verified') return !!p.verified;
+  return pTypeLabel(p) === tab;
+}
+
 /* Lift/elevator is derived from the amenities list rather than stored as its own field */
 function pHasLift(p) {
   return (p.amenities?.selected || []).some(a => /lift/i.test(a));
@@ -5536,7 +5558,7 @@ function renderShortlistPanel() {
   const list = document.getElementById('panelList');
   const ids = [...shortlisted].filter(id => {
     const p = shortlistedData[id];
-    return p && (currentTab === 'All' || pTypeLabel(p) === currentTab);
+    return p && matchesTab(p, currentTab);
   });
   // Header shows the count of items actually visible for the current tab, so it
   // never disagrees with the list below it (e.g. "Shortlisted (2)" while only
@@ -6316,8 +6338,7 @@ function getFiltered() {
   const hasFilters = Object.keys(fs).length > 0;
 
   let list = PROPERTIES.filter(p => {
-    const pType = pTypeLabel(p);
-    if (currentTab !== 'All' && pType !== currentTab) return false;
+    if (!matchesTab(p, currentTab)) return false;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       const area = (p.location?.area || '').toLowerCase();
