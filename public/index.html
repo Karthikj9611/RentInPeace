@@ -2673,7 +2673,6 @@ ul{list-style:none}
     <input 
       type="text" 
       id="searchInput" 
-      placeholder='City, Area, BHK, Property, Rent, Budget, Deposit, Maintenance, Negotiable, Lease, Furnishing, Tenant, Facing, Bathrooms, Age, Availability, Amenities, Parking, Floor, Nearby' 
       onkeydown="if(event.key==='Enter') handleSearch()"
       autocomplete="off" 
       aria-label="Search properties" 
@@ -3269,7 +3268,7 @@ ul{list-style:none}
           <span class="review-star-btn" data-val="5" onclick="setReviewRating(5)">★</span>
         </div>
       </div>
-      <textarea class="review-form-textarea" id="reviewText" rows="3" maxlength="500" placeholder="Tell others about your experience finding a home on Quatar…"></textarea>
+      <textarea class="review-form-textarea" id="reviewText" rows="3" maxlength="500"></textarea>
       <div class="review-form-actions">
         <span class="review-form-charcount" id="reviewCharCount">0 / 500</span>
         <button class="review-submit-btn" id="reviewSubmitBtn" onclick="submitReview()">Post review</button>
@@ -3466,21 +3465,21 @@ ul{list-style:none}
     </div>
     <div class="form-group">
       <label class="form-label">Your name</label>
-      <input class="form-input" type="text" id="sched-name" placeholder="e.g. Priya Sharma" />
+      <input class="form-input" type="text" id="sched-name" />
     </div>
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Your phone</label>
-        <input class="form-input" type="tel" id="sched-phone" placeholder="e.g. 9876543210" />
+        <input class="form-input" type="tel" id="sched-phone" />
       </div>
       <div class="form-group">
         <label class="form-label">Your email</label>
-        <input class="form-input" type="email" id="sched-email" placeholder="you@email.com" />
+        <input class="form-input" type="email" id="sched-email" />
       </div>
     </div>
     <div class="form-group">
       <label class="form-label">Note (optional)</label>
-      <textarea class="form-input" id="sched-note" rows="2" placeholder="Anything the owner should know…" style="resize:vertical"></textarea>
+      <textarea class="form-input" id="sched-note" rows="2" style="resize:vertical"></textarea>
     </div>
     <button class="form-submit" id="scheduleSubmitBtn" onclick="submitScheduleVisit()">Request visit</button>
   </div>
@@ -3503,30 +3502,30 @@ ul{list-style:none}
       </div>
       <div class="form-group">
         <label class="form-label">Number of days <span style="color:var(--brand)">*</span></label>
-        <input class="form-input" type="number" id="book-days" min="1" placeholder="e.g. 2" />
+        <input class="form-input" type="number" id="book-days" min="1" />
       </div>
     </div>
     <div class="form-group">
       <label class="form-label">Number of guests</label>
-      <input class="form-input" type="number" id="book-guests" min="1" placeholder="e.g. 2" />
+      <input class="form-input" type="number" id="book-guests" min="1" />
     </div>
     <div class="form-group">
       <label class="form-label">Your name</label>
-      <input class="form-input" type="text" id="book-name" placeholder="e.g. Priya Sharma" />
+      <input class="form-input" type="text" id="book-name" />
     </div>
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Your phone</label>
-        <input class="form-input" type="tel" id="book-phone" placeholder="e.g. 9876543210" />
+        <input class="form-input" type="tel" id="book-phone" />
       </div>
       <div class="form-group">
         <label class="form-label">Your email</label>
-        <input class="form-input" type="email" id="book-email" placeholder="you@email.com" />
+        <input class="form-input" type="email" id="book-email" />
       </div>
     </div>
     <div class="form-group">
       <label class="form-label">Note (optional)</label>
-      <textarea class="form-input" id="book-note" rows="2" placeholder="Anything the owner should know…" style="resize:vertical"></textarea>
+      <textarea class="form-input" id="book-note" rows="2" style="resize:vertical"></textarea>
     </div>
     <button class="form-submit" id="bookingSubmitBtn" onclick="submitBookingRequest()">Confirm booking</button>
   </div>
@@ -3570,7 +3569,7 @@ ul{list-style:none}
       </div>
       <div class="form-group">
         <label class="form-label">…or paste JSON / database text here</label>
-        <textarea class="form-input" id="f-importText" rows="6" placeholder='Paste a property JSON object here, e.g. { "basic": {...}, "location": {...}, "owner": {...}, ... }' style="resize:vertical;font-family:monospace;font-size:12px"></textarea>
+        <textarea class="form-input" id="f-importText" rows="6" style="resize:vertical;font-family:monospace;font-size:12px"></textarea>
       </div>
       <div id="importStatusMsg" style="font-size:12px;min-height:16px;margin-top:2px"></div>
     </div>
@@ -3598,7 +3597,7 @@ ul{list-style:none}
     <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
 	  <div class="form-group">
         <label class="form-label">Area <span style="color:var(--brand)">*</span></label>
-        <input class="form-input" type="text" id="f-location" placeholder="e.g. Koramangala 6th Block" />
+        <input class="form-input" type="text" id="f-location" />
       </div>
 	  
       <div class="form-group">
@@ -3608,7 +3607,7 @@ ul{list-style:none}
       <div class="form-group" id="fullAddressGroup" style="grid-column:span 3">
         <label class="form-label">Building Live Address</label>
         <div style="display:flex;gap:7px;align-items:flex-start">
-          <textarea class="form-input" id="f-fullAddress" rows="2" placeholder="House No., Building Name, Street, Landmark, Pincode" style="flex:1;min-width:0;resize:vertical;background:var(--bg-2,#f5f5f5);cursor:not-allowed" readonly></textarea>
+          <textarea class="form-input" id="f-fullAddress" rows="2" style="flex:1;min-width:0;resize:vertical;background:var(--bg-2,#f5f5f5);cursor:not-allowed" readonly></textarea>
           <button type="button" onclick="fCaptureLocation()"
             style="flex-shrink:0;padding:9px 12px;border-radius:9px;border:1.5px solid var(--text);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;height:40px;margin-top:1px">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg>
@@ -3619,11 +3618,11 @@ ul{list-style:none}
       </div>
       <div class="form-group" id="latLngGroup">
         <label class="form-label">Latitude / Longitude (auto)</label>
-        <input class="form-input" type="text" id="f-latLngDisplay" placeholder="12.9716° N, 77.5946° E or auto-detected" readonly />
+        <input class="form-input" type="text" id="f-latLngDisplay" readonly />
       </div>
       <div class="form-group" id="mapsLinkGroup">
         <label class="form-label">Google Maps link (optional)</label>
-        <input class="form-input" type="url" id="f-googleMapsLink" placeholder="https://maps.app.goo.gl/..." />
+        <input class="form-input" type="url" id="f-googleMapsLink" />
       </div>
     </div>
     <input type="hidden" id="f-latitude"/><input type="hidden" id="f-longitude"/>
@@ -3634,30 +3633,30 @@ ul{list-style:none}
     <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
 	<div class="form-group">
       <label class="form-label">Property name</label>
-      <input class="form-input" type="text" id="f-title" placeholder="e.g. Prestige Shantiniketan, Whitefield" />
+      <input class="form-input" type="text" id="f-title" />
     </div>
-      <div class="form-group"><label class="form-label">Owner name <span style="color:var(--brand)">*</span></label><input class="form-input" type="text" id="f-ownerName" placeholder="e.g. Ramesh Kumar"/></div>
-      <div class="form-group"><label class="form-label">Phone number <span style="color:var(--brand)">*</span></label><input class="form-input" type="tel" id="f-ownerPhone" placeholder="e.g. 9876543210"/></div>
-      <div class="form-group"><label class="form-label">Email (optional)</label><input class="form-input" type="email" id="f-ownerEmail" placeholder="owner@example.com"/></div>
-      <div class="form-group"><label class="form-label">Alternate number</label><input class="form-input" type="tel" id="f-ownerAltPhone" placeholder="optional"/></div>
+      <div class="form-group"><label class="form-label">Owner name <span style="color:var(--brand)">*</span></label><input class="form-input" type="text" id="f-ownerName"/></div>
+      <div class="form-group"><label class="form-label">Phone number <span style="color:var(--brand)">*</span></label><input class="form-input" type="tel" id="f-ownerPhone"/></div>
+      <div class="form-group"><label class="form-label">Email (optional)</label><input class="form-input" type="email" id="f-ownerEmail"/></div>
+      <div class="form-group"><label class="form-label">Alternate number</label><input class="form-input" type="tel" id="f-ownerAltPhone"/></div>
       <div class="form-group">
         <label class="form-label">Preferred contact time</label>
         <select class="form-select" id="f-contactTime"><option>Any</option><option>Morning (10am - 1pm)</option><option>Afternoon (1pm - 5pm)</option><option>Evening (6pm - 9pm)</option></select>
       </div>
       <div class="form-group" style="grid-column:span 3">
         <label class="form-label">Owner address (optional)</label>
-        <textarea class="form-input" id="f-ownerAddress" rows="2" placeholder="Street, city, pincode (optional)" style="resize:vertical"></textarea>
+        <textarea class="form-input" id="f-ownerAddress" rows="2" style="resize:vertical"></textarea>
       </div>
       <!-- Agent-only fields — shown when Listed by = Agent -->
       <div id="f-agentFields" style="grid-column:span 3">
         <div class="form-row" style="grid-template-columns:1fr 1fr;margin-top:4px">
           <div class="form-group">
             <label class="form-label">Agent phone number</label>
-            <input class="form-input" type="tel" id="f-agentPhone" placeholder="e.g. 9876543210" />
+            <input class="form-input" type="tel" id="f-agentPhone" />
           </div>
           <div class="form-group">
             <label class="form-label">Agent service area</label>
-            <input class="form-input" type="text" id="f-agentArea" placeholder="e.g. Koramangala, HSR Layout, BTM" />
+            <input class="form-input" type="text" id="f-agentArea" />
           </div>
         </div>
       </div>
@@ -3668,10 +3667,10 @@ ul{list-style:none}
     <div id="addPricingSection">
     <div class="lm-section">💰 Pricing</div>
     <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
-      <div class="form-group"><label class="form-label" id="f-rentLabel">Monthly rent (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-rent" placeholder="e.g. 22000" min="0" max="9999999" /></div>
-      <div class="form-group" id="f-depositWrap"><label class="form-label">Security deposit (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-deposit" placeholder="e.g. 44000" min="0" max="9999999" /></div>
-      <div class="form-group" id="f-maintenanceWrap"><label class="form-label">Maintenance (₹/ Month)</label><input class="form-input" type="number" id="f-maintenance" placeholder="e.g. 2000" oninput="onMaintenanceChange()" /></div>
-      <div class="form-group" id="f-escalationWrap"><label class="form-label">Annual rent escalation (%)</label><input class="form-input" type="number" step="0.5" id="f-escalation" placeholder="e.g. 5" /></div>
+      <div class="form-group"><label class="form-label" id="f-rentLabel">Monthly rent (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-rent" min="0" max="9999999" /></div>
+      <div class="form-group" id="f-depositWrap"><label class="form-label">Security deposit (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-deposit" min="0" max="9999999" /></div>
+      <div class="form-group" id="f-maintenanceWrap"><label class="form-label">Maintenance (₹/ Month)</label><input class="form-input" type="number" id="f-maintenance" oninput="onMaintenanceChange()" /></div>
+      <div class="form-group" id="f-escalationWrap"><label class="form-label">Annual rent escalation (%)</label><input class="form-input" type="number" step="0.5" id="f-escalation" /></div>
       <div class="form-group" id="f-electricityWrap">
         <label class="form-label">Electricity included?</label>
         <select class="form-select" id="f-electricityIncluded"><option>Included</option><option>Separate</option><option>Shared meter</option></select>
@@ -3720,11 +3719,11 @@ ul{list-style:none}
 	  
       <div class="form-group">
         <label class="form-label">Floor (out of total)</label>
-        <input class="form-input" type="text" id="f-floor" placeholder="e.g. 3rd / 10 floors" onblur="formatFloorOrdinal(this)" />
+        <input class="form-input" type="text" id="f-floor" onblur="formatFloorOrdinal(this)" />
       </div>
       <div class="form-group">
         <label class="form-label">Area (sqft)</label>
-        <input class="form-input" type="text" inputmode="numeric" id="f-area" placeholder="e.g. 1250" onfocus="stripAreaSqft(this)" onblur="formatAreaSqft(this)" />
+        <input class="form-input" type="text" inputmode="numeric" id="f-area" onfocus="stripAreaSqft(this)" onblur="formatAreaSqft(this)" />
       </div>
       <div class="form-group">
         <label class="form-label">Bathrooms</label>
@@ -3775,25 +3774,25 @@ ul{list-style:none}
             <button type="button" class="am-dd-action-btn am-dd-action-clear" onclick="amClearAll()">Clear all</button>
           </div>
           <div class="am-dd-grid">
-            <label class="am-dd-item"><input type="checkbox" id="am-wifi" onchange="onAmCheck()"/> Wi-Fi <input type="number" id="f-wifiUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-ac" onchange="onAmCheck()"/> AC <input type="number" id="f-acUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-washing" onchange="onAmCheck()"/> Washing machine <input type="number" id="f-washingUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-fridge" onchange="onAmCheck()"/> Refrigerator <input type="number" id="f-fridgeUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-microwave" onchange="onAmCheck()"/> Microwave <input type="number" id="f-microwaveUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-geyser" onchange="onAmCheck()"/> Geyser <input type="number" id="f-geyserUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-wardrobe" onchange="onAmCheck()"/> Cupboards <input type="number" id="f-wardrobeUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-bed" onchange="onAmCheck()"/> Bed &amp; mattress <input type="number" id="f-bedUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-sofa" onchange="onAmCheck()"/> Sofa <input type="number" id="f-sofaUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-lift" onchange="onAmCheck()"/> Elevator <input type="number" id="f-liftUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-balcony" onchange="onAmCheck()"/> Balcony <input type="number" id="f-balconyUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-gym" onchange="onAmCheck()"/> Gym <input type="number" id="f-gymUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-security" onchange="onAmCheck()"/> CCTV <input type="number" id="f-securityUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-power" onchange="onAmCheck()"/> Power backup <input type="number" id="f-powerUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-garden" onchange="onAmCheck()"/> Garden <input type="number" id="f-gardenUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-laundry" onchange="onAmCheck()"/> Laundry <input type="number" id="f-laundryUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-meals" onchange="onAmCheck()"/> Meals included <input type="number" id="f-mealsUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-pipedgas" onchange="onAmCheck()"/> Piped gas connection <input type="number" id="f-pipedgasUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
-            <label class="am-dd-item"><input type="checkbox" id="am-ro" onchange="onAmCheck()"/> RO water filter <input type="number" id="f-roUnits" placeholder="qty" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-wifi" onchange="onAmCheck()"/> Wi-Fi <input type="number" id="f-wifiUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-ac" onchange="onAmCheck()"/> AC <input type="number" id="f-acUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-washing" onchange="onAmCheck()"/> Washing machine <input type="number" id="f-washingUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-fridge" onchange="onAmCheck()"/> Refrigerator <input type="number" id="f-fridgeUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-microwave" onchange="onAmCheck()"/> Microwave <input type="number" id="f-microwaveUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-geyser" onchange="onAmCheck()"/> Geyser <input type="number" id="f-geyserUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-wardrobe" onchange="onAmCheck()"/> Cupboards <input type="number" id="f-wardrobeUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-bed" onchange="onAmCheck()"/> Bed &amp; mattress <input type="number" id="f-bedUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-sofa" onchange="onAmCheck()"/> Sofa <input type="number" id="f-sofaUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-lift" onchange="onAmCheck()"/> Elevator <input type="number" id="f-liftUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-balcony" onchange="onAmCheck()"/> Balcony <input type="number" id="f-balconyUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-gym" onchange="onAmCheck()"/> Gym <input type="number" id="f-gymUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-security" onchange="onAmCheck()"/> CCTV <input type="number" id="f-securityUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-power" onchange="onAmCheck()"/> Power backup <input type="number" id="f-powerUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-garden" onchange="onAmCheck()"/> Garden <input type="number" id="f-gardenUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-laundry" onchange="onAmCheck()"/> Laundry <input type="number" id="f-laundryUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-meals" onchange="onAmCheck()"/> Meals included <input type="number" id="f-mealsUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-pipedgas" onchange="onAmCheck()"/> Piped gas connection <input type="number" id="f-pipedgasUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-ro" onchange="onAmCheck()"/> RO water filter <input type="number" id="f-roUnits" min="1" onclick="event.stopPropagation()"></label>
           </div>
         </div>
       </div>
@@ -3806,7 +3805,7 @@ ul{list-style:none}
     </div>
     <div class="form-group">
       <label class="form-label">Additional amenities (comma-separated)</label>
-      <input class="form-input" type="text" id="f-amenities-extra" placeholder="Intercom, study table, servant quarter, etc."/>
+      <input class="form-input" type="text" id="f-amenities-extra"/>
     </div>
     </div>
 
@@ -3830,8 +3829,8 @@ ul{list-style:none}
     <div id="addLeaseSection" style="display:none">
       <div class="lm-section">💼 Lease Pricing</div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
-        <div class="form-group"><label class="form-label">Lease amount (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-leaseAmount" placeholder="e.g. 2500000" /></div>
-        <div class="form-group"><label class="form-label">Maintenance (₹/ Month)</label><input class="form-input" type="number" id="f-leaseMaintenance" placeholder="e.g. 2000" /></div>
+        <div class="form-group"><label class="form-label">Lease amount (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-leaseAmount" /></div>
+        <div class="form-group"><label class="form-label">Maintenance (₹/ Month)</label><input class="form-input" type="number" id="f-leaseMaintenance" /></div>
       </div>
       <div class="lm-section">📋 Lease Terms</div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
@@ -3861,7 +3860,7 @@ ul{list-style:none}
           <select class="form-select" id="f-pgRoomType"><option>Single</option><option>Double Sharing</option><option>Triple Sharing</option><option>Dormitory</option></select>
         </div>
         <div class="form-group"><label class="form-label">Attached bathroom</label><select class="form-select" id="f-pgBathroom"><option>Yes</option><option>Shared</option></select></div>
-        <div class="form-group"><label class="form-label">Occupancy available</label><input class="form-input" type="number" id="f-pgOccupancy" placeholder="e.g. 2" /></div>
+        <div class="form-group"><label class="form-label">Occupancy available</label><input class="form-input" type="number" id="f-pgOccupancy" /></div>
         <div class="form-group"><label class="form-label">Room furnishing</label><select class="form-select" id="f-pgRoomFurnishing"><option value="">Select</option><option>Fully Furnished</option><option>Semi-Furnished</option><option>Unfurnished</option></select></div>
         <div class="form-group"><label class="form-label">Kitchen access</label><select class="form-select" id="f-pgKitchenAccess"><option value="">Select</option><option>Shared Kitchen</option><option>No Kitchen</option><option>Private Kitchen</option></select></div>
       </div>
@@ -3891,18 +3890,18 @@ ul{list-style:none}
           <label class="form-label">Room type</label>
           <select class="form-select" id="f-ssRoomType"><option>Single</option><option>Double</option><option>Deluxe</option><option>Suite</option></select>
         </div>
-        <div class="form-group"><label class="form-label">Max guests</label><input class="form-input" type="number" id="f-ssMaxGuests" placeholder="e.g. 2" min="1" /></div>
-        <div class="form-group"><label class="form-label">Minimum stay (days)</label><input class="form-input" type="number" id="f-ssMinDays" placeholder="e.g. 1" min="1" /></div>
+        <div class="form-group"><label class="form-label">Max guests</label><input class="form-input" type="number" id="f-ssMaxGuests" min="1" /></div>
+        <div class="form-group"><label class="form-label">Minimum stay (days)</label><input class="form-input" type="number" id="f-ssMinDays" min="1" /></div>
         <div class="form-group"><label class="form-label">Check-in time</label><input class="form-input" type="time" id="f-ssCheckinTime" value="12:00" /></div>
         <div class="form-group"><label class="form-label">Check-out time</label><input class="form-input" type="time" id="f-ssCheckoutTime" value="11:00" /></div>
-        <div class="form-group"><label class="form-label">Extra day rate (₹)</label><input class="form-input" type="number" id="f-ssExtraDayRate" placeholder="e.g. 1200" min="0" /></div>
+        <div class="form-group"><label class="form-label">Extra day rate (₹)</label><input class="form-input" type="number" id="f-ssExtraDayRate" min="0" /></div>
         <div class="form-group"><label class="form-label">Free cancellation window</label><select class="form-select" id="f-ssCancellation"><option value="">Select</option><option>No Cancellation</option><option>Free Till Check-in</option><option>24 Hours Before</option><option>48 Hours Before</option></select></div>
       </div>
       <div class="lm-section">🪪 Guest Policy</div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
         <div class="form-group"><label class="form-label">ID proof required</label><select class="form-select" id="f-ssIdProof"><option>Yes</option><option>No</option></select></div>
         <div class="form-group"><label class="form-label">Unmarried couples allowed</label><select class="form-select" id="f-ssCouples"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
-        <div class="form-group"><label class="form-label">Security deposit (₹, optional)</label><input class="form-input" type="number" id="f-ssDeposit" placeholder="e.g. 500" min="0" /></div>
+        <div class="form-group"><label class="form-label">Security deposit (₹, optional)</label><input class="form-input" type="number" id="f-ssDeposit" min="0" /></div>
       </div>
     </div>
 
@@ -3920,7 +3919,7 @@ ul{list-style:none}
     <div class="detail-gallery" id="detailGallerySlot"></div>
     <div class="form-group" id="videoUrlGroup">
       <label class="form-label">Video tour URL (optional)</label>
-      <input class="form-input" type="url" id="f-videoUrl" placeholder="https://youtube.com/..." />
+      <input class="form-input" type="url" id="f-videoUrl" />
       <!-- View-mode only: an actual playable embed when the URL is a
            recognizable YouTube/Vimeo link or direct video file — see
            buildVideoDisplay()/openDetail(). Falls back to just the link
@@ -3954,7 +3953,7 @@ ul{list-style:none}
     </div>
     <div class="form-group">
       <label class="form-label">Description (optional)</label>
-      <textarea class="form-input" id="f-desc" rows="3" placeholder="Describe the property, nearby landmarks, special features…" style="resize:vertical"></textarea>
+      <textarea class="form-input" id="f-desc" rows="3" style="resize:vertical"></textarea>
     </div>
     </div>
 
@@ -4005,40 +4004,40 @@ ul{list-style:none}
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">First name</label>
-          <input class="form-input" type="text" id="auth-firstname" placeholder="First name" />
+          <input class="form-input" type="text" id="auth-firstname" />
         </div>
         <div class="form-group">
           <label class="form-label">Last name</label>
-          <input class="form-input" type="text" id="auth-lastname" placeholder="Last name" />
+          <input class="form-input" type="text" id="auth-lastname" />
         </div>
       </div>
     </div>
     <div id="authLoginContactField">
       <div class="form-group">
         <label class="form-label">Phone or email</label>
-        <input class="form-input" type="text" id="auth-contact" placeholder="98765 43210 or you@email.com" />
+        <input class="form-input" type="text" id="auth-contact" />
       </div>
     </div>
     <div id="authSignupContactFields" style="display:none">
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Email</label>
-          <input class="form-input" type="email" id="auth-email" placeholder="you@email.com" />
+          <input class="form-input" type="email" id="auth-email" />
         </div>
         <div class="form-group">
           <label class="form-label">Mobile number</label>
-          <input class="form-input" type="tel" id="auth-mobile" placeholder="98765 43210" />
+          <input class="form-input" type="tel" id="auth-mobile" />
         </div>
       </div>
     </div>
     <div class="form-group">
       <label class="form-label">Password</label>
-      <input class="form-input" type="password" id="auth-password" placeholder="••••••••" />
+      <input class="form-input" type="password" id="auth-password" />
     </div>
     <div id="authSignupConfirmField" style="display:none">
       <div class="form-group">
         <label class="form-label">Re-enter password</label>
-        <input class="form-input" type="password" id="auth-confirm-password" placeholder="••••••••" />
+        <input class="form-input" type="password" id="auth-confirm-password" />
       </div>
     </div>
     <div id="authForgotRow" style="text-align:right;margin-bottom:6px">
@@ -4141,15 +4140,15 @@ ul{list-style:none}
           <div class="profile-section-label">Edit account details</div>
           <div class="form-group">
             <label class="form-label">Full name</label>
-            <input class="form-input" type="text" id="profile-edit-name" placeholder="Your name" />
+            <input class="form-input" type="text" id="profile-edit-name" />
           </div>
           <div class="form-group">
             <label class="form-label">Email</label>
-            <input class="form-input" type="email" id="profile-edit-email" placeholder="you@email.com" />
+            <input class="form-input" type="email" id="profile-edit-email" />
           </div>
           <div class="form-group">
             <label class="form-label">Mobile number</label>
-            <input class="form-input" type="tel" id="profile-edit-mobile" placeholder="98765 43210" />
+            <input class="form-input" type="tel" id="profile-edit-mobile" />
           </div>
           <div class="profile-save-row">
             <button class="profile-btn-secondary" onclick="exitProfileEditMode()">Cancel</button>
@@ -4161,11 +4160,11 @@ ul{list-style:none}
           <div class="profile-section-label">Change password</div>
           <div class="form-group">
             <label class="form-label">Current password</label>
-            <input class="form-input" type="password" id="profile-current-password" placeholder="••••••••" />
+            <input class="form-input" type="password" id="profile-current-password" />
           </div>
           <div class="form-group">
             <label class="form-label">New password</label>
-            <input class="form-input" type="password" id="profile-new-password" placeholder="At least 6 characters" />
+            <input class="form-input" type="password" id="profile-new-password" />
           </div>
           <div class="profile-save-row">
             <button class="profile-btn-secondary" onclick="exitPasswordEditMode()">Cancel</button>
@@ -4383,7 +4382,7 @@ ul{list-style:none}
     <div class="help-search">
       <div class="searchbar" style="border-radius:10px">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" placeholder="Search help articles…" onkeydown="if(event.key==='Enter'){showToast('Searching help center…')}" />
+        <input type="text" onkeydown="if(event.key==='Enter'){showToast('Searching help center…')}" />
       </div>
     </div>
 
@@ -8694,11 +8693,12 @@ function onFTypeChange(val) {
   document.getElementById('addAmenitiesSection').style.display = isPG ? 'none' : '';
   document.getElementById('addPricingSection').style.display = isLease ? 'none' : '';
   // Maintenance, rent escalation, electricity-included and water/borewell
-  // charges aren't collected for PG listings — hide just those four fields
-  // (Rent and Negotiable in the same section still apply to PG).
+  // charges aren't collected for PG or Short Stay (hourly-style) listings —
+  // hide just those four fields (Rent and Negotiable in the same section
+  // still apply to both).
   ['f-maintenanceWrap', 'f-escalationWrap', 'f-electricityWrap', 'f-waterWrap'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.style.display = isPG ? 'none' : '';
+    if (el) el.style.display = (isPG || isShortStay) ? 'none' : '';
   });
   document.getElementById('f-depositWrap').style.display = (isPG || isShortStay) ? 'none' : '';
   // Lease has its own "Available from" dropdown in addLeaseSection — hide the
@@ -8843,12 +8843,12 @@ function submitListing() {
     } : {
       rent:         parseInt(rent) || 0,
       deposit:      isShortStay ? (parseInt(gv('f-ssDeposit')) || 0) : (parseInt(document.getElementById('f-deposit').value) || 0),
-      // Maintenance/escalation/electricity/water fields are hidden for PG — don't
-      // read stale/default values from them, send null instead.
-      maintenance:  isPG ? null : (parseFloat(gv('f-maintenance')) || null),
-      rentIncrease: isPG ? null : (parseFloat(gv('f-escalation')) ? gv('f-escalation') + '%' : null),
-      electricity:  isPG ? null : (gv('f-electricityIncluded') || null),
-      water:        isPG ? null : (gv('f-waterCharge') || null),
+      // Maintenance/escalation/electricity/water fields are hidden for PG and
+      // Short Stay — don't read stale/default values from them, send null instead.
+      maintenance:  (isPG || isShortStay) ? null : (parseFloat(gv('f-maintenance')) || null),
+      rentIncrease: (isPG || isShortStay) ? null : (parseFloat(gv('f-escalation')) ? gv('f-escalation') + '%' : null),
+      electricity:  (isPG || isShortStay) ? null : (gv('f-electricityIncluded') || null),
+      water:        (isPG || isShortStay) ? null : (gv('f-waterCharge') || null),
       negotiable:   gv('f-negotiable').toLowerCase() === 'yes' ? 'Yes'
                   : gv('f-negotiable').toLowerCase() === 'no'  ? 'No'
                   : null,

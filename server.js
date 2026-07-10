@@ -423,10 +423,10 @@ const PriceSchema = new mongoose.Schema({
   rent:         { type: Number, required: true },
   deposit:      { type: Number, default: null },
   monthlyRent:  { type: Number, default: null }, // Legacy field — Lease's separate "Monthly rent" input was removed from the form; kept here only to preserve older saved listings, new submissions send null
-  maintenance:  { type: Number, default: null }, // Not collected for PG listings (form hides this field for PG) — sent as null
+  maintenance:  { type: Number, default: null }, // Not collected for PG or Short Stay listings (form hides this field for both) — sent as null
   rentIncrease: { type: String, default: null }, // Legacy field — Lease's "Rent escalation" dropdown was removed from the form; kept only to preserve older saved listings, new submissions send null
-  electricity:  { type: String, default: null }, // Not collected for PG listings (form hides this field for PG) — sent as null
-  water:        { type: String, default: null }, // Not collected for PG listings (form hides this field for PG) — sent as null
+  electricity:  { type: String, default: null }, // Not collected for PG or Short Stay listings (form hides this field for both) — sent as null
+  water:        { type: String, default: null }, // Not collected for PG or Short Stay listings (form hides this field for both) — sent as null
   negotiable:   { type: String, default: null }, // 'Yes' | 'No' | null (not answered)
 }, { _id: false });
 
