@@ -433,9 +433,11 @@ ul{list-style:none}
 .prop-card.type-rent::before{background:linear-gradient(90deg,#a85c6e,#c98a9a);box-shadow:0 1px 4px rgba(168,92,110,.28)}
 .prop-card.type-lease::before{background:linear-gradient(90deg,#8a6b7a,#a893a0);box-shadow:0 1px 4px rgba(138,107,122,.28)}
 .prop-card.type-pg::before{background:linear-gradient(90deg,#6b3d4a,#8a5c68);box-shadow:0 1px 4px rgba(107,61,74,.28)}
+.prop-card.type-shortstay::before{background:linear-gradient(90deg,#3d7a7e,#5c9a9e);box-shadow:0 1px 4px rgba(61,122,126,.28)}
 .prop-card.prop-card-promoted.type-rent::before{background:linear-gradient(90deg,#e63950,#ff7a8f);box-shadow:0 1px 4px rgba(230,57,80,.3)}
 .prop-card.prop-card-promoted.type-lease::before{background:linear-gradient(90deg,#2f5fd1,#6f9bff);box-shadow:0 1px 4px rgba(47,95,209,.3)}
 .prop-card.prop-card-promoted.type-pg::before{background:linear-gradient(90deg,#6b3fc7,#a67bf0);box-shadow:0 1px 4px rgba(107,63,199,.3)}
+.prop-card.prop-card-promoted.type-shortstay::before{background:linear-gradient(90deg,#06b6d4,#5eead4);box-shadow:0 1px 4px rgba(6,182,212,.3)}
 /* ─── Promoted cards get their own gold/rose gradient treatment, overriding
    the type-based top strip, plus a matching border glow so they read as a
    tier above regular listings ─── */
@@ -512,9 +514,11 @@ ul{list-style:none}
 .badge-rent{background:linear-gradient(135deg,#c98a9a,#a85c6e);color:#fff;box-shadow:0 2px 6px rgba(168,92,110,.35)}
 .badge-lease{background:linear-gradient(135deg,#a893a0,#8a6b7a);color:#fff;box-shadow:0 2px 6px rgba(138,107,122,.35)}
 .badge-pg{background:linear-gradient(135deg,#8a5c68,#6b3d4a);color:#fff;box-shadow:0 2px 6px rgba(107,61,74,.35)}
+.badge-shortstay{background:linear-gradient(135deg,#5c9a9e,#3d7a7e);color:#fff;box-shadow:0 2px 6px rgba(61,122,126,.35)}
 .prop-card.prop-card-promoted .badge-rent{background:linear-gradient(135deg,#ff7a8f,#e63950);box-shadow:0 2px 6px rgba(230,57,80,.35)}
 .prop-card.prop-card-promoted .badge-lease{background:linear-gradient(135deg,#6f9bff,#2f5fd1);box-shadow:0 2px 6px rgba(47,95,209,.35)}
 .prop-card.prop-card-promoted .badge-pg{background:linear-gradient(135deg,#a67bf0,#6b3fc7);box-shadow:0 2px 6px rgba(107,63,199,.35)}
+.prop-card.prop-card-promoted .badge-shortstay{background:linear-gradient(135deg,#5eead4,#06b6d4);box-shadow:0 2px 6px rgba(6,182,212,.35)}
 .prop-heart{
   width:30px;height:30px;border-radius:50%;
   background:rgba(255,255,255,.92);backdrop-filter:blur(6px);
@@ -757,6 +761,7 @@ ul{list-style:none}
 .qa-whatsapp .qa-3d-icon{background:linear-gradient(150deg,#5fbd85 0%,#3d9d64 55%,#2c7a4a 100%)}
 .qa-whatsapp .qa-3d-icon svg{fill:#fff;stroke:none}
 .qa-visit .qa-3d-icon{background:linear-gradient(150deg,#e0b784 0%,#c9975c 55%,#a87540 100%)}
+.qa-book .qa-3d-icon{background:linear-gradient(150deg,#5eead4 0%,#06b6d4 55%,#0891b2 100%)}
 .qa-compare .qa-3d-icon{background:linear-gradient(150deg,#b89aa3 0%,#8a6b7a 55%,#6b4d57 100%)}
 .qa-compare.checked .qa-3d-icon{background:linear-gradient(150deg,#5fbd85 0%,#3d9d64 55%,#2c7a4a 100%)}
 .qa-compare.disabled{cursor:not-allowed}
@@ -3087,6 +3092,14 @@ ul{list-style:none}
     </div>
     <div class="prop-grid" id="pgGrid"></div>
   </div>
+  <div id="shortstaySection">
+    <div class="section-divider" id="shortstayDivider" style="display:none">
+      <div class="section-divider-inner">
+        <span class="section-divider-label promoted-label">Short Stay<span class="section-divider-count" id="shortstayCount"></span></span>
+      </div>
+    </div>
+    <div class="prop-grid" id="shortstayGrid"></div>
+  </div>
   <div class="empty-state" id="emptyState">
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     <h3>No properties found</h3>
@@ -3393,6 +3406,52 @@ ul{list-style:none}
   </div>
 </div>
 
+<!-- ─── Book Now Modal (Short Stay direct booking, OYO-style) ───────────────────────── -->
+<div class="add-modal-overlay" id="bookingModal" role="dialog" aria-modal="true" aria-label="Book now">
+  <div class="add-modal" id="bookingModalBox" style="max-width:400px">
+    <div class="add-modal-header">
+      <div class="add-modal-title">Book now</div>
+      <button class="modal-close" style="position:static" onclick="closeBookingModal()" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div id="bookingModalSubtitle" style="font-size:13px;color:var(--text-2);margin-bottom:16px"></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Check-in date <span style="color:var(--brand)">*</span></label>
+        <input class="form-input" type="date" id="book-checkin" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Number of days <span style="color:var(--brand)">*</span></label>
+        <input class="form-input" type="number" id="book-days" min="1" placeholder="e.g. 2" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Number of guests</label>
+      <input class="form-input" type="number" id="book-guests" min="1" placeholder="e.g. 2" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Your name</label>
+      <input class="form-input" type="text" id="book-name" placeholder="e.g. Priya Sharma" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Your phone</label>
+        <input class="form-input" type="tel" id="book-phone" placeholder="e.g. 9876543210" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your email</label>
+        <input class="form-input" type="email" id="book-email" placeholder="you@email.com" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Note (optional)</label>
+      <textarea class="form-input" id="book-note" rows="2" placeholder="Anything the owner should know…" style="resize:vertical"></textarea>
+    </div>
+    <button class="form-submit" id="bookingSubmitBtn" onclick="submitBookingRequest()">Confirm booking</button>
+  </div>
+</div>
+
 <!-- ─── Add Listing Modal (List Your Property) ───────────────────────── -->
 <div class="add-modal-overlay" id="addModal" role="dialog" aria-modal="true" aria-label="Add property listing">
   <div class="add-modal" id="addModalBox" style="max-width:860px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:92vh">
@@ -3442,7 +3501,7 @@ ul{list-style:none}
       <div class="form-group" id="f-typeWrap">
         <label class="form-label">Status <span style="color:var(--brand)">*</span></label>
         <select class="form-select" id="f-type" onchange="onFTypeChange(this.value)">
-          <option value="Rent">Rent</option><option value="Lease">Lease</option><option value="PG">PG / Co-living</option>
+          <option value="Rent">Rent</option><option value="Lease">Lease</option><option value="PG">PG / Co-living</option><option value="ShortStay">Short Stay (Per Day)</option>
         </select>
       </div>
       <div class="form-group">
@@ -3747,6 +3806,29 @@ ul{list-style:none}
         <div class="form-group"><label class="form-label">Visitor policy</label><select class="form-select" id="f-pgVisitorPolicy"><option value="">Select</option><option>Allowed</option><option>Lobby Only</option><option>Not Allowed</option></select></div>
         <div class="form-group"><label class="form-label">Non-veg allowed</label><select class="form-select" id="f-pgNonVeg"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
         <div class="form-group"><label class="form-label">Pets allowed</label><select class="form-select" id="f-pgPets"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
+      </div>
+    </div>
+
+    <!-- ===== 7c. SHORT STAY (PER DAY / OYO-STYLE) FIELDS ===== -->
+    <div id="addShortStaySection" style="display:none">
+      <div class="lm-section">🛎 Room &amp; Booking</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group">
+          <label class="form-label">Room type</label>
+          <select class="form-select" id="f-ssRoomType"><option>Single</option><option>Double</option><option>Deluxe</option><option>Suite</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Max guests</label><input class="form-input" type="number" id="f-ssMaxGuests" placeholder="e.g. 2" min="1" /></div>
+        <div class="form-group"><label class="form-label">Minimum stay (days)</label><input class="form-input" type="number" id="f-ssMinDays" placeholder="e.g. 1" min="1" /></div>
+        <div class="form-group"><label class="form-label">Check-in time</label><input class="form-input" type="time" id="f-ssCheckinTime" value="12:00" /></div>
+        <div class="form-group"><label class="form-label">Check-out time</label><input class="form-input" type="time" id="f-ssCheckoutTime" value="11:00" /></div>
+        <div class="form-group"><label class="form-label">Extra day rate (₹)</label><input class="form-input" type="number" id="f-ssExtraDayRate" placeholder="e.g. 1200" min="0" /></div>
+        <div class="form-group"><label class="form-label">Free cancellation window</label><select class="form-select" id="f-ssCancellation"><option value="">Select</option><option>No Cancellation</option><option>Free Till Check-in</option><option>24 Hours Before</option><option>48 Hours Before</option></select></div>
+      </div>
+      <div class="lm-section">🪪 Guest Policy</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">ID proof required</label><select class="form-select" id="f-ssIdProof"><option>Yes</option><option>No</option></select></div>
+        <div class="form-group"><label class="form-label">Unmarried couples allowed</label><select class="form-select" id="f-ssCouples"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
+        <div class="form-group"><label class="form-label">Security deposit (₹, optional)</label><input class="form-input" type="number" id="f-ssDeposit" placeholder="e.g. 500" min="0" /></div>
       </div>
     </div>
 
@@ -4552,6 +4634,10 @@ ul{list-style:none}
       <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       List PG Property
     </div>
+    <div class="menu-item" onclick="toggleMenuPanel(); openAddModal('ShortStay');">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      List Short Stay Property
+    </div>
     <div class="menu-divider"></div>
     <div class="menu-section-label">Support</div>
     <div class="menu-item" onclick="toggleMenuPanel(); openReferModal();">
@@ -4965,6 +5051,7 @@ let promotedPage = 0;
 let rentPage = 0;
 let leasePage = 0;
 let pgPage = 0;
+let shortstayPage = 0;
 const PAGE_SIZE = 8;
 
 // Which of the four on-page sections a (non-promoted) listing belongs in,
@@ -4973,6 +5060,7 @@ function sectionKeyFor(p) {
   const t = pTypeLabel(p);
   if (t === 'Lease') return 'lease';
   if (t === 'PG') return 'pg';
+  if (t === 'ShortStay') return 'shortstay';
   return 'rent';
 }
 
@@ -4981,7 +5069,7 @@ function renderCards() {
   const list = getFiltered();
   document.getElementById('resultCount').textContent = list.length;
 
-  const SECTIONS = ['promoted', 'rent', 'lease', 'pg'];
+  const SECTIONS = ['promoted', 'rent', 'lease', 'pg', 'shortstay'];
 
   if (list.length === 0) {
     SECTIONS.forEach(key => {
@@ -4997,14 +5085,15 @@ function renderCards() {
   const rest = list.filter(p => !p.promoted);
   const groups = {
     promoted,
-    rent:  rest.filter(p => sectionKeyFor(p) === 'rent'),
-    lease: rest.filter(p => sectionKeyFor(p) === 'lease'),
-    pg:    rest.filter(p => sectionKeyFor(p) === 'pg'),
+    rent:      rest.filter(p => sectionKeyFor(p) === 'rent'),
+    lease:     rest.filter(p => sectionKeyFor(p) === 'lease'),
+    pg:        rest.filter(p => sectionKeyFor(p) === 'pg'),
+    shortstay: rest.filter(p => sectionKeyFor(p) === 'shortstay'),
   };
 
   const gridClass = 'prop-grid' + (isListView ? ' list-view' : '');
-  const pageGetters = { promoted: () => promotedPage, rent: () => rentPage, lease: () => leasePage, pg: () => pgPage };
-  const pageSetters = { promoted: v => promotedPage = v, rent: v => rentPage = v, lease: v => leasePage = v, pg: v => pgPage = v };
+  const pageGetters = { promoted: () => promotedPage, rent: () => rentPage, lease: () => leasePage, pg: () => pgPage, shortstay: () => shortstayPage };
+  const pageSetters = { promoted: v => promotedPage = v, rent: v => rentPage = v, lease: v => leasePage = v, pg: v => pgPage = v, shortstay: v => shortstayPage = v };
 
   SECTIONS.forEach(key => {
     const items = groups[key];
@@ -5086,8 +5175,8 @@ function sectionItems(section) {
   return list.filter(p => !p.promoted && sectionKeyFor(p) === section);
 }
 
-const SECTION_PAGE_GETTERS = { promoted: () => promotedPage, rent: () => rentPage, lease: () => leasePage, pg: () => pgPage };
-const SECTION_PAGE_SETTERS = { promoted: v => promotedPage = v, rent: v => rentPage = v, lease: v => leasePage = v, pg: v => pgPage = v };
+const SECTION_PAGE_GETTERS = { promoted: () => promotedPage, rent: () => rentPage, lease: () => leasePage, pg: () => pgPage, shortstay: () => shortstayPage };
+const SECTION_PAGE_SETTERS = { promoted: v => promotedPage = v, rent: v => rentPage = v, lease: v => leasePage = v, pg: v => pgPage = v, shortstay: v => shortstayPage = v };
 
 function changePage(section, dir) {
   const items = sectionItems(section);
@@ -5272,6 +5361,7 @@ function pTypeLabel(p) {
   if (status === 'For Rent') return 'Rent';
   if (status === 'Lease') return 'Lease';
   if (status === 'PG') return 'PG';
+  if (status === 'Short Stay') return 'ShortStay';
   return status || 'Rent';
 }
 
@@ -5296,7 +5386,7 @@ function cardHTML(p, compact) {
   const lockedType = getCompareType();
   const pType = pTypeLabel(p);
   const compareDisabled = !compared && lockedType && pType !== lockedType;
-  const colors = {Rent:'#e8f5ee:#1a6640',Lease:'#dde9fa:#1a4680',PG:'#eee8fa:#4a2a9a'};
+  const colors = {Rent:'#e8f5ee:#1a6640',Lease:'#dde9fa:#1a4680',PG:'#eee8fa:#4a2a9a',ShortStay:'#e0f7fa:#00646e'};
   const [bg, fg] = (colors[pType]||'#f0f0f0:#333').split(':');
   const listClass = isListView ? ' list-view' : '';
   const bathrooms = parseInt(p.property?.bathrooms) || 1;
@@ -5353,7 +5443,7 @@ function cardHTML(p, compact) {
         ${ptype ? `<span class="prop-title-buildtype" title="${esc(ptype)}">${esc(ptype)}</span>` : ''}
       </div>
       <div class="prop-price-row">
-        <div class="prop-price">${fmtRupee(p.price?.rent||0)}<span class="prop-price-unit">/ ${pType === 'Lease' ? (leaseDur || 'Lease') : 'Month'}</span></div>
+        <div class="prop-price">${fmtRupee(p.price?.rent||0)}<span class="prop-price-unit">/ ${pType === 'Lease' ? (leaseDur || 'Lease') : pType === 'ShortStay' ? 'Day' : 'Month'}</span></div>
         <div class="prop-deposit-inline" title="Security deposit">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2"/><circle cx="12" cy="12.5" r="2.5"/></svg>
           <span class="prop-deposit-val">${fmtRupee(deposit)}</span><span class="prop-deposit-lbl">Deposit</span>
@@ -5425,10 +5515,14 @@ function cardHTML(p, compact) {
             <span class="qa-3d-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg></span>
             <span>WhatsApp</span>
           </button>
+          ${pType === 'ShortStay' ? `
+          <div class="prop-qa-icon prop-qa-3d qa-book" id="prop-qa-icon-${p.id}" data-prop-id="${p.id}" onclick="event.stopPropagation();openBookingModal('${p.id}')" aria-label="Book now" title="Book now">
+            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4" width="19" height="15" rx="2"/><line x1="7" y1="1.5" x2="7" y2="6.5"/><line x1="17" y1="1.5" x2="17" y2="6.5"/><line x1="2.5" y1="9" x2="21.5" y2="9"/><path d="M8 14.2l2.4 2.4L16 11"/></svg></span>
+          </div>` : `
           <div class="prop-qa-icon prop-qa-3d qa-visit" id="prop-qa-icon-${p.id}" data-prop-id="${p.id}" onclick="event.stopPropagation();openScheduleModal('${p.id}')" aria-label="Schedule a visit" title="Schedule a visit">
             <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4" width="14" height="15" rx="2"/><line x1="6" y1="1.5" x2="6" y2="6.5"/><line x1="13" y1="1.5" x2="13" y2="6.5"/><line x1="2.5" y1="9" x2="16.5" y2="9"/><circle cx="16.5" cy="16.5" r="6.2" fill="#c9975c"/><path d="M16.5 12.8v3.7l2.6 1.5"/></svg></span>
             <span class="prop-qa-count" style="${(p.visitCount||0) > 0 ? '' : 'display:none'}">${p.visitCount||0}</span>
-          </div>
+          </div>`}
           <div class="prop-qa-icon prop-qa-3d qa-compare prop-action-compare${compared?' checked':''}${compareDisabled?' disabled':''}" onclick="event.stopPropagation();toggleCompare('${p.id}',this)" aria-label="${compared?'Remove from':'Add to'} compare" title="${compareDisabled?`You're comparing ${lockedType} properties`:'Compare'}">
             <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="8" height="16" rx="1.5"/><rect x="13" y="4" width="8" height="16" rx="1.5" opacity="0.55"/></svg></span>
           </div>
@@ -5456,7 +5550,7 @@ function shortlistCardHTML(p) {
   const lockedType = getCompareType();
   const pType = pTypeLabel(p);
   const compareDisabled = !compared && lockedType && pType !== lockedType;
-  const colors = {Rent:'#e8f5ee:#1a6640',Lease:'#dde9fa:#1a4680',PG:'#eee8fa:#4a2a9a'};
+  const colors = {Rent:'#e8f5ee:#1a6640',Lease:'#dde9fa:#1a4680',PG:'#eee8fa:#4a2a9a',ShortStay:'#e0f7fa:#00646e'};
   const [bg, fg] = (colors[pType]||'#f0f0f0:#333').split(':');
   const bathrooms = parseInt(p.property?.bathrooms) || 1;
   const carCount = parseInt(p.property?.car, 10) || 0;
@@ -5490,7 +5584,7 @@ function shortlistCardHTML(p) {
         <span class="prop-title-text">${esc(p.propertyId || 'Untitled listing')}</span>
       </div>
       <div class="prop-price-row">
-        <div class="prop-price">${fmtRupee(p.price?.rent||0)}<span class="prop-price-unit">/ ${pType === 'Lease' ? (leaseDur || 'Lease') : 'Month'}</span></div>
+        <div class="prop-price">${fmtRupee(p.price?.rent||0)}<span class="prop-price-unit">/ ${pType === 'Lease' ? (leaseDur || 'Lease') : pType === 'ShortStay' ? 'Day' : 'Month'}</span></div>
         <div class="prop-deposit-inline" title="Security deposit">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2"/><circle cx="12" cy="12.5" r="2.5"/></svg>
           <span class="prop-deposit-val">${fmtRupee(deposit)}</span><span class="prop-deposit-lbl">Deposit</span>
@@ -5547,10 +5641,14 @@ function shortlistCardHTML(p) {
             <span class="qa-3d-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg></span>
             <span>WhatsApp</span>
           </button>
+          ${pType === 'ShortStay' ? `
+          <div class="prop-qa-icon prop-qa-3d qa-book" id="prop-qa-icon-${p.id}" data-prop-id="${p.id}" onclick="event.stopPropagation();openBookingModal('${p.id}')" aria-label="Book now" title="Book now">
+            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4" width="19" height="15" rx="2"/><line x1="7" y1="1.5" x2="7" y2="6.5"/><line x1="17" y1="1.5" x2="17" y2="6.5"/><line x1="2.5" y1="9" x2="21.5" y2="9"/><path d="M8 14.2l2.4 2.4L16 11"/></svg></span>
+          </div>` : `
           <div class="prop-qa-icon prop-qa-3d qa-visit" id="prop-qa-icon-${p.id}" data-prop-id="${p.id}" onclick="event.stopPropagation();openScheduleModal('${p.id}')" aria-label="Schedule a visit" title="Schedule a visit">
             <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4" width="14" height="15" rx="2"/><line x1="6" y1="1.5" x2="6" y2="6.5"/><line x1="13" y1="1.5" x2="13" y2="6.5"/><line x1="2.5" y1="9" x2="16.5" y2="9"/><circle cx="16.5" cy="16.5" r="6.2" fill="#c9975c"/><path d="M16.5 12.8v3.7l2.6 1.5"/></svg></span>
             <span class="prop-qa-count" style="${(p.visitCount||0) > 0 ? '' : 'display:none'}">${p.visitCount||0}</span>
-          </div>
+          </div>`}
           <div class="prop-qa-icon prop-qa-3d qa-compare prop-action-compare${compared?' checked':''}${compareDisabled?' disabled':''}" onclick="event.stopPropagation();toggleCompare('${p.id}',this)" aria-label="${compared?'Remove from':'Add to'} compare" title="${compareDisabled?`You're comparing ${lockedType} properties`:'Compare'}">
             <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="8" height="16" rx="1.5"/><rect x="13" y="4" width="8" height="16" rx="1.5" opacity="0.55"/></svg></span>
           </div>
@@ -6542,7 +6640,7 @@ function openDetail(id) {
   const gallerySlot = document.getElementById('detailGallerySlot');
   if (gallerySlot) {
     const pType = pTypeLabel(p);
-    const colors = {Rent:'#e8f5ee:#1a6640',Lease:'#dde9fa:#1a4680',PG:'#eee8fa:#4a2a9a'};
+    const colors = {Rent:'#e8f5ee:#1a6640',Lease:'#dde9fa:#1a4680',PG:'#eee8fa:#4a2a9a',ShortStay:'#e0f7fa:#00646e'};
     const [gbg, gfg] = (colors[pType]||'#f0f0f0:#333').split(':');
     gallerySlot.innerHTML = `<div class="prop-img" style="background:${gbg}" data-idx="0">${buildImgSlider(p, gfg, '-detail')}</div>`;
   }
@@ -6676,6 +6774,7 @@ function toggleShortlistFromModal(id) {
    SCHEDULE A VISIT
 ═══════════════════════════════════════════════ */
 let scheduleForPropId = null;
+let bookingForPropId = null;
 
 function openScheduleModal(propId) {
   if (!getLoggedInUser()) { showToast('Please log in to schedule a visit'); openAuthModal(); return; }
@@ -6776,6 +6875,87 @@ async function submitScheduleVisit() {
   } finally {
     btn.disabled = false;
     btn.textContent = 'Request visit';
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   BOOK NOW — direct customer booking for Short Stay listings
+   (OYO-style: no owner visit needed, guest books the room directly)
+═══════════════════════════════════════════════ */
+function openBookingModal(propId) {
+  if (!getLoggedInUser()) { showToast('Please log in to book'); openAuthModal(); return; }
+  const p = PROPERTIES.find(x => x.id === propId);
+  if (!p) return;
+  bookingForPropId = propId;
+  document.getElementById('bookingModalSubtitle').textContent = (p.propertyId || '') + ' · ' + (p.location?.area || '');
+  const user = getLoggedInUser();
+  document.getElementById('book-checkin').value = '';
+  document.getElementById('book-days').value = p.shortStay?.minDays || '';
+  document.getElementById('book-guests').value = '';
+  const preloadName = (user && `${user.firstName || ''} ${user.lastName || ''}`.trim()) || (user && user.name) || '';
+  document.getElementById('book-name').value = preloadName;
+  document.getElementById('book-phone').value = (user && user.mobile) || '';
+  document.getElementById('book-email').value = (user && user.email) || '';
+  document.getElementById('book-note').value = '';
+  // default the date picker's minimum to today so past dates can't be picked
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('book-checkin').min = today;
+  document.getElementById('bookingModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeBookingModal() {
+  document.getElementById('bookingModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+async function submitBookingRequest() {
+  const checkin = document.getElementById('book-checkin').value;
+  const days    = document.getElementById('book-days').value;
+  const guests  = document.getElementById('book-guests').value;
+  const name    = document.getElementById('book-name').value.trim();
+  const phone   = document.getElementById('book-phone').value.trim();
+  const email   = document.getElementById('book-email').value.trim();
+  const note    = document.getElementById('book-note').value.trim();
+
+  if (!checkin) { showToast('Please pick a check-in date'); return; }
+  if (!days || parseInt(days) < 1) { showToast('Please enter the number of days'); return; }
+  if (!name) { showToast('Please enter your name'); return; }
+  if (!phone) { showToast('Please enter your phone number'); return; }
+
+  const p = PROPERTIES.find(x => x.id === bookingForPropId);
+  if (!p) { showToast('Could not find that property. Please try again.'); return; }
+
+  const btn = document.getElementById('bookingSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Booking…';
+
+  try {
+    const res = await fetch('/api/bookings', {
+      method: 'POST',
+      headers: userAuthHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({
+        propertyId:   bookingForPropId,
+        guestName:    name,
+        guestPhone:   phone,
+        email,
+        note,
+        checkinDate:  checkin,
+        days:         parseInt(days) || 1,
+        guests:       parseInt(guests) || 1,
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) { showToast(data.message || 'Could not complete the booking. Please try again.'); return; }
+
+    const dateLabel = new Date(checkin).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+    closeBookingModal();
+    showToast(`Booked from ${dateLabel} for ${days} day${days > 1 ? 's' : ''} — ${p.propertyId || ''}`);
+  } catch (err) {
+    showToast('Network error. Please try again.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Confirm booking';
   }
 }
 
@@ -8408,18 +8588,23 @@ async function addImagesFromFiles(input) {
 function onFTypeChange(val) {
   const isPG = val === 'PG';
   const isLease = val === 'Lease';
+  const isShortStay = val === 'ShortStay';
   document.getElementById('addPgSection').style.display = isPG ? '' : 'none';
-  document.getElementById('addRentSection').style.display = (!isPG && !isLease) ? '' : 'none';
+  document.getElementById('addShortStaySection').style.display = isShortStay ? '' : 'none';
+  document.getElementById('addRentSection').style.display = (!isPG && !isLease && !isShortStay) ? '' : 'none';
   document.getElementById('addLeaseSection').style.display = isLease ? '' : 'none';
-  document.getElementById('addPropDetailsSection').style.display = isPG ? 'none' : '';
+  document.getElementById('addPropDetailsSection').style.display = (isPG || isShortStay) ? 'none' : '';
   document.getElementById('addAmenitiesSection').style.display = isPG ? 'none' : '';
   document.getElementById('addPricingSection').style.display = isLease ? 'none' : '';
-  document.getElementById('f-depositWrap').style.display = isPG ? 'none' : '';
+  document.getElementById('f-depositWrap').style.display = (isPG || isShortStay) ? 'none' : '';
   // Lease has its own "Available from" dropdown in addLeaseSection — hide the
   // Property-Details date field for Lease so there isn't a second, unused one.
-  document.getElementById('f-availWrap').style.display = isLease ? 'none' : '';
+  document.getElementById('f-availWrap').style.display = (isLease || isShortStay) ? 'none' : '';
   const lbl = document.getElementById('f-rentLabel');
-  if (lbl) lbl.innerHTML = (val === 'For Rent' || val === 'Rent') ? 'Monthly rent (₹) <span style="color:var(--brand)">*</span>' : isLease ? 'Token rent (₹) <span style="color:var(--brand)">*</span>' : 'Monthly charge (₹) <span style="color:var(--brand)">*</span>';
+  if (lbl) lbl.innerHTML = (val === 'For Rent' || val === 'Rent') ? 'Monthly rent (₹) <span style="color:var(--brand)">*</span>'
+    : isLease ? 'Token rent (₹) <span style="color:var(--brand)">*</span>'
+    : isShortStay ? 'Per day rate (₹) <span style="color:var(--brand)">*</span>'
+    : 'Monthly charge (₹) <span style="color:var(--brand)">*</span>';
 }
 
 function fCaptureLocation() {
@@ -8470,11 +8655,12 @@ function submitListing() {
 
   const typeRaw = document.getElementById('f-type').value;
   // Map frontend type values → schema basic.status enum values
-  // Schema enum: "For Sale" | "For Rent" | "New Launch" | "Sold" | "Booked" | "Lease" | "PG"
-  const statusMap = { 'Rent': 'For Rent', 'For Rent': 'For Rent', 'Lease': 'Lease', 'PG': 'PG' };
+  // Schema enum: "For Sale" | "For Rent" | "New Launch" | "Sold" | "Booked" | "Lease" | "PG" | "Short Stay"
+  const statusMap = { 'Rent': 'For Rent', 'For Rent': 'For Rent', 'Lease': 'Lease', 'PG': 'PG', 'ShortStay': 'Short Stay' };
   const status = statusMap[typeRaw] || 'For Rent';
   const isPG = status === 'PG';
   const isLease = status === 'Lease';
+  const isShortStay = status === 'Short Stay';
 
   // ── Build the nested submission payload ──────────────────────
   // {basic, location, owner, price, property, amenities, terms, rules, media, pg}
@@ -8516,7 +8702,7 @@ function submitListing() {
       negotiable:   null,
     } : {
       rent:         parseInt(rent) || 0,
-      deposit:      parseInt(document.getElementById('f-deposit').value) || 0,
+      deposit:      isShortStay ? (parseInt(gv('f-ssDeposit')) || 0) : (parseInt(document.getElementById('f-deposit').value) || 0),
       maintenance:  parseFloat(gv('f-maintenance')) || null,
       rentIncrease: parseFloat(gv('f-escalation')) ? gv('f-escalation') + '%' : null,
       electricity:  gv('f-electricityIncluded') || null,
@@ -8526,21 +8712,22 @@ function submitListing() {
                   : null,
     },
     property: {
-      type:      isPG ? null : gv('f-propertyType'),
-      bhk:       isPG ? null : gv('f-bhk'),
-      bike:      isPG ? '0' : String(parseInt(document.getElementById('f-bikepark').value, 10) || 0),
-      car:       isPG ? '0' : String(parseInt(document.getElementById('f-carpark').value, 10) || 0),
+      type:      (isPG || isShortStay) ? null : gv('f-propertyType'),
+      bhk:       (isPG || isShortStay) ? null : gv('f-bhk'),
+      bike:      (isPG || isShortStay) ? '0' : String(parseInt(document.getElementById('f-bikepark').value, 10) || 0),
+      car:       (isPG || isShortStay) ? '0' : String(parseInt(document.getElementById('f-carpark').value, 10) || 0),
       floor:     document.getElementById('f-floor').value || 'G',
-      area:      isPG ? null : gv('f-area'),
+      area:      (isPG || isShortStay) ? null : gv('f-area'),
       bathrooms: isPG ? '1' : (document.getElementById('f-baths').value || '1'),
       furnish:   document.getElementById('f-furnishing').value,
       facing:    isPG ? 'North' : document.getElementById('f-facing').value,
-      age:       isPG ? null : gv('f-age'),
+      age:       (isPG || isShortStay) ? null : gv('f-age'),
       tenant:    isPG
         ? (document.getElementById('f-pgGender').value === 'Girls' ? 'Female only' : 'Any')
         : document.getElementById('f-tenant').value,
       available: isPG ? gv('f-pgAvailableFrom')
                 : isLease ? gv('f-leaseAvailableFrom')
+                : isShortStay ? null
                 : (document.getElementById('f-avail').value || null),
     },
     amenities: {
@@ -8550,22 +8737,23 @@ function submitListing() {
     terms: {
       notice: isPG ? (gv('f-pgNotice') || null)
             : isLease ? (gv('f-leaseNoticePeriod') || null)
+            : isShortStay ? null
             : (gv('f-noticePeriod') || null),
       lease:  isLease
         ? (gv('f-leaseDurationVal') || null)
         // f-leaseDuration lives in #addRentSection, which is hidden for PG — reading it
         // there would always save null anyway, but do it explicitly so it's not relying
         // on a hidden field by accident.
-        : (isPG ? null : (gv('f-leaseDuration') || null)),
+        : ((isPG || isShortStay) ? null : (gv('f-leaseDuration') || null)),
       leaseType: isLease ? (gv('f-leaseType') || null) : null,
       lockIn:    isLease ? (gv('f-lockInPeriod') || null) : null,
     },
     rules: {
-      pets:   isPG ? (gv('f-pgPets') || null) : isLease ? (gv('f-leasePets') || null) : (gv('f-petsAllowed') || null),
-      nonVeg: isPG ? (gv('f-pgNonVeg') || null) : isLease ? (gv('f-leaseNonVeg') || null) : (gv('f-nonVegAllowed') || null),
+      pets:   isPG ? (gv('f-pgPets') || null) : isLease ? (gv('f-leasePets') || null) : isShortStay ? null : (gv('f-petsAllowed') || null),
+      nonVeg: isPG ? (gv('f-pgNonVeg') || null) : isLease ? (gv('f-leaseNonVeg') || null) : isShortStay ? null : (gv('f-nonVegAllowed') || null),
       // f-pipedGas lives in #addRentSection, which is hidden for Lease — it would always
       // save null anyway, but do it explicitly so it's not relying on a hidden field.
-      gas:    (isPG || isLease) ? null : (gv('f-pipedGas') || null),
+      gas:    (isPG || isLease || isShortStay) ? null : (gv('f-pipedGas') || null),
     },
     media: {
       video: gv('f-videoUrl') || null,
@@ -8589,6 +8777,17 @@ function submitListing() {
       gateTime:  gv('f-pgGateTime') || null,
       nonVeg:    gv('f-pgNonVeg') || null,
       pets:      gv('f-pgPets') || null,
+    } : {},
+    shortStay: isShortStay ? {
+      roomType:      document.getElementById('f-ssRoomType').value,
+      maxGuests:     gv('f-ssMaxGuests') || null,
+      minDays:       gv('f-ssMinDays') || null,
+      checkinTime:   gv('f-ssCheckinTime') || null,
+      checkoutTime:  gv('f-ssCheckoutTime') || null,
+      extraDayRate:  parseFloat(gv('f-ssExtraDayRate')) || null,
+      cancellation:  gv('f-ssCancellation') || null,
+      idProof:       document.getElementById('f-ssIdProof').value,
+      couplesAllowed: gv('f-ssCouples') || null,
     } : {},
   };
 
@@ -8740,6 +8939,9 @@ document.getElementById('detailModal').addEventListener('click', function(e) {
 });
 document.getElementById('scheduleModal').addEventListener('click', function(e) {
   if (e.target === this) closeScheduleModal();
+});
+document.getElementById('bookingModal').addEventListener('click', function(e) {
+  if (e.target === this) closeBookingModal();
 });
 document.getElementById('addModal').addEventListener('click', function(e) {
   if (e.target === this) closeAddModal();

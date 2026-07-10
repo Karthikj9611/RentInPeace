@@ -394,7 +394,7 @@ mongoose.connect(process.env.MONGODB_URI)
 
 // ── Property Schema (nested, matches the listing-submission payload shape) ──
 const BasicSchema = new mongoose.Schema({
-  status:    { type: String, enum: ['For Sale','For Rent','New Launch','Sold','Booked','Lease','PG'], default: 'For Rent' },
+  status:    { type: String, enum: ['For Sale','For Rent','New Launch','Sold','Booked','Lease','PG','Short Stay'], default: 'For Rent' },
   listedBy:  { type: String, default: 'Owner' },
 }, { _id: false });
 
@@ -488,6 +488,18 @@ const PgSchema = new mongoose.Schema({
   pets:          { type: String, default: null },
 }, { _id: false });
 
+const ShortStaySchema = new mongoose.Schema({
+  roomType:       { type: String, default: null }, // ssRoomType (Single/Double/Deluxe/Suite)
+  maxGuests:      { type: String, default: null }, // ssMaxGuests
+  minDays:        { type: String, default: null }, // ssMinDays
+  checkinTime:    { type: String, default: null }, // ssCheckinTime, e.g. '12:00'
+  checkoutTime:   { type: String, default: null }, // ssCheckoutTime, e.g. '11:00'
+  extraDayRate:   { type: Number, default: null }, // ssExtraDayRate
+  cancellation:   { type: String, default: null }, // ssCancellation
+  idProof:        { type: String, default: null }, // ssIdProof (Yes/No)
+  couplesAllowed: { type: String, default: null }, // ssCouples (Yes/No)
+}, { _id: false });
+
 // ── Counter (atomic per-type sequence for human-readable property IDs) ──
 // Using a dedicated collection with $inc (rather than e.g. Property.countDocuments()+1)
 // so two simultaneous submissions can never be handed the same number.
@@ -526,26 +538,28 @@ async function nextPropertyId() {
   let id, exists = true, attempts = 0;
   while (exists && attempts < 10) {
     id = randomCode();
-    const [inRent, inLease, inPg] = await Promise.all([
+    const [inRent, inLease, inPg, inHourlyStay] = await Promise.all([
       Rent.exists({ propertyId: id }),
       Lease.exists({ propertyId: id }),
       Pg.exists({ propertyId: id }),
+      HourlyStay.exists({ propertyId: id }),
     ]);
-    exists = !!(inRent || inLease || inPg);
+    exists = !!(inRent || inLease || inPg || inHourlyStay);
     attempts++;
   }
   return id;
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// ── LISTING MODELS: split across three collections by category ──
-// A listing is stored in exactly one of three collections based on its
+// ── LISTING MODELS: split across four collections by category ──
+// A listing is stored in exactly one of four collections based on its
 // basic.status: 'Lease' → the `lease` collection, 'PG' → the `pg` collection,
-// and everything else (For Rent / For Sale / New Launch / Sold / Booked) →
-// the `rent` collection. All three share the identical schema shape below —
-// only the collection (and therefore the Mongoose model) differs — so a
-// listing's category can be switched later by moving the document between
-// models (see moveListingIfNeeded below) rather than needing a migration.
+// 'Short Stay' → the `hourlyStay` collection, and everything else (For Rent /
+// For Sale / New Launch / Sold / Booked) → the `rent` collection. All four
+// share the identical schema shape below — only the collection (and therefore
+// the Mongoose model) differs — so a listing's category can be switched later
+// by moving the document between models (see moveListingIfNeeded below)
+// rather than needing a migration.
 // ────────────────────────────────────────────────────────────────────────────
 function buildListingSchema() {
   const schema = new mongoose.Schema({
@@ -559,6 +573,7 @@ function buildListingSchema() {
     rules:      { type: RulesSchema,            default: () => ({}) },
     media:      { type: MediaSchema,            default: () => ({}) },
     pg:         { type: PgSchema }, // no default — left unset for non-PG listings so we don't store an all-null subdocument
+    shortStay:  { type: ShortStaySchema }, // no default — left unset for non-Short-Stay listings, same reasoning as pg above
     // ── Meta (kept top-level / flat — not part of the submitted payload) ──
     propertyId:       { type: String, unique: true, sparse: true, index: true }, // random alphanumeric code, e.g. AAA123
     userId:           { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true }, // owner of this listing, null = posted while logged out
@@ -568,6 +583,7 @@ function buildListingSchema() {
     promotedPriority: { type: Number,  default: 3 },
     views:            { type: Number,  default: 0 },
     visitCount:       { type: Number,  default: 0 }, // # of "Schedule a Visit" requests made for this listing
+    bookingCount:     { type: Number,  default: 0 }, // # of direct "Book Now" requests made for this listing (Short Stay only)
     remarks:          { type: [String], default: [] }, // admin-panel notes
     createdAt:        { type: Date,    default: Date.now },
   });
@@ -576,24 +592,26 @@ function buildListingSchema() {
   return schema;
 }
 
-// Explicit 3rd arg pins the exact collection name — 'rent' / 'lease' / 'pg' —
-// instead of Mongoose's default pluralization.
-const Rent  = mongoose.model('Rent',  buildListingSchema(), 'rent');
-const Lease = mongoose.model('Lease', buildListingSchema(), 'lease');
-const Pg    = mongoose.model('Pg',    buildListingSchema(), 'pg');
+// Explicit 3rd arg pins the exact collection name — 'rent' / 'lease' / 'pg' /
+// 'hourlyStay' — instead of Mongoose's default pluralization.
+const Rent       = mongoose.model('Rent',       buildListingSchema(), 'rent');
+const Lease      = mongoose.model('Lease',      buildListingSchema(), 'lease');
+const Pg         = mongoose.model('Pg',         buildListingSchema(), 'pg');
+const HourlyStay = mongoose.model('HourlyStay', buildListingSchema(), 'hourlyStay');
 
 // Keyed by the same names used for VisitRequest.propertyType (refPath target).
-const LISTING_MODELS = { Rent, Lease, Pg };
+const LISTING_MODELS = { Rent, Lease, Pg, HourlyStay };
 const LISTING_MODEL_LIST = Object.values(LISTING_MODELS);
 
 // A listing's basic.status decides which collection it belongs in.
 function modelForStatus(status) {
-  if (status === 'Lease') return Lease;
-  if (status === 'PG')    return Pg;
+  if (status === 'Lease')      return Lease;
+  if (status === 'PG')         return Pg;
+  if (status === 'Short Stay') return HourlyStay;
   return Rent; // For Rent, For Sale, New Launch, Sold, Booked
 }
-// Finds a listing by Mongo _id without knowing in advance which of the three
-// collections it lives in — tries all three in parallel (a given ObjectId can
+// Finds a listing by Mongo _id without knowing in advance which of the four
+// collections it lives in — tries all four in parallel (a given ObjectId can
 // only ever exist in one, since each collection mints its own _ids).
 async function findListingById(id, { lean = false } = {}) {
   if (!mongoose.Types.ObjectId.isValid(id)) return { doc: null, model: null, type: null };
@@ -667,7 +685,7 @@ const VisitRequestSchema = new mongoose.Schema({
   propertyId:   { type: mongoose.Schema.Types.ObjectId, refPath: 'propertyType', required: true, index: true },
   // Which of the three listing collections propertyId points into — stamped
   // at creation (see POST /api/visits) so populate() can resolve it dynamically.
-  propertyType: { type: String, enum: ['Rent', 'Lease', 'Pg'], default: 'Rent' },
+  propertyType: { type: String, enum: ['Rent', 'Lease', 'Pg', 'HourlyStay'], default: 'Rent' },
   userId:       { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true },
   userReadableId: { type: String, default: null, index: true }, // human-readable User.userId (e.g. USER-000001), stamped at creation for admin readability — same pattern as UserSession.userId
   visitorName:  { type: String, required: true, trim: true },
@@ -685,6 +703,35 @@ VisitRequestSchema.index({ createdAt: -1 });
 VisitRequestSchema.index({ userId: 1, propertyId: 1, visitDate: 1 });
 const VisitRequest = mongoose.model('VisitRequest', VisitRequestSchema);
 
+// ── Booking Request Schema (from the "Book Now" modal — Short Stay direct booking) ──
+const BookingRequestSchema = new mongoose.Schema({
+  // Human-readable unique id, same pattern as VisitRequest.visitId (e.g. BOOKING-000001).
+  bookingId:    { type: String, unique: true, sparse: true, index: true },
+  propertyId:   { type: mongoose.Schema.Types.ObjectId, refPath: 'propertyType', required: true, index: true },
+  // Which listing collection propertyId points into — stamped at creation
+  // (see POST /api/bookings) so populate() can resolve it dynamically.
+  // In practice this is always 'HourlyStay' today, since Book Now only appears
+  // on Short Stay cards, but kept as an enum (matching VisitRequest's pattern)
+  // in case direct booking is ever offered on another listing type.
+  propertyType: { type: String, enum: ['Rent', 'Lease', 'Pg', 'HourlyStay'], default: 'HourlyStay' },
+  userId:       { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true },
+  userReadableId: { type: String, default: null, index: true }, // human-readable User.userId (e.g. USER-000001), stamped at creation for admin readability
+  guestName:    { type: String, required: true, trim: true },
+  guestPhone:   { type: String, required: true, trim: true },
+  email:        { type: String, default: '', trim: true, lowercase: true }, // preloaded from the logged-in user's account email
+  note:         { type: String, default: '', trim: true },
+  checkinDate:  { type: String, required: true }, // 'YYYY-MM-DD'
+  days:         { type: Number, required: true, min: 1 },
+  guests:       { type: Number, default: 1, min: 1 },
+  status:       { type: String, enum: ['Pending', 'Confirmed', 'Cancelled', 'Completed'], default: 'Pending' },
+  remarks:      { type: [RemarkEntrySchema], default: [] },
+  createdAt:    { type: Date, default: Date.now },
+});
+BookingRequestSchema.index({ createdAt: -1 });
+// Speeds up the duplicate-booking lookup in POST /api/bookings (same user + property + check-in date).
+BookingRequestSchema.index({ userId: 1, propertyId: 1, checkinDate: 1 });
+const BookingRequest = mongoose.model('BookingRequest', BookingRequestSchema);
+
 // ── Helpers ──
 function formatPrice(price, status) {
   const num = Number(price);
@@ -693,7 +740,8 @@ function formatPrice(price, status) {
   else if (num >= 100000)   display = (num / 100000).toFixed(1).replace(/\.?0+$/, '') + 'L';
   else if (num >= 1000)     display = (num / 1000).toFixed(1).replace(/\.?0+$/, '') + 'K';
   else                      display = String(num);
-  if (['For Rent', 'Lease', 'PG'].includes(status)) display += '/Month';
+  if (status === 'Short Stay') display += '/Day';
+  else if (['For Rent', 'Lease', 'PG'].includes(status)) display += '/Month';
   return display;
 }
 
@@ -716,7 +764,7 @@ function formatPostedDateTime(date) {
 }
 
 // Top-level keys accepted from the client, matching the nested submission shape exactly.
-const NESTED_SECTIONS = ['basic','location','owner','price','property','amenities','terms','rules','media','pg'];
+const NESTED_SECTIONS = ['basic','location','owner','price','property','amenities','terms','rules','media','pg','shortStay'];
 
 const URL_FIELDS_BY_SECTION = { location: ['mapLink'], media: ['video'] };
 const MAX_LENGTHS = {
@@ -798,10 +846,12 @@ app.post('/api/properties', listingLimiter, requireUser, async (req, res) => {
     const status = fields.basic.status;
 
     // Fields required by every listing type, with a type-appropriate label in the error message
-    // (price.rent doubles as "monthly rent" for Rent, "lease amount" for Lease, "monthly charge" for PG).
-    const priceLabel = status === 'Lease' ? 'price.rent (lease amount)'
-                      : status === 'PG'   ? 'price.rent (monthly charge)'
-                      :                     'price.rent (monthly rent)';
+    // (price.rent doubles as "monthly rent" for Rent, "lease amount" for Lease, "monthly charge" for PG,
+    // "per day rate" for Short Stay).
+    const priceLabel = status === 'Lease'      ? 'price.rent (lease amount)'
+                      : status === 'PG'         ? 'price.rent (monthly charge)'
+                      : status === 'Short Stay' ? 'price.rent (per day rate)'
+                      :                           'price.rent (monthly rent)';
     if (!fields.owner.propertyName || !fields.location.area ||
         fields.price.rent === undefined || fields.price.rent === null || fields.price.rent === '') {
       return res.status(400).json({ message: `owner.propertyName, location.area, and ${priceLabel} are required.` });
@@ -814,11 +864,14 @@ app.post('/api/properties', listingLimiter, requireUser, async (req, res) => {
     if (status === 'Lease' && !fields.terms.lease) {
       return res.status(400).json({ message: 'terms.lease (lease duration) is required for Lease listings.' });
     }
+    if (status === 'Short Stay' && !fields.shortStay.roomType) {
+      return res.status(400).json({ message: 'shortStay.roomType is required for Short Stay listings.' });
+    }
 
     const displayPrice = formatPrice(fields.price.rent, status);
     const propertyId = await nextPropertyId();
 
-    const ListingModel = modelForStatus(status); // Rent, Lease, or Pg — decided by basic.status
+    const ListingModel = modelForStatus(status); // Rent, Lease, Pg, or HourlyStay — decided by basic.status
     const prop = new ListingModel({
       propertyId,
       userId:         req.userId || null, // links the listing to its creator when logged in
@@ -833,6 +886,7 @@ app.post('/api/properties', listingLimiter, requireUser, async (req, res) => {
       rules:     fields.rules,
       media:     fields.media,
       pg:        status === 'PG' ? fields.pg : undefined,
+      shortStay: status === 'Short Stay' ? fields.shortStay : undefined,
     });
     await prop.save();
 
@@ -873,8 +927,8 @@ app.get('/api/properties', async (req, res) => {
       '-location.address -location.lat -location.lng -location.mapLink';
 
     // If a status was requested, we already know exactly which single
-    // collection to query. Otherwise we need to fan out to all three and
-    // merge, since listings now live in separate rent/lease/pg collections.
+    // collection to query. Otherwise we need to fan out to all four and
+    // merge, since listings now live in separate rent/lease/pg/hourlyStay collections.
     const modelsToQuery = (status && typeof status === 'string')
       ? [modelForStatus(status)]
       : LISTING_MODEL_LIST;
@@ -993,6 +1047,92 @@ app.post('/api/visits', visitLimiter, requireUser, async (req, res) => {
   }
 });
 
+// ── POST /api/bookings (Book Now modal — Short Stay direct booking) ──
+const bookingLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, max: 20,
+  standardHeaders: true, legacyHeaders: false,
+  message: { message: 'Too many booking requests. Please try again later.' }
+});
+
+app.post('/api/bookings', bookingLimiter, requireUser, async (req, res) => {
+  try {
+    const { propertyId, guestName, guestPhone, email, note, checkinDate, days, guests } = req.body || {};
+
+    if (!propertyId || !mongoose.Types.ObjectId.isValid(propertyId)) {
+      return res.status(400).json({ message: 'A valid propertyId is required' });
+    }
+    if (!guestName || !String(guestName).trim()) {
+      return res.status(400).json({ message: 'Your name is required' });
+    }
+    if (!guestPhone || !String(guestPhone).trim()) {
+      return res.status(400).json({ message: 'Your phone number is required' });
+    }
+    if (!checkinDate || !/^\d{4}-\d{2}-\d{2}$/.test(checkinDate)) {
+      return res.status(400).json({ message: 'A valid check-in date is required' });
+    }
+    const daysNum = parseInt(days, 10);
+    if (!daysNum || daysNum < 1) {
+      return res.status(400).json({ message: 'Number of days must be at least 1' });
+    }
+    const guestsNum = parseInt(guests, 10) || 1;
+
+    const { doc: property, model: propertyModel, type: propertyType } = await findListingById(propertyId, { lean: true });
+    if (!property) return res.status(404).json({ message: 'Property not found' });
+    if (propertyType !== 'HourlyStay') {
+      return res.status(400).json({ message: 'Direct booking is only available for Short Stay listings.' });
+    }
+
+    // Block a second booking from the same user for the same property on the
+    // same check-in date. A previously cancelled booking doesn't count, so the
+    // user can still rebook after cancelling.
+    if (req.userId) {
+      const duplicate = await BookingRequest.findOne({
+        userId:      req.userId,
+        propertyId,
+        checkinDate,
+        status: { $ne: 'Cancelled' },
+      }).lean();
+      if (duplicate) {
+        return res.status(409).json({ message: 'You already have a booking for this property on this check-in date. Please choose a different date, or cancel your existing booking first.' });
+      }
+    }
+
+    const bookingId = await nextSequenceId('BOOKING');
+
+    const booking = await BookingRequest.create({
+      bookingId,
+      propertyId,
+      propertyType,
+      userId:         req.userId || null,
+      userReadableId: req.userReadableId || null, // e.g. USER-000001, for admin readability
+      guestName:  String(guestName).trim(),
+      guestPhone: String(guestPhone).trim(),
+      email:      email ? String(email).trim().toLowerCase() : '',
+      note:       note ? String(note).trim().slice(0, 1000) : '',
+      checkinDate,
+      days:   daysNum,
+      guests: guestsNum,
+    });
+
+    // Bump the property's booking counter. $inc is atomic, so concurrent
+    // requests for the same property can't race and undercount each other.
+    const updatedProperty = await propertyModel.findByIdAndUpdate(
+      propertyId,
+      { $inc: { bookingCount: 1 } },
+      { new: true, select: 'bookingCount' }
+    ).lean();
+
+    res.status(201).json({
+      message: 'Booking confirmed',
+      booking,
+      bookingCount: updatedProperty ? updatedProperty.bookingCount : undefined,
+    });
+  } catch (err) {
+    console.error('POST /api/bookings error:', err);
+    res.status(500).json({ message: 'Error saving booking: ' + err.message });
+  }
+});
+
 // ── GET /api/user/my-visits (visit requests the logged-in user has made) ──
 app.get('/api/user/my-visits', requireUser, async (req, res) => {
   try {
@@ -1056,8 +1196,8 @@ app.get('/api/users', requireAdmin, async (req, res) => {
       ])
     ]);
 
-    // Sum counts per user across the three collections (a user's listings can
-    // be split between rent/lease/pg).
+    // Sum counts per user across the four collections (a user's listings can
+    // be split between rent/lease/pg/hourlyStay).
     const propMap = {};
     for (const agg of propAggByModel) {
       for (const x of agg) {
