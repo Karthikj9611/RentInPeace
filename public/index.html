@@ -862,6 +862,47 @@ ul{list-style:none}
   backdrop-filter:blur(2px);
 }
 .modal-overlay.open{display:flex}
+
+/* ── Confirm dialog (replaces native confirm()) ── */
+#confirmOverlay{
+  position:fixed;inset:0;z-index:1200;
+  background:rgba(20,16,17,.55);
+  display:none;align-items:center;justify-content:center;
+  padding:16px;backdrop-filter:blur(2px);
+}
+#confirmOverlay.open{display:flex}
+.confirm-card{
+  background:var(--bg);border-radius:var(--radius-xl);
+  width:100%;max-width:360px;
+  padding:28px 24px 22px;
+  box-shadow:0 24px 70px rgba(0,0,0,.28);
+  animation:modalIn .22s cubic-bezier(.2,.7,.3,1);
+  text-align:center;
+}
+.confirm-card .confirm-icon{
+  width:52px;height:52px;border-radius:50%;
+  background:var(--brand-light);color:var(--brand);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 14px;font-size:1.3rem;
+}
+.confirm-card .confirm-icon.info{background:#eef4ff;color:#2563eb}
+.confirm-card .confirm-title{
+  font-size:1.05rem;font-weight:800;color:var(--text);margin-bottom:6px;
+}
+.confirm-card .confirm-msg{
+  font-size:0.86rem;color:var(--text-2);line-height:1.5;margin-bottom:22px;
+}
+.confirm-card .confirm-actions{display:flex;gap:10px}
+.confirm-card .confirm-actions button{
+  flex:1;padding:11px;border-radius:var(--radius);border:none;
+  font-size:0.86rem;font-weight:700;cursor:pointer;transition:all .15s;
+}
+.confirm-cancel-btn{background:var(--bg-3);color:var(--text-2)}
+.confirm-cancel-btn:hover{background:var(--border-2);color:var(--text)}
+.confirm-ok-btn{background:var(--brand);color:#fff}
+.confirm-ok-btn:hover{background:var(--brand-hover)}
+.confirm-ok-btn.info{background:#2563eb}
+.confirm-ok-btn.info:hover{background:#1d4ed8}
 .modal{
   background:var(--bg);border-radius:var(--radius-xl);
   width:100%;max-width:720px;max-height:92vh;
@@ -3470,7 +3511,7 @@ ul{list-style:none}
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Your phone</label>
-        <input class="form-input" type="tel" id="sched-phone" />
+        <input class="form-input" type="tel" id="sched-phone" inputmode="numeric" maxlength="10" oninput="sanitizeMobileInput(this)" />
       </div>
       <div class="form-group">
         <label class="form-label">Your email</label>
@@ -3516,7 +3557,7 @@ ul{list-style:none}
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Your phone</label>
-        <input class="form-input" type="tel" id="book-phone" />
+        <input class="form-input" type="tel" id="book-phone" inputmode="numeric" maxlength="10" oninput="sanitizeMobileInput(this)" />
       </div>
       <div class="form-group">
         <label class="form-label">Your email</label>
@@ -3540,7 +3581,7 @@ ul{list-style:none}
         <div style="color:rgba(255,255,255,.85);font-size:12px;font-weight:600;margin-top:2px;display:none" id="addModalSubtitleText"></div>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
-      <button type="button" id="clearFormBtn" onclick="if(confirm('Clear everything you\'ve filled in for this listing?')) clearAddModalDraft()" style="background:transparent;border:1.5px solid rgba(255,255,255,.4);color:#fff;border-radius:16px;padding:0 12px;height:32px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">Clear form</button>
+      <button type="button" id="clearFormBtn" onclick="confirmClearAddModalDraft()" style="background:transparent;border:1.5px solid rgba(255,255,255,.4);color:#fff;border-radius:16px;padding:0 12px;height:32px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">Clear form</button>
       <button class="modal-close" style="position:static;background:rgba(255,255,255,.22);border:1.5px solid rgba(255,255,255,.4);color:#fff;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;transition:background .15s,transform .15s" onmouseover="this.style.background='rgba(255,255,255,.35)';this.style.transform='scale(1.06)'" onmouseout="this.style.background='rgba(255,255,255,.22)';this.style.transform='scale(1)'" onclick="closeAddModal()" aria-label="Close">
         <svg viewBox="0 0 24 24" aria-hidden="true" stroke="#fff" style="width:18px;height:18px;stroke-width:2.2;stroke:#fff !important"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
@@ -3636,9 +3677,9 @@ ul{list-style:none}
       <input class="form-input" type="text" id="f-title" />
     </div>
       <div class="form-group"><label class="form-label">Owner name <span style="color:var(--brand)">*</span></label><input class="form-input" type="text" id="f-ownerName"/></div>
-      <div class="form-group"><label class="form-label">Phone number <span style="color:var(--brand)">*</span></label><input class="form-input" type="tel" id="f-ownerPhone"/></div>
+      <div class="form-group"><label class="form-label">Phone number <span style="color:var(--brand)">*</span></label><input class="form-input" type="tel" id="f-ownerPhone" inputmode="numeric" maxlength="10" oninput="sanitizeMobileInput(this)"/></div>
       <div class="form-group"><label class="form-label">Email (optional)</label><input class="form-input" type="email" id="f-ownerEmail"/></div>
-      <div class="form-group"><label class="form-label">Alternate number</label><input class="form-input" type="tel" id="f-ownerAltPhone"/></div>
+      <div class="form-group"><label class="form-label">Alternate number</label><input class="form-input" type="tel" id="f-ownerAltPhone" inputmode="numeric" maxlength="10" oninput="sanitizeMobileInput(this)"/></div>
       <div class="form-group">
         <label class="form-label">Preferred contact time</label>
         <select class="form-select" id="f-contactTime"><option>Any</option><option>Morning (10am - 1pm)</option><option>Afternoon (1pm - 5pm)</option><option>Evening (6pm - 9pm)</option></select>
@@ -3652,7 +3693,7 @@ ul{list-style:none}
         <div class="form-row" style="grid-template-columns:1fr 1fr;margin-top:4px">
           <div class="form-group">
             <label class="form-label">Agent phone number</label>
-            <input class="form-input" type="tel" id="f-agentPhone" />
+            <input class="form-input" type="tel" id="f-agentPhone" inputmode="numeric" maxlength="10" oninput="sanitizeMobileInput(this)" />
           </div>
           <div class="form-group">
             <label class="form-label">Agent service area</label>
@@ -4026,7 +4067,7 @@ ul{list-style:none}
         </div>
         <div class="form-group">
           <label class="form-label">Mobile number</label>
-          <input class="form-input" type="tel" id="auth-mobile" />
+          <input class="form-input" type="tel" id="auth-mobile" inputmode="numeric" maxlength="10" oninput="sanitizeMobileInput(this)" />
         </div>
       </div>
     </div>
@@ -4148,7 +4189,7 @@ ul{list-style:none}
           </div>
           <div class="form-group">
             <label class="form-label">Mobile number</label>
-            <input class="form-input" type="tel" id="profile-edit-mobile" />
+            <input class="form-input" type="tel" id="profile-edit-mobile" inputmode="numeric" maxlength="10" oninput="sanitizeMobileInput(this)" />
           </div>
           <div class="profile-save-row">
             <button class="profile-btn-secondary" onclick="exitProfileEditMode()">Cancel</button>
@@ -6888,6 +6929,7 @@ async function submitScheduleVisit() {
   }
   if (!name) { showToast('Please enter your name'); return; }
   if (!phone) { showToast('Please enter your phone number'); return; }
+  if (!isValidIndianMobile(phone)) { showToast('Enter a valid 10-digit mobile number starting with 6, 7, 8 or 9'); return; }
 
   const p = PROPERTIES.find(x => x.id === scheduleForPropId);
   if (!p) { showToast('Could not find that property. Please try again.'); return; }
@@ -6993,6 +7035,7 @@ async function submitBookingRequest() {
   if (!days || parseInt(days) < 1) { showToast('Please enter the number of days'); return; }
   if (!name) { showToast('Please enter your name'); return; }
   if (!phone) { showToast('Please enter your phone number'); return; }
+  if (!isValidIndianMobile(phone)) { showToast('Enter a valid 10-digit mobile number starting with 6, 7, 8 or 9'); return; }
 
   const p = PROPERTIES.find(x => x.id === bookingForPropId);
   if (!p) { showToast('Could not find that property. Please try again.'); return; }
@@ -7478,6 +7521,16 @@ function clearAddModalDraft() {
   showToast('Form cleared');
 }
 
+async function confirmClearAddModalDraft() {
+  if (await showConfirmDialog({
+    title: 'Clear form?',
+    message: "Clear everything you've filled in for this listing?",
+    okText: 'Clear form'
+  })) {
+    clearAddModalDraft();
+  }
+}
+
 /* ═══════════════════════════════════════════════
    LOG IN / SIGN UP MODAL
 ═══════════════════════════════════════════════ */
@@ -7600,6 +7653,7 @@ async function submitAuth() {
     if (!firstName || !lastName) { showToast('Please enter your first and last name'); return; }
     if (!email)  { showToast('Please enter your email'); return; }
     if (!mobile) { showToast('Please enter your mobile number'); return; }
+    if (!isValidIndianMobile(mobile)) { showToast('Enter a valid 10-digit mobile number starting with 6, 7, 8 or 9'); return; }
     if (!password) { showToast('Please enter a password'); return; }
     if (password !== confirmPassword) { showToast('Passwords do not match'); return; }
     body = { firstName, lastName, email, mobile, password, confirmPassword };
@@ -7676,6 +7730,7 @@ async function saveProfileEdits() {
   const mobile = document.getElementById('profile-edit-mobile').value.trim();
   if (!email)  { showToast('Email cannot be empty'); return; }
   if (!mobile) { showToast('Mobile number cannot be empty'); return; }
+  if (!isValidIndianMobile(mobile)) { showToast('Enter a valid 10-digit mobile number starting with 6, 7, 8 or 9'); return; }
 
   const btn = document.getElementById('profileSaveBtn');
   btn.disabled = true;
@@ -7810,7 +7865,7 @@ function renderMyListings() {
 }
 
 async function deleteMyListing(id) {
-  if (!confirm('Delete this listing? This cannot be undone.')) return;
+  if (!await showConfirmDialog({ title: 'Delete listing?', message: 'This cannot be undone.', okText: 'Delete' })) return;
   try {
     const res = await fetch('/api/user/listings/' + id, { method: 'DELETE', headers: userAuthHeaders() });
     const data = await res.json();
@@ -8781,6 +8836,21 @@ function submitListing() {
   function gv(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
   function gb(id) { const el = document.getElementById(id); return el ? el.checked : false; }
 
+  if (ownerPhone && !isValidIndianMobile(ownerPhone)) {
+    showToast('Enter a valid 10-digit owner phone number starting with 6, 7, 8 or 9');
+    return;
+  }
+  const ownerAltPhone = gv('f-ownerAltPhone');
+  if (ownerAltPhone && !isValidIndianMobile(ownerAltPhone)) {
+    showToast('Enter a valid 10-digit alternate number starting with 6, 7, 8 or 9');
+    return;
+  }
+  const agentPhone = gv('f-agentPhone');
+  if (agentPhone && !isValidIndianMobile(agentPhone)) {
+    showToast('Enter a valid 10-digit agent phone number starting with 6, 7, 8 or 9');
+    return;
+  }
+
   const amenitiesSelected = AM_LIST.filter(([id]) => gb(id)).map(([id, label, unitId]) => {
     if (unitId) {
       const qty = parseInt(gv(unitId)) || 1;
@@ -8976,6 +9046,68 @@ const TOAST_ICONS = {
   info:    '<path d="M20 6L9 17l-5-5"/>',
   error:   '<circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="16" x2="12" y2="16.01"/>',
 };
+
+/* ── Indian mobile number validation ──
+   Valid mobile numbers: exactly 10 digits, first digit 6/7/8/9. */
+function isValidIndianMobile(v) {
+  return /^[6-9]\d{9}$/.test((v || '').trim());
+}
+
+// Attach via oninput to any dedicated mobile-number <input>. Strips
+// non-digits, drops leading digits that can't start a valid number
+// (0–5), and caps the length at 10 digits — all in real time as the
+// person types or pastes.
+function sanitizeMobileInput(el) {
+  let digits = el.value.replace(/\D/g, '');
+  while (digits.length && !/[6-9]/.test(digits[0])) {
+    digits = digits.slice(1);
+  }
+  el.value = digits.slice(0, 10);
+}
+
+/* ── Confirm dialog (Promise-based replacement for window.confirm()) ──
+   Usage: if (!await showConfirmDialog({ message: 'Delete this?' })) return; */
+function showConfirmDialog({ title = 'Are you sure?', message = 'This action cannot be undone.', okText = 'Confirm', cancelText = 'Cancel', variant = 'danger' } = {}) {
+  return new Promise(resolve => {
+    const overlay   = document.getElementById('confirmOverlay');
+    const iconEl    = document.getElementById('confirmIcon');
+    const titleEl   = document.getElementById('confirmTitle');
+    const msgEl     = document.getElementById('confirmMsg');
+    const okBtn     = document.getElementById('confirmOkBtn');
+    const cancelBtn = document.getElementById('confirmCancelBtn');
+
+    titleEl.textContent = title;
+    msgEl.textContent = message;
+    okBtn.textContent = okText;
+    cancelBtn.textContent = cancelText;
+
+    const isInfo = variant === 'info';
+    iconEl.classList.toggle('info', isInfo);
+    okBtn.classList.toggle('info', isInfo);
+
+    function cleanup(result) {
+      overlay.classList.remove('open');
+      okBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+      overlay.removeEventListener('click', onOverlayClick);
+      document.removeEventListener('keydown', onKeydown);
+      resolve(result);
+    }
+    function onOk() { cleanup(true); }
+    function onCancel() { cleanup(false); }
+    function onOverlayClick(e) { if (e.target === overlay) cleanup(false); }
+    function onKeydown(e) { if (e.key === 'Escape') cleanup(false); if (e.key === 'Enter') cleanup(true); }
+
+    okBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+    overlay.addEventListener('click', onOverlayClick);
+    document.addEventListener('keydown', onKeydown);
+
+    overlay.classList.add('open');
+    okBtn.focus();
+  });
+}
+
 function showToast(msg, type) {
   const t = document.getElementById('toast');
   const backdrop = document.getElementById('toastBackdrop');
@@ -9233,6 +9365,21 @@ document.addEventListener('keydown',function(e){
   <div style="position:relative;max-width:100%;max-height:90vh;display:flex;">
     <img id="imgZoomSrc" src="" alt="Zoomed image">
     <div id="imgZoomCaption"></div>
+  </div>
+</div>
+
+<!-- ── Confirm dialog (replaces native confirm()) ── -->
+<div id="confirmOverlay">
+  <div class="confirm-card">
+    <div class="confirm-icon" id="confirmIcon">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+    </div>
+    <div class="confirm-title" id="confirmTitle">Are you sure?</div>
+    <div class="confirm-msg" id="confirmMsg">This action cannot be undone.</div>
+    <div class="confirm-actions">
+      <button class="confirm-cancel-btn" id="confirmCancelBtn">Cancel</button>
+      <button class="confirm-ok-btn" id="confirmOkBtn">Confirm</button>
+    </div>
   </div>
 </div>
 
