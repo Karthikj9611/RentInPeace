@@ -3608,14 +3608,14 @@ ul{list-style:none}
       <div class="form-group" id="fullAddressGroup" style="grid-column:span 3">
         <label class="form-label">Building Live Address</label>
         <div style="display:flex;gap:7px;align-items:flex-start">
-          <textarea class="form-input" id="f-fullAddress" rows="2" placeholder="House No., Building Name, Street, Landmark, Pincode" style="flex:1;min-width:0;resize:vertical"></textarea>
+          <textarea class="form-input" id="f-fullAddress" rows="2" placeholder="House No., Building Name, Street, Landmark, Pincode" style="flex:1;min-width:0;resize:vertical;background:var(--bg-2,#f5f5f5);cursor:not-allowed" readonly></textarea>
           <button type="button" onclick="fCaptureLocation()"
             style="flex-shrink:0;padding:9px 12px;border-radius:9px;border:1.5px solid var(--text);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;height:40px;margin-top:1px">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg>
             <span id="f-locBtnTxt">Live</span>
           </button>
         </div>
-        <div id="f-locStatus" style="font-size:11px;color:var(--text-2);min-height:14px;margin-top:2px">Live auto-fills from GPS</div>
+        <div id="f-locStatus" style="font-size:11px;color:var(--text-2);min-height:14px;margin-top:2px">Auto-filled from your current location · Tap Live to update</div>
       </div>
       <div class="form-group" id="latLngGroup">
         <label class="form-label">Latitude / Longitude (auto)</label>
@@ -3642,7 +3642,7 @@ ul{list-style:none}
       <div class="form-group"><label class="form-label">Alternate number</label><input class="form-input" type="tel" id="f-ownerAltPhone" placeholder="optional"/></div>
       <div class="form-group">
         <label class="form-label">Preferred contact time</label>
-        <select class="form-select" id="f-contactTime"><option>Any</option><option>Morning</option><option>Afternoon</option><option>Evening</option></select>
+        <select class="form-select" id="f-contactTime"><option>Any</option><option>Morning (10am - 1pm)</option><option>Afternoon (1pm - 5pm)</option><option>Evening (6pm - 9pm)</option></select>
       </div>
       <div class="form-group" style="grid-column:span 3">
         <label class="form-label">Owner address (optional)</label>
@@ -3670,13 +3670,13 @@ ul{list-style:none}
     <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
       <div class="form-group"><label class="form-label" id="f-rentLabel">Monthly rent (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-rent" placeholder="e.g. 22000" min="0" max="9999999" /></div>
       <div class="form-group" id="f-depositWrap"><label class="form-label">Security deposit (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-deposit" placeholder="e.g. 44000" min="0" max="9999999" /></div>
-      <div class="form-group"><label class="form-label">Maintenance (₹/ Month)</label><input class="form-input" type="number" id="f-maintenance" placeholder="e.g. 2000" /></div>
-      <div class="form-group"><label class="form-label">Annual rent escalation (%)</label><input class="form-input" type="number" step="0.5" id="f-escalation" placeholder="e.g. 5" /></div>
-      <div class="form-group">
+      <div class="form-group" id="f-maintenanceWrap"><label class="form-label">Maintenance (₹/ Month)</label><input class="form-input" type="number" id="f-maintenance" placeholder="e.g. 2000" oninput="onMaintenanceChange()" /></div>
+      <div class="form-group" id="f-escalationWrap"><label class="form-label">Annual rent escalation (%)</label><input class="form-input" type="number" step="0.5" id="f-escalation" placeholder="e.g. 5" /></div>
+      <div class="form-group" id="f-electricityWrap">
         <label class="form-label">Electricity included?</label>
         <select class="form-select" id="f-electricityIncluded"><option>Included</option><option>Separate</option><option>Shared meter</option></select>
       </div>
-      <div class="form-group">
+      <div class="form-group" id="f-waterWrap">
         <label class="form-label">Water / borewell charges</label>
         <select class="form-select" id="f-waterCharge"><option>Included</option><option>Separate</option><option>Tanker</option></select>
       </div>
@@ -3720,11 +3720,11 @@ ul{list-style:none}
 	  
       <div class="form-group">
         <label class="form-label">Floor (out of total)</label>
-        <input class="form-input" type="text" id="f-floor" placeholder="e.g. 3rd / 10 floors" />
+        <input class="form-input" type="text" id="f-floor" placeholder="e.g. 3rd / 10 floors" onblur="formatFloorOrdinal(this)" />
       </div>
       <div class="form-group">
         <label class="form-label">Area (sqft)</label>
-        <input class="form-input" type="number" id="f-area" placeholder="e.g. 1250" />
+        <input class="form-input" type="text" inputmode="numeric" id="f-area" placeholder="e.g. 1250" onfocus="stripAreaSqft(this)" onblur="formatAreaSqft(this)" />
       </div>
       <div class="form-group">
         <label class="form-label">Bathrooms</label>
@@ -3816,14 +3816,13 @@ ul{list-style:none}
     <div id="addRentSection">
       <div class="lm-section">📅 Availability &amp; Terms</div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
-        <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-noticePeriod"><option value="">Select</option><option>15 Days</option><option>1 Month</option><option>2 Months</option><option>3 Months</option></select></div>
-        <div class="form-group"><label class="form-label">Lease duration</label><select class="form-select" id="f-leaseDuration"><option value="">Any</option><option>6 Months</option><option>11 Months</option><option>12 Months</option><option>24+ Months</option></select></div>
+        <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-noticePeriod"><option value="">Select</option><option>15 Days</option><option>1 Month</option><option>2 Months</option><option selected>3 Months</option></select></div>
+        <div class="form-group"><label class="form-label">Lease duration</label><select class="form-select" id="f-leaseDuration"><option value="">Any</option><option>6 Months</option><option>12 Months</option><option>24+ Months</option></select></div>
       </div>
       <div class="lm-section">⚖️ Tenant Rules</div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
         <div class="form-group"><label class="form-label">Pets allowed</label><select class="form-select" id="f-petsAllowed"><option value="">Select</option><option>Yes</option><option>No</option><option>Restricted</option></select></div>
         <div class="form-group"><label class="form-label">Non-veg allowed</label><select class="form-select" id="f-nonVegAllowed"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
-        <div class="form-group"><label class="form-label">Piped gas</label><select class="form-select" id="f-pipedGas"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
       </div>
     </div>
 
@@ -3832,7 +3831,6 @@ ul{list-style:none}
       <div class="lm-section">💼 Lease Pricing</div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
         <div class="form-group"><label class="form-label">Lease amount (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-leaseAmount" placeholder="e.g. 2500000" /></div>
-        <div class="form-group"><label class="form-label">Monthly rent (₹) <span class="form-label-hint" title="Optional recurring rent on top of the lease corpus — most lease agreements set this to ₹0">ⓘ</span></label><input class="form-input" type="number" id="f-leaseMonthlyRent" placeholder="e.g. 0 (leave blank if none)" /></div>
         <div class="form-group"><label class="form-label">Maintenance (₹/ Month)</label><input class="form-input" type="number" id="f-leaseMaintenance" placeholder="e.g. 2000" /></div>
       </div>
       <div class="lm-section">📋 Lease Terms</div>
@@ -3841,8 +3839,7 @@ ul{list-style:none}
         <div class="form-group"><label class="form-label">Lease type</label><select class="form-select" id="f-leaseType"><option value="">Select</option><option>Residential</option><option>Commercial</option><option>Industrial</option><option>Mixed Use</option></select></div>
         <div class="form-group"><label class="form-label">Lock-in period</label><select class="form-select" id="f-lockInPeriod"><option value="">None</option><option>1 Year</option><option>2 Years</option><option>3 Years</option></select></div>
         <div class="form-group"><label class="form-label">Available from</label><input class="form-input" type="date" id="f-leaseAvailableFrom" /></div>
-        <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-leaseNoticePeriod"><option value="">Select</option><option>1 Month</option><option>2 Months</option><option>3 Months</option></select></div>
-        <div class="form-group"><label class="form-label">Rent escalation</label><select class="form-select" id="f-rentEscalation"><option value="">None</option><option>5% per year</option><option>10% per year</option><option>15% per year</option></select></div>
+        <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-leaseNoticePeriod"><option value="">Select</option><option>1 Month</option><option>2 Months</option><option selected>3 Months</option></select></div>
       </div>
       <div class="lm-section">⚖️ House Rules</div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
@@ -3865,15 +3862,13 @@ ul{list-style:none}
         </div>
         <div class="form-group"><label class="form-label">Attached bathroom</label><select class="form-select" id="f-pgBathroom"><option>Yes</option><option>Shared</option></select></div>
         <div class="form-group"><label class="form-label">Occupancy available</label><input class="form-input" type="number" id="f-pgOccupancy" placeholder="e.g. 2" /></div>
-        <div class="form-group"><label class="form-label">Total beds</label><input class="form-input" type="number" id="f-pgTotalBeds" placeholder="e.g. 20" /></div>
-        <div class="form-group"><label class="form-label">Meals cost (₹/ Month)</label><input class="form-input" type="number" id="f-pgMealsCost" placeholder="e.g. 3000" /></div>
         <div class="form-group"><label class="form-label">Room furnishing</label><select class="form-select" id="f-pgRoomFurnishing"><option value="">Select</option><option>Fully Furnished</option><option>Semi-Furnished</option><option>Unfurnished</option></select></div>
         <div class="form-group"><label class="form-label">Kitchen access</label><select class="form-select" id="f-pgKitchenAccess"><option value="">Select</option><option>Shared Kitchen</option><option>No Kitchen</option><option>Private Kitchen</option></select></div>
       </div>
       <div class="lm-section">📅 Availability &amp; Terms</div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
         <div class="form-group"><label class="form-label">Available from</label><input class="form-input" type="date" id="f-pgAvailableFrom" /></div>
-        <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-pgNotice"><option value="">Select</option><option>15 Days</option><option>1 Month</option><option>2 Months</option><option>3 Months</option></select></div>
+        <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-pgNotice"><option value="">Select</option><option selected>15 Days</option><option>1 Month</option><option>2 Months</option><option>3 Months</option></select></div>
       </div>
       <div class="lm-section">🍽 Meals &amp; Rules</div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
@@ -3885,7 +3880,6 @@ ul{list-style:none}
         <div class="form-group"><label class="form-label">Gate closing time</label><select class="form-select" id="f-pgGateTime"><option value="">No Curfew</option><option>9 PM</option><option>10 PM</option><option>11 PM</option></select></div>
         <div class="form-group"><label class="form-label">Visitor policy</label><select class="form-select" id="f-pgVisitorPolicy"><option value="">Select</option><option>Allowed</option><option>Lobby Only</option><option>Not Allowed</option></select></div>
         <div class="form-group"><label class="form-label">Non-veg allowed</label><select class="form-select" id="f-pgNonVeg"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
-        <div class="form-group"><label class="form-label">Pets allowed</label><select class="form-select" id="f-pgPets"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
       </div>
     </div>
 
@@ -3948,9 +3942,7 @@ ul{list-style:none}
     <div class="form-group" id="imgFormGroup">
       <label class="form-label">Property images (optional)</label>
       <div class="img-row" id="imgAddControls">
-        <textarea class="img-url-input" id="f-imgUrlInput" rows="2" placeholder="Paste image URLs, one per line or comma-separated…"></textarea>
         <div class="img-btns">
-          <button type="button" class="img-btn-add" onclick="addImageFromUrl()">+ Add URL(s)</button>
           <button type="button" class="img-btn-sec" onclick="document.getElementById('f-imgFileInput').click()">📁 Upload</button>
           <button type="button" class="img-btn-sec" onclick="document.getElementById('f-imgCameraInput').click()">📷 Camera</button>
         </div>
@@ -5483,7 +5475,7 @@ function cardHTML(p, compact) {
   const electricLabel = p.price?.electricity || '';
   // ── Extra fields captured on the post-property form but not previously shown on cards ──
   const ptype = p.property?.type || '';
-  const areaSqft = p.property?.area || '';
+  const areaSqft = (p.property?.area || '').toString().replace(/\s*sqft\s*$/i, '').trim();
   const leaseDur = p.terms?.lease || '';
   const video = p.media?.video || '';
   const pg = p.pg || {};
@@ -5967,7 +5959,7 @@ function renderCompareTable() {
     section('Property Details'),
     { label: 'Property type', get: p => dash(p.property?.type) },
     { label: 'Configuration', get: p => dash(p.property?.bhk) },
-    { label: 'Built-up area', get: p => p.property?.area ? `${p.property.area} sqft` : '—' },
+    { label: 'Built-up area', get: p => p.property?.area ? `${String(p.property.area).replace(/\s*sqft\s*$/i, '').trim()} sqft` : '—' },
     { label: 'Age of property', get: p => dash(p.property?.age) },
     { label: 'Furnishing', get: p => dash(p.property?.furnish) },
     { label: 'Floor', get: p => dash(p.property?.floor) },
@@ -7078,6 +7070,19 @@ function openWhatsApp(propId) {
 function resetListingForm() {
   // Reset all standard inputs/selects/textareas inside the modal
   document.querySelectorAll('#addModal input:not([type="checkbox"]), #addModal select, #addModal textarea').forEach(el => { el.value = ''; });
+  // Re-apply default notice periods (3 Months for Rent/Lease, 15 Days for PG)
+  // which the blanket reset above just cleared back to the placeholder.
+  const noticeRent = document.getElementById('f-noticePeriod');
+  const noticeLease = document.getElementById('f-leaseNoticePeriod');
+  const noticePg = document.getElementById('f-pgNotice');
+  if (noticeRent) noticeRent.value = '3 Months';
+  if (noticeLease) noticeLease.value = '3 Months';
+  if (noticePg) noticePg.value = '15 Days';
+  // Undo the maintenance>0 lock on electricity/water so a fresh form starts unlocked
+  const elecReset = document.getElementById('f-electricityIncluded');
+  const waterReset = document.getElementById('f-waterCharge');
+  if (elecReset) elecReset.disabled = false;
+  if (waterReset) waterReset.disabled = false;
   // Uncheck all checkboxes (amenities + misc toggles)
   document.querySelectorAll('#addModal input[type="checkbox"]').forEach(el => { el.checked = false; });
   // Clear amenity unit qty fields and re-render
@@ -7220,6 +7225,12 @@ function openAddModal(presetType) {
   document.body.style.overflow = 'hidden';
   onFTypeChange(document.getElementById('f-type').value);
   if (restored) showToast('Your unfinished listing was restored');
+  // Fresh listing (no restored draft, no address yet): auto-fill the
+  // current location so the field is populated without the person having
+  // to tap "Live" themselves. They can still tap it later to refresh.
+  if (!restored && !document.getElementById('f-fullAddress').value.trim()) {
+    fCaptureLocation();
+  }
 }
 function closeAddModal() {
   // Same modal/header X button and backdrop-click are shared with the
@@ -7363,9 +7374,7 @@ function applyImportedProperty(p) {
   // Pricing
   if (isLease) {
     sv('f-leaseAmount', price.rent);
-    sv('f-leaseMonthlyRent', price.monthlyRent);
     sv('f-leaseMaintenance', price.maintenance);
-    sv('f-rentEscalation', price.rentIncrease);
   } else {
     sv('f-rent', price.rent);
     sv('f-deposit', price.deposit);
@@ -7374,6 +7383,7 @@ function applyImportedProperty(p) {
     sv('f-electricityIncluded', price.electricity);
     sv('f-waterCharge', price.water);
     sv('f-negotiable', (price.negotiable || '').toLowerCase() === 'yes' ? 'yes' : (price.negotiable || '').toLowerCase() === 'no' ? 'no' : '');
+    onMaintenanceChange();
   }
 
   // Property details
@@ -7381,6 +7391,7 @@ function applyImportedProperty(p) {
     sv('f-propertyType', property.type);
     sv('f-bhk', property.bhk);
     sv('f-area', property.area);
+    formatAreaSqft(document.getElementById('f-area'));
     sv('f-age', property.age);
     sv('f-tenant', property.tenant);
     sv('f-facing', property.facing);
@@ -7424,7 +7435,6 @@ function applyImportedProperty(p) {
 
   // Rules
   if (isPG) {
-    sv('f-pgPets', rules.pets);
     sv('f-pgNonVeg', rules.nonVeg);
   } else if (isLease) {
     sv('f-leasePets', rules.pets);
@@ -7432,7 +7442,6 @@ function applyImportedProperty(p) {
   } else {
     sv('f-petsAllowed', rules.pets);
     sv('f-nonVegAllowed', rules.nonVeg);
-    sv('f-pipedGas', rules.gas);
   }
 
   // Media
@@ -7452,8 +7461,6 @@ function applyImportedProperty(p) {
     sv('f-pgMeals', pg.meals);
     sv('f-pgOccupancy', pg.occupancy);
     sv('f-pgBathroom', pg.bathroom);
-    sv('f-pgMealsCost', pg.mealCost);
-    sv('f-pgTotalBeds', pg.beds);
     sv('f-pgRoomFurnishing', pg.furnish);
     sv('f-pgFoodType', pg.food);
     sv('f-pgKitchenAccess', pg.kitchen);
@@ -8652,14 +8659,6 @@ function removeFImage(i) {
   fImages.splice(i, 1);
   renderFImages();
 }
-function addImageFromUrl() {
-  const ta = document.getElementById('f-imgUrlInput');
-  ta.value.split(/[\n,]+/).map(s => s.trim()).filter(s => s.indexOf('http') === 0).forEach(u => {
-    if (fImages.indexOf(u) < 0) fImages.push(u);
-  });
-  ta.value = '';
-  renderFImages();
-}
 async function addImagesFromFiles(input) {
   const files = Array.from(input.files || []);
   input.value = '';
@@ -8694,6 +8693,13 @@ function onFTypeChange(val) {
   document.getElementById('addPropDetailsSection').style.display = (isPG || isShortStay) ? 'none' : '';
   document.getElementById('addAmenitiesSection').style.display = isPG ? 'none' : '';
   document.getElementById('addPricingSection').style.display = isLease ? 'none' : '';
+  // Maintenance, rent escalation, electricity-included and water/borewell
+  // charges aren't collected for PG listings — hide just those four fields
+  // (Rent and Negotiable in the same section still apply to PG).
+  ['f-maintenanceWrap', 'f-escalationWrap', 'f-electricityWrap', 'f-waterWrap'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = isPG ? 'none' : '';
+  });
   document.getElementById('f-depositWrap').style.display = (isPG || isShortStay) ? 'none' : '';
   // Lease has its own "Available from" dropdown in addLeaseSection — hide the
   // Property-Details date field for Lease so there isn't a second, unused one.
@@ -8705,6 +8711,41 @@ function onFTypeChange(val) {
     : 'Monthly charge (₹) <span style="color:var(--brand)">*</span>';
 }
 
+function stripAreaSqft(el) {
+  el.value = el.value.replace(/\s*Sqft\s*$/i, '').trim();
+}
+function formatAreaSqft(el) {
+  const num = el.value.replace(/[^\d.]/g, '').trim();
+  el.value = num ? num + 'Sqft' : '';
+}
+function formatFloorOrdinal(el) {
+  const raw = el.value.trim();
+  // Only auto-convert when the person typed a plain number (e.g. "3");
+  // leave anything already containing text (e.g. "3rd / 10 floors") alone.
+  if (!/^\d+$/.test(raw)) return;
+  const n = parseInt(raw, 10);
+  const mod100 = n % 100;
+  const mod10 = n % 10;
+  let suffix = 'th';
+  if (mod100 < 11 || mod100 > 13) {
+    if (mod10 === 1) suffix = 'st';
+    else if (mod10 === 2) suffix = 'nd';
+    else if (mod10 === 3) suffix = 'rd';
+  }
+  el.value = n + suffix;
+}
+function onMaintenanceChange() {
+  const maint = parseFloat(document.getElementById('f-maintenance').value) || 0;
+  const elec = document.getElementById('f-electricityIncluded');
+  const water = document.getElementById('f-waterCharge');
+  if (maint > 0) {
+    elec.value = 'Included'; elec.disabled = true;
+    water.value = 'Included'; water.disabled = true;
+  } else {
+    elec.disabled = false;
+    water.disabled = false;
+  }
+}
 function fCaptureLocation() {
   const btnTxt = document.getElementById('f-locBtnTxt');
   const status = document.getElementById('f-locStatus');
@@ -8791,20 +8832,23 @@ function submitListing() {
       // Deposit/electricity/water/negotiable live in #addPricingSection, which is hidden
       // for Lease — reading them here would silently save stale/default values the user
       // never saw or entered. Lease simply doesn't collect these, so they're sent as null.
+      // Monthly rent and rent escalation fields were removed from the Lease form too.
       deposit:      null,
-      monthlyRent:  parseFloat(gv('f-leaseMonthlyRent')) || null, // optional recurring rent on top of the lease amount
+      monthlyRent:  null,
       maintenance:  parseFloat(gv('f-leaseMaintenance')) || null,
-      rentIncrease: gv('f-rentEscalation') || null,
+      rentIncrease: null,
       electricity:  null,
       water:        null,
       negotiable:   null,
     } : {
       rent:         parseInt(rent) || 0,
       deposit:      isShortStay ? (parseInt(gv('f-ssDeposit')) || 0) : (parseInt(document.getElementById('f-deposit').value) || 0),
-      maintenance:  parseFloat(gv('f-maintenance')) || null,
-      rentIncrease: parseFloat(gv('f-escalation')) ? gv('f-escalation') + '%' : null,
-      electricity:  gv('f-electricityIncluded') || null,
-      water:        gv('f-waterCharge') || null,
+      // Maintenance/escalation/electricity/water fields are hidden for PG — don't
+      // read stale/default values from them, send null instead.
+      maintenance:  isPG ? null : (parseFloat(gv('f-maintenance')) || null),
+      rentIncrease: isPG ? null : (parseFloat(gv('f-escalation')) ? gv('f-escalation') + '%' : null),
+      electricity:  isPG ? null : (gv('f-electricityIncluded') || null),
+      water:        isPG ? null : (gv('f-waterCharge') || null),
       negotiable:   gv('f-negotiable').toLowerCase() === 'yes' ? 'Yes'
                   : gv('f-negotiable').toLowerCase() === 'no'  ? 'No'
                   : null,
@@ -8847,11 +8891,11 @@ function submitListing() {
       lockIn:    isLease ? (gv('f-lockInPeriod') || null) : null,
     },
     rules: {
-      pets:   isPG ? (gv('f-pgPets') || null) : isLease ? (gv('f-leasePets') || null) : isShortStay ? null : (gv('f-petsAllowed') || null),
+      pets:   isPG ? null : isLease ? (gv('f-leasePets') || null) : isShortStay ? null : (gv('f-petsAllowed') || null),
       nonVeg: isPG ? (gv('f-pgNonVeg') || null) : isLease ? (gv('f-leaseNonVeg') || null) : isShortStay ? null : (gv('f-nonVegAllowed') || null),
-      // f-pipedGas lives in #addRentSection, which is hidden for Lease — it would always
-      // save null anyway, but do it explicitly so it's not relying on a hidden field.
-      gas:    (isPG || isLease || isShortStay) ? null : (gv('f-pipedGas') || null),
+      // Piped gas dropdown was removed — amenities already has a "Piped gas
+      // connection" checkbox (am-pipedgas), so derive Yes/No from that instead.
+      gas:    (isPG || isLease || isShortStay) ? null : (gb('am-pipedgas') ? 'Yes' : 'No'),
     },
     media: {
       video: gv('f-videoUrl') || null,
@@ -8865,8 +8909,6 @@ function submitListing() {
       occupancy: gv('f-pgOccupancy') || null,
       notice:    gv('f-pgNotice') || null,
       bathroom:  gv('f-pgBathroom') || null,
-      mealCost:  parseFloat(gv('f-pgMealsCost')) || null,
-      beds:      gv('f-pgTotalBeds') || null,
       furnish:   gv('f-pgRoomFurnishing') || null,
       food:      gv('f-pgFoodType') || null,
       kitchen:   gv('f-pgKitchenAccess') || null,
@@ -8874,7 +8916,6 @@ function submitListing() {
       visitors:  gv('f-pgVisitorPolicy') || null,
       gateTime:  gv('f-pgGateTime') || null,
       nonVeg:    gv('f-pgNonVeg') || null,
-      pets:      gv('f-pgPets') || null,
     } : {},
     shortStay: isShortStay ? {
       roomType:      document.getElementById('f-ssRoomType').value,

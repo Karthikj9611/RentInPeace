@@ -422,11 +422,11 @@ const OwnerSchema = new mongoose.Schema({
 const PriceSchema = new mongoose.Schema({
   rent:         { type: Number, required: true },
   deposit:      { type: Number, default: null },
-  monthlyRent:  { type: Number, default: null }, // Lease only: optional recurring rent on top of the lease/token amount (f-leaseMonthlyRent)
-  maintenance:  { type: Number, default: null },
-  rentIncrease: { type: String, default: null },
-  electricity:  { type: String, default: null },
-  water:        { type: String, default: null },
+  monthlyRent:  { type: Number, default: null }, // Legacy field — Lease's separate "Monthly rent" input was removed from the form; kept here only to preserve older saved listings, new submissions send null
+  maintenance:  { type: Number, default: null }, // Not collected for PG listings (form hides this field for PG) — sent as null
+  rentIncrease: { type: String, default: null }, // Legacy field — Lease's "Rent escalation" dropdown was removed from the form; kept only to preserve older saved listings, new submissions send null
+  electricity:  { type: String, default: null }, // Not collected for PG listings (form hides this field for PG) — sent as null
+  water:        { type: String, default: null }, // Not collected for PG listings (form hides this field for PG) — sent as null
   negotiable:   { type: String, default: null }, // 'Yes' | 'No' | null (not answered)
 }, { _id: false });
 
@@ -458,9 +458,9 @@ const TermsSchema = new mongoose.Schema({
 }, { _id: false });
 
 const RulesSchema = new mongoose.Schema({
-  pets:   { type: String, default: null }, // petsAllowed / leasePets / pgPets
+  pets:   { type: String, default: null }, // petsAllowed / leasePets — PG's "Pets allowed" field was removed from the form, so PG listings always send null here now
   nonVeg: { type: String, default: null }, // nonVegAllowed / leaseNonVeg / pgNonVeg
-  gas:    { type: String, default: null }, // pipedGas
+  gas:    { type: String, default: null }, // Derived from the "Piped gas connection" amenity checkbox now — the standalone pipedGas dropdown was removed from the form
 }, { _id: false });
 
 const MediaSchema = new mongoose.Schema({
@@ -476,8 +476,8 @@ const PgSchema = new mongoose.Schema({
   occupancy:     { type: String, default: null },
   notice:        { type: String, default: null }, // pgNotice (also mirrored into terms.notice)
   bathroom:      { type: String, default: null },
-  mealCost:      { type: Number, default: null },
-  beds:          { type: String, default: null }, // pgTotalBeds
+  mealCost:      { type: Number, default: null }, // Legacy field — "Meals cost" input was removed from the PG form; kept only to preserve older saved listings, new submissions send null
+  beds:          { type: String, default: null }, // Legacy field — "Total beds" input was removed from the PG form; kept only to preserve older saved listings, new submissions send null
   furnish:       { type: String, default: null }, // pgRoomFurnishing
   food:          { type: String, default: null }, // pgFoodType
   kitchen:       { type: String, default: null }, // pgKitchenAccess
@@ -485,7 +485,7 @@ const PgSchema = new mongoose.Schema({
   visitors:      { type: String, default: null }, // pgVisitorPolicy
   gateTime:      { type: String, default: null },
   nonVeg:        { type: String, default: null },
-  pets:          { type: String, default: null },
+  pets:          { type: String, default: null }, // Legacy field — "Pets allowed" input was removed from the PG form; kept only to preserve older saved listings, new submissions send null
 }, { _id: false });
 
 const ShortStaySchema = new mongoose.Schema({
