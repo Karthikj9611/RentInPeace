@@ -1212,6 +1212,45 @@ ul{list-style:none}
 .fab:hover{background:var(--brand-hover);transform:scale(1.05)}
 .fab svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2}
 
+/* ─── FAB add-type picker (opens above the FAB) ─────────── */
+.fab-picker-backdrop{position:fixed;inset:0;z-index:240;background:rgba(20,15,20,.28);backdrop-filter:blur(2px);display:none}
+.fab-picker-backdrop.open{display:block}
+.fab-picker{
+  position:fixed;top:50%;left:50%;z-index:250;
+  background:var(--bg);border-radius:20px;
+  box-shadow:0 20px 48px rgba(0,0,0,.22),0 2px 8px rgba(0,0,0,.08);
+  width:320px;max-width:calc(100vw - 32px);padding:6px;
+  opacity:0;transform:translate(-50%,-50%) scale(.94);
+  pointer-events:none;transform-origin:center;
+  transition:opacity .2s cubic-bezier(.2,.8,.3,1.2), transform .2s cubic-bezier(.2,.8,.3,1.2);
+}
+.fab-picker.open{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:auto}
+.fab-picker-header{padding:14px 14px 10px}
+.fab-picker-title{font-size:15.5px;font-weight:700;color:var(--text)}
+.fab-picker-sub{font-size:12px;color:var(--text-3);margin-top:2px}
+.fab-picker-item{
+  display:flex;align-items:center;gap:13px;
+  padding:11px;border-radius:14px;
+  cursor:pointer;transition:background .14s,transform .14s;
+}
+.fab-picker-item:hover{background:var(--bg-2)}
+.fab-picker-item:active{transform:scale(.98)}
+.fab-picker-icon{
+  width:42px;height:42px;border-radius:12px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 3px 8px rgba(0,0,0,.14);
+}
+.fab-picker-icon svg{width:21px;height:21px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fpi-rent{background:linear-gradient(135deg,#ff7a8f,#e63950)}
+.fpi-lease{background:linear-gradient(135deg,#6f9bff,#2f5fd1)}
+.fpi-pg{background:linear-gradient(135deg,#a67bf0,#6b3fc7)}
+.fpi-shortstay{background:linear-gradient(135deg,#5eead4,#06b6d4)}
+.fab-picker-text{flex:1;min-width:0}
+.fab-picker-label{font-size:14px;font-weight:600;color:var(--text)}
+.fab-picker-desc{font-size:11.5px;color:var(--text-3);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fab-picker-chevron{width:16px;height:16px;stroke:var(--text-3);fill:none;stroke-width:2;flex-shrink:0;opacity:.6;transition:transform .14s,opacity .14s}
+.fab-picker-item:hover .fab-picker-chevron{transform:translateX(2px);opacity:1}
+
 /* ─── Compare Bar ──────────────────────────────── */
 .compare-bar{
   position:fixed;left:50%;bottom:80px;z-index:160;
@@ -3282,9 +3321,50 @@ ul{list-style:none}
 </div>
 
 <!-- ─── FAB: Add listing ────────────────────────── -->
-<button class="fab" onclick="openAddModal()" aria-label="Add a listing" title="List your property">
+<button class="fab" onclick="openFabPicker()" aria-label="Add a listing" title="List your property">
   <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
 </button>
+
+<!-- ─── Add-type picker: choose which kind of listing to create ─── -->
+<div class="fab-picker-backdrop" id="fabPickerBackdrop" onclick="closeFabPicker()"></div>
+<div class="fab-picker" id="fabPicker" role="menu" aria-label="Choose listing type">
+  <div class="fab-picker-header">
+    <div class="fab-picker-title">Create a listing</div>
+    <div class="fab-picker-sub">What are you posting today?</div>
+  </div>
+  <div class="fab-picker-item" role="menuitem" onclick="selectFabType('Rent')">
+    <span class="fab-picker-icon fpi-rent"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg></span>
+    <div class="fab-picker-text">
+      <div class="fab-picker-label">List Rent Property</div>
+      <div class="fab-picker-desc">Monthly rentals</div>
+    </div>
+    <svg class="fab-picker-chevron" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+  </div>
+  <div class="fab-picker-item" role="menuitem" onclick="selectFabType('Lease')">
+    <span class="fab-picker-icon fpi-lease"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="14 3 14 9 20 9"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg></span>
+    <div class="fab-picker-text">
+      <div class="fab-picker-label">List Lease Property</div>
+      <div class="fab-picker-desc">Long-term commercial/residential</div>
+    </div>
+    <svg class="fab-picker-chevron" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+  </div>
+  <div class="fab-picker-item" role="menuitem" onclick="selectFabType('PG')">
+    <span class="fab-picker-icon fpi-pg"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+    <div class="fab-picker-text">
+      <div class="fab-picker-label">List PG Property</div>
+      <div class="fab-picker-desc">PG &amp; co-living rooms</div>
+    </div>
+    <svg class="fab-picker-chevron" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+  </div>
+  <div class="fab-picker-item" role="menuitem" onclick="selectFabType('ShortStay')">
+    <span class="fab-picker-icon fpi-shortstay"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
+    <div class="fab-picker-text">
+      <div class="fab-picker-label">List Short Stay Property</div>
+      <div class="fab-picker-desc">Per-day, OYO-style bookings</div>
+    </div>
+    <svg class="fab-picker-chevron" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+  </div>
+</div>
 
 <!-- ─── Mobile bottom nav ────────────────────────── -->
 <nav class="bottom-nav" aria-label="Main navigation">
@@ -7109,6 +7189,24 @@ function restoreListingDraft() {
   return true;
 }
 
+/* ═══════════════════════════════════════════════
+   FAB ADD-TYPE PICKER — the FAB opens this small picker first so the
+   person chooses which kind of listing to create, instead of jumping
+   straight into the (Rent-defaulted) form.
+═══════════════════════════════════════════════ */
+function openFabPicker() {
+  document.getElementById('fabPickerBackdrop').classList.add('open');
+  document.getElementById('fabPicker').classList.add('open');
+}
+function closeFabPicker() {
+  document.getElementById('fabPickerBackdrop').classList.remove('open');
+  document.getElementById('fabPicker').classList.remove('open');
+}
+function selectFabType(type) {
+  closeFabPicker();
+  openAddModal(type);
+}
+
 function openAddModal(presetType) {
   if (!getLoggedInUser()) { showToast('Please log in to list your property'); openAuthModal(); return; }
   const restored = restoreListingDraft();
@@ -8925,6 +9023,8 @@ document.addEventListener('keydown', e => {
     closeAboutModal();
     closeCompareModal();
     closeScheduleModal();
+    closeBookingModal();
+    closeFabPicker();
     document.getElementById('filterPanel').classList.remove('open');
     if (document.getElementById('shortlistPanel').classList.contains('open')) toggleShortlistPanel();
     if (document.getElementById('menuPanel').classList.contains('open')) toggleMenuPanel();
