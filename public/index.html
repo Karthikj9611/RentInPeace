@@ -30,6 +30,7 @@
   --shadow-md:0 4px 16px rgba(0,0,0,.10);
   --nav-h:60px;
   --filter-h:52px;
+  --qmb-h:50px;
   --search-h:64px;
 }
 html{scroll-behavior:smooth;overflow-x:hidden;width:100%}
@@ -56,6 +57,7 @@ ul{list-style:none}
   background:var(--bg-2);
   border-top:1px solid var(--border);
   border-bottom:1px solid var(--border);
+  scroll-margin-top:calc(var(--nav-h) + var(--filter-h));
 }
 .section-divider-inner{
   display:flex;align-items:center;gap:12px;
@@ -89,7 +91,9 @@ ul{list-style:none}
 
 /* ─── Topnav ───────────────────────────────────── */
 .topnav{
-  position:static;
+  position:sticky;
+  top:0;
+  z-index:99;
   background:var(--bg);
   border-bottom:1px solid var(--border);
   height:var(--nav-h);
@@ -193,7 +197,7 @@ ul{list-style:none}
 /* ─── Filter Dropdown Bar ───────────────────────── */
 .filter-dd-bar{
   position:sticky;
-  top:0;
+  top:var(--nav-h);
   z-index:98;
   background:var(--bg);
   border-bottom:1px solid var(--border);
@@ -266,6 +270,33 @@ ul{list-style:none}
 .fd-clear-all:hover{color:var(--brand)}
 .fd-total-badge{display:none;background:var(--brand);color:#fff;border-radius:99px;font-size:11px;font-weight:700;padding:2px 8px}
 .fd-total-badge.show{display:inline-block}
+
+/* ─── Quick Menu Bar (Charges/Refer/About/Help/Profile/Notifications) ─────
+   Mobile-only. Replaces the topnav on small screens — sits at the very top,
+   with the filter bar sticking directly below it. Single row, 6 equal columns. */
+.quick-menu-bar{
+  display:none;
+  position:sticky;
+  top:0;
+  z-index:99;
+  height:var(--qmb-h);
+  background:var(--bg);
+  border-bottom:1px solid var(--border);
+  grid-template-columns:repeat(6,1fr);
+}
+.qmb-item{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;padding:8px 0;font-size:10px;font-weight:500;color:var(--text-2);cursor:pointer;
+  white-space:nowrap;position:relative;
+}
+.qmb-item svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7}
+.qmb-item:active{color:var(--brand)}
+.qmb-badge{
+  position:absolute;top:2px;right:14px;
+  background:var(--brand);color:#fff;border-radius:99px;
+  font-size:9px;font-weight:700;min-width:14px;height:14px;
+  display:flex;align-items:center;justify-content:center;padding:0 3px;
+}
 
 /* Tab-aware dropdown button visibility */
 .fd-rent,.fd-lease,.fd-pg,.fd-shortstay{display:none}
@@ -2552,7 +2583,8 @@ ul{list-style:none}
 /* ─── Mobile bottom nav ────────────────────────── */
 @media(max-width:640px){
   .nav-tabs{display:none}
-  .topnav{padding:0 14px;justify-content:space-between}
+  .topnav{display:none}
+  .filter-dd-bar{top:var(--qmb-h)}
   .main{padding:14px 0 80px}
   .results-header{padding:0 12px}
   .ad-banner{height:52px}
@@ -2621,12 +2653,22 @@ ul{list-style:none}
     background:var(--bg);border-top:1px solid var(--border);
     height:56px;padding-bottom:env(safe-area-inset-bottom);
   }
+  .quick-menu-bar{display:grid}
+  .section-divider{scroll-margin-top:calc(var(--qmb-h) + var(--filter-h) + 46px)}
   .bottom-tab{
     flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
     gap:3px;font-size:10px;font-weight:500;color:var(--text-3);cursor:pointer;
+    position:relative;
   }
   .bottom-tab svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7}
   .bottom-tab.active{color:var(--brand)}
+  .bottom-tab-badge{
+    position:absolute;
+    background:var(--brand);color:#fff;border-radius:99px;
+    font-size:9px;font-weight:700;min-width:14px;height:14px;
+    display:flex;align-items:center;justify-content:center;padding:0 3px;
+    transform:translate(10px,-6px);
+  }
   .fab{bottom:68px}
 }
 @media(min-width:641px){
@@ -2856,6 +2898,34 @@ ul{list-style:none}
     </div>
   </div>
 </nav>
+
+<!-- ─── Quick Menu Bar (mobile-only, replaces topnav) ────── -->
+<div class="quick-menu-bar" id="quickMenuBar">
+  <div class="qmb-item" onclick="openChargesModal()">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 9.5c0-1.4 1.3-2.5 3-2.5s3 1.1 3 2.5-1.3 2-3 2.5c-1.7.5-3 1.1-3 2.5s1.3 2.5 3 2.5 3-1.1 3-2.5"/></svg>
+    Charges
+  </div>
+  <div class="qmb-item" onclick="openReferModal()">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Refer
+  </div>
+  <div class="qmb-item" onclick="openAboutModal()">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><line x1="12" y1="8" x2="12" y2="8.01"/></svg>
+    About
+  </div>
+  <div class="qmb-item" onclick="openHelpModal()">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg>
+    Help
+  </div>
+  <div class="qmb-item" onclick="handleMenuAuthClick()">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Profile
+  </div>
+  <div class="qmb-item" onclick="openNotifModal()">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    Notifications
+  </div>
+</div>
 
 <!-- ─── Filter Bar ──────────────────────────────── -->
 <!-- ─── Filter Dropdown Bar ──────────────────────── -->
@@ -4057,7 +4127,14 @@ ul{list-style:none}
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-7h6v7"/><path d="M3 11h18"/></svg>
     Short Stay
   </div>
+  <div class="bottom-tab" onclick="toggleShortlistPanel()">
+    <span class="bottom-tab-badge" id="bottomTabShortlistCount">0</span>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    Shortlist
+  </div>
 </nav>
+
+
 
 <!-- ─── Sort Modal ──────────────────────────────── -->
 <div class="sort-modal" id="sortModal" role="dialog" aria-modal="true" aria-label="Sort options">
@@ -6405,6 +6482,8 @@ function updateShortlistCount() {
   document.getElementById('shortlistCount').textContent = n;
   const menuBadge = document.getElementById('menuShortlistCount');
   if (menuBadge) menuBadge.textContent = n;
+  const bottomBadge = document.getElementById('bottomTabShortlistCount');
+  if (bottomBadge) bottomBadge.textContent = n;
   // panelCount intentionally not set here — renderShortlistPanel() keeps it in
   // sync with whatever the current tab filter actually shows (see below).
 }
