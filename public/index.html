@@ -4643,7 +4643,7 @@ ul{list-style:none}
     </div>
     </div>
 
-    <button class="form-submit" onclick="submitListing()">Submit listing</button>
+    <button class="form-submit" id="listingSubmitBtn" onclick="submitListing()">Submit listing</button>
 
     <!-- View-mode only: quick actions carried over from the old detail view (save,
          contact, schedule a visit, WhatsApp). Sits inline at the end of the
@@ -4883,44 +4883,6 @@ ul{list-style:none}
 </div>
 
 <!-- ─── Edit Listing Modal (used from My Listings) ─── -->
-<div class="add-modal-overlay" id="editListingModal" role="dialog" aria-modal="true" aria-label="Edit listing">
-  <div class="add-modal" style="max-width:440px">
-    <div class="add-modal-header">
-      <div class="add-modal-title">Edit Listing</div>
-      <button class="modal-close" style="position:static" onclick="closeEditListingModal()" aria-label="Close">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Property name</label>
-      <input class="form-input" type="text" id="edit-listing-name" />
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Rent (₹/month)</label>
-        <input class="form-input" type="number" id="edit-listing-rent" />
-      </div>
-      <div class="form-group" id="edit-listing-depositWrap">
-        <label class="form-label">Deposit (₹)</label>
-        <input class="form-input" type="number" id="edit-listing-deposit" />
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Area / locality</label>
-      <input class="form-input" type="text" id="edit-listing-area" />
-    </div>
-    <div class="form-group">
-      <label class="form-label">Status</label>
-      <input class="form-input" type="text" id="edit-listing-status" readonly disabled
-             style="background:#f2f2f2;color:#666;cursor:not-allowed" />
-      <span style="font-size:12px;color:#888">Listing type can't be changed here — delete and re-create the listing to switch type.</span>
-    </div>
-    <button class="form-submit" id="editListingSaveBtn" onclick="saveListingEdits()">Save changes</button>
-  </div>
-</div>
-
-
-
 <!-- ─── Notifications Modal ─────────────────────── -->
 <div class="add-modal-overlay" id="notifModal" role="dialog" aria-modal="true" aria-label="Notifications">
   <div class="add-modal" id="notifModalBox" style="max-width:440px">
@@ -7609,6 +7571,10 @@ function setView(type, btn) {
 // shared open/close plumbing (backdrop click, the header X button, autosave)
 // can tell the two uses apart and not clobber the user's own in-progress draft.
 let propertyViewMode = false;
+// Set to a listing's id while the "List your property" form is being reused
+// to edit that *existing* listing (see openEditListingFull below). null
+// means the form is in its normal "create a new listing" mode.
+let editingPropertyId = null;
 
 function openDetail(id) {
   const p = PROPERTIES.find(x => x.id === id);
@@ -8089,6 +8055,10 @@ const LISTING_DRAFT_KEY = 'quatar_listing_draft_v1';
 let _draftSaveTimer = null;
 
 function saveListingDraftNow() {
+  // While editing an existing listing (see openEditListingFull), the form is
+  // full of *that listing's* data, not a new listing in progress — never let
+  // it overwrite the person's own unrelated "new listing" draft.
+  if (editingPropertyId) return;
   try {
     const fields = {};
     document.querySelectorAll('#addModal input, #addModal select, #addModal textarea').forEach(el => {
@@ -8167,6 +8137,10 @@ function closeAddModal() {
   // read-only property view (see openDetail/closeDetail) — route there
   // instead so we don't save someone else's listing as this user's draft.
   if (propertyViewMode) { closeDetail(); return; }
+  // Same modal is also reused to edit one of the user's own existing
+  // listings (see openEditListingFull) — route there so closing doesn't
+  // save the *edited* listing's data over their unrelated new-listing draft.
+  if (editingPropertyId) { closeEditListingFull(); return; }
   // Do NOT clear the draft here — closing (even accidentally) should not
   // wipe what the user has already filled in. It's cleared only on
   // successful submission or explicit "Clear form".
@@ -8760,91 +8734,86 @@ function renderMyListings() {
         ${p.visitCount > 0 ? `<span class="profile-status-pill" style="background:var(--brand-light);color:var(--brand);margin-left:5px">${p.visitCount} visit${p.visitCount===1?'':'s'} requested</span>` : ''}
       </div>
       <div class="profile-mini-actions">
-        <button class="profile-mini-icon-btn" title="Edit" onclick="event.stopPropagation();openEditListingModal('${p.id}')">
+        <button class="profile-mini-icon-btn" title="Edit" onclick="event.stopPropagation();openEditListingFull('${p.id}')">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        </button>
-        <button class="profile-mini-icon-btn danger" title="Delete" onclick="event.stopPropagation();deleteMyListing('${p.id}')">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
         </button>
       </div>
     </div>`;
   }).join('');
 }
 
-async function deleteMyListing(id) {
-  if (!await showConfirmDialog({ title: 'Delete listing?', message: 'This cannot be undone.', okText: 'Delete' })) return;
-  try {
-    const res = await fetch('/api/user/listings/' + id, { method: 'DELETE', headers: userAuthHeaders() });
-    const data = await res.json();
-    if (!res.ok) { showToast(data.message || 'Could not delete listing'); return; }
-    MY_LISTINGS_CACHE = MY_LISTINGS_CACHE.filter(p => p.id !== id);
-    renderMyListings();
-    PROPERTIES = PROPERTIES.filter(p => p.id !== id);
-    renderCards();
-    showToast('Listing deleted');
-  } catch (err) {
-    showToast('Network error. Please try again.');
-  }
-}
 
-let editListingId = null;
-function openEditListingModal(id) {
+/* ═══════════════════════════════════════════════
+   PROPERTY EDIT (full form) — reuses the exact same form used to create a
+   listing (applyImportedProperty() already knows how to load every field
+   from a property object, since it also powers the read-only detail view
+   and the JSON-import feature) so the owner can edit *every* field of a
+   listing they posted, not just a few. submitListing() below then PUTs
+   instead of POSTs when editingPropertyId is set.
+═══════════════════════════════════════════════ */
+function openEditListingFull(id) {
   const p = MY_LISTINGS_CACHE.find(x => x.id === id);
-  if (!p) return;
-  editListingId = id;
-  document.getElementById('edit-listing-name').value = p.owner?.propertyName || '';
-  document.getElementById('edit-listing-rent').value = p.price?.rent ?? '';
-  document.getElementById('edit-listing-deposit').value = p.price?.deposit ?? '';
-  document.getElementById('edit-listing-area').value = p.location?.area || '';
-  document.getElementById('edit-listing-status').value = p.basic?.status || 'For Rent';
-  // Lease listings don't collect a deposit (see price.deposit === null for Lease) —
-  // hide the field here too so this quick-edit can't reintroduce one.
-  document.getElementById('edit-listing-depositWrap').style.display =
-    (p.basic?.status === 'Lease') ? 'none' : '';
-  document.getElementById('editListingModal').classList.add('open');
+  if (!p) { showToast('Could not find that listing'); return; }
+
+  closeProfileModal();
+  editingPropertyId = id;
+  resetListingForm();
+  applyImportedProperty(p);
+  onFTypeChange(document.getElementById('f-type').value);
+
+  // Changing the listing type (Rent/Lease/PG/Short Stay) after creation would
+  // need re-deriving a lot of type-specific fields, so keep it locked here —
+  // same restriction the old quick-edit modal had.
+  const typeSelect = document.getElementById('f-type');
+  if (typeSelect) typeSelect.disabled = true;
+
+  // Hide the "import existing data" panel and "Clear form" button — neither
+  // makes sense while editing a listing that already exists.
+  const importHeader = document.getElementById('importSectionHeader');
+  const importBody = document.getElementById('importPanelBody');
+  if (importHeader) importHeader.style.display = 'none';
+  if (importBody) importBody.style.display = 'none';
+  const clearBtn = document.getElementById('clearFormBtn');
+  if (clearBtn) clearBtn.style.display = 'none';
+
+  document.getElementById('addModalTitleText').textContent = 'Edit listing';
+  const sub = document.getElementById('addModalSubtitleText');
+  if (sub) {
+    sub.textContent = p.propertyId || '';
+    sub.style.display = p.propertyId ? '' : 'none';
+  }
+
+  const submitBtn = document.getElementById('listingSubmitBtn');
+  if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Save changes'; }
+
+  document.getElementById('addModal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-function closeEditListingModal() {
-  document.getElementById('editListingModal').classList.remove('open');
+
+function closeEditListingFull() {
+  document.getElementById('addModal').classList.remove('open');
   document.body.style.overflow = '';
-  editListingId = null;
-}
-async function saveListingEdits() {
-  if (!editListingId) return;
-  const name   = document.getElementById('edit-listing-name').value.trim();
-  const rent   = document.getElementById('edit-listing-rent').value;
-  const depositHidden = document.getElementById('edit-listing-depositWrap').style.display === 'none';
-  const deposit = depositHidden ? '' : document.getElementById('edit-listing-deposit').value;
-  const area   = document.getElementById('edit-listing-area').value.trim();
+  editingPropertyId = null;
 
-  if (!name || !area || rent === '') { showToast('Property name, area, and rent are required'); return; }
+  const typeSelect = document.getElementById('f-type');
+  if (typeSelect) typeSelect.disabled = false;
 
-  const btn = document.getElementById('editListingSaveBtn');
-  btn.disabled = true;
-  btn.textContent = 'Saving…';
-  try {
-    const res = await fetch('/api/user/listings/' + editListingId, {
-      method: 'PUT',
-      headers: userAuthHeaders({ 'Content-Type': 'application/json' }),
-      body: JSON.stringify({
-        owner: { propertyName: name },
-        location: { area },
-        price: { rent: Number(rent), deposit: deposit === '' ? null : Number(deposit) }
-        // basic.status intentionally omitted — status can't be changed from this quick-edit modal
-      })
-    });
-    const data = await res.json();
-    if (!res.ok) { showToast(data.message || 'Could not save changes'); return; }
-    closeEditListingModal();
-    showToast('Listing updated');
-    loadMyListings();
-    fetchProperties(); // refresh main grid so the edit shows up there too
-  } catch (err) {
-    showToast('Network error. Please try again.');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Save changes';
-  }
+  const importHeader = document.getElementById('importSectionHeader');
+  const clearBtn = document.getElementById('clearFormBtn');
+  if (importHeader) importHeader.style.display = '';
+  if (clearBtn) clearBtn.style.display = '';
+
+  document.getElementById('addModalTitleText').textContent = 'List your property';
+  const sub = document.getElementById('addModalSubtitleText');
+  if (sub) { sub.style.display = 'none'; sub.textContent = ''; }
+
+  const submitBtn = document.getElementById('listingSubmitBtn');
+  if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit listing'; }
+
+  // Put the form back to a blank "new listing" state, then restore whatever
+  // the user themselves had in progress before they tapped Edit, if anything.
+  resetListingForm();
+  restoreListingDraft();
 }
 
 /* ═══════════════════════════════════════════════
@@ -10001,18 +9970,26 @@ function submitListing() {
     } : {},
   };
 
-  // ── POST to backend ──────────────────────────────────────────
-  const submitBtn = document.querySelector('#addModal .form-submit');
-  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Submitting…'; }
+  // ── POST (new listing) or PUT (editing an existing one) to backend ──
+  const isEditing = !!editingPropertyId;
+  const submitBtn = document.getElementById('listingSubmitBtn');
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = isEditing ? 'Saving…' : 'Submitting…'; }
 
-  fetch('/api/properties', {
-    method: 'POST',
+  fetch(isEditing ? ('/api/user/listings/' + editingPropertyId) : '/api/properties', {
+    method: isEditing ? 'PUT' : 'POST',
     headers: userAuthHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(newProp)
   })
   .then(async res => {
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Server error');
+    if (isEditing) {
+      showToast('Listing updated');
+      closeEditListingFull();
+      loadMyListings();     // refresh "My Listings" with the saved changes
+      fetchProperties();    // refresh the public grid so the edit shows up there too
+      return;
+    }
     // Don't add this to PROPERTIES / the public grid — a brand-new listing
     // is unverified, and the public /api/properties endpoint only returns
     // verified: true listings. It'll show up once admin verifies it; until
@@ -10026,10 +10003,10 @@ function submitListing() {
   })
   .catch(err => {
     console.error('Submit listing error:', err);
-    showToast('Failed to submit: ' + err.message);
+    showToast('Failed to ' + (isEditing ? 'save changes' : 'submit') + ': ' + err.message);
   })
   .finally(() => {
-    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit listing'; }
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = isEditing ? 'Save changes' : 'Submit listing'; }
   });
 }
 
@@ -10169,9 +10146,6 @@ document.getElementById('authModal').addEventListener('click', function(e) {
 });
 document.getElementById('profileModal').addEventListener('click', function(e) {
   if (e.target === this) closeProfileModal();
-});
-document.getElementById('editListingModal').addEventListener('click', function(e) {
-  if (e.target === this) closeEditListingModal();
 });
 document.getElementById('notifModal').addEventListener('click', function(e) {
   if (e.target === this) closeNotifModal();
