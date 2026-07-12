@@ -1935,6 +1935,22 @@ ul{list-style:none}
 .add-modal.view-mode #fImgHint{display:none}
 .add-modal.view-mode #imgFormGroup{display:none}
 .add-modal.view-mode #mediaSectionHeader{display:none}
+/* View mode shows ONLY the gallery, the key/value spec table, and the video
+   display — the entire actual form (every input/select/textarea/button) is
+   hidden as one block, so nothing in it can ever be seen or interacted with
+   while just viewing a listing. */
+.add-modal.view-mode #listingFormSections{display:none}
+.detail-table-wrap{display:none}
+.add-modal.view-mode #detailTableWrap{display:block;margin-bottom:16px}
+.detail-kv-table{width:100%;font-size:13px;display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border);border-left:1px solid var(--border)}
+.detail-kv-table .kv-cell{padding:9px 10px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);min-width:0}
+.detail-kv-table .kv-cell.wide{grid-column:1 / -1}
+.detail-kv-table .kv-label{color:var(--text-3);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px}
+.detail-kv-table .kv-value{color:var(--brand);font-weight:600;word-break:break-word}
+@media (max-width:520px){
+  .detail-kv-table{grid-template-columns:1fr}
+  .detail-kv-table .kv-cell{grid-column:1 / -1}
+}
 /* The amenities picker's "Select all" / "Clear all" buttons, and each
    selected-amenity tag's ✕ button, mutate checkbox state directly via JS —
    disabling the checkboxes themselves doesn't stop that. Hide the whole
@@ -4242,6 +4258,31 @@ ul{list-style:none}
 
     <div style="overflow-y:auto;padding:20px 28px 28px;flex:1" id="addModalScrollBody">
 
+    <!-- View-mode only: photo gallery, a plain key/value spec table, and the
+         video display — all built directly from the property object in
+         openDetail(), and living outside #listingFormSections below so
+         they're never affected by hiding the actual form. See
+         buildDetailTable()/openDetail()/closeDetail(). -->
+    <div class="detail-gallery" id="detailGallerySlot"></div>
+    <div class="detail-table-wrap" id="detailTableWrap"></div>
+    <div class="video-embed-wrap" id="videoEmbedWrap" style="display:none"></div>
+    <div class="video-view-row" id="videoViewRow" style="display:none">
+      <a href="#" id="videoViewLink" target="_blank" rel="noopener noreferrer" class="video-view-link">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        <span id="videoViewLinkText"></span>
+      </a>
+      <button type="button" class="video-view-copy" onclick="copyVideoLink()" aria-label="Copy video link" title="Copy link">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      </button>
+    </div>
+
+    <!-- Everything below is the actual "list your property" form (create +
+         edit modes). It's hidden as a single block in view mode — see
+         .add-modal.view-mode #listingFormSections in the CSS — so nothing
+         inside it can ever be visible or interactive while just viewing a
+         listing. -->
+    <div id="listingFormSections">
+
     <!-- ===== 0. IMPORT EXISTING DATA (file upload or pasted JSON) ===== -->
     <div class="lm-section" id="importSectionHeader" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between" onclick="toggleImportPanel()">
       <span>📥 Import property data (optional)</span>
@@ -4599,37 +4640,11 @@ ul{list-style:none}
     </div>
 
     <!-- ===== 8. MEDIA & DESCRIPTION ===== -->
-    <!-- Anchor marks this section's normal spot in the posting flow — in
-         property VIEW mode, #mediaSection gets moved to the top of the
-         scroll body instead (see openDetail/closeDetail) so photos/video
-         are the first thing a visitor sees, not the last. -->
-    <div id="mediaSectionAnchor"></div>
     <div id="mediaSection">
     <div class="lm-section" id="mediaSectionHeader">📸 Media &amp; Description</div>
-    <!-- View-mode only: a real photo gallery (same slider used on the property
-         card) instead of the raw "paste a URL" add-listing controls. Hidden
-         while actually creating/editing a listing — see openDetail(). -->
-    <div class="detail-gallery" id="detailGallerySlot"></div>
     <div class="form-group" id="videoUrlGroup">
       <label class="form-label">Video tour URL (optional)</label>
       <input class="form-input" type="url" id="f-videoUrl" />
-      <!-- View-mode only: an actual playable embed when the URL is a
-           recognizable YouTube/Vimeo link or direct video file — see
-           buildVideoDisplay()/openDetail(). Falls back to just the link
-           row below when the URL can't be embedded. -->
-      <div class="video-embed-wrap" id="videoEmbedWrap" style="display:none"></div>
-      <!-- View-mode only: disabled inputs can't be clicked or selected for
-           copying, so show the link as a real anchor plus a copy button
-           instead — see openDetail(). -->
-      <div class="video-view-row" id="videoViewRow" style="display:none">
-        <a href="#" id="videoViewLink" target="_blank" rel="noopener noreferrer" class="video-view-link">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-          <span id="videoViewLinkText"></span>
-        </a>
-        <button type="button" class="video-view-copy" onclick="copyVideoLink()" aria-label="Copy video link" title="Copy link">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        </button>
-      </div>
     </div>
     <div class="form-group" id="imgFormGroup">
       <label class="form-label">Property images (optional)</label>
@@ -4649,6 +4664,9 @@ ul{list-style:none}
       <textarea class="form-input" id="f-desc" rows="3" style="resize:vertical"></textarea>
     </div>
     </div>
+
+    </div>
+    <!-- /listingFormSections -->
 
     <button class="form-submit" id="listingSubmitBtn" onclick="submitListing()">Submit listing</button>
 
@@ -7590,26 +7608,19 @@ function openDetail(id) {
   recordRecentlyViewed(p);
   renderCards();        // reflect the new count on the card grid
 
-  // Show the property using the exact same form used to list one — every
-  // field prefilled from this listing's data, locked to read-only.
+  // View mode never touches the actual "list your property" form — it
+  // builds a plain read-only key/value table straight from the property
+  // object instead (see buildDetailTable()), so there's nothing here that
+  // could ever be clicked, checked, or typed into.
   propertyViewMode = true;
-  resetListingForm();
-  applyImportedProperty(p);
-  onFTypeChange(document.getElementById('f-type').value);
 
-  document.querySelectorAll('#addModalBox input, #addModalBox select, #addModalBox textarea')
-    .forEach(el => { el.disabled = true; });
-  ['importSectionHeader', 'importPanelBody', 'clearFormBtn', 'ownerDetailsSection', 'fullAddressGroup', 'latLngGroup', 'mapsLinkGroup'].forEach(elId => {
-    const el = document.getElementById(elId);
-    if (el) el.style.display = 'none';
-  });
   document.getElementById('addModalTitleText').textContent = p.propertyId || 'Property details';
   const sub = document.getElementById('addModalSubtitleText');
   const subArea = p.location?.area || '';
   if (sub) { sub.textContent = subArea; sub.style.display = subArea ? '' : 'none'; }
 
   // Render the same photo slider used on the property card (large image,
-  // arrows/dots, tap-to-zoom) instead of the raw add-listing image controls.
+  // arrows/dots, tap-to-zoom).
   const gallerySlot = document.getElementById('detailGallerySlot');
   if (gallerySlot) {
     const pType = pTypeLabel(p);
@@ -7618,10 +7629,13 @@ function openDetail(id) {
     gallerySlot.innerHTML = `<div class="prop-img" style="background:${gbg}" data-idx="0">${buildImgSlider(p, gfg, '-detail')}</div>`;
   }
 
-  // Video tour URL — the input is disabled in view mode (can't be clicked,
-  // played, or copied), so render a real embedded player when we recognize
-  // the URL (YouTube/Vimeo/direct file), plus a clickable link + copy
-  // button so it can always be opened externally or shared either way.
+  // Plain key/value table with every spec — see buildDetailTable() below.
+  const tableWrap = document.getElementById('detailTableWrap');
+  if (tableWrap) tableWrap.innerHTML = buildDetailTable(p);
+
+  // Video tour — a real embedded player when we recognize the URL
+  // (YouTube/Vimeo/direct file), plus a clickable link + copy button so it
+  // can always be opened externally or shared either way.
   const videoUrl = p.media?.video || '';
   const videoRow = document.getElementById('videoViewRow');
   const videoEmbedWrap = document.getElementById('videoEmbedWrap');
@@ -7667,15 +7681,118 @@ function openDetail(id) {
   document.getElementById('addModal').classList.add('open');
   document.body.style.overflow = 'hidden';
 
-  // Move the media block (images/video) to the very top for viewing —
-  // photos are what someone wants to see first, not last.
-  const mediaSection = document.getElementById('mediaSection');
   const scrollBody = document.getElementById('addModalScrollBody');
-  if (mediaSection && scrollBody && scrollBody.firstElementChild !== mediaSection) {
-    scrollBody.insertBefore(mediaSection, scrollBody.firstElementChild);
+  if (scrollBody) scrollBody.scrollTop = 0;
+}
+
+/* Builds the plain key/value spec table used by the property view. Reads
+   straight from the property object (never touches the actual form), and
+   skips any field that has no value so the table only shows what was
+   actually filled in. Contact details (owner name/phone/email/address,
+   agent info) and the full address/lat-lng/maps link are intentionally
+   left out here, same as before — contacting the owner goes through the
+   Call/WhatsApp/Schedule buttons instead of showing raw contact info. */
+function buildDetailTable(p) {
+  const basic = p.basic || {}, location = p.location || {}, price = p.price || {},
+        property = p.property || {}, amenities = p.amenities || {}, terms = p.terms || {},
+        rules = p.rules || {}, media = p.media || {}, pg = p.pg || {}, shortStay = p.shortStay || {};
+
+  const status = basic.status || 'For Rent';
+  const isPG = status === 'PG', isLease = status === 'Lease', isShortStay = status === 'Short Stay';
+
+  const rows = [];
+  function row(label, value, wide) {
+    if (value === null || value === undefined) return;
+    const text = String(value).trim();
+    if (!text) return;
+    rows.push('<div class="kv-cell' + (wide ? ' wide' : '') + '"><div class="kv-label">' + esc(label) + '</div><div class="kv-value">' + esc(text) + '</div></div>');
   }
-  scrollBody.scrollTop = 0;
-  hideEmptyViewFields();
+
+  row('Status', status);
+  row('Listed by', basic.listedBy);
+  row('Area / Locality', location.area);
+  row('City', location.city);
+
+  if (isLease) {
+    row('Lease amount', price.rent != null ? fmtRupee(price.rent) + '/month' : null);
+    row('Maintenance', price.maintenance != null ? fmtRupee(price.maintenance) : null);
+  } else {
+    row('Rent', price.rent != null ? fmtRupee(price.rent) + '/month' : null);
+    row('Deposit', price.deposit != null ? fmtRupee(price.deposit) : null);
+    row('Maintenance', price.maintenance != null ? fmtRupee(price.maintenance) : null);
+    row('Rent increase', price.rentIncrease);
+    row('Electricity included', price.electricity);
+    row('Water charge', price.water);
+    row('Negotiable', price.negotiable);
+  }
+
+  if (!isPG && !isShortStay) {
+    row('Property type', property.type);
+    row('BHK', property.bhk);
+    row('Built-up area', property.area);
+    row('Age of property', property.age);
+    row('Preferred tenants', property.tenant);
+    row('Facing', property.facing);
+  }
+  row('Bike parking', property.bike);
+  row('Car parking', property.car);
+  row('Floor', property.floor);
+  row('Bathrooms', property.bathrooms);
+  row('Furnishing', property.furnish);
+  if (!isPG) row('Available from', property.available);
+
+  const selected = Array.isArray(amenities.selected) ? amenities.selected : [];
+  row('Amenities', selected.join(', '), true);
+  row('Additional amenities', amenities.extra, true);
+
+  if (isLease) {
+    row('Notice period', terms.notice);
+    row('Lease duration', terms.lease);
+    row('Lease type', terms.leaseType);
+    row('Lock-in period', terms.lockIn);
+  } else if (!isPG && !isShortStay) {
+    row('Notice period', terms.notice);
+    row('Lease duration', terms.lease);
+  }
+
+  if (!isShortStay) {
+    row('Pets allowed', rules.pets);
+    row('Non-veg allowed', rules.nonVeg);
+    row('Piped gas', rules.gas);
+  }
+
+  if (isPG) {
+    row('Gender preference', pg.gender);
+    row('Room type', pg.room);
+    row('Meals', pg.meals);
+    row('Occupancy', pg.occupancy);
+    row('Notice period', pg.notice);
+    row('Bathroom', pg.bathroom);
+    row('Room furnishing', pg.furnish);
+    row('Food type', pg.food);
+    row('Kitchen access', pg.kitchen);
+    row('Available from', pg.available);
+    row('Visitor policy', pg.visitors);
+    row('Gate closing time', pg.gateTime);
+    row('Non-veg allowed', pg.nonVeg);
+  }
+
+  if (isShortStay) {
+    row('Room type', shortStay.roomType);
+    row('Max guests', shortStay.maxGuests);
+    row('Minimum stay (days)', shortStay.minDays);
+    row('Check-in time', shortStay.checkinTime);
+    row('Check-out time', shortStay.checkoutTime);
+    row('Extra day rate', shortStay.extraDayRate != null ? fmtRupee(shortStay.extraDayRate) : null);
+    row('Free cancellation window', shortStay.cancellation);
+    row('ID proof required', shortStay.idProof);
+    row('Unmarried couples allowed', shortStay.couplesAllowed);
+  }
+
+  row('Description', media.desc, true);
+
+  if (!rows.length) return '<div class="profile-list-empty" style="padding:14px 0">No details added yet.</div>';
+  return '<div class="detail-kv-table">' + rows.join('') + '</div>';
 }
 
 function closeDetail() {
@@ -7686,35 +7803,16 @@ function closeDetail() {
   propertyViewMode = false;
   const gallerySlot = document.getElementById('detailGallerySlot');
   if (gallerySlot) gallerySlot.innerHTML = '';
+  const tableWrap = document.getElementById('detailTableWrap');
+  if (tableWrap) tableWrap.innerHTML = '';
   const videoRow = document.getElementById('videoViewRow');
   if (videoRow) videoRow.style.display = 'none';
   const videoEmbedWrap = document.getElementById('videoEmbedWrap');
   if (videoEmbedWrap) { videoEmbedWrap.innerHTML = ''; videoEmbedWrap.style.display = 'none'; }
 
-  // Put the media block back in its normal spot in the posting flow.
-  const mediaSection = document.getElementById('mediaSection');
-  const mediaAnchor = document.getElementById('mediaSectionAnchor');
-  if (mediaSection && mediaAnchor) {
-    mediaAnchor.insertAdjacentElement('afterend', mediaSection);
-  }
-
-  // Put the form back to normal "List your property" chrome and clear out
-  // the viewed listing's data so it can never leak into a future draft —
-  // then restore whatever the user themselves had in progress, if anything.
-  document.querySelectorAll('#addModalBox input, #addModalBox select, #addModalBox textarea')
-    .forEach(el => { el.disabled = false; });
-  ['importSectionHeader', 'clearFormBtn', 'ownerDetailsSection', 'fullAddressGroup', 'latLngGroup', 'mapsLinkGroup'].forEach(elId => {
-    const el = document.getElementById(elId);
-    if (el) el.style.display = '';
-  });
-  document.getElementById('importPanelBody').style.display = 'none';
-  document.getElementById('importPanelToggleTxt').textContent = 'Show';
   document.getElementById('addModalTitleText').textContent = 'List your property';
   const sub = document.getElementById('addModalSubtitleText');
   if (sub) { sub.style.display = 'none'; sub.textContent = ''; }
-
-  resetListingForm();
-  restoreListingDraft();
 
   document.getElementById('viewActionsRow').style.display = 'none';
   document.getElementById('viewActionsRow2').style.display = 'none';
