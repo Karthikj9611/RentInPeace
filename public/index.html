@@ -1644,7 +1644,7 @@ ul{list-style:none}
 }
 .services-scroll::-webkit-scrollbar{display:none}
 .service-card{
-  position:relative;flex:0 0 auto;width:200px;height:280px;
+  position:relative;flex:0 0 auto;width:280px;height:360px;
   border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;
   background:var(--bg-3);box-shadow:var(--shadow);
   transition:transform .18s ease, box-shadow .18s ease;
@@ -1699,7 +1699,7 @@ ul{list-style:none}
     grid-auto-columns:calc(50% - 5px);gap:10px;
     overflow-x:auto;scroll-snap-type:x mandatory;
   }
-  .service-card{width:100%;height:170px;scroll-snap-align:start}
+  .service-card{width:100%;height:220px;scroll-snap-align:start}
   .services-arrow{display:none}
 }
 
@@ -1722,9 +1722,9 @@ ul{list-style:none}
   overscroll-behavior-x:contain;
 }
 .hr-scroll::-webkit-scrollbar{display:none}
-.hr-card{flex:0 0 auto;width:172px;cursor:pointer}
+.hr-card{flex:0 0 auto;width:280px;cursor:pointer}
 .hr-thumb{
-  position:relative;width:172px;height:306px;border-radius:var(--radius-lg);
+  position:relative;width:280px;height:300px;border-radius:var(--radius-lg);
   overflow:hidden;background:var(--bg-3);box-shadow:var(--shadow);
   transition:transform .18s ease, box-shadow .18s ease;
 }
@@ -1846,8 +1846,8 @@ ul{list-style:none}
   .hr-section{padding:8px 16px 24px}
   .hr-head-title{font-size:18px}
   .hr-arrow{display:none}
-  .hr-card{width:132px}
-  .hr-thumb{width:132px;height:234px}
+  .hr-card{width:170px}
+  .hr-thumb{width:170px;height:182px}
 }
 
 /* ─── Service Request Modal ────────────────────── */
@@ -9045,12 +9045,12 @@ function openHelpModal() {
 }
 function scrollServices(dir) {
   const el = document.getElementById('servicesScroll');
-  const cardWidth = el.querySelector('.service-card')?.offsetWidth || 200;
+  const cardWidth = el.querySelector('.service-card')?.offsetWidth || 280;
   el.scrollBy({ left: dir * (cardWidth + 16) * 2, behavior: 'smooth' });
 }
 function scrollHonestReviews(dir) {
   const el = document.getElementById('honestReviewsScroll');
-  const cardWidth = el.querySelector('.hr-card')?.offsetWidth || 172;
+  const cardWidth = el.querySelector('.hr-card')?.offsetWidth || 280;
   el.scrollBy({ left: dir * (cardWidth + 14) * 2, behavior: 'smooth' });
 }
 function openHonestReview(url) {
