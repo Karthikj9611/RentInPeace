@@ -1698,7 +1698,7 @@ ul{list-style:none}
 
 /* ─── Honest Reviews (video shorts) Section ────── */
 .hr-section{padding:8px 24px 36px;background:var(--bg);border-top:1px solid var(--border)}
-.hr-head{display:flex;align-items:center;gap:10px;max-width:1280px;margin:0 auto 4px}
+.hr-head{display:flex;align-items:center;justify-content:center;gap:10px;max-width:1280px;margin:0 auto 4px}
 .hr-head-icon{
   width:30px;height:30px;border-radius:9px;
   background:var(--brand);color:#fff;
@@ -1707,7 +1707,7 @@ ul{list-style:none}
 .hr-head-icon svg{width:17px;height:17px;fill:currentColor}
 .hr-head-title{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.3px}
 .hr-head-title span{color:var(--brand)}
-.hr-sub{font-size:13px;color:var(--text-2);margin:6px 0 16px;max-width:1280px}
+.hr-sub{font-size:13px;color:var(--text-2);margin:6px 0 16px;max-width:1280px;text-align:center}
 .hr-scroll-wrap{position:relative;max-width:1280px;margin:0 auto}
 .hr-scroll{
   display:flex;gap:14px;overflow-x:auto;scroll-behavior:smooth;
@@ -2556,6 +2556,7 @@ ul{list-style:none}
   .ad-slide-icon{font-size:18px}
   .ad-slide-cta{font-size:11px;padding:5px 12px}
   .prop-grid{grid-template-columns:1fr 1fr;gap:10px;padding:0 12px}
+  .prop-card{min-height:0}
   .view-toggle{display:none}
   .prop-grid.list-view,.prop-grid{grid-template-columns:1fr 1fr;gap:10px}
   .prop-card.list-view{flex-direction:column}
@@ -3782,7 +3783,9 @@ ul{list-style:none}
 <section class="services-section" id="premiumServicesSection" aria-label="Our premium services">
   <div class="services-head">
     <div class="services-title">Our <span>Premium Services</span></div>
+    <p class="services-sub">From home repairs to digital solutions — one call gets it all done in Bangalore</p>
   </div>
+  <p class="services-hint">👆 Tap a service you're interested in, then contact us below</p>
 
   <div class="services-scroll-wrap">
     <button class="services-arrow prev" onclick="scrollServices(-1)" aria-label="Scroll left">
@@ -3875,7 +3878,7 @@ ul{list-style:none}
     </div>
     <div class="hr-head-title">Honest <span>Reviews</span></div>
   </div>
-  <p class="hr-sub"></p>
+  <p class="hr-sub">Real experiences</p>
 
   <div class="hr-scroll-wrap">
     <button class="hr-arrow prev" onclick="scrollHonestReviews(-1)" aria-label="Scroll left">
