@@ -2662,12 +2662,13 @@ ul{list-style:none}
   }
   .bottom-tab-icon{font-size:21px;line-height:1;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.18))}
   .bottom-tab.active{color:var(--brand)}
+  .bottom-tab-icon-wrap{position:relative;display:inline-flex}
   .bottom-tab-badge{
-    position:absolute;
+    position:absolute;top:-4px;right:-7px;
     background:var(--brand);color:#fff;border-radius:99px;
     font-size:9px;font-weight:700;min-width:14px;height:14px;
     display:flex;align-items:center;justify-content:center;padding:0 3px;
-    transform:translate(10px,-6px);
+    box-shadow:0 0 0 1.5px var(--bg);
   }
   .fab{bottom:68px}
 }
@@ -4128,8 +4129,10 @@ ul{list-style:none}
     Short Stay
   </div>
   <div class="bottom-tab" onclick="toggleShortlistPanel()">
-    <span class="bottom-tab-badge" id="bottomTabShortlistCount">0</span>
-    <span class="bottom-tab-icon">❤️</span>
+    <span class="bottom-tab-icon-wrap">
+      <span class="bottom-tab-icon">❤️</span>
+      <span class="bottom-tab-badge" id="bottomTabShortlistCount">0</span>
+    </span>
     Shortlist
   </div>
 </nav>
