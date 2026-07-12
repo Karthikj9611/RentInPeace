@@ -1833,13 +1833,14 @@ app.post('/api/reviews', async (req, res) => {
 
 
 // ── Honest Reviews (video testimonials shown as a "Shorts" style row) ──
-// Two ways cards get in here:
-//  1) Admin adds one directly via POST /api/honest-reviews — goes live
-//     immediately (status: 'approved').
+// Two ways cards get in here, both go live immediately (no manage/approve
+// UI exists on the site yet):
+//  1) Admin adds one directly via POST /api/honest-reviews.
 //  2) A logged-in user submits their own YouTube link via
-//     POST /api/honest-reviews/submit — saved as status: 'pending' and
-//     hidden from the public row until an admin approves it (via the
-//     existing PUT /api/honest-reviews/:id, now also accepting `status`).
+//     POST /api/honest-reviews/submit.
+// The `status` field (pending/approved/rejected) and the admin-only
+// /api/honest-reviews/all, PUT, DELETE routes are kept so a moderation
+// step can be reintroduced later without a schema change.
 const honestReviewSchema = new mongoose.Schema({
   videoUrl:  { type: String, required: true },       // real YouTube/video link opened on click
   thumbUrl:  { type: String, required: true },        // thumbnail image shown on the card
@@ -1919,8 +1920,9 @@ app.get('/api/honest-reviews/mine', requireUser, async (req, res) => {
 });
 
 // POST /api/honest-reviews/submit — any logged-in user can submit their own
-// YouTube video to be considered for the Honest Reviews row. Goes in as
-// `pending` and stays invisible to the public until an admin approves it.
+// YouTube video. Goes live immediately (no manage/approve UI exists yet on
+// the site) — if moderation is added back later, flip `active`/`status`
+// below to false/'pending' and reintroduce an approve step.
 app.post('/api/honest-reviews/submit', requireUser, async (req, res) => {
   try {
     const user = await User.findById(req.userId);
@@ -1943,13 +1945,13 @@ app.post('/api/honest-reviews/submit', requireUser, async (req, res) => {
       title: title.slice(0, 120),
       meta: `Submitted by ${user.name || 'a Quatar user'}`,
       verifiedLabel: 'Verified user',
-      active: false,
-      status: 'pending',
+      active: true,
+      status: 'approved',
       userId: user._id,
       userName: user.name || ''
     });
 
-    res.status(201).json({ review, message: 'Thanks! Your video was submitted for review.' });
+    res.status(201).json({ review, message: 'Thanks! Your video is now live in Honest Reviews.' });
   } catch (err) {
     console.error('POST /api/honest-reviews/submit error:', err.message);
     res.status(500).json({ error: 'Could not submit your video' });

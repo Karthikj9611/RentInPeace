@@ -8517,9 +8517,10 @@ async function submitVideoReview(evt) {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Could not submit your video');
-    showToast(data.message || 'Thanks! Your video was submitted for review.');
+    showToast(data.message || 'Thanks! Your video is now live in Honest Reviews.');
     document.getElementById('submitVideoForm').reset();
     closeSubmitVideoModal();
+    loadHonestReviews();
   } catch (err) {
     console.error('submitVideoReview error:', err);
     showToast(err.message || 'Could not submit your video');
