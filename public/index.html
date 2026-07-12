@@ -385,7 +385,8 @@ ul{list-style:none}
 /* ─── Property Grid ────────────────────────────── */
 .prop-grid{
   display:grid;
-  grid-template-columns:repeat(4,1fr);
+  grid-template-columns:repeat(auto-fill, 280px);
+  justify-content:start;
   gap:16px;
   padding:0 20px;
 }
@@ -417,6 +418,7 @@ ul{list-style:none}
   z-index:0;
   display:flex;flex-direction:column;
   height:100%;
+  min-height:390px;
   min-width:0;
 }
 .prop-card::before{
@@ -1644,7 +1646,7 @@ ul{list-style:none}
 }
 .services-scroll::-webkit-scrollbar{display:none}
 .service-card{
-  position:relative;flex:0 0 auto;width:280px;height:360px;
+  position:relative;flex:0 0 auto;width:280px;height:390px;
   border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;
   background:var(--bg-3);box-shadow:var(--shadow);
   transition:transform .18s ease, box-shadow .18s ease;
@@ -1690,16 +1692,7 @@ ul{list-style:none}
   .services-section{padding:8px 16px 24px}
   .services-title{font-size:23px}
   .services-sub{font-size:13px}
-  /* 2×2 grid that scrolls sideways: two rows fixed, columns auto-flow so
-     each swipe/scroll reveals the next pair of cards (4 visible at once,
-     6 cards → slides to reveal the remaining 2). Scroll-snap makes it
-     settle cleanly on a pair instead of stopping mid-card. */
-  .services-scroll{
-    display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,1fr);
-    grid-auto-columns:calc(50% - 5px);gap:10px;
-    overflow-x:auto;scroll-snap-type:x mandatory;
-  }
-  .service-card{width:100%;height:220px;scroll-snap-align:start}
+  .service-card{width:170px;height:230px}
   .services-arrow{display:none}
 }
 
@@ -1724,7 +1717,7 @@ ul{list-style:none}
 .hr-scroll::-webkit-scrollbar{display:none}
 .hr-card{flex:0 0 auto;width:280px;cursor:pointer}
 .hr-thumb{
-  position:relative;width:280px;height:300px;border-radius:var(--radius-lg);
+  position:relative;width:280px;height:330px;border-radius:var(--radius-lg);
   overflow:hidden;background:var(--bg-3);box-shadow:var(--shadow);
   transition:transform .18s ease, box-shadow .18s ease;
 }
@@ -3789,9 +3782,7 @@ ul{list-style:none}
 <section class="services-section" id="premiumServicesSection" aria-label="Our premium services">
   <div class="services-head">
     <div class="services-title">Our <span>Premium Services</span></div>
-    <p class="services-sub">From home repairs to digital solutions — one call gets it all done in Bangalore</p>
   </div>
-  <p class="services-hint">👆 Tap a service you're interested in, then contact us below</p>
 
   <div class="services-scroll-wrap">
     <button class="services-arrow prev" onclick="scrollServices(-1)" aria-label="Scroll left">
@@ -3884,7 +3875,7 @@ ul{list-style:none}
     </div>
     <div class="hr-head-title">Honest <span>Reviews</span></div>
   </div>
-  <p class="hr-sub">Real experiences</p>
+  <p class="hr-sub"></p>
 
   <div class="hr-scroll-wrap">
     <button class="hr-arrow prev" onclick="scrollHonestReviews(-1)" aria-label="Scroll left">
