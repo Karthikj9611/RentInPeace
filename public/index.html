@@ -1648,9 +1648,10 @@ ul{list-style:none}
 }
 .services-scroll::-webkit-scrollbar{display:none}
 .service-card{
-  position:relative;flex:0 0 auto;width:280px;height:390px;
+  position:relative;flex:0 0 280px;width:280px;min-width:280px;max-width:280px;
+  height:390px;min-height:390px;max-height:390px;
   border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;
-  background:var(--bg-3);box-shadow:var(--shadow);
+  background:var(--bg-3);box-shadow:var(--shadow);border:1px solid var(--border);
   transition:transform .18s ease, box-shadow .18s ease;
 }
 .service-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
@@ -1694,7 +1695,7 @@ ul{list-style:none}
   .services-section{padding:8px 16px 24px}
   .services-title{font-size:23px}
   .services-sub{font-size:13px}
-  .service-card{width:170px;height:230px}
+  .service-card{width:170px;min-width:170px;max-width:170px;height:230px;min-height:230px;max-height:230px}
   .services-arrow{display:none}
 }
 
@@ -1717,10 +1718,11 @@ ul{list-style:none}
   overscroll-behavior-x:contain;
 }
 .hr-scroll::-webkit-scrollbar{display:none}
-.hr-card{flex:0 0 auto;width:280px;cursor:pointer}
+.hr-card{flex:0 0 280px;width:280px;min-width:280px;max-width:280px;cursor:pointer}
 .hr-thumb{
-  position:relative;width:280px;height:330px;border-radius:var(--radius-lg);
-  overflow:hidden;background:var(--bg-3);box-shadow:var(--shadow);
+  position:relative;width:280px;min-width:280px;max-width:280px;
+  height:390px;min-height:390px;max-height:390px;border-radius:var(--radius-lg);
+  overflow:hidden;background:var(--bg-3);box-shadow:var(--shadow);border:1px solid var(--border);
   transition:transform .18s ease, box-shadow .18s ease;
 }
 .hr-card:hover .hr-thumb{transform:translateY(-3px);box-shadow:var(--shadow-md)}
@@ -1841,8 +1843,8 @@ ul{list-style:none}
   .hr-section{padding:8px 16px 24px}
   .hr-head-title{font-size:18px}
   .hr-arrow{display:none}
-  .hr-card{width:170px}
-  .hr-thumb{width:170px;height:182px}
+  .hr-card{width:170px;min-width:170px;max-width:170px}
+  .hr-thumb{width:170px;min-width:170px;max-width:170px;height:230px;min-height:230px;max-height:230px}
 }
 
 /* ─── Service Request Modal ────────────────────── */
