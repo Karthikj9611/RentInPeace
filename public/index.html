@@ -1935,6 +1935,13 @@ ul{list-style:none}
 .add-modal.view-mode #fImgHint{display:none}
 .add-modal.view-mode #imgFormGroup{display:none}
 .add-modal.view-mode #mediaSectionHeader{display:none}
+/* The amenities picker's "Select all" / "Clear all" buttons, and each
+   selected-amenity tag's ✕ button, mutate checkbox state directly via JS —
+   disabling the checkboxes themselves doesn't stop that. Hide the whole
+   picker widget (view mode already shows the same info read-only in the
+   "Selected amenities" box below it) and hide the tag remove buttons. */
+.add-modal.view-mode #amSelectFormGroup{display:none}
+.add-modal.view-mode .am-tag-remove{display:none}
 .detail-gallery{display:none}
 .add-modal.view-mode .detail-gallery{display:block;margin-bottom:16px}
 .detail-gallery .prop-img{
@@ -4447,7 +4454,7 @@ ul{list-style:none}
     <!-- ===== 6. AMENITIES ===== -->
     <div id="addAmenitiesSection">
     <div class="lm-section">✨ Amenities</div>
-    <div class="form-group">
+    <div class="form-group" id="amSelectFormGroup">
       <label class="form-label">Select amenities</label>
       <div class="am-dd" id="amDropdown">
         <button type="button" class="am-dd-trigger" onclick="toggleAmDropdown(event)">
