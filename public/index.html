@@ -2858,7 +2858,7 @@ ul{list-style:none}
   </div>
 
   <div class="nav-tabs" role="tablist">
-    <div class="nav-tab" data-tab="All" role="tab" onclick="switchTab(this)" tabindex="0">
+    <div class="nav-tab active" data-tab="All" role="tab" onclick="switchTab(this)" tabindex="0">
       <span class="nav-tab-icon">🌐</span>
       All
     </div>
@@ -2866,7 +2866,7 @@ ul{list-style:none}
       <span class="nav-tab-icon">⭐</span>
       Promoted
     </div>
-    <div class="nav-tab active" data-tab="Rent" role="tab" onclick="switchTab(this)" tabindex="0">
+    <div class="nav-tab" data-tab="Rent" role="tab" onclick="switchTab(this)" tabindex="0">
       <span class="nav-tab-icon">🏠</span>
       Rent
     </div>
@@ -4107,11 +4107,11 @@ ul{list-style:none}
 
 <!-- ─── Mobile bottom nav ────────────────────────── -->
 <nav class="bottom-nav" aria-label="Main navigation">
-  <div class="bottom-tab" data-tab="All" onclick="switchTabMobile(this)">
+  <div class="bottom-tab active" data-tab="All" onclick="switchTabMobile(this)">
     <span class="bottom-tab-icon">🌐</span>
     All
   </div>
-  <div class="bottom-tab active" data-tab="Rent" onclick="switchTabMobile(this)">
+  <div class="bottom-tab" data-tab="Rent" onclick="switchTabMobile(this)">
     <span class="bottom-tab-icon">🏠</span>
     Rent
   </div>
@@ -5643,7 +5643,7 @@ function formatViews(n) {
 /* ═══════════════════════════════════════════════
    STATE
 ═══════════════════════════════════════════════ */
-let currentTab = 'Rent';
+let currentTab = 'All';
 let currentSort = 'newest';
 const SHORTLIST_KEY = 'quatar_shortlisted_properties';
 const SHORTLIST_DATA_KEY = 'quatar_shortlisted_properties_data';
