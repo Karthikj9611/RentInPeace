@@ -904,7 +904,7 @@ app.post('/api/properties', listingLimiter, requireUser, async (req, res) => {
 app.get('/api/properties', async (req, res) => {
   try {
     const { status, q, limit = 100, skip = 0 } = req.query;
-    const filter = {};
+    const filter = { verified: true }; // a listing only appears to the public once admin has verified it
     if (status && typeof status === 'string') filter['basic.status'] = status;
     if (q && typeof q === 'string') {
       const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');

@@ -280,13 +280,20 @@ ul{list-style:none}
 .fd-total-badge.show{display:inline-block}
 
 /* Tab-aware dropdown button visibility */
-.fd-rent,.fd-lease,.fd-pg{display:none}
+.fd-rent,.fd-lease,.fd-pg,.fd-shortstay{display:none}
 .filter-dd-bar.tab-all .fd-rent,
 .filter-dd-bar.tab-all .fd-lease,
-.filter-dd-bar.tab-all .fd-pg{display:inline-flex}
+.filter-dd-bar.tab-all .fd-pg,
+.filter-dd-bar.tab-all .fd-shortstay{display:inline-flex}
 .filter-dd-bar.tab-rent .fd-rent{display:inline-flex}
 .filter-dd-bar.tab-lease .fd-lease{display:inline-flex}
 .filter-dd-bar.tab-pg .fd-pg{display:inline-flex}
+.filter-dd-bar.tab-shortstay .fd-shortstay{display:inline-flex}
+/* Promoted crosses all four listing types, so show the same full filter set as "All" */
+.filter-dd-bar.tab-promoted .fd-rent,
+.filter-dd-bar.tab-promoted .fd-lease,
+.filter-dd-bar.tab-promoted .fd-pg,
+.filter-dd-bar.tab-promoted .fd-shortstay{display:inline-flex}
 .sort-modal{
   position:fixed;inset:0;z-index:200;
   display:none;align-items:flex-end;justify-content:center;
@@ -543,11 +550,11 @@ ul{list-style:none}
 }
 .prop-icon-promoted{background:linear-gradient(135deg,#eec9c0,#d9a488)}
 .prop-icon-promoted svg{width:13px;height:13px;fill:#4a2418;stroke:none}
-.prop-icon-verified{background:linear-gradient(135deg,#3fb87a,#2a8f5c)}
-.prop-icon-verified svg{width:14px;height:14px;fill:#fff;stroke:none}
+.prop-icon-verified{background:linear-gradient(135deg,#4ba7ff,#1a73e8)}
+.prop-icon-verified svg{width:15px;height:15px;fill:#fff;stroke:none}
 .prop-card.prop-card-promoted .prop-icon-promoted{background:linear-gradient(135deg,#ffd166,#f4a300)}
 .prop-card.prop-card-promoted .prop-icon-promoted svg{fill:#7a4a00}
-.prop-card.prop-card-promoted .prop-icon-verified{background:linear-gradient(135deg,#4fd88f,#1f9e5c)}
+.prop-card.prop-card-promoted .prop-icon-verified{background:linear-gradient(135deg,#5cb3ff,#0f66d6)}
 .prop-body{padding:13px 14px 12px;flex:1;min-width:0;display:flex;flex-direction:column}
 .prop-price-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:3px;margin-bottom:4px}
 .prop-price{
@@ -2670,10 +2677,6 @@ ul{list-style:none}
       <span class="nav-tab-icon">⭐</span>
       Promoted
     </div>
-    <div class="nav-tab" data-tab="Verified" role="tab" onclick="switchTab(this)" tabindex="0">
-      <span class="nav-tab-icon">✅</span>
-      Verified
-    </div>
     <div class="nav-tab" data-tab="Rent" role="tab" onclick="switchTab(this)" tabindex="0">
       <span class="nav-tab-icon">🏠</span>
       Rent
@@ -2685,6 +2688,10 @@ ul{list-style:none}
     <div class="nav-tab" data-tab="PG" role="tab" onclick="switchTab(this)" tabindex="0">
       <span class="nav-tab-icon">🛏️</span>
       PG
+    </div>
+    <div class="nav-tab" data-tab="ShortStay" role="tab" onclick="switchTab(this)" tabindex="0">
+      <span class="nav-tab-icon">🏨</span>
+      Short Stay
     </div>
   </div>
 
@@ -2969,7 +2976,7 @@ ul{list-style:none}
   </div>
 
   <!-- ALL: Amenities -->
-  <div class="fd-btn fd-rent fd-lease fd-pg" id="fdb-amenities" onclick="toggleFd('amenities',this)">
+  <div class="fd-btn fd-rent fd-lease fd-pg fd-shortstay" id="fdb-amenities" onclick="toggleFd('amenities',this)">
     <span class="fd-icon">✨</span>
     Amenities <span class="fd-badge" id="fdbc-amenities" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
@@ -2984,7 +2991,7 @@ ul{list-style:none}
   </div>
 
   <!-- ALL: Lift & Parking -->
-  <div class="fd-btn fd-rent fd-lease fd-pg" id="fdb-facilities" onclick="toggleFd('facilities',this)">
+  <div class="fd-btn fd-rent fd-lease fd-pg fd-shortstay" id="fdb-facilities" onclick="toggleFd('facilities',this)">
     <span class="fd-icon">🅿️</span>
     Facilities <span class="fd-badge" id="fdbc-facilities" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
@@ -3068,6 +3075,87 @@ ul{list-style:none}
       <div class="fd-pop-footer">
         <button class="fd-clear-btn" onclick="clearFd('pgRent')">Clear</button>
         <button class="fd-apply-btn" onclick="applyFd('pgRent')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHORT STAY: Room type -->
+  <div class="fd-btn fd-shortstay" id="fdb-ssRoom" onclick="toggleFd('ssRoom',this)">
+    <span class="fd-icon">🚪</span>
+    Room type <span class="fd-badge" id="fdbc-ssRoom" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-ssRoom" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Room type</div>
+      <div class="fd-opts" id="fdo-ssRoom"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('ssRoom')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('ssRoom')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHORT STAY: Rate per day -->
+  <div class="fd-btn fd-shortstay" id="fdb-ssRent" onclick="toggleFd('ssRent',this)">
+    <span class="fd-icon">💰</span>
+    Per day <span class="fd-badge" id="fdbc-ssRent" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-ssRent" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Rate per day</div>
+      <div class="fd-opts">
+        <div class="fp-opt" data-filter="_ssRentBucket" data-val="0-1000" onclick="toggleOpt(this,'ssRent')">Under ₹1k</div>
+        <div class="fp-opt" data-filter="_ssRentBucket" data-val="1000-2000" onclick="toggleOpt(this,'ssRent')">₹1k – ₹2k</div>
+        <div class="fp-opt" data-filter="_ssRentBucket" data-val="2000-3500" onclick="toggleOpt(this,'ssRent')">₹2k – ₹3.5k</div>
+        <div class="fp-opt" data-filter="_ssRentBucket" data-val="3500-5000" onclick="toggleOpt(this,'ssRent')">₹3.5k – ₹5k</div>
+        <div class="fp-opt" data-filter="_ssRentBucket" data-val="5000-" onclick="toggleOpt(this,'ssRent')">Above ₹5k</div>
+      </div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('ssRent')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('ssRent')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHORT STAY: Max guests -->
+  <div class="fd-btn fd-shortstay" id="fdb-ssGuests" onclick="toggleFd('ssGuests',this)">
+    <span class="fd-icon">👥</span>
+    Guests <span class="fd-badge" id="fdbc-ssGuests" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-ssGuests" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Max guests</div>
+      <div class="fd-opts" id="fdo-ssGuests"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('ssGuests')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('ssGuests')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHORT STAY: Cancellation policy -->
+  <div class="fd-btn fd-shortstay" id="fdb-ssCancellation" onclick="toggleFd('ssCancellation',this)">
+    <span class="fd-icon">🚫</span>
+    Cancellation <span class="fd-badge" id="fdbc-ssCancellation" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop fd-pop right" id="fdp-ssCancellation" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Free cancellation</div>
+      <div class="fd-opts" id="fdo-ssCancellation"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('ssCancellation')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('ssCancellation')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHORT STAY: Couples allowed -->
+  <div class="fd-btn fd-shortstay" id="fdb-ssCouples" onclick="toggleFd('ssCouples',this)">
+    <span class="fd-icon">💑</span>
+    Couples <span class="fd-badge" id="fdbc-ssCouples" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop fd-pop right" id="fdp-ssCouples" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Unmarried couples allowed</div>
+      <div class="fd-opts" id="fdo-ssCouples"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('ssCouples')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('ssCouples')">Apply</button>
       </div>
     </div>
   </div>
@@ -5545,7 +5633,7 @@ function cardHTML(p, compact) {
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
           </div>
           ${p.promoted ? '<div class="prop-icon-badge prop-icon-promoted" title="Promoted"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.26 6.9.8-5.1 4.7 1.4 6.84L12 17.3l-6.1 3.3 1.4-6.84-5.1-4.7 6.9-.8z"/></svg></div>' : ''}
-          ${p.verified ? '<div class="prop-icon-badge prop-icon-verified" title="Verified"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l6.5 2.8v5.4c0 4.8-2.8 8.9-6.5 10.8-3.7-1.9-6.5-6-6.5-10.8V5.3z" fill="#fff"/><path d="M8.7 12l2.3 2.3 4.3-4.6" stroke="#2a8f5c" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' : ''}
+          ${p.verified ? '<div class="prop-icon-badge prop-icon-verified" title="Verified"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="#fff"/><path d="M8 12.3l2.6 2.6 5.4-5.8" stroke="#1a73e8" stroke-width="2.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' : ''}
         </div>
       </div>
     </div>
@@ -5687,7 +5775,7 @@ function shortlistCardHTML(p) {
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
           </div>
           ${p.promoted ? '<div class="prop-icon-badge prop-icon-promoted" title="Promoted"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.26 6.9.8-5.1 4.7 1.4 6.84L12 17.3l-6.1 3.3 1.4-6.84-5.1-4.7 6.9-.8z"/></svg></div>' : ''}
-          ${p.verified ? '<div class="prop-icon-badge prop-icon-verified" title="Verified"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l6.5 2.8v5.4c0 4.8-2.8 8.9-6.5 10.8-3.7-1.9-6.5-6-6.5-10.8V5.3z" fill="#fff"/><path d="M8.7 12l2.3 2.3 4.3-4.6" stroke="#2a8f5c" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' : ''}
+          ${p.verified ? '<div class="prop-icon-badge prop-icon-verified" title="Verified"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="#fff"/><path d="M8 12.3l2.6 2.6 5.4-5.8" stroke="#1a73e8" stroke-width="2.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' : ''}
         </div>
       </div>
     </div>
@@ -6068,7 +6156,7 @@ function renderCompareTable() {
             <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </div>
           ${p.promoted ? '<div class="prop-icon-badge prop-icon-promoted" title="Promoted"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.26 6.9.8-5.1 4.7 1.4 6.84L12 17.3l-6.1 3.3 1.4-6.84-5.1-4.7 6.9-.8z"/></svg></div>' : ''}
-          ${p.verified ? '<div class="prop-icon-badge prop-icon-verified" title="Verified"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l6.5 2.8v5.4c0 4.8-2.8 8.9-6.5 10.8-3.7-1.9-6.5-6-6.5-10.8V5.3z" fill="#fff"/><path d="M8.7 12l2.3 2.3 4.3-4.6" stroke="#2a8f5c" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' : ''}
+          ${p.verified ? '<div class="prop-icon-badge prop-icon-verified" title="Verified"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="#fff"/><path d="M8 12.3l2.6 2.6 5.4-5.8" stroke="#1a73e8" stroke-width="2.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' : ''}
         </div>
       </div>`;
     return `<th class="compare-col compare-col-head">
@@ -6227,6 +6315,11 @@ const FD_GROUPS = {
   pgRoom:     ['pgRoomType'],
   pgMeals:    ['pgMeals','pgFoodType'],
   pgRent:     ['_pgRentBucket'],
+  ssRoom:         ['ssRoomType'],
+  ssRent:         ['_ssRentBucket'],
+  ssGuests:       ['ssMaxGuests'],
+  ssCancellation: ['ssCancellation'],
+  ssCouples:      ['ssCouples'],
 };
 
 let openFd = null;
@@ -6284,6 +6377,10 @@ const FILTER_FIELD_PATHS = {
   pgRoomType:   ['pg','room'],
   pgMeals:      ['pg','meals'],
   pgFoodType:   ['pg','food'],
+  ssRoomType:     ['shortStay','roomType'],
+  ssMaxGuests:    ['shortStay','maxGuests'],
+  ssCancellation: ['shortStay','cancellation'],
+  ssCouples:      ['shortStay','couplesAllowed'],
 };
 function pFieldByPath(p, pathArr) {
   return pathArr.reduce((o, k) => (o == null ? o : o[k]), p);
@@ -6400,6 +6497,22 @@ function buildFilterOptions() {
     fdSortValues('pgFoodType', fdCollectValues('pgFoodType', p => pTypeLabel(p) === 'PG')), 'pgMeals');
   restoreSel('fdo-pgFoodType');
 
+  fdRenderOpts('fdo-ssRoom', 'ssRoomType',
+    fdSortValues('ssRoomType', fdCollectValues('ssRoomType', p => pTypeLabel(p) === 'ShortStay')), 'ssRoom');
+  restoreSel('fdo-ssRoom');
+
+  fdRenderOpts('fdo-ssGuests', 'ssMaxGuests',
+    fdSortValues('ssMaxGuests', fdCollectValues('ssMaxGuests', p => pTypeLabel(p) === 'ShortStay')), 'ssGuests');
+  restoreSel('fdo-ssGuests');
+
+  fdRenderOpts('fdo-ssCancellation', 'ssCancellation',
+    fdSortValues('ssCancellation', fdCollectValues('ssCancellation', p => pTypeLabel(p) === 'ShortStay')), 'ssCancellation');
+  restoreSel('fdo-ssCancellation');
+
+  fdRenderOpts('fdo-ssCouples', 'ssCouples',
+    fdSortValues('ssCouples', fdCollectValues('ssCouples', p => pTypeLabel(p) === 'ShortStay')), 'ssCouples');
+  restoreSel('fdo-ssCouples');
+
   // Refresh badges/has-sel state for every dropdown after rebuilding
   Object.keys(FD_GROUPS).forEach(id => refreshFdBtn(id));
 }
@@ -6407,7 +6520,7 @@ function buildFilterOptions() {
 function syncFdBar() {
   const bar = document.getElementById('filterDdBar');
   if (!bar) return;
-  bar.classList.remove('tab-all','tab-rent','tab-lease','tab-pg');
+  bar.classList.remove('tab-all','tab-rent','tab-lease','tab-pg','tab-promoted','tab-shortstay');
   bar.classList.add('tab-' + currentTab.toLowerCase());
 }
 
@@ -6591,6 +6704,12 @@ function getFiltered() {
 
   let list = PROPERTIES.filter(p => {
     if (!matchesTab(p, currentTab)) return false;
+    // NOTE: pType was previously used further down (Rent/Lease/PG-specific
+    // filter checks) without ever being declared in this scope, which threw
+    // a ReferenceError the moment any filter was selected — silently
+    // breaking every filter dropdown. Declaring it here fixes that for the
+    // existing Rent/Lease/PG filters too, not just the new Short Stay ones.
+    const pType = pTypeLabel(p);
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       const area = (p.location?.area || '').toLowerCase();
@@ -6668,6 +6787,23 @@ function getFiltered() {
     }
     if (fs._pgRentBucket) {
       if (pType!=='PG' || !fdValueInBuckets(p.price?.rent, fs._pgRentBucket)) return false;
+    }
+    // Short-Stay-only filters — same unconditional-check pattern as the PG
+    // filters above, so a Rent/Lease/PG row can never slip through them.
+    if (fs.ssRoomType) {
+      if (pType!=='ShortStay' || !fs.ssRoomType.includes(p.shortStay?.roomType)) return false;
+    }
+    if (fs.ssMaxGuests) {
+      if (pType!=='ShortStay' || !fs.ssMaxGuests.includes(p.shortStay?.maxGuests)) return false;
+    }
+    if (fs.ssCancellation) {
+      if (pType!=='ShortStay' || !fs.ssCancellation.includes(p.shortStay?.cancellation)) return false;
+    }
+    if (fs.ssCouples) {
+      if (pType!=='ShortStay' || !fs.ssCouples.includes(p.shortStay?.couplesAllowed)) return false;
+    }
+    if (fs._ssRentBucket) {
+      if (pType!=='ShortStay' || !fdValueInBuckets(p.price?.rent, fs._ssRentBucket)) return false;
     }
     return true;
   });
@@ -7382,14 +7518,18 @@ function applyImportedProperty(p) {
   function sv(id, val) { const el = document.getElementById(id); if (el && val !== undefined && val !== null) el.value = val; }
   const basic = p.basic || {}, location = p.location || {}, owner = p.owner || {}, price = p.price || {},
         property = p.property || {}, amenities = p.amenities || {}, terms = p.terms || {}, rules = p.rules || {},
-        media = p.media || {}, pg = p.pg || {};
+        media = p.media || {}, pg = p.pg || {}, shortStay = p.shortStay || {};
 
   // Map schema status back → the dropdown's own value set
-  const reverseStatusMap = { 'For Rent': 'Rent', 'Lease': 'Lease', 'PG': 'PG' };
+  // ('Short Stay' → 'ShortStay' was missing here, so Short Stay listings fell
+  // through to the raw 'Short Stay' string, which matches no <option> in
+  // #f-type and made onFTypeChange()/isShortStay checks below fail silently —
+  // the view rendered as a plain Rent form and lost all Short-Stay-specific data.)
+  const reverseStatusMap = { 'For Rent': 'Rent', 'Lease': 'Lease', 'PG': 'PG', 'Short Stay': 'ShortStay' };
   const typeVal = reverseStatusMap[basic.status] || (basic.status || 'Rent');
   sv('f-type', typeVal);
   sv('f-listedBy', basic.listedBy);
-  const isPG = typeVal === 'PG', isLease = typeVal === 'Lease';
+  const isPG = typeVal === 'PG', isLease = typeVal === 'Lease', isShortStay = typeVal === 'ShortStay';
 
   // Location
   sv('f-location', location.area);
@@ -7419,7 +7559,8 @@ function applyImportedProperty(p) {
     sv('f-leaseMaintenance', price.maintenance);
   } else {
     sv('f-rent', price.rent);
-    sv('f-deposit', price.deposit);
+    if (isShortStay) sv('f-ssDeposit', price.deposit);
+    else sv('f-deposit', price.deposit);
     sv('f-maintenance', price.maintenance);
     if (price.rentIncrease) sv('f-escalation', parseFloat(price.rentIncrease));
     sv('f-electricityIncluded', price.electricity);
@@ -7429,7 +7570,7 @@ function applyImportedProperty(p) {
   }
 
   // Property details
-  if (!isPG) {
+  if (!isPG && !isShortStay) {
     sv('f-propertyType', property.type);
     sv('f-bhk', property.bhk);
     sv('f-area', property.area);
@@ -7438,14 +7579,14 @@ function applyImportedProperty(p) {
     sv('f-tenant', property.tenant);
     sv('f-facing', property.facing);
   }
-  sv('f-bikepark', isPG ? '0' : property.bike);
-  sv('f-carpark', isPG ? '0' : property.car);
+  sv('f-bikepark', (isPG || isShortStay) ? '0' : property.bike);
+  sv('f-carpark', (isPG || isShortStay) ? '0' : property.car);
   sv('f-floor', property.floor);
   sv('f-baths', isPG ? '1' : property.bathrooms);
   sv('f-furnishing', property.furnish);
   if (isPG) sv('f-pgAvailableFrom', property.available);
   else if (isLease) sv('f-leaseAvailableFrom', property.available);
-  else sv('f-avail', property.available);
+  else if (!isShortStay) sv('f-avail', property.available);
 
   // Amenities — check the boxes whose label matches, parsing any "Label ×N" qty suffix
   const selected = Array.isArray(amenities.selected) ? amenities.selected : [];
@@ -7508,6 +7649,20 @@ function applyImportedProperty(p) {
     sv('f-pgKitchenAccess', pg.kitchen);
     sv('f-pgVisitorPolicy', pg.visitors);
     sv('f-pgGateTime', pg.gateTime);
+  }
+
+  // Short-Stay-specific block (was missing entirely — none of these ever
+  // got restored when viewing a Short Stay listing).
+  if (isShortStay) {
+    sv('f-ssRoomType', shortStay.roomType);
+    sv('f-ssMaxGuests', shortStay.maxGuests);
+    sv('f-ssMinDays', shortStay.minDays);
+    sv('f-ssCheckinTime', shortStay.checkinTime);
+    sv('f-ssCheckoutTime', shortStay.checkoutTime);
+    sv('f-ssExtraDayRate', shortStay.extraDayRate);
+    sv('f-ssCancellation', shortStay.cancellation);
+    sv('f-ssIdProof', shortStay.idProof);
+    sv('f-ssCouples', shortStay.couplesAllowed);
   }
 
   onFTypeChange(typeVal);
@@ -9012,22 +9167,16 @@ function submitListing() {
   .then(async res => {
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Server error');
-    // Use the saved doc as-is (already in the nested shape); just attach
-    // the bits the GET endpoint normally adds (id/posted/verified/displayPrice).
-    const saved = data.property || {};
-    const localProp = Object.assign({}, newProp, saved, {
-      id:      saved._id || saved.id || (PROPERTIES.length + 1),
-      posted:  formatPostedDateTime(new Date()),
-      verified: false,
-    });
-    PROPERTIES.unshift(localProp);
+    // Don't add this to PROPERTIES / the public grid — a brand-new listing
+    // is unverified, and the public /api/properties endpoint only returns
+    // verified: true listings. It'll show up once admin verifies it; until
+    // then it's visible to the owner via "My Listings" (fetched fresh from
+    // /api/user/my-listings, which is unfiltered for the owner's own posts).
     clearListingDraft();
     resetListingForm();
     document.getElementById('addModal').classList.remove('open');
     document.body.style.overflow = '';
-    buildFilterOptions();
-    renderCards();
-    showToast('Listing submitted successfully!');
+    showToast('Listing submitted! It will appear once our team verifies it.');
   })
   .catch(err => {
     console.error('Submit listing error:', err);
