@@ -169,12 +169,6 @@ ul{list-style:none}
 }
 
 /* ─── Search bar ───────────────────────────────── */
-.searchbar-wrap{
-  position:static;
-  background:var(--bg);
-  border-bottom:1px solid var(--border);
-  padding:10px 20px;
-}
 .searchbar{
   display:flex;align-items:center;gap:10px;
   border:1.5px solid var(--border-2);
@@ -192,12 +186,6 @@ ul{list-style:none}
   background:transparent;
 }
 .searchbar input::placeholder{color:var(--text-3)}
-.mic-btn{
-  width:28px;height:28px;display:flex;align-items:center;justify-content:center;
-  color:var(--text-3);cursor:pointer;flex-shrink:0;
-}
-.mic-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.7}
-.mic-btn:hover svg{stroke:var(--brand)}
 
 /* ─── Filter chips ─────────────────────────────── */
 /* filterbar replaced by .filter-dd-bar — old rules removed */
@@ -2652,17 +2640,6 @@ ul{list-style:none}
 }
 .slide-dot.active{background:#fff}
 
-.mic-btn.listening{
-    animation:pulse 1s infinite;
-}
-
-@keyframes pulse{
-    50%{
-        transform:scale(1.2);
-    }
-}
-
-
 /* ─── Welcome / Offer Modal ────────────────────── */
 #welcomeModal{
   position:fixed;inset:0;z-index:9999;
@@ -2817,7 +2794,7 @@ ul{list-style:none}
   </div>
 
   <div class="nav-tabs" role="tablist">
-    <div class="nav-tab active" data-tab="All" role="tab" onclick="switchTab(this)" tabindex="0">
+    <div class="nav-tab" data-tab="All" role="tab" onclick="switchTab(this)" tabindex="0">
       <span class="nav-tab-icon">🌐</span>
       All
     </div>
@@ -2825,7 +2802,7 @@ ul{list-style:none}
       <span class="nav-tab-icon">⭐</span>
       Promoted
     </div>
-    <div class="nav-tab" data-tab="Rent" role="tab" onclick="switchTab(this)" tabindex="0">
+    <div class="nav-tab active" data-tab="Rent" role="tab" onclick="switchTab(this)" tabindex="0">
       <span class="nav-tab-icon">🏠</span>
       Rent
     </div>
@@ -2857,34 +2834,6 @@ ul{list-style:none}
     </div>
   </div>
 </nav>
-
-<!-- ─── Search Bar ──────────────────────────────── -->
-<div class="searchbar-wrap">
-  <div class="searchbar">
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="11" cy="11" r="8"/>
-      <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-    </svg>
-
-    <input 
-      type="text" 
-      id="searchInput" 
-      onkeydown="if(event.key==='Enter') handleSearch()"
-      autocomplete="off" 
-      aria-label="Search properties" 
-    />
-
-    <div class="mic-btn" id="micBtn" title="Voice search" onclick="startVoiceSearch()">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-        <line x1="12" y1="19" x2="12" y2="23"/>
-        <line x1="8" y1="23" x2="16" y2="23"/>
-      </svg>
-    </div>
-
-  </div>
-</div>
 
 <!-- ─── Filter Bar ──────────────────────────────── -->
 <!-- ─── Filter Dropdown Bar ──────────────────────── -->
@@ -2961,6 +2910,56 @@ ul{list-style:none}
       <div class="fd-pop-footer">
         <button class="fd-clear-btn" onclick="clearFd('deposit')">Clear</button>
         <button class="fd-apply-btn" onclick="applyFd('deposit')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RENT: Rent escalation -->
+  <div class="fd-btn fd-rent" id="fdb-escalation" onclick="toggleFd('escalation',this)">
+    <span class="fd-icon">📈</span>
+    Escalation <span class="fd-badge" id="fdbc-escalation" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-escalation" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Annual rent escalation</div>
+      <div class="fd-opts">
+        <div class="fp-opt" data-filter="_escalationBucket" data-val="0-1" onclick="toggleOpt(this,'escalation')">None</div>
+        <div class="fp-opt" data-filter="_escalationBucket" data-val="1-5" onclick="toggleOpt(this,'escalation')">Up to 5%</div>
+        <div class="fp-opt" data-filter="_escalationBucket" data-val="5-10" onclick="toggleOpt(this,'escalation')">5% – 10%</div>
+        <div class="fp-opt" data-filter="_escalationBucket" data-val="10-" onclick="toggleOpt(this,'escalation')">Above 10%</div>
+      </div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('escalation')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('escalation')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RENT: Electricity included -->
+  <div class="fd-btn fd-rent" id="fdb-electricityIncluded" onclick="toggleFd('electricityIncluded',this)">
+    <span class="fd-icon">🔌</span>
+    Electricity <span class="fd-badge" id="fdbc-electricityIncluded" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-electricityIncluded" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Electricity charges</div>
+      <div class="fd-opts" id="fdo-electricityIncluded"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('electricityIncluded')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('electricityIncluded')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RENT: Water charge -->
+  <div class="fd-btn fd-rent" id="fdb-waterCharge" onclick="toggleFd('waterCharge',this)">
+    <span class="fd-icon">🚰</span>
+    Water <span class="fd-badge" id="fdbc-waterCharge" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-waterCharge" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Water / borewell charges</div>
+      <div class="fd-opts" id="fdo-waterCharge"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('waterCharge')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('waterCharge')">Apply</button>
       </div>
     </div>
   </div>
@@ -3102,6 +3101,47 @@ ul{list-style:none}
     </div>
   </div>
 
+  <!-- RENT + LEASE: Floor -->
+  <div class="fd-btn fd-rent fd-lease" id="fdb-floor" onclick="toggleFd('floor',this)">
+    <span class="fd-icon">🏬</span>
+    Floor <span class="fd-badge" id="fdbc-floor" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-floor" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Floor</div>
+      <div class="fd-opts">
+        <div class="fp-opt" data-filter="_floorBucket" data-val="0-1" onclick="toggleOpt(this,'floor')">Ground</div>
+        <div class="fp-opt" data-filter="_floorBucket" data-val="1-4" onclick="toggleOpt(this,'floor')">1st – 3rd</div>
+        <div class="fp-opt" data-filter="_floorBucket" data-val="4-9" onclick="toggleOpt(this,'floor')">4th – 8th</div>
+        <div class="fp-opt" data-filter="_floorBucket" data-val="9-" onclick="toggleOpt(this,'floor')">9th &amp; above</div>
+      </div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('floor')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('floor')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RENT + LEASE: Area -->
+  <div class="fd-btn fd-rent fd-lease" id="fdb-area" onclick="toggleFd('area',this)">
+    <span class="fd-icon">📐</span>
+    Area <span class="fd-badge" id="fdbc-area" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-area" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Area (sqft)</div>
+      <div class="fd-opts">
+        <div class="fp-opt" data-filter="_areaBucket" data-val="0-500" onclick="toggleOpt(this,'area')">Under 500</div>
+        <div class="fp-opt" data-filter="_areaBucket" data-val="500-1000" onclick="toggleOpt(this,'area')">500 – 1000</div>
+        <div class="fp-opt" data-filter="_areaBucket" data-val="1000-1500" onclick="toggleOpt(this,'area')">1000 – 1500</div>
+        <div class="fp-opt" data-filter="_areaBucket" data-val="1500-2000" onclick="toggleOpt(this,'area')">1500 – 2000</div>
+        <div class="fp-opt" data-filter="_areaBucket" data-val="2000-" onclick="toggleOpt(this,'area')">Above 2000</div>
+      </div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('area')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('area')">Apply</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ALL: Available from -->
   <div class="fd-btn fd-rent fd-lease fd-pg" id="fdb-availFrom" onclick="toggleFd('availFrom',this)">
     <span class="fd-icon">📅</span>
@@ -3119,6 +3159,96 @@ ul{list-style:none}
       <div class="fd-pop-footer">
         <button class="fd-clear-btn" onclick="clearFd('availFrom')">Clear</button>
         <button class="fd-apply-btn" onclick="applyFd('availFrom')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RENT + LEASE: Notice period -->
+  <div class="fd-btn fd-rent fd-lease" id="fdb-notice" onclick="toggleFd('notice',this)">
+    <span class="fd-icon">🔔</span>
+    Notice <span class="fd-badge" id="fdbc-notice" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-notice" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Notice period</div>
+      <div class="fd-opts" id="fdo-notice"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('notice')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('notice')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RENT + LEASE: Lease duration -->
+  <div class="fd-btn fd-rent fd-lease" id="fdb-leaseDuration" onclick="toggleFd('leaseDuration',this)">
+    <span class="fd-icon">📜</span>
+    Lease Term <span class="fd-badge" id="fdbc-leaseDuration" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-leaseDuration" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Lease duration</div>
+      <div class="fd-opts" id="fdo-leaseDuration"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('leaseDuration')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('leaseDuration')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RENT + LEASE: Pets allowed -->
+  <div class="fd-btn fd-rent fd-lease" id="fdb-petsAllowed" onclick="toggleFd('petsAllowed',this)">
+    <span class="fd-icon">🐾</span>
+    Pets <span class="fd-badge" id="fdbc-petsAllowed" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-petsAllowed" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Pets allowed</div>
+      <div class="fd-opts" id="fdo-petsAllowed"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('petsAllowed')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('petsAllowed')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RENT + LEASE: Non-veg allowed -->
+  <div class="fd-btn fd-rent fd-lease" id="fdb-nonVegAllowed" onclick="toggleFd('nonVegAllowed',this)">
+    <span class="fd-icon">🍗</span>
+    Non-Veg <span class="fd-badge" id="fdbc-nonVegAllowed" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-nonVegAllowed" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Non-veg allowed</div>
+      <div class="fd-opts" id="fdo-nonVegAllowed"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('nonVegAllowed')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('nonVegAllowed')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEASE: Lease type -->
+  <div class="fd-btn fd-lease" id="fdb-leaseType" onclick="toggleFd('leaseType',this)">
+    <span class="fd-icon">🏷️</span>
+    Lease Type <span class="fd-badge" id="fdbc-leaseType" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-leaseType" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Lease type</div>
+      <div class="fd-opts" id="fdo-leaseType"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('leaseType')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('leaseType')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEASE: Lock-in period -->
+  <div class="fd-btn fd-lease" id="fdb-lockIn" onclick="toggleFd('lockIn',this)">
+    <span class="fd-icon">🔒</span>
+    Lock-in <span class="fd-badge" id="fdbc-lockIn" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-lockIn" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Lock-in period</div>
+      <div class="fd-opts" id="fdo-lockIn"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('lockIn')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('lockIn')">Apply</button>
       </div>
     </div>
   </div>
@@ -3227,6 +3357,126 @@ ul{list-style:none}
     </div>
   </div>
 
+  <!-- PG: Attached bathroom -->
+  <div class="fd-btn fd-pg" id="fdb-pgBathroom" onclick="toggleFd('pgBathroom',this)">
+    <span class="fd-icon">🚿</span>
+    Bathroom <span class="fd-badge" id="fdbc-pgBathroom" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-pgBathroom" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Attached bathroom</div>
+      <div class="fd-opts" id="fdo-pgBathroom"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('pgBathroom')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('pgBathroom')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PG: Occupancy -->
+  <div class="fd-btn fd-pg" id="fdb-pgOccupancy" onclick="toggleFd('pgOccupancy',this)">
+    <span class="fd-icon">👥</span>
+    Occupancy <span class="fd-badge" id="fdbc-pgOccupancy" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-pgOccupancy" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Occupancy available</div>
+      <div class="fd-opts" id="fdo-pgOccupancy"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('pgOccupancy')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('pgOccupancy')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PG: Room furnishing -->
+  <div class="fd-btn fd-pg" id="fdb-pgFurnishing" onclick="toggleFd('pgFurnishing',this)">
+    <span class="fd-icon">🛋️</span>
+    Furnishing <span class="fd-badge" id="fdbc-pgFurnishing" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-pgFurnishing" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Room furnishing</div>
+      <div class="fd-opts" id="fdo-pgFurnishing"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('pgFurnishing')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('pgFurnishing')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PG: Kitchen access -->
+  <div class="fd-btn fd-pg" id="fdb-pgKitchen" onclick="toggleFd('pgKitchen',this)">
+    <span class="fd-icon">🍳</span>
+    Kitchen <span class="fd-badge" id="fdbc-pgKitchen" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-pgKitchen" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Kitchen access</div>
+      <div class="fd-opts" id="fdo-pgKitchen"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('pgKitchen')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('pgKitchen')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PG: Notice period -->
+  <div class="fd-btn fd-pg" id="fdb-pgNotice" onclick="toggleFd('pgNotice',this)">
+    <span class="fd-icon">📅</span>
+    Notice <span class="fd-badge" id="fdbc-pgNotice" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-pgNotice" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Notice period</div>
+      <div class="fd-opts" id="fdo-pgNotice"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('pgNotice')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('pgNotice')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PG: Gate closing time -->
+  <div class="fd-btn fd-pg" id="fdb-pgGateTime" onclick="toggleFd('pgGateTime',this)">
+    <span class="fd-icon">🚪</span>
+    Gate time <span class="fd-badge" id="fdbc-pgGateTime" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-pgGateTime" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Gate closing time</div>
+      <div class="fd-opts" id="fdo-pgGateTime"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('pgGateTime')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('pgGateTime')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PG: Visitor policy -->
+  <div class="fd-btn fd-pg" id="fdb-pgVisitors" onclick="toggleFd('pgVisitors',this)">
+    <span class="fd-icon">🧑‍🤝‍🧑</span>
+    Visitors <span class="fd-badge" id="fdbc-pgVisitors" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-pgVisitors" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Visitor policy</div>
+      <div class="fd-opts" id="fdo-pgVisitors"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('pgVisitors')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('pgVisitors')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PG: Non-veg allowed -->
+  <div class="fd-btn fd-pg" id="fdb-pgNonVeg" onclick="toggleFd('pgNonVeg',this)">
+    <span class="fd-icon">🍗</span>
+    Non-veg <span class="fd-badge" id="fdbc-pgNonVeg" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-pgNonVeg" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Non-veg allowed</div>
+      <div class="fd-opts" id="fdo-pgNonVeg"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('pgNonVeg')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('pgNonVeg')">Apply</button>
+      </div>
+    </div>
+  </div>
+
   <!-- SHORT STAY: Room type -->
   <div class="fd-btn fd-shortstay" id="fdb-ssRoom" onclick="toggleFd('ssRoom',this)">
     <span class="fd-icon">🚪</span>
@@ -3304,6 +3554,95 @@ ul{list-style:none}
       <div class="fd-pop-footer">
         <button class="fd-clear-btn" onclick="clearFd('ssCouples')">Clear</button>
         <button class="fd-apply-btn" onclick="applyFd('ssCouples')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHORT STAY: Minimum stay -->
+  <div class="fd-btn fd-shortstay" id="fdb-ssMinDays" onclick="toggleFd('ssMinDays',this)">
+    <span class="fd-icon">🗓️</span>
+    Min stay <span class="fd-badge" id="fdbc-ssMinDays" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-ssMinDays" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Minimum stay (days)</div>
+      <div class="fd-opts" id="fdo-ssMinDays"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('ssMinDays')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('ssMinDays')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHORT STAY: Check-in / Check-out timings -->
+  <div class="fd-btn fd-shortstay" id="fdb-ssTimings" onclick="toggleFd('ssTimings',this)">
+    <span class="fd-icon">⏰</span>
+    Timings <span class="fd-badge" id="fdbc-ssTimings" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop fd-pop right" id="fdp-ssTimings" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Check-in time</div>
+      <div class="fd-opts" id="fdo-ssCheckinTime"></div>
+      <div class="fd-pop-label" style="margin-top:6px">Check-out time</div>
+      <div class="fd-opts" id="fdo-ssCheckoutTime"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('ssTimings')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('ssTimings')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHORT STAY: Extra day rate -->
+  <div class="fd-btn fd-shortstay" id="fdb-ssExtraDayRate" onclick="toggleFd('ssExtraDayRate',this)">
+    <span class="fd-icon">➕</span>
+    Extra day <span class="fd-badge" id="fdbc-ssExtraDayRate" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop fd-pop right" id="fdp-ssExtraDayRate" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Extra day rate</div>
+      <div class="fd-opts">
+        <div class="fp-opt" data-filter="_ssExtraDayRateBucket" data-val="0-500" onclick="toggleOpt(this,'ssExtraDayRate')">Under ₹500</div>
+        <div class="fp-opt" data-filter="_ssExtraDayRateBucket" data-val="500-1000" onclick="toggleOpt(this,'ssExtraDayRate')">₹500 – ₹1k</div>
+        <div class="fp-opt" data-filter="_ssExtraDayRateBucket" data-val="1000-2000" onclick="toggleOpt(this,'ssExtraDayRate')">₹1k – ₹2k</div>
+        <div class="fp-opt" data-filter="_ssExtraDayRateBucket" data-val="2000-3500" onclick="toggleOpt(this,'ssExtraDayRate')">₹2k – ₹3.5k</div>
+        <div class="fp-opt" data-filter="_ssExtraDayRateBucket" data-val="3500-" onclick="toggleOpt(this,'ssExtraDayRate')">Above ₹3.5k</div>
+      </div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('ssExtraDayRate')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('ssExtraDayRate')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHORT STAY: ID proof required -->
+  <div class="fd-btn fd-shortstay" id="fdb-ssIdProof" onclick="toggleFd('ssIdProof',this)">
+    <span class="fd-icon">🪪</span>
+    ID proof <span class="fd-badge" id="fdbc-ssIdProof" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop fd-pop right" id="fdp-ssIdProof" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">ID proof required</div>
+      <div class="fd-opts" id="fdo-ssIdProof"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('ssIdProof')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('ssIdProof')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHORT STAY: Security deposit -->
+  <div class="fd-btn fd-shortstay" id="fdb-ssDeposit" onclick="toggleFd('ssDeposit',this)">
+    <span class="fd-icon">🔒</span>
+    Deposit <span class="fd-badge" id="fdbc-ssDeposit" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop fd-pop right" id="fdp-ssDeposit" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Security deposit</div>
+      <div class="fd-opts">
+        <div class="fp-opt" data-filter="_ssDepositBucket" data-val="0-1000" onclick="toggleOpt(this,'ssDeposit')">No deposit / Under ₹1k</div>
+        <div class="fp-opt" data-filter="_ssDepositBucket" data-val="1000-3000" onclick="toggleOpt(this,'ssDeposit')">₹1k – ₹3k</div>
+        <div class="fp-opt" data-filter="_ssDepositBucket" data-val="3000-5000" onclick="toggleOpt(this,'ssDeposit')">₹3k – ₹5k</div>
+        <div class="fp-opt" data-filter="_ssDepositBucket" data-val="5000-10000" onclick="toggleOpt(this,'ssDeposit')">₹5k – ₹10k</div>
+        <div class="fp-opt" data-filter="_ssDepositBucket" data-val="10000-" onclick="toggleOpt(this,'ssDeposit')">Above ₹10k</div>
+      </div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('ssDeposit')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('ssDeposit')">Apply</button>
       </div>
     </div>
   </div>
@@ -3679,11 +4018,11 @@ ul{list-style:none}
 
 <!-- ─── Mobile bottom nav ────────────────────────── -->
 <nav class="bottom-nav" aria-label="Main navigation">
-  <div class="bottom-tab active" data-tab="All" onclick="switchTabMobile(this)">
+  <div class="bottom-tab" data-tab="All" onclick="switchTabMobile(this)">
     <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>
     All
   </div>
-  <div class="bottom-tab" data-tab="Rent" onclick="switchTabMobile(this)">
+  <div class="bottom-tab active" data-tab="Rent" onclick="switchTabMobile(this)">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 9V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h3m3 0h6"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M1 11h15"/></svg>
     Rent
   </div>
@@ -5273,7 +5612,7 @@ function formatViews(n) {
 /* ═══════════════════════════════════════════════
    STATE
 ═══════════════════════════════════════════════ */
-let currentTab = 'All';
+let currentTab = 'Rent';
 let currentSort = 'newest';
 const SHORTLIST_KEY = 'quatar_shortlisted_properties';
 const SHORTLIST_DATA_KEY = 'quatar_shortlisted_properties_data';
@@ -6531,17 +6870,41 @@ const FD_GROUPS = {
   bathrooms:  ['bathrooms'],
   age:        ['age'],
   availFrom:  ['_availBucket'],
+  escalation: ['_escalationBucket'],
+  electricityIncluded: ['electricityIncluded'],
+  waterCharge: ['waterCharge'],
+  floor:      ['_floorBucket'],
+  area:       ['_areaBucket'],
+  notice:     ['notice'],
+  leaseDuration: ['leaseDuration'],
+  petsAllowed:   ['petsAllowed'],
+  nonVegAllowed: ['nonVegAllowed'],
+  leaseType:     ['leaseType'],
+  lockIn:        ['lockIn'],
   amenities:  ['amenities'],
   facilities: ['lift','carpark','bikepark','verified'],
   pgGender:   ['pgGender'],
   pgRoom:     ['pgRoomType'],
   pgMeals:    ['pgMeals','pgFoodType'],
   pgRent:     ['_pgRentBucket'],
+  pgBathroom:   ['pgBathroom'],
+  pgOccupancy:  ['pgOccupancy'],
+  pgFurnishing: ['pgFurnishing'],
+  pgKitchen:    ['pgKitchen'],
+  pgNotice:     ['pgNotice'],
+  pgGateTime:   ['pgGateTime'],
+  pgVisitors:   ['pgVisitors'],
+  pgNonVeg:     ['pgNonVeg'],
   ssRoom:         ['ssRoomType'],
   ssRent:         ['_ssRentBucket'],
   ssGuests:       ['ssMaxGuests'],
   ssCancellation: ['ssCancellation'],
   ssCouples:      ['ssCouples'],
+  ssMinDays:      ['ssMinDays'],
+  ssTimings:      ['ssCheckinTime','ssCheckoutTime'],
+  ssExtraDayRate: ['_ssExtraDayRateBucket'],
+  ssIdProof:      ['ssIdProof'],
+  ssDeposit:      ['_ssDepositBucket'],
 };
 
 let openFd = null;
@@ -6560,6 +6923,20 @@ const FD_SORT_ORDER = {
   age: ['Under Construction','Less than 1 Year','1-5 Years','5-10 Years','10+ Years'],
   furnishing: ['Furnished','Semi-Furnished','Unfurnished'],
   pgMeals: ['All 3 Meals','Breakfast only','No meals'],
+  notice: ['15 Days','1 Month','2 Months','3 Months'],
+  leaseDuration: ['6 Months','12 Months','24+ Months','1 Year','2 Years','3 Years','5 Years','9 Years','15 Years','30 Years'],
+  petsAllowed: ['Yes','No','Restricted'],
+  nonVegAllowed: ['Yes','No'],
+  leaseType: ['Residential','Commercial','Industrial','Mixed Use'],
+  lockIn: ['1 Year','2 Years','3 Years'],
+  pgBathroom: ['Yes','Shared'],
+  pgFurnishing: ['Fully Furnished','Semi-Furnished','Unfurnished'],
+  pgKitchen: ['Private Kitchen','Shared Kitchen','No Kitchen'],
+  pgNotice: ['15 Days','1 Month','2 Months','3 Months'],
+  pgGateTime: ['9 PM','10 PM','11 PM'],
+  pgVisitors: ['Allowed','Lobby Only','Not Allowed'],
+  pgNonVeg: ['Yes','No'],
+  ssIdProof: ['Yes','No'],
 };
 
 function fdLabel(filterKey, val) {
@@ -6595,14 +6972,34 @@ const FILTER_FIELD_PATHS = {
   facing:       ['property','facing'],
   bathrooms:    ['property','bathrooms'],
   age:          ['property','age'],
+  electricityIncluded: ['price','electricity'],
+  waterCharge:  ['price','water'],
+  notice:       ['terms','notice'],
+  leaseDuration:['terms','lease'],
+  petsAllowed:  ['rules','pets'],
+  nonVegAllowed:['rules','nonVeg'],
+  leaseType:    ['terms','leaseType'],
+  lockIn:       ['terms','lockIn'],
   pgGender:     ['pg','gender'],
   pgRoomType:   ['pg','room'],
   pgMeals:      ['pg','meals'],
   pgFoodType:   ['pg','food'],
+  pgBathroom:   ['pg','bathroom'],
+  pgOccupancy:  ['pg','occupancy'],
+  pgFurnishing: ['pg','furnish'],
+  pgKitchen:    ['pg','kitchen'],
+  pgNotice:     ['pg','notice'],
+  pgGateTime:   ['pg','gateTime'],
+  pgVisitors:   ['pg','visitors'],
+  pgNonVeg:     ['pg','nonVeg'],
   ssRoomType:     ['shortStay','roomType'],
   ssMaxGuests:    ['shortStay','maxGuests'],
   ssCancellation: ['shortStay','cancellation'],
   ssCouples:      ['shortStay','couplesAllowed'],
+  ssMinDays:      ['shortStay','minDays'],
+  ssCheckinTime:  ['shortStay','checkinTime'],
+  ssCheckoutTime: ['shortStay','checkoutTime'],
+  ssIdProof:      ['shortStay','idProof'],
 };
 function pFieldByPath(p, pathArr) {
   return pathArr.reduce((o, k) => (o == null ? o : o[k]), p);
@@ -6699,6 +7096,41 @@ function buildFilterOptions() {
     fdSortValues('age', fdCollectValues('age')), 'age');
   restoreSel('fdo-age');
 
+  fdRenderOpts('fdo-electricityIncluded', 'electricityIncluded',
+    fdSortValues('electricityIncluded', fdCollectValues('electricityIncluded')), 'electricityIncluded');
+  restoreSel('fdo-electricityIncluded');
+
+  fdRenderOpts('fdo-waterCharge', 'waterCharge',
+    fdSortValues('waterCharge', fdCollectValues('waterCharge')), 'waterCharge');
+  restoreSel('fdo-waterCharge');
+
+  // notice/lease live in the shared `terms` object, fed by both Rent's and
+  // Lease's own notice-period/duration fields — now that this filter shows
+  // on both tabs, collect values from either type.
+  fdRenderOpts('fdo-notice', 'notice',
+    fdSortValues('notice', fdCollectValues('notice', p => pTypeLabel(p) === 'Rent' || pTypeLabel(p) === 'Lease')), 'notice');
+  restoreSel('fdo-notice');
+
+  fdRenderOpts('fdo-leaseDuration', 'leaseDuration',
+    fdSortValues('leaseDuration', fdCollectValues('leaseDuration', p => pTypeLabel(p) === 'Rent' || pTypeLabel(p) === 'Lease')), 'leaseDuration');
+  restoreSel('fdo-leaseDuration');
+
+  fdRenderOpts('fdo-petsAllowed', 'petsAllowed',
+    fdSortValues('petsAllowed', fdCollectValues('petsAllowed')), 'petsAllowed');
+  restoreSel('fdo-petsAllowed');
+
+  fdRenderOpts('fdo-nonVegAllowed', 'nonVegAllowed',
+    fdSortValues('nonVegAllowed', fdCollectValues('nonVegAllowed')), 'nonVegAllowed');
+  restoreSel('fdo-nonVegAllowed');
+
+  fdRenderOpts('fdo-leaseType', 'leaseType',
+    fdSortValues('leaseType', fdCollectValues('leaseType', p => pTypeLabel(p) === 'Lease')), 'leaseType');
+  restoreSel('fdo-leaseType');
+
+  fdRenderOpts('fdo-lockIn', 'lockIn',
+    fdSortValues('lockIn', fdCollectValues('lockIn', p => pTypeLabel(p) === 'Lease')), 'lockIn');
+  restoreSel('fdo-lockIn');
+
   fdRenderOpts('fdo-amenities', 'amenities',
     fdSortValues('amenities', fdCollectAmenities()), 'amenities');
   restoreSel('fdo-amenities');
@@ -6719,6 +7151,38 @@ function buildFilterOptions() {
     fdSortValues('pgFoodType', fdCollectValues('pgFoodType', p => pTypeLabel(p) === 'PG')), 'pgMeals');
   restoreSel('fdo-pgFoodType');
 
+  fdRenderOpts('fdo-pgBathroom', 'pgBathroom',
+    fdSortValues('pgBathroom', fdCollectValues('pgBathroom', p => pTypeLabel(p) === 'PG')), 'pgBathroom');
+  restoreSel('fdo-pgBathroom');
+
+  fdRenderOpts('fdo-pgOccupancy', 'pgOccupancy',
+    fdSortValues('pgOccupancy', fdCollectValues('pgOccupancy', p => pTypeLabel(p) === 'PG')), 'pgOccupancy');
+  restoreSel('fdo-pgOccupancy');
+
+  fdRenderOpts('fdo-pgFurnishing', 'pgFurnishing',
+    fdSortValues('pgFurnishing', fdCollectValues('pgFurnishing', p => pTypeLabel(p) === 'PG')), 'pgFurnishing');
+  restoreSel('fdo-pgFurnishing');
+
+  fdRenderOpts('fdo-pgKitchen', 'pgKitchen',
+    fdSortValues('pgKitchen', fdCollectValues('pgKitchen', p => pTypeLabel(p) === 'PG')), 'pgKitchen');
+  restoreSel('fdo-pgKitchen');
+
+  fdRenderOpts('fdo-pgNotice', 'pgNotice',
+    fdSortValues('pgNotice', fdCollectValues('pgNotice', p => pTypeLabel(p) === 'PG')), 'pgNotice');
+  restoreSel('fdo-pgNotice');
+
+  fdRenderOpts('fdo-pgGateTime', 'pgGateTime',
+    fdSortValues('pgGateTime', fdCollectValues('pgGateTime', p => pTypeLabel(p) === 'PG')), 'pgGateTime');
+  restoreSel('fdo-pgGateTime');
+
+  fdRenderOpts('fdo-pgVisitors', 'pgVisitors',
+    fdSortValues('pgVisitors', fdCollectValues('pgVisitors', p => pTypeLabel(p) === 'PG')), 'pgVisitors');
+  restoreSel('fdo-pgVisitors');
+
+  fdRenderOpts('fdo-pgNonVeg', 'pgNonVeg',
+    fdSortValues('pgNonVeg', fdCollectValues('pgNonVeg', p => pTypeLabel(p) === 'PG')), 'pgNonVeg');
+  restoreSel('fdo-pgNonVeg');
+
   fdRenderOpts('fdo-ssRoom', 'ssRoomType',
     fdSortValues('ssRoomType', fdCollectValues('ssRoomType', p => pTypeLabel(p) === 'ShortStay')), 'ssRoom');
   restoreSel('fdo-ssRoom');
@@ -6734,6 +7198,22 @@ function buildFilterOptions() {
   fdRenderOpts('fdo-ssCouples', 'ssCouples',
     fdSortValues('ssCouples', fdCollectValues('ssCouples', p => pTypeLabel(p) === 'ShortStay')), 'ssCouples');
   restoreSel('fdo-ssCouples');
+
+  fdRenderOpts('fdo-ssMinDays', 'ssMinDays',
+    fdSortValues('ssMinDays', fdCollectValues('ssMinDays', p => pTypeLabel(p) === 'ShortStay')), 'ssMinDays');
+  restoreSel('fdo-ssMinDays');
+
+  fdRenderOpts('fdo-ssCheckinTime', 'ssCheckinTime',
+    fdSortValues('ssCheckinTime', fdCollectValues('ssCheckinTime', p => pTypeLabel(p) === 'ShortStay')), 'ssTimings');
+  restoreSel('fdo-ssCheckinTime');
+
+  fdRenderOpts('fdo-ssCheckoutTime', 'ssCheckoutTime',
+    fdSortValues('ssCheckoutTime', fdCollectValues('ssCheckoutTime', p => pTypeLabel(p) === 'ShortStay')), 'ssTimings');
+  restoreSel('fdo-ssCheckoutTime');
+
+  fdRenderOpts('fdo-ssIdProof', 'ssIdProof',
+    fdSortValues('ssIdProof', fdCollectValues('ssIdProof', p => pTypeLabel(p) === 'ShortStay')), 'ssIdProof');
+  restoreSel('fdo-ssIdProof');
 
   // Refresh badges/has-sel state for every dropdown after rebuilding
   Object.keys(FD_GROUPS).forEach(id => refreshFdBtn(id));
@@ -6911,6 +7391,26 @@ function fdValueInBuckets(value, buckets) {
   });
 }
 
+/* Rent escalation is stored like "5%" — strip the % and parse the number */
+function fdEscalationNum(v) {
+  if (v === null || v === undefined || v === '') return 0;
+  return parseFloat(String(v).replace('%', '')) || 0;
+}
+/* Floor is stored as free text ("G", "3rd", "12th"...) — treat Ground/G as 0 */
+function fdFloorNum(v) {
+  if (!v) return 0;
+  const s = String(v).trim();
+  if (/^g(round)?$/i.test(s)) return 0;
+  const n = parseInt(s, 10);
+  return isNaN(n) ? 0 : n;
+}
+/* Area is stored like "1200Sqft" — strip the suffix and parse the number */
+function fdAreaNum(v) {
+  if (!v) return 0;
+  const n = parseFloat(String(v).replace(/[^\d.]/g, ''));
+  return isNaN(n) ? 0 : n;
+}
+
 /* Days between today and a YYYY-MM-DD date string (negative if already past) */
 function fdDaysFromToday(dateStr) {
   if (!dateStr) return null;
@@ -6987,10 +7487,27 @@ function getFiltered() {
       if (fs._rentBucket && !fdValueInBuckets(p.price?.rent, fs._rentBucket)) return false;
       if (fs._depositBucket && !fdValueInBuckets(p.price?.deposit, fs._depositBucket)) return false;
       if (fs._maintenanceBucket && !fdValueInBuckets(p.price?.maintenance||0, fs._maintenanceBucket)) return false;
+      if (fs._escalationBucket && !fdValueInBuckets(fdEscalationNum(p.price?.rentIncrease), fs._escalationBucket)) return false;
+      if (fs.electricityIncluded && !fs.electricityIncluded.includes(p.price?.electricity)) return false;
+      if (fs.waterCharge && !fs.waterCharge.includes(p.price?.water)) return false;
+      if (fs._floorBucket && !fdValueInBuckets(fdFloorNum(p.property?.floor), fs._floorBucket)) return false;
+      if (fs._areaBucket && !fdValueInBuckets(fdAreaNum(p.property?.area), fs._areaBucket)) return false;
+      if (fs.notice && !fs.notice.includes(p.terms?.notice)) return false;
+      if (fs.leaseDuration && !fs.leaseDuration.includes(p.terms?.lease)) return false;
+      if (fs.petsAllowed && !fs.petsAllowed.includes(p.rules?.pets)) return false;
+      if (fs.nonVegAllowed && !fs.nonVegAllowed.includes(p.rules?.nonVeg)) return false;
     }
     if (pType==='Lease') {
       if (fs._leaseBucket && !fdValueInBuckets(p.price?.rent||0, fs._leaseBucket)) return false;
       if (fs._maintenanceBucket && !fdValueInBuckets(p.price?.maintenance||0, fs._maintenanceBucket)) return false;
+      if (fs._floorBucket && !fdValueInBuckets(fdFloorNum(p.property?.floor), fs._floorBucket)) return false;
+      if (fs._areaBucket && !fdValueInBuckets(fdAreaNum(p.property?.area), fs._areaBucket)) return false;
+      if (fs.notice && !fs.notice.includes(p.terms?.notice)) return false;
+      if (fs.leaseDuration && !fs.leaseDuration.includes(p.terms?.lease)) return false;
+      if (fs.petsAllowed && !fs.petsAllowed.includes(p.rules?.pets)) return false;
+      if (fs.nonVegAllowed && !fs.nonVegAllowed.includes(p.rules?.nonVeg)) return false;
+      if (fs.leaseType && !fs.leaseType.includes(p.terms?.leaseType)) return false;
+      if (fs.lockIn && !fs.lockIn.includes(p.terms?.lockIn)) return false;
     }
     // PG-only filters must exclude non-PG properties outright (checked unconditionally,
     // not nested inside an `if (pType==='PG')` gate, otherwise Rent/Lease rows would
@@ -7010,6 +7527,30 @@ function getFiltered() {
     if (fs._pgRentBucket) {
       if (pType!=='PG' || !fdValueInBuckets(p.price?.rent, fs._pgRentBucket)) return false;
     }
+    if (fs.pgBathroom) {
+      if (pType!=='PG' || !fs.pgBathroom.includes(p.pg?.bathroom)) return false;
+    }
+    if (fs.pgOccupancy) {
+      if (pType!=='PG' || !fs.pgOccupancy.includes(String(p.pg?.occupancy ?? ''))) return false;
+    }
+    if (fs.pgFurnishing) {
+      if (pType!=='PG' || !fs.pgFurnishing.includes(p.pg?.furnish)) return false;
+    }
+    if (fs.pgKitchen) {
+      if (pType!=='PG' || !fs.pgKitchen.includes(p.pg?.kitchen)) return false;
+    }
+    if (fs.pgNotice) {
+      if (pType!=='PG' || !fs.pgNotice.includes(p.pg?.notice)) return false;
+    }
+    if (fs.pgGateTime) {
+      if (pType!=='PG' || !fs.pgGateTime.includes(p.pg?.gateTime)) return false;
+    }
+    if (fs.pgVisitors) {
+      if (pType!=='PG' || !fs.pgVisitors.includes(p.pg?.visitors)) return false;
+    }
+    if (fs.pgNonVeg) {
+      if (pType!=='PG' || !fs.pgNonVeg.includes(p.pg?.nonVeg)) return false;
+    }
     // Short-Stay-only filters — same unconditional-check pattern as the PG
     // filters above, so a Rent/Lease/PG row can never slip through them.
     if (fs.ssRoomType) {
@@ -7026,6 +7567,24 @@ function getFiltered() {
     }
     if (fs._ssRentBucket) {
       if (pType!=='ShortStay' || !fdValueInBuckets(p.price?.rent, fs._ssRentBucket)) return false;
+    }
+    if (fs.ssMinDays) {
+      if (pType!=='ShortStay' || !fs.ssMinDays.includes(String(p.shortStay?.minDays ?? ''))) return false;
+    }
+    if (fs.ssCheckinTime) {
+      if (pType!=='ShortStay' || !fs.ssCheckinTime.includes(p.shortStay?.checkinTime)) return false;
+    }
+    if (fs.ssCheckoutTime) {
+      if (pType!=='ShortStay' || !fs.ssCheckoutTime.includes(p.shortStay?.checkoutTime)) return false;
+    }
+    if (fs._ssExtraDayRateBucket) {
+      if (pType!=='ShortStay' || !fdValueInBuckets(p.shortStay?.extraDayRate||0, fs._ssExtraDayRateBucket)) return false;
+    }
+    if (fs.ssIdProof) {
+      if (pType!=='ShortStay' || !fs.ssIdProof.includes(p.shortStay?.idProof)) return false;
+    }
+    if (fs._ssDepositBucket) {
+      if (pType!=='ShortStay' || !fdValueInBuckets(p.price?.deposit||0, fs._ssDepositBucket)) return false;
     }
     return true;
   });
@@ -9586,61 +10145,6 @@ function showToast(msg, type) {
   toastTimer = setTimeout(() => { t.classList.remove('show'); backdrop.classList.remove('show'); }, 2400);
 }
 
-
-function startVoiceSearch(){
-
-    const SpeechRecognition =
-        window.SpeechRecognition || window.webkitSpeechRecognition;
-
-
-    if(!SpeechRecognition){
-        showToast("Browser does not support voice search");
-        return;
-    }
-
-
-    let recognition = new SpeechRecognition();
-
-
-    recognition.lang = "en-IN";
-    recognition.continuous = false;
-    recognition.interimResults = false;
-
-
-    recognition.onstart = function(){
-        console.log("Listening started");
-        showToast("Listening...");
-    };
-
-
-    recognition.onresult = function(event){
-
-        let text = event.results[0][0].transcript;
-
-        console.log("Voice text:", text);
-
-        document.getElementById("searchInput").value = text;
-
-        handleSearch();
-    };
-
-
-    recognition.onerror = function(event){
-
-        console.log(event.error);
-
-        showToast("Voice error: " + event.error);
-    };
-
-
-    recognition.onend = function(){
-        console.log("Stopped");
-    };
-
-
-    recognition.start();
-}
-
 /* ═══════════════════════════════════════════════
    KEYBOARD & CLOSE
 ═══════════════════════════════════════════════ */
@@ -9718,6 +10222,7 @@ document.getElementById('aboutModal').addEventListener('click', function(e) {
    INIT
 ═══════════════════════════════════════════════ */
 buildFilterOptions();
+syncFdBar();
 renderCards();
 updateShortlistCount();
 renderShortlistPanel();
