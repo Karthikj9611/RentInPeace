@@ -1832,8 +1832,184 @@ app.post('/api/reviews', async (req, res) => {
 });
 
 
-// ────────────────────────────────────────────────────────────────────────────
-// ── IMAGE UPLOAD (POST /api/upload-images) ──
+// ── Honest Reviews (video testimonials shown as a "Shorts" style row) ──
+// Two ways cards get in here:
+//  1) Admin adds one directly via POST /api/honest-reviews — goes live
+//     immediately (status: 'approved').
+//  2) A logged-in user submits their own YouTube link via
+//     POST /api/honest-reviews/submit — saved as status: 'pending' and
+//     hidden from the public row until an admin approves it (via the
+//     existing PUT /api/honest-reviews/:id, now also accepting `status`).
+const honestReviewSchema = new mongoose.Schema({
+  videoUrl:  { type: String, required: true },       // real YouTube/video link opened on click
+  thumbUrl:  { type: String, required: true },        // thumbnail image shown on the card
+  caption:   { type: String, required: true, maxlength: 120 },  // overlay text on the thumbnail
+  title:     { type: String, required: true, maxlength: 120 }, // e.g. "Priya & Rohan — 2BHK in Indiranagar"
+  meta:      { type: String, default: '', maxlength: 80 },     // e.g. "Moved in April 2026"
+  verifiedLabel: { type: String, default: 'Verified tenant' },
+  order:     { type: Number, default: 0 },             // lower shows first
+  active:    { type: Boolean, default: true },
+  status:    { type: String, enum: ['pending', 'approved', 'rejected'], default: 'approved', index: true },
+  userId:    { type: mongoose.Schema.Types.ObjectId, default: null },   // set only for user-submitted videos
+  userName:  { type: String, default: '' },
+  createdAt: { type: Date, default: Date.now }
+});
+
+const HonestReview = mongoose.model('HonestReview', honestReviewSchema);
+
+// Pulls the video ID out of the common YouTube URL shapes so we can build a
+// thumbnail automatically for user submissions (they won't have one to give
+// us). Returns null if the link isn't a YouTube URL we recognize.
+function extractYouTubeId(url) {
+  try {
+    const u = new URL(String(url).trim());
+    const host = u.hostname.replace(/^www\./, '');
+    if (host === 'youtu.be') return u.pathname.slice(1).split('/')[0] || null;
+    if (host === 'youtube.com' || host === 'm.youtube.com') {
+      if (u.pathname === '/watch') return u.searchParams.get('v');
+      const shortsMatch = u.pathname.match(/^\/shorts\/([^/?]+)/);
+      if (shortsMatch) return shortsMatch[1];
+      const embedMatch = u.pathname.match(/^\/embed\/([^/?]+)/);
+      if (embedMatch) return embedMatch[1];
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+// GET /api/honest-reviews — public, powers the homepage video row.
+// Only approved + active cards are ever shown to regular visitors.
+app.get('/api/honest-reviews', async (req, res) => {
+  try {
+    const reviews = await HonestReview.find({ active: true, status: 'approved' })
+      .sort({ order: 1, createdAt: -1 })
+      .lean();
+    res.json({ reviews });
+  } catch (err) {
+    console.error('GET /api/honest-reviews error:', err.message);
+    res.status(500).json({ error: 'Could not load honest reviews' });
+  }
+});
+
+// GET /api/honest-reviews/all — admin-only, returns every entry regardless
+// of status (pending/approved/rejected) or active flag, for the manage UI.
+app.get('/api/honest-reviews/all', requireAdmin, async (req, res) => {
+  try {
+    const reviews = await HonestReview.find({})
+      .sort({ createdAt: -1 })
+      .lean();
+    res.json({ reviews });
+  } catch (err) {
+    console.error('GET /api/honest-reviews/all error:', err.message);
+    res.status(500).json({ error: 'Could not load honest reviews' });
+  }
+});
+
+// GET /api/honest-reviews/mine — a logged-in user checking the status of
+// the video(s) they've submitted (pending / approved / rejected).
+app.get('/api/honest-reviews/mine', requireUser, async (req, res) => {
+  try {
+    const reviews = await HonestReview.find({ userId: req.userId }).sort({ createdAt: -1 }).lean();
+    res.json({ reviews });
+  } catch (err) {
+    console.error('GET /api/honest-reviews/mine error:', err.message);
+    res.status(500).json({ error: 'Could not load your submissions' });
+  }
+});
+
+// POST /api/honest-reviews/submit — any logged-in user can submit their own
+// YouTube video to be considered for the Honest Reviews row. Goes in as
+// `pending` and stays invisible to the public until an admin approves it.
+app.post('/api/honest-reviews/submit', requireUser, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(401).json({ error: 'Invalid or expired session' });
+
+    const videoUrl = (req.body.videoUrl || '').trim();
+    const title = (req.body.title || '').trim();
+    const caption = (req.body.caption || '').trim();
+
+    const videoId = extractYouTubeId(videoUrl);
+    if (!videoId) {
+      return res.status(400).json({ error: 'Please paste a valid YouTube video link' });
+    }
+    if (!title) return res.status(400).json({ error: 'Please give your video a short title' });
+
+    const review = await HonestReview.create({
+      videoUrl,
+      thumbUrl: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+      caption: caption || title,
+      title: title.slice(0, 120),
+      meta: `Submitted by ${user.name || 'a Quatar user'}`,
+      verifiedLabel: 'Verified user',
+      active: false,
+      status: 'pending',
+      userId: user._id,
+      userName: user.name || ''
+    });
+
+    res.status(201).json({ review, message: 'Thanks! Your video was submitted for review.' });
+  } catch (err) {
+    console.error('POST /api/honest-reviews/submit error:', err.message);
+    res.status(500).json({ error: 'Could not submit your video' });
+  }
+});
+
+// POST /api/honest-reviews — admin-only, add a new video card (goes live immediately)
+app.post('/api/honest-reviews', requireAdmin, async (req, res) => {
+  try {
+    const { videoUrl, thumbUrl, caption, title, meta, verifiedLabel, order, active } = req.body;
+    if (!videoUrl || !thumbUrl || !caption || !title) {
+      return res.status(400).json({ error: 'videoUrl, thumbUrl, caption and title are required' });
+    }
+    const review = await HonestReview.create({
+      videoUrl, thumbUrl, caption, title,
+      meta: meta || '',
+      verifiedLabel: verifiedLabel || 'Verified tenant',
+      order: Number(order) || 0,
+      active: active !== false,
+      status: 'approved'
+    });
+    res.status(201).json({ review });
+  } catch (err) {
+    console.error('POST /api/honest-reviews error:', err.message);
+    res.status(500).json({ error: 'Could not save honest review' });
+  }
+});
+
+// PUT /api/honest-reviews/:id — admin-only, edit an existing video card.
+// Also used to approve/reject user submissions by setting `status` (and
+// typically `active` alongside it).
+app.put('/api/honest-reviews/:id', requireAdmin, async (req, res) => {
+  try {
+    const fields = (({ videoUrl, thumbUrl, caption, title, meta, verifiedLabel, order, active, status }) =>
+      ({ videoUrl, thumbUrl, caption, title, meta, verifiedLabel, order, active, status }))(req.body);
+    Object.keys(fields).forEach(k => fields[k] === undefined && delete fields[k]);
+
+    const review = await HonestReview.findByIdAndUpdate(req.params.id, fields, { new: true });
+    if (!review) return res.status(404).json({ error: 'Honest review not found' });
+    res.json({ review });
+  } catch (err) {
+    console.error('PUT /api/honest-reviews/:id error:', err.message);
+    res.status(500).json({ error: 'Could not update honest review' });
+  }
+});
+
+// DELETE /api/honest-reviews/:id — admin-only
+app.delete('/api/honest-reviews/:id', requireAdmin, async (req, res) => {
+  try {
+    const deleted = await HonestReview.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ error: 'Honest review not found' });
+    res.json({ message: 'Honest review deleted' });
+  } catch (err) {
+    console.error('DELETE /api/honest-reviews/:id error:', err.message);
+    res.status(500).json({ error: 'Could not delete honest review' });
+  }
+});
+
+
+
 // Accepts any number of images (multipart/form-data, field name 'images'), converts
 // each to WebP (max 1200px on the long edge, quality 80) via sharp, and saves
 // the resulting bytes as a document in MongoDB (not the local disk — Render's

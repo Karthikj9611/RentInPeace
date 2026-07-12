@@ -1293,6 +1293,7 @@ ul{list-style:none}
 .fpi-lease{background:linear-gradient(135deg,#6f9bff,#2f5fd1)}
 .fpi-pg{background:linear-gradient(135deg,#a67bf0,#6b3fc7)}
 .fpi-shortstay{background:linear-gradient(135deg,#5eead4,#06b6d4)}
+.fpi-video{background:linear-gradient(135deg,#ff8a8a,var(--brand))}
 .fab-picker-text{flex:1;min-width:0}
 .fab-picker-label{font-size:14px;font-weight:600;color:var(--text)}
 .fab-picker-desc{font-size:11.5px;color:var(--text-3);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1712,6 +1713,153 @@ ul{list-style:none}
   }
   .service-card{width:100%;height:170px;scroll-snap-align:start}
   .services-arrow{display:none}
+}
+
+/* ─── Honest Reviews (video shorts) Section ────── */
+.hr-section{padding:8px 24px 36px;background:var(--bg);border-top:1px solid var(--border)}
+.hr-head{display:flex;align-items:center;gap:10px;max-width:1280px;margin:0 auto 4px}
+.hr-head-icon{
+  width:30px;height:30px;border-radius:9px;
+  background:var(--brand);color:#fff;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.hr-head-icon svg{width:17px;height:17px;fill:currentColor}
+.hr-head-title{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.3px}
+.hr-head-title span{color:var(--brand)}
+.hr-sub{font-size:13px;color:var(--text-2);margin:6px 0 16px;max-width:1280px}
+.hr-scroll-wrap{position:relative;max-width:1280px;margin:0 auto}
+.hr-scroll{
+  display:flex;gap:14px;overflow-x:auto;scroll-behavior:smooth;
+  padding:4px 4px 10px;-ms-overflow-style:none;scrollbar-width:none;
+  overscroll-behavior-x:contain;
+}
+.hr-scroll::-webkit-scrollbar{display:none}
+.hr-card{flex:0 0 auto;width:172px;cursor:pointer}
+.hr-thumb{
+  position:relative;width:172px;height:306px;border-radius:var(--radius-lg);
+  overflow:hidden;background:var(--bg-3);box-shadow:var(--shadow);
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.hr-card:hover .hr-thumb{transform:translateY(-3px);box-shadow:var(--shadow-md)}
+.hr-thumb img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  transition:transform .3s ease;
+}
+.hr-card:hover .hr-thumb img{transform:scale(1.05)}
+.hr-thumb-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 30%),
+             linear-gradient(to top, rgba(0,0,0,.15) 0%, rgba(0,0,0,0) 22%);
+}
+.hr-caption{
+  position:absolute;top:10px;left:10px;right:10px;
+  color:#fff;font-size:12px;font-weight:700;line-height:1.35;
+  text-shadow:0 1px 3px rgba(0,0,0,.5);
+}
+.hr-play{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:40px;height:40px;border-radius:50%;
+  background:rgba(255,255,255,.92);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 10px rgba(0,0,0,.25);
+  transition:transform .15s ease;
+}
+.hr-card:hover .hr-play{transform:translate(-50%,-50%) scale(1.08)}
+.hr-play svg{width:15px;height:15px;fill:var(--brand);margin-left:2px}
+.hr-verified{
+  position:absolute;bottom:10px;left:10px;right:10px;
+  display:flex;align-items:center;gap:5px;
+  color:#fff;font-size:10.5px;font-weight:700;
+  text-shadow:0 1px 3px rgba(0,0,0,.5);
+}
+.hr-verified svg{width:12px;height:12px;fill:#4ade80;flex-shrink:0}
+.hr-card-title{
+  font-size:12.5px;font-weight:600;color:var(--text);
+  margin-top:8px;line-height:1.35;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.hr-card-meta{font-size:11px;color:var(--text-3);margin-top:3px}
+.hr-loading,.hr-empty{
+  display:flex;align-items:center;justify-content:center;
+  width:100%;min-height:200px;color:var(--text-3);font-size:13px;
+}
+.hr-manage-btn{
+  margin-left:auto;display:flex;align-items:center;gap:5px;
+  font-size:12px;font-weight:600;color:var(--text-2);
+  border:1.5px solid var(--border-2);border-radius:99px;
+  padding:6px 12px;background:var(--bg);transition:border-color .12s,color .12s;
+  flex-shrink:0;
+}
+.hr-manage-btn:hover{border-color:var(--brand);color:var(--brand)}
+.hr-manage-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* ─── Honest Reviews Manager Modal ──────────────── */
+.hr-admin-gate{text-align:center;padding:12px 4px 4px}
+.hr-admin-gate p{font-size:13px;color:var(--text-2);margin-bottom:14px}
+.hr-admin-gate .form-input{margin-bottom:10px}
+.hr-admin-error{color:var(--brand);font-size:12px;margin-top:6px;min-height:16px}
+.hr-admin-section-label{font-size:13px;font-weight:700;margin:18px 0 10px;color:var(--text)}
+.hr-admin-list{display:flex;flex-direction:column;gap:8px;max-height:280px;overflow-y:auto;margin-bottom:6px}
+.hr-admin-row{
+  display:flex;align-items:center;gap:10px;
+  border:1px solid var(--border);border-radius:10px;padding:8px 10px;
+}
+.hr-admin-row img{width:44px;height:78px;object-fit:cover;border-radius:6px;flex-shrink:0;background:var(--bg-3)}
+.hr-admin-row-info{flex:1;min-width:0}
+.hr-admin-row-title{font-size:12.5px;font-weight:600;color:var(--text);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hr-admin-row-meta{font-size:11px;color:var(--text-3);margin-top:2px;display:flex;align-items:center;gap:6px}
+.hr-admin-badge{
+  font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:99px;
+  background:var(--bg-3);color:var(--text-2);
+}
+.hr-admin-badge.active,.hr-admin-badge.approved{background:var(--brand-light);color:var(--brand)}
+.hr-admin-badge.pending{background:#fff7e0;color:#a66a00}
+.hr-admin-badge.rejected{background:#f2f2f2;color:var(--text-3)}
+.hr-approve-btn{color:#16a34a!important;border-color:#bbf0cf!important}
+.hr-approve-btn:hover{background:#f0fdf4}
+.hr-reject-btn{color:var(--brand)!important;border-color:#f5c0c8!important}
+.hr-reject-btn:hover{background:var(--brand-light)}
+.hr-admin-row-actions{display:flex;gap:6px;flex-shrink:0}
+.hr-admin-row-actions button{
+  width:30px;height:30px;border-radius:8px;border:1px solid var(--border-2);
+  display:flex;align-items:center;justify-content:center;color:var(--text-2);
+  transition:border-color .12s,color .12s;
+}
+.hr-admin-row-actions button:hover{border-color:var(--brand);color:var(--brand)}
+.hr-admin-row-actions button svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.9}
+.hr-admin-empty{font-size:12.5px;color:var(--text-3);text-align:center;padding:14px 0}
+.hr-admin-form-actions{display:flex;gap:10px;margin-top:6px}
+.hr-admin-submit-btn{
+  flex:1;background:var(--brand);color:#fff;font-weight:700;font-size:13px;
+  padding:10px;border-radius:9px;transition:background .12s;
+}
+.hr-admin-submit-btn:hover{background:var(--brand-hover)}
+.hr-admin-cancel-edit-btn{
+  font-size:13px;font-weight:600;color:var(--text-2);
+  border:1.5px solid var(--border-2);border-radius:9px;padding:10px 14px;
+  display:none;
+}
+.hr-admin-checkbox-row{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.hr-admin-checkbox-row label{font-size:13px;color:var(--text-2)}
+.hr-arrow{
+  position:absolute;top:130px;
+  width:36px;height:36px;border-radius:50%;
+  background:var(--bg);border:1px solid var(--border-2);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  box-shadow:var(--shadow-md);z-index:5;color:var(--text);
+  transition:background .15s;
+}
+.hr-arrow:hover{background:var(--bg-2)}
+.hr-arrow svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2}
+.hr-arrow.prev{left:-6px}
+.hr-arrow.next{right:-6px}
+@media (max-width:680px){
+  .hr-section{padding:8px 16px 24px}
+  .hr-head-title{font-size:18px}
+  .hr-arrow{display:none}
+  .hr-card{width:132px}
+  .hr-thumb{width:132px;height:234px}
 }
 
 /* ─── Service Request Modal ────────────────────── */
@@ -3361,6 +3509,33 @@ ul{list-style:none}
   </div>
 </section>
 
+<!-- ─── Honest Reviews (video shorts) Section ──────
+     Cards are loaded dynamically from GET /api/honest-reviews (MongoDB),
+     see loadHonestReviews() in the script below. Manage entries via the
+     admin-only POST/PUT/DELETE /api/honest-reviews/:id endpoints in
+     server.js. -->
+<section class="hr-section" aria-label="Honest customer reviews" id="honestReviewsSection">
+  <div class="hr-head">
+    <div class="hr-head-icon">
+      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    </div>
+    <div class="hr-head-title">Honest <span>Reviews</span></div>
+  </div>
+  <p class="hr-sub">Real customers, real homes, real experiences — hear it straight from them</p>
+
+  <div class="hr-scroll-wrap">
+    <button class="hr-arrow prev" onclick="scrollHonestReviews(-1)" aria-label="Scroll left">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <div class="hr-scroll" id="honestReviewsScroll">
+      <div class="hr-loading" id="honestReviewsLoading">Loading reviews…</div>
+    </div>
+    <button class="hr-arrow next" onclick="scrollHonestReviews(1)" aria-label="Scroll right">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+</section>
+
 <!-- ─── Reviews Section ─────────────────────────── -->
 <section class="reviews-section" aria-label="User reviews">
   <div class="reviews-head">
@@ -3489,6 +3664,14 @@ ul{list-style:none}
     <div class="fab-picker-text">
       <div class="fab-picker-label">List Short Stay Property</div>
       <div class="fab-picker-desc">Per-day, OYO-style bookings</div>
+    </div>
+    <svg class="fab-picker-chevron" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+  </div>
+  <div class="fab-picker-item" role="menuitem" onclick="closeFabPicker(); openSubmitVideoModal();">
+    <span class="fab-picker-icon fpi-video"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></span>
+    <div class="fab-picker-text">
+      <div class="fab-picker-label">Post Your Video Review</div>
+      <div class="fab-picker-desc">Share your YouTube video in Honest Reviews</div>
     </div>
     <svg class="fab-picker-chevron" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
   </div>
@@ -3659,6 +3842,41 @@ ul{list-style:none}
     <button class="form-submit" id="bookingSubmitBtn" onclick="submitBookingRequest()">Confirm booking</button>
   </div>
 </div>
+
+<!-- ─── Submit Your Video Review Modal (any logged-in user) ──────────── -->
+<div class="add-modal-overlay" id="submitVideoModal" role="dialog" aria-modal="true" aria-label="Submit your video review">
+  <div class="add-modal" style="max-width:460px">
+    <div class="add-modal-header">
+      <div class="add-modal-title">Post Your Video Review</div>
+      <button class="icon-btn" onclick="closeSubmitVideoModal()" aria-label="Close">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <p style="font-size:13px;color:var(--text-2);margin:-8px 0 16px;line-height:1.5">
+      Share a YouTube video about your experience with Quatar. Once approved by our team, it'll appear in the Honest Reviews row for everyone to see.
+    </p>
+    <form id="submitVideoForm" onsubmit="submitVideoReview(event)">
+      <div class="form-group">
+        <label class="form-label">YouTube video link</label>
+        <input type="url" class="form-input" id="svf-videoUrl" placeholder="https://www.youtube.com/watch?v=..." required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Give it a short title</label>
+        <input type="text" class="form-input" id="svf-title" maxlength="120" placeholder="e.g. My move-in experience in Koramangala" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Caption (optional)</label>
+        <input type="text" class="form-input" id="svf-caption" maxlength="120" placeholder='e.g. "Found my flat in just 2 days!"' />
+      </div>
+      <button type="submit" class="hr-admin-submit-btn" id="svfSubmitBtn" style="width:100%">Submit for review</button>
+    </form>
+  </div>
+</div>
+
+<!-- Honest Reviews "Manage" modal removed for now — the admin API routes
+     (/api/honest-reviews/all, POST, PUT, DELETE, and status approve/reject)
+     are still in server.js and ready to wire up to a proper admin panel
+     later. -->
 
 <!-- ─── Add Listing Modal (List Your Property) ───────────────────────── -->
 <div class="add-modal-overlay" id="addModal" role="dialog" aria-modal="true" aria-label="Add property listing">
@@ -8221,6 +8439,99 @@ function scrollServices(dir) {
   const cardWidth = el.querySelector('.service-card')?.offsetWidth || 200;
   el.scrollBy({ left: dir * (cardWidth + 16) * 2, behavior: 'smooth' });
 }
+function scrollHonestReviews(dir) {
+  const el = document.getElementById('honestReviewsScroll');
+  const cardWidth = el.querySelector('.hr-card')?.offsetWidth || 172;
+  el.scrollBy({ left: dir * (cardWidth + 14) * 2, behavior: 'smooth' });
+}
+function openHonestReview(url) {
+  if (!url) return;
+  window.open(url, '_blank', 'noopener');
+}
+
+const HR_PLAY_ICON = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+const HR_VERIFIED_ICON = '<svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5.5 3.4 9.7 8 11 4.6-1.3 8-5.5 8-11V5l-8-3z"/></svg>';
+
+function renderHonestReviews(reviews) {
+  const wrap = document.getElementById('honestReviewsScroll');
+  if (!wrap) return;
+
+  if (!reviews || !reviews.length) {
+    wrap.innerHTML = '<div class="hr-empty">No reviews yet — check back soon.</div>';
+    return;
+  }
+
+  wrap.innerHTML = reviews.map(r => {
+    const url = safeUrl(r.videoUrl);
+    return `
+      <div class="hr-card" onclick="openHonestReview('${esc(url)}')">
+        <div class="hr-thumb">
+          <img src="${esc(safeUrl(r.thumbUrl))}" alt="${esc(r.title || 'Customer review video')}" loading="lazy" />
+          <div class="hr-thumb-overlay"></div>
+          <div class="hr-caption">${esc(r.caption)}</div>
+          <div class="hr-play">${HR_PLAY_ICON}</div>
+          <div class="hr-verified">${HR_VERIFIED_ICON}${esc(r.verifiedLabel || 'Verified tenant')}</div>
+        </div>
+        <div class="hr-card-title">${esc(r.title)}</div>
+        ${r.meta ? `<div class="hr-card-meta">${esc(r.meta)}</div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+async function loadHonestReviews() {
+  const wrap = document.getElementById('honestReviewsScroll');
+  try {
+    const res = await fetch('/api/honest-reviews');
+    if (!res.ok) throw new Error('Request failed: ' + res.status);
+    const data = await res.json();
+    renderHonestReviews(data.reviews || []);
+  } catch (err) {
+    console.error('loadHonestReviews error:', err);
+    if (wrap) wrap.innerHTML = '<div class="hr-empty">Couldn\'t load reviews right now.</div>';
+  }
+}
+
+/* ── Post Your Video Review (any logged-in user) ── */
+function openSubmitVideoModal() {
+  if (!getLoggedInUser()) { showToast('Please log in to submit your video'); openAuthModal(); return; }
+  document.getElementById('submitVideoModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeSubmitVideoModal() {
+  document.getElementById('submitVideoModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+async function submitVideoReview(evt) {
+  evt.preventDefault();
+  const videoUrl = document.getElementById('svf-videoUrl').value.trim();
+  const title = document.getElementById('svf-title').value.trim();
+  const caption = document.getElementById('svf-caption').value.trim();
+  const btn = document.getElementById('svfSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+  try {
+    const res = await fetch('/api/honest-reviews/submit', {
+      method: 'POST',
+      headers: userAuthHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ videoUrl, title, caption })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Could not submit your video');
+    showToast(data.message || 'Thanks! Your video was submitted for review.');
+    document.getElementById('submitVideoForm').reset();
+    closeSubmitVideoModal();
+  } catch (err) {
+    console.error('submitVideoReview error:', err);
+    showToast(err.message || 'Could not submit your video');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Submit for review';
+  }
+}
+document.getElementById('submitVideoModal').addEventListener('click', function(e) {
+  if (e.target === this) closeSubmitVideoModal();
+});
+
 const SERVICE_PRICING = {
   'Website & App Development': {
     items: [
@@ -9348,6 +9659,7 @@ document.addEventListener('keydown', e => {
     closeBookingModal();
     closeFabPicker();
     document.getElementById('filterPanel').classList.remove('open');
+    if (document.getElementById('submitVideoModal').classList.contains('open')) closeSubmitVideoModal();
     if (document.getElementById('shortlistPanel').classList.contains('open')) toggleShortlistPanel();
     if (document.getElementById('menuPanel').classList.contains('open')) toggleMenuPanel();
   }
@@ -9406,6 +9718,7 @@ updateShortlistCount();
 renderShortlistPanel();
 renderRecentlyViewed();
 updateNavAuth();
+loadHonestReviews();
 
 // ── Welcome Modal ──
 (function(){
