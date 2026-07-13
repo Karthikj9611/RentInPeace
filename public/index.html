@@ -1279,8 +1279,8 @@ ul{list-style:none}
 
 /* ─── FAB ──────────────────────────────────────── */
 .fab{
-  position:fixed;bottom:24px;right:24px;z-index:150;
-  width:40px;height:40px;border-radius:50%;
+  position:fixed;bottom:116px;right:24px;z-index:150;
+  width:36px;height:36px;border-radius:50%;
   background:var(--brand);color:#fff;
   display:flex;align-items:center;justify-content:center;
   box-shadow:0 4px 16px rgba(224,58,82,.35);
@@ -1288,37 +1288,51 @@ ul{list-style:none}
   border:none;
 }
 .fab:hover{background:var(--brand-hover);transform:scale(1.05)}
-.fab svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2}
+.fab svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2}
 
 /* ─── FAB stat pills (visitor count / registered users) ────── */
+/* Same 36px footprint and right offset as .fab, so the FAB and both stat
+   icons sit in one straight vertical column — FAB on top, Visitors/Users
+   stacked below it. */
 .fab-stats{
-  position:fixed;right:24px;bottom:76px;z-index:150;
-  display:flex;flex-direction:column;gap:12px;
+  position:fixed;right:24px;bottom:24px;z-index:150;
+  display:flex;flex-direction:column;gap:10px;
   align-items:center;
 }
 .fab-stat-item{
   position:relative;
-  width:40px;height:40px;
+  width:36px;height:36px;
 }
 .fab-stat-icon{
-  width:40px;height:40px;border-radius:50%;
+  width:36px;height:36px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
   color:#fff;
   box-shadow:var(--shadow-md);
 }
-.fab-stat-icon svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.2}
+.fab-stat-icon svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.2}
 .fab-stat-icon.visitors{background:linear-gradient(135deg,#6f9bff,#2f5fd1)}
 .fab-stat-icon.users{background:linear-gradient(135deg,var(--brand),var(--brand-hover))}
 .fab-stat-badge{
   position:absolute;top:-4px;right:-6px;
   background:var(--text);color:#fff;
   border-radius:99px;font-size:10px;font-weight:700;
-  min-width:18px;height:18px;padding:0 4px;
+  min-width:16px;height:16px;padding:0 3px;
   display:flex;align-items:center;justify-content:center;
   box-shadow:0 0 0 2px var(--bg);
 }
 @media(max-width:640px){
-  .fab-stats{bottom:120px}
+  .fab-stats{bottom:68px}
+  /* The bottom-nav has 6 equal-width tabs (flex:1); "Shortlist" is the last
+     one, so its center sits at 11/12 of the viewport width. Align the FAB
+     and stat icons to that same x-position (instead of a fixed right
+     offset) so the whole column sits straight above the Shortlist tab. */
+  .fab,.fab-stats{
+    right:auto;
+    left:calc(100% * 11 / 12);
+    transform:translateX(-50%);
+  }
+  .fab{bottom:160px}
+  .fab:hover{background:var(--brand-hover);transform:translateX(-50%) scale(1.05)}
 }
 
 /* ─── FAB add-type picker (opens above the FAB) ─────────── */
@@ -2735,7 +2749,6 @@ ul{list-style:none}
     display:flex;align-items:center;justify-content:center;padding:0 3px;
     box-shadow:0 0 0 1.5px var(--bg);
   }
-  .fab{bottom:68px}
 }
 @media(min-width:641px){
   .bottom-nav{display:none}
