@@ -2231,5 +2231,56 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
+// ────────────────────────────────────────────────────────────────────────────
+// ── SITE STATS (visitor counter + total registered users) ──
+// Powers the two small stat pills above the FAB on the homepage:
+//   - "Website visitors": all-time count of page loads, bumped once per
+//     visit by a fire-and-forget call from the frontend on load.
+//   - "Login users": total registered users (User.countDocuments()).
+// A single-document counter (keyed by `key`) is enough here — no need for
+// the Counter/nextSequenceId pattern used for human-readable IDs elsewhere.
+// ────────────────────────────────────────────────────────────────────────────
+const SiteStatSchema = new mongoose.Schema({
+  key:   { type: String, required: true, unique: true, index: true },
+  value: { type: Number, default: 0 },
+});
+const SiteStat = mongoose.model('SiteStat', SiteStatSchema);
+
+// Light rate limit — this is a public, unauthenticated endpoint hit once per
+// page load, so it just needs to keep bots from spamming it, not restrict
+// normal browsing.
+const visitLimiterStats = rateLimit({
+  windowMs: 60 * 1000, max: 20,
+  standardHeaders: true, legacyHeaders: false,
+  message: { message: 'Too many requests. Please try again later.' }
+});
+
+app.post('/api/stats/visit', visitLimiterStats, async (req, res) => {
+  try {
+    const doc = await SiteStat.findOneAndUpdate(
+      { key: 'totalVisits' },
+      { $inc: { value: 1 } },
+      { upsert: true, new: true }
+    );
+    res.json({ totalVisits: doc.value });
+  } catch (err) {
+    console.error('POST /api/stats/visit error:', err.message);
+    res.status(500).json({ message: 'Error recording visit' });
+  }
+});
+
+app.get('/api/stats', async (req, res) => {
+  try {
+    const [visitDoc, totalUsers] = await Promise.all([
+      SiteStat.findOne({ key: 'totalVisits' }).lean(),
+      User.countDocuments(),
+    ]);
+    res.json({ totalVisits: visitDoc ? visitDoc.value : 0, totalUsers });
+  } catch (err) {
+    console.error('GET /api/stats error:', err.message);
+    res.status(500).json({ message: 'Error fetching stats' });
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server on port ${PORT}`));

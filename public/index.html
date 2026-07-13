@@ -1280,7 +1280,7 @@ ul{list-style:none}
 /* ─── FAB ──────────────────────────────────────── */
 .fab{
   position:fixed;bottom:24px;right:24px;z-index:150;
-  width:52px;height:52px;border-radius:50%;
+  width:40px;height:40px;border-radius:50%;
   background:var(--brand);color:#fff;
   display:flex;align-items:center;justify-content:center;
   box-shadow:0 4px 16px rgba(224,58,82,.35);
@@ -1288,7 +1288,38 @@ ul{list-style:none}
   border:none;
 }
 .fab:hover{background:var(--brand-hover);transform:scale(1.05)}
-.fab svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2}
+.fab svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2}
+
+/* ─── FAB stat pills (visitor count / registered users) ────── */
+.fab-stats{
+  position:fixed;right:24px;bottom:76px;z-index:150;
+  display:flex;flex-direction:column;gap:12px;
+  align-items:center;
+}
+.fab-stat-item{
+  position:relative;
+  width:40px;height:40px;
+}
+.fab-stat-icon{
+  width:40px;height:40px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;
+  box-shadow:var(--shadow-md);
+}
+.fab-stat-icon svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.2}
+.fab-stat-icon.visitors{background:linear-gradient(135deg,#6f9bff,#2f5fd1)}
+.fab-stat-icon.users{background:linear-gradient(135deg,var(--brand),var(--brand-hover))}
+.fab-stat-badge{
+  position:absolute;top:-4px;right:-6px;
+  background:var(--text);color:#fff;
+  border-radius:99px;font-size:10px;font-weight:700;
+  min-width:18px;height:18px;padding:0 4px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 0 2px var(--bg);
+}
+@media(max-width:640px){
+  .fab-stats{bottom:120px}
+}
 
 /* ─── FAB add-type picker (opens above the FAB) ─────────── */
 .fab-picker-backdrop{position:fixed;inset:0;z-index:240;background:rgba(20,15,20,.28);backdrop-filter:blur(2px);display:none}
@@ -4088,6 +4119,22 @@ ul{list-style:none}
         WhatsApp
       </a>
     </div>
+  </div>
+</div>
+
+<!-- ─── FAB stats: website visitors / registered users ─── -->
+<div class="fab-stats" id="fabStats" aria-hidden="false">
+  <div class="fab-stat-item" title="Total website visitors">
+    <span class="fab-stat-icon visitors">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+    </span>
+    <span class="fab-stat-badge" id="fabStatVisitors">–</span>
+  </div>
+  <div class="fab-stat-item" title="Total registered users">
+    <span class="fab-stat-icon users">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    </span>
+    <span class="fab-stat-badge" id="fabStatUsers">–</span>
   </div>
 </div>
 
@@ -10504,9 +10551,37 @@ document.getElementById('aboutModal').addEventListener('click', function(e) {
 });
 
 /* ═══════════════════════════════════════════════
+   FAB STATS (website visitors / registered users)
+═══════════════════════════════════════════════ */
+function formatStatCount(n){
+  if (typeof n !== 'number' || isNaN(n)) return '–';
+  if (n >= 1000000) return (n/1000000).toFixed(n % 1000000 === 0 ? 0 : 1) + 'M';
+  if (n >= 1000) return (n/1000).toFixed(n % 1000 === 0 ? 0 : 1) + 'k';
+  return String(n);
+}
+async function initFabStats(){
+  try{
+    // Record this visit once per browser tab session (not on every internal
+    // re-render), then always fetch the latest totals to display.
+    if (!sessionStorage.getItem('visitRecorded')) {
+      sessionStorage.setItem('visitRecorded', '1');
+      fetch('/api/stats/visit', { method: 'POST' }).catch(()=>{});
+    }
+    const res = await fetch('/api/stats');
+    if (!res.ok) return;
+    const data = await res.json();
+    document.getElementById('fabStatVisitors').textContent = formatStatCount(data.totalVisits);
+    document.getElementById('fabStatUsers').textContent = formatStatCount(data.totalUsers);
+  }catch(err){
+    console.error('initFabStats error:', err);
+  }
+}
+
+/* ═══════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════ */
 buildFilterOptions();
+initFabStats();
 syncFdBar();
 renderCards();
 updateShortlistCount();
