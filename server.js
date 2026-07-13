@@ -732,6 +732,35 @@ BookingRequestSchema.index({ createdAt: -1 });
 BookingRequestSchema.index({ userId: 1, propertyId: 1, checkinDate: 1 });
 const BookingRequest = mongoose.model('BookingRequest', BookingRequestSchema);
 
+// ── Notification Schema (in-app notifications for logged-in users) ──
+// Fired whenever an admin action changes something a user is waiting on:
+// a listing gets verified, a submitted Honest Review video gets approved,
+// or a Schedule-a-Visit request changes status. Read via GET
+// /api/user/notifications and the unread badge polls /unread-count.
+const NotificationSchema = new mongoose.Schema({
+  userId:    { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+  type:      { type: String, enum: ['property_verified', 'review_approved', 'visit_status'], required: true },
+  title:     { type: String, required: true },
+  message:   { type: String, required: true },
+  read:      { type: Boolean, default: false, index: true },
+  meta:      { type: mongoose.Schema.Types.Mixed, default: {} }, // e.g. { propertyId, visitId, status }
+  createdAt: { type: Date, default: Date.now },
+});
+NotificationSchema.index({ userId: 1, createdAt: -1 });
+const Notification = mongoose.model('Notification', NotificationSchema);
+
+// Best-effort notification creation — never lets a notification failure
+// break the admin action that triggered it. No-op if userId is null (e.g.
+// a listing posted while logged out has no owner to notify).
+async function notifyUser(userId, { type, title, message, meta }) {
+  if (!userId) return;
+  try {
+    await Notification.create({ userId, type, title, message, meta: meta || {} });
+  } catch (err) {
+    console.error('notifyUser error:', err.message);
+  }
+}
+
 // ── Helpers ──
 function formatPrice(price, status) {
   const num = Number(price);
@@ -1147,6 +1176,59 @@ app.get('/api/user/my-visits', requireUser, async (req, res) => {
   }
 });
 
+// ── GET /api/user/notifications (logged-in user's notification feed) ──
+app.get('/api/user/notifications', requireUser, async (req, res) => {
+  try {
+    const notifications = await Notification.find({ userId: req.userId })
+      .sort({ createdAt: -1 })
+      .limit(50)
+      .lean();
+    const unreadCount = await Notification.countDocuments({ userId: req.userId, read: false });
+    res.json({ notifications, unreadCount });
+  } catch (err) {
+    console.error('GET /api/user/notifications error:', err);
+    res.status(500).json({ message: 'Error fetching notifications: ' + err.message });
+  }
+});
+
+// ── GET /api/user/notifications/unread-count (lightweight — polled for the nav badge) ──
+app.get('/api/user/notifications/unread-count', requireUser, async (req, res) => {
+  try {
+    const unreadCount = await Notification.countDocuments({ userId: req.userId, read: false });
+    res.json({ unreadCount });
+  } catch (err) {
+    console.error('GET /api/user/notifications/unread-count error:', err);
+    res.status(500).json({ message: 'Error fetching unread count: ' + err.message });
+  }
+});
+
+// ── PATCH /api/user/notifications/:id/read (marks a single notification as read) ──
+app.patch('/api/user/notifications/:id/read', requireUser, async (req, res) => {
+  try {
+    const notif = await Notification.findOneAndUpdate(
+      { _id: req.params.id, userId: req.userId },
+      { read: true },
+      { new: true }
+    );
+    if (!notif) return res.status(404).json({ message: 'Notification not found' });
+    res.json({ message: 'Marked as read', notification: notif });
+  } catch (err) {
+    console.error('PATCH /api/user/notifications/:id/read error:', err);
+    res.status(500).json({ message: 'Error marking notification as read: ' + err.message });
+  }
+});
+
+// ── PATCH /api/user/notifications/read-all (marks every notification as read) ──
+app.patch('/api/user/notifications/read-all', requireUser, async (req, res) => {
+  try {
+    await Notification.updateMany({ userId: req.userId, read: false }, { read: true });
+    res.json({ message: 'All notifications marked as read' });
+  } catch (err) {
+    console.error('PATCH /api/user/notifications/read-all error:', err);
+    res.status(500).json({ message: 'Error marking notifications as read: ' + err.message });
+  }
+});
+
 // ── GET /api/admin/visits (admin panel — all visit requests, newest first) ──
 app.get('/api/admin/visits', requireAdmin, async (req, res) => {
   try {
@@ -1168,8 +1250,23 @@ app.patch('/api/admin/visits/:id/status', requireAdmin, async (req, res) => {
     if (!['Pending', 'Confirmed', 'Cancelled', 'Completed'].includes(status)) {
       return res.status(400).json({ message: 'Invalid status' });
     }
+    const before = await VisitRequest.findById(req.params.id).lean();
     const visit = await VisitRequest.findByIdAndUpdate(req.params.id, { status }, { new: true });
     if (!visit) return res.status(404).json({ message: 'Visit request not found' });
+
+    if (before && before.status !== status && visit.userId) {
+      const statusText = {
+        Confirmed: 'confirmed', Cancelled: 'cancelled',
+        Completed: 'marked as completed', Pending: 'set back to pending',
+      }[status] || status.toLowerCase();
+      await notifyUser(visit.userId, {
+        type: 'visit_status',
+        title: `Visit ${statusText}`,
+        message: `Your visit scheduled for ${visit.visitDate} at ${visit.visitTime} has been ${statusText}.`,
+        meta: { visitId: visit.visitId, mongoId: String(visit._id), status },
+      });
+    }
+
     res.json({ message: 'Status updated', visit });
   } catch (err) {
     console.error('PATCH /api/admin/visits/:id/status error:', err);
@@ -1368,8 +1465,23 @@ app.patch('/api/appointments/:id', requireAdmin, async (req, res) => {
     const STATUS_MAP = { pending:'Pending', confirmed:'Confirmed', cancelled:'Cancelled', completed:'Completed' };
     const mapped = STATUS_MAP[String(status || '').toLowerCase()];
     if (!mapped) return res.status(400).json({ message: 'Invalid status' });
+    const before = await VisitRequest.findById(req.params.id).lean();
     const visit = await VisitRequest.findByIdAndUpdate(req.params.id, { status: mapped }, { new: true });
     if (!visit) return res.status(404).json({ message: 'Appointment not found' });
+
+    if (before && before.status !== mapped && visit.userId) {
+      const statusText = {
+        Confirmed: 'confirmed', Cancelled: 'cancelled',
+        Completed: 'marked as completed', Pending: 'set back to pending',
+      }[mapped] || mapped.toLowerCase();
+      await notifyUser(visit.userId, {
+        type: 'visit_status',
+        title: `Visit ${statusText}`,
+        message: `Your visit scheduled for ${visit.visitDate} at ${visit.visitTime} has been ${statusText}.`,
+        meta: { visitId: visit.visitId, mongoId: String(visit._id), status: mapped },
+      });
+    }
+
     res.json({ message: 'Status updated' });
   } catch (err) {
     console.error('PATCH /api/appointments/:id error:', err);
@@ -1584,8 +1696,21 @@ app.patch('/api/properties/:id/verified', requireAdmin, async (req, res) => {
     if (typeof verified !== 'boolean') {
       return res.status(400).json({ message: 'verified must be a boolean' });
     }
+    // Grab the pre-update state so we only notify on the false → true
+    // transition, not on every re-save while already verified.
+    const before = await findListingById(req.params.id, { lean: true });
     const prop = await updateListingById(req.params.id, { verified }, { new: true });
     if (!prop) return res.status(404).json({ message: 'Property not found' });
+
+    if (verified === true && before.doc && !before.doc.verified && prop.userId) {
+      await notifyUser(prop.userId, {
+        type: 'property_verified',
+        title: 'Listing verified',
+        message: `Your ${prop.basic.status} listing "${prop.owner.propertyName}" in ${prop.location.area} is now verified and live for everyone to see.`,
+        meta: { propertyId: prop.propertyId, mongoId: String(prop._id) },
+      });
+    }
+
     res.json({ message: 'Verified status updated', verified: prop.verified });
   } catch (err) {
     console.error('PATCH /api/properties/:id/verified error:', err);
@@ -1989,8 +2114,21 @@ app.put('/api/honest-reviews/:id', requireAdmin, async (req, res) => {
       ({ videoUrl, thumbUrl, caption, title, meta, verifiedLabel, order, active, status }))(req.body);
     Object.keys(fields).forEach(k => fields[k] === undefined && delete fields[k]);
 
+    const before = await HonestReview.findById(req.params.id).lean();
     const review = await HonestReview.findByIdAndUpdate(req.params.id, fields, { new: true });
     if (!review) return res.status(404).json({ error: 'Honest review not found' });
+
+    // Only notify on the pending/rejected → approved transition, not on
+    // every subsequent edit to an already-approved card.
+    if (review.status === 'approved' && before && before.status !== 'approved' && review.userId) {
+      await notifyUser(review.userId, {
+        type: 'review_approved',
+        title: 'Honest Review approved',
+        message: `Your video "${review.title}" has been approved and is now live in Honest Reviews.`,
+        meta: { reviewId: String(review._id) },
+      });
+    }
+
     res.json({ review });
   } catch (err) {
     console.error('PUT /api/honest-reviews/:id error:', err.message);
