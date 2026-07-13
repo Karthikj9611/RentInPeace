@@ -30,7 +30,7 @@
   --shadow-md:0 4px 16px rgba(0,0,0,.10);
   --nav-h:60px;
   --filter-h:52px;
-  --qmb-h:56px;
+  --qmb-h:50px;
   --search-h:64px;
 }
 html{scroll-behavior:smooth;overflow-x:hidden;width:100%}
@@ -77,17 +77,6 @@ ul{list-style:none}
   padding:4px 12px;border-radius:99px;
   border:1px solid #f5c0c8;
 }
-/* Type-matching divider pills — same accent pairs as the card type badges
-   (badge-rent/lease/pg/shortstay) so a section header visually matches the
-   cards beneath it instead of every section using the same pink pill. */
-.rent-label{color:#1a6640;background:#e8f5ee;padding:4px 12px;border-radius:99px;border:1px solid #bfe3cd}
-.lease-label{color:#1a4680;background:#dde9fa;padding:4px 12px;border-radius:99px;border:1px solid #c3d6f5}
-.pg-label{color:#4a2a9a;background:#eee8fa;padding:4px 12px;border-radius:99px;border:1px solid #d7c8f2}
-.shortstay-label{color:#00646e;background:#e0f7fa;padding:4px 12px;border-radius:99px;border:1px solid #b8ecf0}
-.rent-label .section-divider-count{background:#1a6640}
-.lease-label .section-divider-count{background:#1a4680}
-.pg-label .section-divider-count{background:#4a2a9a}
-.shortstay-label .section-divider-count{background:#00646e}
 .section-divider-count{
   margin-left:7px;font-weight:700;font-size:11px;
   background:var(--brand);color:#fff;
@@ -297,19 +286,10 @@ ul{list-style:none}
 }
 .qmb-item{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:4px;padding:8px 2px;font-size:10px;font-weight:500;color:var(--text-2);cursor:pointer;
-  white-space:normal;text-align:center;line-height:1.15;
-  min-width:0;width:100%;overflow:hidden;position:relative;
+  gap:3px;padding:8px 0;font-size:10px;font-weight:500;color:var(--text-2);cursor:pointer;
+  white-space:nowrap;position:relative;
 }
-.qmb-item:active{transform:scale(.94)}
-.qmb-icon{
-  font-size:20px;line-height:1;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.18));
-  display:inline-flex;align-items:center;justify-content:center;
-  width:34px;height:34px;border-radius:11px;
-  background:var(--bg-2);
-  transition:transform .12s;
-}
-.qmb-item:active .qmb-icon{transform:scale(.9)}
+.qmb-icon{font-size:21px;line-height:1;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.18))}
 .qmb-rupee-coin{
   display:inline-flex;align-items:center;justify-content:center;
   width:24px;height:24px;border-radius:50%;
@@ -824,10 +804,6 @@ ul{list-style:none}
 .qa-compare.disabled{cursor:not-allowed}
 .qa-compare.disabled .qa-3d-icon{filter:grayscale(.55) opacity(.55);box-shadow:none}
 .qa-compare.disabled:active .qa-3d-icon{transform:none}
-.qa-shortlist .qa-3d-icon{background:linear-gradient(150deg,#d9a3ae 0%,#a85c6e 55%,#7a3d4a 100%)}
-.qa-shortlist.liked .qa-3d-icon{background:linear-gradient(150deg,#ff8fa3 0%,#e63950 55%,#a8203a 100%)}
-.qa-shortlist.liked .qa-3d-icon svg{fill:#fff}
-.prop-card.prop-card-promoted .qa-shortlist.liked .qa-3d-icon{background:linear-gradient(150deg,#ff8a7a 0%,#ff4d3d 55%,#c9291a 100%)}
 .prop-card.prop-card-promoted .qa-call .qa-3d-icon{background:linear-gradient(150deg,#ff8a7a 0%,#ff4d3d 55%,#c9291a 100%)}
 .prop-card.prop-card-promoted .qa-visit .qa-3d-icon{background:linear-gradient(150deg,#ffcc66 0%,#f4a300 55%,#c47f00 100%)}
 .prop-card.prop-card-promoted .qa-compare .qa-3d-icon{background:linear-gradient(150deg,#7ea8ff 0%,#3f6fe0 55%,#2648a8 100%)}
@@ -2694,50 +2670,44 @@ ul{list-style:none}
   .ad-slide{padding:0 14px;gap:10px;font-size:12.5px}
   .ad-slide-icon{font-size:18px}
   .ad-slide-cta{font-size:11px;padding:5px 12px}
-  /* Two cards per row on mobile. To fit at ~half the previous width, the
-     footer quick-actions become icon-only (Contact/WhatsApp text hidden)
-     and the secondary chip row (furnish/maintenance/water/electric/PG
-     details) is dropped — there just isn't room for it at this width, and
-     tapping the card still opens the full detail view for everything else. */
-  .prop-grid{grid-template-columns:repeat(2,1fr);gap:10px;padding:0 10px}
+  .prop-grid{grid-template-columns:1fr 1fr;gap:10px;padding:0 12px}
   .prop-card{min-height:0}
   .view-toggle{display:none}
-  .prop-grid.list-view,.prop-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .prop-grid.list-view,.prop-grid{grid-template-columns:1fr 1fr;gap:10px}
   .prop-card.list-view{flex-direction:column}
   .prop-card.list-view .prop-img{width:100%;aspect-ratio:4/3;height:auto;min-height:0;border-radius:16px 16px 0 0}
-  .prop-img{aspect-ratio:16/10}
-  .prop-chip-row-scroll,.prop-body>.prop-chip-row{display:none}
 
-  .prop-body{padding:10px 10px 9px}
-  .prop-title{font-size:12.5px}
-  .prop-title-buildtype{display:none}
-  .prop-price{font-size:13.5px}
-  .prop-price-unit{font-size:10.5px}
-  .prop-deposit-inline{font-size:10.5px;gap:3px}
-  .prop-deposit-inline svg{width:11px;height:11px}
-  .prop-price-row{flex-wrap:wrap;row-gap:3px}
+  /* Compact sizing for the 2-up mobile card so title/price/deposit/buttons
+     don't get squeezed or overflow the narrower card width. */
+  .prop-body{padding:10px 10px 10px}
+  .prop-title{font-size:11px}
+  .prop-price{font-size:11px}
+  .prop-price-unit{font-size:11px}
+  .prop-deposit-inline{font-size:11px;gap:3px}
+  .prop-deposit-inline svg{width:10px;height:10px}
+  .prop-price-row{flex-wrap:wrap;row-gap:2px}
   .prop-loc{font-size:11px}
-  .prop-stats{gap:3px 0;margin-top:6px}
+  .prop-stats{gap:2px 0;margin-top:7px}
   .prop-stat{font-size:11px;padding:0 6px 0 0}
-  .prop-stat-icon{width:16px;height:16px}
-  .prop-chip{font-size:12px;padding:3px 10px 3px 4px}
-  .prop-chip-icon,.chip-ico-wrap{width:17px;height:17px}
+  .prop-stat-icon{width:19px;height:19px}
+  .prop-chip{font-size:11px;padding:2px 8px 2px 3px}
+  .prop-chip-icon,.chip-ico-wrap{width:16px;height:16px}
 
-  /* Quick-action row: icon-only at this width — hide the Contact/WhatsApp
-     text labels and shrink the tiles down so 5 icons fit across one card
-     column instead of a full-width card. */
-  .prop-quick-actions{gap:4px;margin-top:8px}
-  .prop-qa-btn>span:not(.qa-3d-icon){display:none}
+  /* Quick-action row already renders as equal-size icon-only buttons at
+     every width (see base .prop-qa-btn/.prop-qa-icon rules) — on mobile we
+     additionally give them a raised "3D" look to stand out on the compact
+     2-up card layout. */
+  .prop-quick-actions{gap:2px}
   .prop-qa-btn,.prop-qa-icon{
-    height:30px;min-width:0;
-    border-radius:8px;
+    height:32px;min-width:0;
+    border-radius:9px;
     background:linear-gradient(145deg,#ffffff,#eef0f1);
     border:1px solid var(--border-2);
     box-shadow:0 2px 3px rgba(20,16,17,.08),inset 0 1px 0 rgba(255,255,255,.9);
   }
-  .qa-3d-icon{width:22px;max-width:100%;aspect-ratio:1/1;height:auto;border-radius:7px}
+  .qa-3d-icon{width:25px;max-width:100%;aspect-ratio:1/1;height:auto;border-radius:8px}
   .qa-3d-icon svg{width:12px;height:12px}
-  .prop-views-icon{width:22px;max-width:100%;aspect-ratio:1/1;height:auto;border-radius:7px}
+  .prop-views-icon{width:25px;max-width:100%;aspect-ratio:1/1;height:auto;border-radius:8px}
   .prop-views-icon svg{width:12px;height:12px}
   .prop-qa-btn:active,.prop-qa-icon:active{
     box-shadow:inset 0 1px 3px rgba(20,16,17,.15);transform:scale(.95);
@@ -2748,18 +2718,8 @@ ul{list-style:none}
   .prop-qa-icon.checked{
     background:linear-gradient(145deg,var(--brand-light),#fbdfe4);border-color:var(--brand);
   }
-  .prop-meta-row{gap:8px}
-  .prop-views,.prop-posted{font-size:12px}
-
-  /* Equal-column layout for the 5 quick-action icons (Call/WhatsApp/
-     Visit/Compare/Views) — same repeat(N,1fr) technique as the
-     top quick-menu-bar, so icons divide the full card width evenly instead
-     of stretching with big gaps (flex:1 on undersized icons) or bunching
-     to one side (fixed-width + left-align). */
-  .prop-quick-actions{display:grid;grid-template-columns:repeat(6,1fr);gap:3px}
-  .prop-quick-actions .prop-qa-btn.prop-qa-3d,
-  .prop-quick-actions .prop-qa-icon.prop-qa-3d,
-  .prop-quick-actions .prop-views{flex:none;width:100%}
+  .prop-meta-row{gap:6px}
+  .prop-views,.prop-posted{font-size:11px}
   
   .shortlist-btn span.shortlist-txt{display:none}
   .shortlist-panel{width:100%}
@@ -2776,10 +2736,10 @@ ul{list-style:none}
   .section-divider{scroll-margin-top:calc(var(--qmb-h) + var(--filter-h) + 46px)}
   .bottom-tab{
     flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:4px;font-size:10px;font-weight:500;color:var(--text-3);cursor:pointer;
+    gap:3px;font-size:10px;font-weight:500;color:var(--text-3);cursor:pointer;
     position:relative;
   }
-  .bottom-tab-icon{font-size:20px;line-height:1;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.18))}
+  .bottom-tab-icon{font-size:21px;line-height:1;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.18))}
   .bottom-tab.active{color:var(--brand)}
   .bottom-tab-icon-wrap{position:relative;display:inline-flex}
   .bottom-tab-badge{
@@ -3941,7 +3901,7 @@ ul{list-style:none}
   <div id="rentSection">
     <div class="section-divider" id="rentDivider" style="display:none">
       <div class="section-divider-inner">
-        <span class="section-divider-label rent-label">Rent<span class="section-divider-count" id="rentCount"></span></span>
+        <span class="section-divider-label promoted-label">Rent<span class="section-divider-count" id="rentCount"></span></span>
       </div>
     </div>
     <div class="prop-grid" id="rentGrid"></div>
@@ -3949,7 +3909,7 @@ ul{list-style:none}
   <div id="leaseSection">
     <div class="section-divider" id="leaseDivider" style="display:none">
       <div class="section-divider-inner">
-        <span class="section-divider-label lease-label">Lease<span class="section-divider-count" id="leaseCount"></span></span>
+        <span class="section-divider-label promoted-label">Lease<span class="section-divider-count" id="leaseCount"></span></span>
       </div>
     </div>
     <div class="prop-grid" id="leaseGrid"></div>
@@ -3957,7 +3917,7 @@ ul{list-style:none}
   <div id="pgSection">
     <div class="section-divider" id="pgDivider" style="display:none">
       <div class="section-divider-inner">
-        <span class="section-divider-label pg-label">PG<span class="section-divider-count" id="pgCount"></span></span>
+        <span class="section-divider-label promoted-label">PG<span class="section-divider-count" id="pgCount"></span></span>
       </div>
     </div>
     <div class="prop-grid" id="pgGrid"></div>
@@ -3965,7 +3925,7 @@ ul{list-style:none}
   <div id="shortstaySection">
     <div class="section-divider" id="shortstayDivider" style="display:none">
       <div class="section-divider-inner">
-        <span class="section-divider-label shortstay-label">Short Stay<span class="section-divider-count" id="shortstayCount"></span></span>
+        <span class="section-divider-label promoted-label">Short Stay<span class="section-divider-count" id="shortstayCount"></span></span>
       </div>
     </div>
     <div class="prop-grid" id="shortstayGrid"></div>
@@ -5947,20 +5907,6 @@ let leasePage = 0;
 let pgPage = 0;
 let shortstayPage = 0;
 const PAGE_SIZE = 8;
-// On mobile, show fewer cards per "page" before paginating, since the
-// single-column layout means 8 cards is a very long scroll.
-const MOBILE_PAGE_SIZE = 4;
-
-// Mirrors the CSS @media(max-width:640px) breakpoint used everywhere else,
-// so JS layout decisions (e.g. page size) stay in sync with the CSS that
-// actually reflows the cards.
-function isMobileView() {
-  return window.innerWidth <= 640;
-}
-
-function currentPageSize() {
-  return isMobileView() ? MOBILE_PAGE_SIZE : PAGE_SIZE;
-}
 
 // Which of the four on-page sections a (non-promoted) listing belongs in,
 // mirroring the backend's rent/lease/pg collection split.
@@ -6002,10 +5948,6 @@ function renderCards() {
   const gridClass = 'prop-grid' + (isListView ? ' list-view' : '');
   const pageGetters = { promoted: () => promotedPage, rent: () => rentPage, lease: () => leasePage, pg: () => pgPage, shortstay: () => shortstayPage };
   const pageSetters = { promoted: v => promotedPage = v, rent: v => rentPage = v, lease: v => leasePage = v, pg: v => pgPage = v, shortstay: v => shortstayPage = v };
-  // On mobile there's no room for numbered page buttons and tapping "Next"
-  // breaks the scroll flow, so every section just lists all its matching
-  // properties in one continuous vertically-scrollable feed instead.
-  const mobile = isMobileView();
 
   SECTIONS.forEach(key => {
     const items = groups[key];
@@ -6021,13 +5963,11 @@ function renderCards() {
 
     divider.style.display = '';
     document.getElementById(key + 'Count').textContent = items.length;
-
-    const size = mobile ? MOBILE_PAGE_SIZE : PAGE_SIZE;
-    let page = Math.min(pageGetters[key](), Math.floor((items.length - 1) / size));
+    let page = Math.min(pageGetters[key](), Math.floor((items.length - 1) / PAGE_SIZE));
     pageSetters[key](page);
-    const slice = items.slice(page * size, (page + 1) * size);
-    grid.innerHTML = slice.map(p => cardHTML(p, false)).join('') +
-      paginationHTML(key, page, items.length, size);
+    const slice = items.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+    grid.innerHTML = slice.map(p => cardHTML(p, key !== 'promoted')).join('') +
+      paginationHTML(key, page, items.length);
   });
 }
 
@@ -6059,12 +5999,11 @@ function pageNumberButtons(section, page, totalPages) {
   }).join('');
 }
 
-function paginationHTML(section, page, total, size) {
-  size = size || PAGE_SIZE;
-  const totalPages = Math.ceil(total / size);
+function paginationHTML(section, page, total) {
+  const totalPages = Math.ceil(total / PAGE_SIZE);
   if (totalPages <= 1) return '';
-  const start = page * size + 1;
-  const end = Math.min((page + 1) * size, total);
+  const start = page * PAGE_SIZE + 1;
+  const end = Math.min((page + 1) * PAGE_SIZE, total);
   return `
     <div style="grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:14px;padding:14px 20px;border-top:1px solid var(--border);background:var(--bg)">
   <span style="font-size:12px;color:var(--text-3);white-space:nowrap">${start}–${end} of ${total}</span>
@@ -6095,7 +6034,7 @@ const SECTION_PAGE_SETTERS = { promoted: v => promotedPage = v, rent: v => rentP
 
 function changePage(section, dir) {
   const items = sectionItems(section);
-  const max = Math.ceil(items.length / currentPageSize()) - 1;
+  const max = Math.ceil(items.length / PAGE_SIZE) - 1;
   SECTION_PAGE_SETTERS[section](Math.max(0, Math.min(SECTION_PAGE_GETTERS[section]() + dir, max)));
   renderCards();
   // scroll to the section top
@@ -6105,7 +6044,7 @@ function changePage(section, dir) {
 
 function goToPage(section, pageIndex) {
   const items = sectionItems(section);
-  const max = Math.ceil(items.length / currentPageSize()) - 1;
+  const max = Math.ceil(items.length / PAGE_SIZE) - 1;
   SECTION_PAGE_SETTERS[section](Math.max(0, Math.min(pageIndex, max)));
   renderCards();
   const el = document.getElementById(section + 'Divider');
@@ -6344,7 +6283,7 @@ function cardHTML(p, compact) {
           <span class="prop-badge-type badge-${pType.toLowerCase()}">${pType}</span>
         </div>
         <div class="prop-right-badges">
-          <div class="prop-heart${liked?' liked':''}" data-shortlist-id="${p.id}" onclick="event.stopPropagation();toggleShortlist('${p.id}',this)" aria-label="${liked?'Remove from':'Add to'} shortlist">
+          <div class="prop-heart${liked?' liked':''}" onclick="event.stopPropagation();toggleShortlist('${p.id}',this)" aria-label="${liked?'Remove from':'Add to'} shortlist">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
           </div>
           ${p.promoted ? '<div class="prop-icon-badge prop-icon-promoted" title="Promoted"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.26 6.9.8-5.1 4.7 1.4 6.84L12 17.3l-6.1 3.3 1.4-6.84-5.1-4.7 6.9-.8z"/></svg></div>' : ''}
@@ -6441,15 +6380,132 @@ function cardHTML(p, compact) {
           <div class="prop-qa-icon prop-qa-3d qa-compare prop-action-compare${compared?' checked':''}${compareDisabled?' disabled':''}" onclick="event.stopPropagation();toggleCompare('${p.id}',this)" aria-label="${compared?'Remove from':'Add to'} compare" title="${compareDisabled?`You're comparing ${lockedType} properties`:'Compare'}">
             <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="8" height="16" rx="1.5"/><rect x="13" y="4" width="8" height="16" rx="1.5" opacity="0.55"/></svg></span>
           </div>
-          <div class="prop-qa-icon prop-qa-3d qa-shortlist${liked?' liked':''}" data-shortlist-id="${p.id}" onclick="event.stopPropagation();toggleShortlist('${p.id}',this)" aria-label="${liked?'Remove from':'Add to'} shortlist" title="${liked?'Remove from':'Add to'} shortlist">
-            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>
-          </div>
           <span class="prop-views" title="${getViews(p).toLocaleString('en-IN')} views">
             <span class="prop-views-icon">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               <span class="prop-views-badge">${formatViews(getViews(p))}</span>
             </span>
           </span>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* Compact card used only inside the Shortlisted side panel. Unlike the full
+   cardHTML(), it deliberately drops the long tail of chips (floor, tenant,
+   negotiable, lease terms, age, description, etc.) so the 4 action buttons
+   (Contact / WhatsApp / Schedule visit / Compare) are reachable without
+   scrolling through a full spec sheet — the panel is for quick review, not
+   full listing detail (tap the card to open the full detail modal for that). */
+function shortlistCardHTML(p) {
+  const liked = shortlisted.has(String(p.id));
+  const compared = compareSet.has(p.id);
+  const lockedType = getCompareType();
+  const pType = pTypeLabel(p);
+  const compareDisabled = !compared && lockedType && pType !== lockedType;
+  const colors = {Rent:'#e8f5ee:#1a6640',Lease:'#dde9fa:#1a4680',PG:'#eee8fa:#4a2a9a',ShortStay:'#e0f7fa:#00646e'};
+  const [bg, fg] = (colors[pType]||'#f0f0f0:#333').split(':');
+  const bathrooms = parseInt(p.property?.bathrooms) || 1;
+  const carCount = parseInt(p.property?.car, 10) || 0;
+  const bikeCount = parseInt(p.property?.bike, 10) || 0;
+  const carpark = carCount > 0;
+  const bikepark = bikeCount > 0;
+  const lift = pHasLift(p);
+  const deposit = p.price?.deposit || 0;
+  const maintenance = p.price?.maintenance || 0;
+  const leaseDur = p.terms?.lease || '';
+  const waterLabel = p.price?.water || '';
+  const electricLabel = p.price?.electricity || '';
+  return `<div class="prop-card type-${pType.toLowerCase()}" onclick="openDetail('${p.id}')">
+    <div class="prop-img" style="background:${bg}" data-idx="0">
+      ${buildImgSlider(p, fg, '-sl')}
+      <div class="prop-card-top-row">
+        <div class="prop-left-badges">
+          <span class="prop-badge-type badge-${pType.toLowerCase()}">${pType}</span>
+        </div>
+        <div class="prop-right-badges">
+          <div class="prop-heart${liked?' liked':''}" onclick="event.stopPropagation();toggleShortlist('${p.id}',this)" aria-label="${liked?'Remove from':'Add to'} shortlist">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </div>
+          ${p.promoted ? '<div class="prop-icon-badge prop-icon-promoted" title="Promoted"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.26 6.9.8-5.1 4.7 1.4 6.84L12 17.3l-6.1 3.3 1.4-6.84-5.1-4.7 6.9-.8z"/></svg></div>' : ''}
+          ${p.verified ? '<div class="prop-icon-badge prop-icon-verified" title="Verified"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="#fff"/><path d="M8 12.3l2.6 2.6 5.4-5.8" stroke="#1a73e8" stroke-width="2.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' : ''}
+        </div>
+      </div>
+    </div>
+    <div class="prop-body">
+      <div class="prop-title" title="${esc(p.propertyId)}">
+        <span class="prop-title-text">${esc(p.propertyId || 'Untitled listing')}</span>
+      </div>
+      <div class="prop-price-row">
+        <div class="prop-price">${fmtRupee(p.price?.rent||0)}<span class="prop-price-unit">/ ${pType === 'Lease' ? (leaseDur || 'Lease') : pType === 'ShortStay' ? 'Day' : 'Month'}</span></div>
+        <div class="prop-deposit-inline" title="Security deposit">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2"/><circle cx="12" cy="12.5" r="2.5"/></svg>
+          <span class="prop-deposit-val">${fmtRupee(deposit)}</span><span class="prop-deposit-lbl">Deposit</span>
+        </div>
+      </div>
+      <div class="prop-loc">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>${esc(p.location?.area)}</span>
+      </div>
+      <div class="prop-stats">
+        <span class="prop-stat" title="Configuration">
+          <span class="prop-stat-icon icon-bed">🛏️</span>
+          ${String(p.property?.bhk || '').replace(/\s*BHK\s*$/i, '').trim()}
+        </span>
+        <span class="prop-stat" title="Bathrooms">
+          <span class="prop-stat-icon icon-bath">🚿</span>
+          ${bathrooms}
+        </span>
+        <span class="prop-stat" title="Furnishing">
+          <span class="prop-stat-icon icon-furnish">🛋️</span>
+          ${p.property?.furnish}
+        </span>
+        <span class="prop-stat${carpark?'':' is-off'}" title="${carCount>0?carCount+' car parking spot'+(carCount>1?'s':''):'No car parking'}">
+          <span class="prop-stat-icon icon-car">🚗</span>
+          ${carCount>0?carCount:''}
+        </span>
+        <span class="prop-stat${bikepark?'':' is-off'}" title="${bikeCount>0?bikeCount+' bike parking spot'+(bikeCount>1?'s':''):'No bike parking'}">
+          <span class="prop-stat-icon icon-bike">🏍️</span>
+          ${bikeCount>0?bikeCount:''}
+        </span>
+        ${lift ? `<span class="prop-stat" title="Lift available"><span class="prop-stat-icon icon-lift">🛗</span></span>` : ''}
+      </div>
+      ${(maintenance > 0 || waterLabel || electricLabel) ? `<div class="prop-chip-row prop-chip-row-scroll">
+        ${maintenance > 0 ? `<span class="prop-chip chip-maint" title="Monthly maintenance">
+          <span class="chip-ico-wrap icon-maint"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+          ${fmtRupee(maintenance)} maintenance
+        </span>` : ''}
+        ${waterLabel ? `<span class="prop-chip chip-water" title="Water supply">
+          <span class="chip-ico-wrap icon-water"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.69s-5.5 6.16-5.5 10.31a5.5 5.5 0 0 0 11 0c0-4.15-5.5-10.31-5.5-10.31z"/></svg></span>
+          Water: ${waterLabel}
+        </span>` : ''}
+        ${electricLabel ? `<span class="prop-chip chip-electric" title="Electricity">
+          <span class="chip-ico-wrap icon-electric"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
+          Electricity: ${electricLabel}
+        </span>` : ''}
+      </div>` : ''}
+      <div class="prop-footer">
+        <div class="prop-quick-actions">
+          <button class="prop-qa-btn prop-qa-3d qa-call" onclick="event.stopPropagation();openCall('${p.id}')" aria-label="Call owner">
+            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+            <span>Contact</span>
+          </button>
+          <button class="prop-qa-btn prop-qa-3d qa-whatsapp" onclick="event.stopPropagation();openWhatsApp('${p.id}')" aria-label="Contact on WhatsApp">
+            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg></span>
+            <span>WhatsApp</span>
+          </button>
+          ${pType === 'ShortStay' ? `
+          <div class="prop-qa-icon prop-qa-3d qa-book" id="prop-qa-icon-${p.id}" data-prop-id="${p.id}" onclick="event.stopPropagation();openBookingModal('${p.id}')" aria-label="Book now" title="Book now">
+            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4" width="19" height="15" rx="2"/><line x1="7" y1="1.5" x2="7" y2="6.5"/><line x1="17" y1="1.5" x2="17" y2="6.5"/><line x1="2.5" y1="9" x2="21.5" y2="9"/><path d="M8 14.2l2.4 2.4L16 11"/></svg></span>
+          </div>` : `
+          <div class="prop-qa-icon prop-qa-3d qa-visit" id="prop-qa-icon-${p.id}" data-prop-id="${p.id}" onclick="event.stopPropagation();openScheduleModal('${p.id}')" aria-label="Schedule a visit" title="Schedule a visit">
+            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4" width="14" height="15" rx="2"/><line x1="6" y1="1.5" x2="6" y2="6.5"/><line x1="13" y1="1.5" x2="13" y2="6.5"/><line x1="2.5" y1="9" x2="16.5" y2="9"/><circle cx="16.5" cy="16.5" r="6.2" fill="#c9975c"/><path d="M16.5 12.8v3.7l2.6 1.5"/></svg></span>
+            <span class="prop-qa-count" style="${(p.visitCount||0) > 0 ? '' : 'display:none'}">${p.visitCount||0}</span>
+          </div>`}
+          <div class="prop-qa-icon prop-qa-3d qa-compare prop-action-compare${compared?' checked':''}${compareDisabled?' disabled':''}" onclick="event.stopPropagation();toggleCompare('${p.id}',this)" aria-label="${compared?'Remove from':'Add to'} compare" title="${compareDisabled?`You're comparing ${lockedType} properties`:'Compare'}">
+            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="8" height="16" rx="1.5"/><rect x="13" y="4" width="8" height="16" rx="1.5" opacity="0.55"/></svg></span>
+          </div>
         </div>
       </div>
     </div>
@@ -6464,19 +6520,15 @@ function toggleShortlist(id, el) {
   if (shortlisted.has(id)) {
     shortlisted.delete(id);
     delete shortlistedData[id];
+    el.classList.remove('liked');
     showToast('Removed from shortlist');
   } else {
     shortlisted.add(id);
     const p = PROPERTIES.find(x => String(x.id) === id);
     if (p) shortlistedData[id] = p;
+    el.classList.add('liked');
     showToast('Added to shortlist ♥');
   }
-  const isLiked = shortlisted.has(id);
-  document.querySelectorAll(`[data-shortlist-id="${id}"]`).forEach(node => {
-    node.classList.toggle('liked', isLiked);
-    node.setAttribute('aria-label', (isLiked ? 'Remove from' : 'Add to') + ' shortlist');
-    if (node.hasAttribute('title')) node.setAttribute('title', (isLiked ? 'Remove from' : 'Add to') + ' shortlist');
-  });
   saveShortlist();
   saveShortlistData();
   updateShortlistCount();
@@ -6514,7 +6566,7 @@ function renderShortlistPanel() {
       : `<div class="panel-empty">No shortlisted ${currentTab} properties.<br>Switch tabs to see the rest of your shortlist.</div>`;
     return;
   }
-  list.innerHTML = ids.map(id => cardHTML(shortlistedData[id], false)).join('');
+  list.innerHTML = ids.map(id => shortlistCardHTML(shortlistedData[id])).join('');
 }
 
 
@@ -6524,10 +6576,9 @@ function removeShortlist(id) {
   delete shortlistedData[id];
   saveShortlist();
   saveShortlistData();
-  document.querySelectorAll(`[data-shortlist-id="${id}"]`).forEach(node => {
-    node.classList.remove('liked');
-    node.setAttribute('aria-label', 'Add to shortlist');
-    if (node.hasAttribute('title')) node.setAttribute('title', 'Add to shortlist');
+  const hearts = document.querySelectorAll('.prop-heart');
+  hearts.forEach(h => {
+    if (h.onclick && h.onclick.toString().includes(`toggleShortlist('${id}',`)) h.classList.remove('liked');
   });
   updateShortlistCount();
   renderShortlistPanel();
@@ -7409,14 +7460,6 @@ window.addEventListener('scroll', function() {
   pop.style.left = left + 'px';
 }, true);
 window.addEventListener('resize', closeAllFd);
-let _lastMobileViewState = isMobileView();
-window.addEventListener('resize', () => {
-  const nowMobile = isMobileView();
-  if (nowMobile !== _lastMobileViewState) {
-    _lastMobileViewState = nowMobile;
-    renderCards();
-  }
-});
 
 /* ── Read all active filter state ── */
 function getFilterState() {
