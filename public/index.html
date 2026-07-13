@@ -30,7 +30,7 @@
   --shadow-md:0 4px 16px rgba(0,0,0,.10);
   --nav-h:60px;
   --filter-h:52px;
-  --qmb-h:50px;
+  --qmb-h:56px;
   --search-h:64px;
 }
 html{scroll-behavior:smooth;overflow-x:hidden;width:100%}
@@ -303,9 +303,9 @@ ul{list-style:none}
 }
 .qmb-item:active{transform:scale(.94)}
 .qmb-icon{
-  font-size:19px;line-height:1;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.18));
+  font-size:20px;line-height:1;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.18));
   display:inline-flex;align-items:center;justify-content:center;
-  width:32px;height:32px;border-radius:11px;
+  width:34px;height:34px;border-radius:11px;
   background:var(--bg-2);
   transition:transform .12s;
 }
@@ -2776,10 +2776,10 @@ ul{list-style:none}
   .section-divider{scroll-margin-top:calc(var(--qmb-h) + var(--filter-h) + 46px)}
   .bottom-tab{
     flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:3px;font-size:10px;font-weight:500;color:var(--text-3);cursor:pointer;
+    gap:4px;font-size:10px;font-weight:500;color:var(--text-3);cursor:pointer;
     position:relative;
   }
-  .bottom-tab-icon{font-size:21px;line-height:1;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.18))}
+  .bottom-tab-icon{font-size:20px;line-height:1;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.18))}
   .bottom-tab.active{color:var(--brand)}
   .bottom-tab-icon-wrap{position:relative;display:inline-flex}
   .bottom-tab-badge{
@@ -5947,12 +5947,19 @@ let leasePage = 0;
 let pgPage = 0;
 let shortstayPage = 0;
 const PAGE_SIZE = 8;
+// On mobile, show fewer cards per "page" before paginating, since the
+// single-column layout means 8 cards is a very long scroll.
+const MOBILE_PAGE_SIZE = 4;
 
 // Mirrors the CSS @media(max-width:640px) breakpoint used everywhere else,
-// so JS layout decisions (e.g. skipping pagination on mobile) stay in sync
-// with the CSS that actually reflows the cards.
+// so JS layout decisions (e.g. page size) stay in sync with the CSS that
+// actually reflows the cards.
 function isMobileView() {
   return window.innerWidth <= 640;
+}
+
+function currentPageSize() {
+  return isMobileView() ? MOBILE_PAGE_SIZE : PAGE_SIZE;
 }
 
 // Which of the four on-page sections a (non-promoted) listing belongs in,
@@ -6015,16 +6022,12 @@ function renderCards() {
     divider.style.display = '';
     document.getElementById(key + 'Count').textContent = items.length;
 
-    if (mobile) {
-      grid.innerHTML = items.map(p => cardHTML(p, false)).join('');
-      return;
-    }
-
-    let page = Math.min(pageGetters[key](), Math.floor((items.length - 1) / PAGE_SIZE));
+    const size = mobile ? MOBILE_PAGE_SIZE : PAGE_SIZE;
+    let page = Math.min(pageGetters[key](), Math.floor((items.length - 1) / size));
     pageSetters[key](page);
-    const slice = items.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+    const slice = items.slice(page * size, (page + 1) * size);
     grid.innerHTML = slice.map(p => cardHTML(p, false)).join('') +
-      paginationHTML(key, page, items.length);
+      paginationHTML(key, page, items.length, size);
   });
 }
 
@@ -6056,11 +6059,12 @@ function pageNumberButtons(section, page, totalPages) {
   }).join('');
 }
 
-function paginationHTML(section, page, total) {
-  const totalPages = Math.ceil(total / PAGE_SIZE);
+function paginationHTML(section, page, total, size) {
+  size = size || PAGE_SIZE;
+  const totalPages = Math.ceil(total / size);
   if (totalPages <= 1) return '';
-  const start = page * PAGE_SIZE + 1;
-  const end = Math.min((page + 1) * PAGE_SIZE, total);
+  const start = page * size + 1;
+  const end = Math.min((page + 1) * size, total);
   return `
     <div style="grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:14px;padding:14px 20px;border-top:1px solid var(--border);background:var(--bg)">
   <span style="font-size:12px;color:var(--text-3);white-space:nowrap">${start}–${end} of ${total}</span>
@@ -6091,7 +6095,7 @@ const SECTION_PAGE_SETTERS = { promoted: v => promotedPage = v, rent: v => rentP
 
 function changePage(section, dir) {
   const items = sectionItems(section);
-  const max = Math.ceil(items.length / PAGE_SIZE) - 1;
+  const max = Math.ceil(items.length / currentPageSize()) - 1;
   SECTION_PAGE_SETTERS[section](Math.max(0, Math.min(SECTION_PAGE_GETTERS[section]() + dir, max)));
   renderCards();
   // scroll to the section top
@@ -6101,7 +6105,7 @@ function changePage(section, dir) {
 
 function goToPage(section, pageIndex) {
   const items = sectionItems(section);
-  const max = Math.ceil(items.length / PAGE_SIZE) - 1;
+  const max = Math.ceil(items.length / currentPageSize()) - 1;
   SECTION_PAGE_SETTERS[section](Math.max(0, Math.min(pageIndex, max)));
   renderCards();
   const el = document.getElementById(section + 'Divider');
