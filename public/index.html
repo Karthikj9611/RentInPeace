@@ -992,16 +992,16 @@ ul{list-style:none}
 }
 .modal-close{
   position:absolute;top:12px;right:12px;z-index:3;
-  width:38px;height:38px;border-radius:50%;
-  background:rgba(255,255,255,.92);
+  width:32px;height:32px;border-radius:50%;
+  background:var(--brand);
   display:flex;align-items:center;justify-content:center;
-  cursor:pointer;border:1.5px solid rgba(255,255,255,.5);
-  transition:background .15s,border-color .15s,transform .15s;
-  flex-shrink:0;backdrop-filter:blur(4px);
+  cursor:pointer;border:none;
+  box-shadow:0 3px 8px rgba(0,0,0,.25);
+  transition:background .15s,transform .15s;
+  flex-shrink:0;
 }
-.modal-close:hover{background:var(--brand);border-color:var(--brand);transform:scale(1.06)}
-.modal-close svg{width:18px;height:18px;stroke:var(--brand);fill:none;stroke-width:2.2;transition:stroke .15s}
-.modal-close:hover svg{stroke:#fff}
+.modal-close:hover{background:var(--brand-hover);transform:scale(1.06)}
+.modal-close svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.6;transition:stroke .15s}
 .modal-body{padding:22px 24px 28px}
 
 /* ── Header ── */
@@ -1916,7 +1916,7 @@ ul{list-style:none}
   animation:modalIn .2s ease;
   position:relative;
 }
-.add-modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.add-modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-right:40px}
 .add-modal-title{font-size:17px;font-weight:700}
 .form-group{margin-bottom:14px}
 .form-label{font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:5px;display:block}
@@ -4066,7 +4066,7 @@ ul{list-style:none}
   <div class="add-modal" id="serviceModalBox" style="max-width:440px">
     <div class="add-modal-header">
       <div class="add-modal-title">Request a Service</div>
-      <button class="modal-close" style="position:static" onclick="closeServiceModal()" aria-label="Close">
+      <button class="modal-close" onclick="closeServiceModal()" aria-label="Close">
         <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -4239,7 +4239,7 @@ ul{list-style:none}
   <div class="add-modal" id="scheduleModalBox" style="max-width:400px">
     <div class="add-modal-header">
       <div class="add-modal-title">Schedule a visit</div>
-      <button class="modal-close" style="position:static" onclick="closeScheduleModal()" aria-label="Close">
+      <button class="modal-close" onclick="closeScheduleModal()" aria-label="Close">
         <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -4279,7 +4279,7 @@ ul{list-style:none}
   <div class="add-modal" id="bookingModalBox" style="max-width:400px">
     <div class="add-modal-header">
       <div class="add-modal-title">Book now</div>
-      <button class="modal-close" style="position:static" onclick="closeBookingModal()" aria-label="Close">
+      <button class="modal-close" onclick="closeBookingModal()" aria-label="Close">
         <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -4365,8 +4365,8 @@ ul{list-style:none}
       </div>
       <div style="display:flex;align-items:center;gap:10px">
       <button type="button" id="clearFormBtn" onclick="confirmClearAddModalDraft()" style="background:transparent;border:1.5px solid rgba(255,255,255,.4);color:#fff;border-radius:16px;padding:0 12px;height:32px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">Clear form</button>
-      <button class="modal-close" style="position:static;background:rgba(255,255,255,.22);border:1.5px solid rgba(255,255,255,.4);color:#fff;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;transition:background .15s,transform .15s" onmouseover="this.style.background='rgba(255,255,255,.35)';this.style.transform='scale(1.06)'" onmouseout="this.style.background='rgba(255,255,255,.22)';this.style.transform='scale(1)'" onclick="closeAddModal()" aria-label="Close">
-        <svg viewBox="0 0 24 24" aria-hidden="true" stroke="#fff" style="width:18px;height:18px;stroke-width:2.2;stroke:#fff !important"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <button class="modal-close" style="position:static;background:var(--brand);border:none;color:#fff;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(0,0,0,.25);transition:background .15s,transform .15s" onmouseover="this.style.background='var(--brand-hover)';this.style.transform='scale(1.06)'" onmouseout="this.style.background='var(--brand)';this.style.transform='scale(1)'" onclick="closeAddModal()" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true" stroke="#fff" style="width:16px;height:16px;stroke-width:2.6;stroke:#fff !important"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
       </div>
     </div>
@@ -4816,7 +4816,7 @@ ul{list-style:none}
   <div class="add-modal" id="authModalBox" style="max-width:400px">
     <div class="add-modal-header">
       <div class="add-modal-title" id="authModalTitle">Welcome back</div>
-      <button class="modal-close" style="position:static" onclick="closeAuthModal()" aria-label="Close">
+      <button class="modal-close" onclick="closeAuthModal()" aria-label="Close">
         <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -5031,7 +5031,7 @@ ul{list-style:none}
         <div class="add-modal-title">Notifications</div>
         <div class="notif-modal-sub" id="notifModalSub">&nbsp;</div>
       </div>
-      <button class="modal-close" style="position:static" onclick="closeNotifModal()" aria-label="Close">
+      <button class="modal-close" onclick="closeNotifModal()" aria-label="Close">
         <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -5049,7 +5049,7 @@ ul{list-style:none}
   <div class="add-modal" id="referModalBox" style="max-width:440px">
     <div class="add-modal-header">
       <div class="add-modal-title">Refer &amp; Earn</div>
-      <button class="modal-close" style="position:static" onclick="closeReferModal()" aria-label="Close">
+      <button class="modal-close" onclick="closeReferModal()" aria-label="Close">
         <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -5082,7 +5082,7 @@ ul{list-style:none}
   <div class="add-modal" id="chargesModalBox" style="max-width:460px">
     <div class="add-modal-header">
       <div class="add-modal-title">Our Charges</div>
-      <button class="modal-close" style="position:static" onclick="closeChargesModal()" aria-label="Close">
+      <button class="modal-close" onclick="closeChargesModal()" aria-label="Close">
         <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -5145,7 +5145,7 @@ ul{list-style:none}
   <div class="add-modal" id="helpModalBox" style="max-width:480px">
     <div class="add-modal-header">
       <div class="add-modal-title">Help &amp; Support</div>
-      <button class="modal-close" style="position:static" onclick="closeHelpModal()" aria-label="Close">
+      <button class="modal-close" onclick="closeHelpModal()" aria-label="Close">
         <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -5228,11 +5228,8 @@ ul{list-style:none}
         <div class="faq-q" onclick="toggleFaq(this)">Is there a brokerage or fee?
           <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
-        <div class="faq-a">Yes, we charge a one-time brokerage that depends on the property type:<br><br>
-          <b>Rent:</b> 30% of the monthly rent (e.g. ₹20,000 rent → ₹6,000). ₹3,000 is paid upfront before we show you 4 shortlisted properties, and the remaining balance is paid after you like a property and move in.<br><br>
-          <b>Lease:</b> equal to one month's rent, paid one-time.<br><br>
-          <b>PG / Co-living:</b> a flat ₹2,000, paid in full before we arrange your visit.<br><br>
-          No online payments — speak with our team first, and pay only when you meet in person.
+        <div class="faq-a">Yes, we charge a one-time brokerage that varies by property type (Rent, Lease, or PG/Co-living), paid only after you meet in person — no online payments.<br><br>
+          <a href="javascript:void(0)" onclick="closeHelpModal(); openChargesModal();" style="color:var(--brand);font-weight:600;text-decoration:underline">See full charges breakdown →</a>
         </div>
       </div>
 
@@ -5289,14 +5286,18 @@ ul{list-style:none}
         <div class="faq-q" onclick="toggleFaq(this)">When do I get my ₹1,000 referral reward?
           <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
-        <div class="faq-a">Your ₹1,000 is credited to your UPI on the day the referred tenant successfully moves into the property via a commission-based booking. There is no limit on how many tenants you can refer.</div>
+        <div class="faq-a">Your reward is credited to your UPI once the referred tenant moves in via a commission-based booking. No limit on how many tenants you can refer.<br><br>
+          <a href="javascript:void(0)" onclick="closeHelpModal(); openReferModal();" style="color:var(--brand);font-weight:600;text-decoration:underline">See Refer &amp; Earn details →</a>
+        </div>
       </div>
 
       <div class="faq-item" data-cat="refer">
         <div class="faq-q" onclick="toggleFaq(this)">How does the referral link work?
           <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
-        <div class="faq-a">Share your unique referral link via WhatsApp, SMS, or any app. When the tenant opens it, books a property, and moves in, the referral is automatically tracked to your account.</div>
+        <div class="faq-a">Share your unique referral link — when the tenant books through it and moves in, the referral is tracked automatically.<br><br>
+          <a href="javascript:void(0)" onclick="closeHelpModal(); openReferModal();" style="color:var(--brand);font-weight:600;text-decoration:underline">Get your referral link →</a>
+        </div>
       </div>
 
     </div>
@@ -5313,7 +5314,7 @@ ul{list-style:none}
   <div class="add-modal" id="aboutModalBox" style="max-width:460px">
     <div class="add-modal-header">
       <div class="add-modal-title">About Us</div>
-      <button class="modal-close" style="position:static" onclick="closeAboutModal()" aria-label="Close">
+      <button class="modal-close" onclick="closeAboutModal()" aria-label="Close">
         <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -5332,7 +5333,7 @@ ul{list-style:none}
               <span class="about-founder-name">Karthik Reddy</span>
               <span class="about-founder-role">CEO</span>
             </div>
-            <div class="about-founder-bio">Founded Quatar to make renting simpler, more affordable, and transparent with lower brokerage, verified listings, and complete customer privacy.</div>
+            <div class="about-founder-bio">BE in Mechanical Engineering, MBA in Marketing &amp; Strategy.</div>
             <div class="about-founder-links">
               <span class="about-founder-link" onclick="showToast('no@no.com')">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><polyline points="22 6 12 13 2 6"/></svg>
@@ -5349,7 +5350,7 @@ ul{list-style:none}
               <span class="about-founder-name">Prashanth Gowda</span>
               <span class="about-founder-role">COO</span>
             </div>
-            <div class="about-founder-bio">Built and scaled operations teams across two B2C marketplaces. Leads owner onboarding, verification and city operations.</div>
+            <div class="about-founder-bio">BE in Mechanical Engineering, PG Diploma in Business Management.</div>
             <div class="about-founder-links">
               <span class="about-founder-link" onclick="showToast('no@no.com')">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><polyline points="22 6 12 13 2 6"/></svg>
@@ -5521,7 +5522,7 @@ ul{list-style:none}
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg>
           <span>Share</span>
         </button>
-        <button class="modal-close" style="position:static" onclick="closeCompareModal()" aria-label="Close comparison">
+        <button class="modal-close" onclick="closeCompareModal()" aria-label="Close comparison">
           <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
