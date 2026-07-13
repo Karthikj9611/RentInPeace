@@ -297,8 +297,9 @@ ul{list-style:none}
 }
 .qmb-item{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:4px;padding:8px 0;font-size:10px;font-weight:500;color:var(--text-2);cursor:pointer;
-  white-space:nowrap;position:relative;
+  gap:4px;padding:8px 2px;font-size:10px;font-weight:500;color:var(--text-2);cursor:pointer;
+  white-space:normal;text-align:center;line-height:1.15;
+  min-width:0;width:100%;overflow:hidden;position:relative;
 }
 .qmb-item:active{transform:scale(.94)}
 .qmb-icon{
@@ -2693,47 +2694,51 @@ ul{list-style:none}
   .ad-slide{padding:0 14px;gap:10px;font-size:12.5px}
   .ad-slide-icon{font-size:18px}
   .ad-slide-cta{font-size:11px;padding:5px 12px}
-  /* Single full-width column — a 2-up grid on a ~370px phone left each card
-     too narrow to hold the full field set (chips, PG details, view count)
-     and wasted the leftover column as blank space next to lone cards. One
-     wide card per row gives every field room and reads like a proper
-     listing rather than a cramped thumbnail. */
-  .prop-grid{grid-template-columns:1fr;gap:14px;padding:0 12px}
+  /* Two cards per row on mobile. To fit at ~half the previous width, the
+     footer quick-actions become icon-only (Contact/WhatsApp text hidden)
+     and the secondary chip row (furnish/maintenance/water/electric/PG
+     details) is dropped — there just isn't room for it at this width, and
+     tapping the card still opens the full detail view for everything else. */
+  .prop-grid{grid-template-columns:repeat(2,1fr);gap:10px;padding:0 10px}
   .prop-card{min-height:0}
   .view-toggle{display:none}
-  .prop-grid.list-view,.prop-grid{grid-template-columns:1fr;gap:14px}
+  .prop-grid.list-view,.prop-grid{grid-template-columns:repeat(2,1fr);gap:10px}
   .prop-card.list-view{flex-direction:column}
   .prop-card.list-view .prop-img{width:100%;aspect-ratio:4/3;height:auto;min-height:0;border-radius:16px 16px 0 0}
   .prop-img{aspect-ratio:16/10}
+  .prop-chip-row-scroll,.prop-body>.prop-chip-row{display:none}
 
-  .prop-body{padding:13px 14px 12px}
-  .prop-title{font-size:14px}
-  .prop-price{font-size:15px}
-  .prop-price-unit{font-size:12px}
-  .prop-deposit-inline{font-size:12px;gap:4px}
-  .prop-deposit-inline svg{width:12px;height:12px}
-  .prop-price-row{flex-wrap:wrap;row-gap:4px}
-  .prop-loc{font-size:12.5px}
-  .prop-stats{gap:4px 0;margin-top:8px}
-  .prop-stat{font-size:12.5px;padding:0 8px 0 0}
-  .prop-stat-icon{width:20px;height:20px}
+  .prop-body{padding:10px 10px 9px}
+  .prop-title{font-size:12.5px}
+  .prop-title-buildtype{display:none}
+  .prop-price{font-size:13.5px}
+  .prop-price-unit{font-size:10.5px}
+  .prop-deposit-inline{font-size:10.5px;gap:3px}
+  .prop-deposit-inline svg{width:11px;height:11px}
+  .prop-price-row{flex-wrap:wrap;row-gap:3px}
+  .prop-loc{font-size:11px}
+  .prop-stats{gap:3px 0;margin-top:6px}
+  .prop-stat{font-size:11px;padding:0 6px 0 0}
+  .prop-stat-icon{width:16px;height:16px}
   .prop-chip{font-size:12px;padding:3px 10px 3px 4px}
   .prop-chip-icon,.chip-ico-wrap{width:17px;height:17px}
 
-  /* Quick-action row keeps its raised "3D" look, sized comfortably now
-     that a single-column card has the width to spare. */
-  .prop-quick-actions{gap:5px}
+  /* Quick-action row: icon-only at this width — hide the Contact/WhatsApp
+     text labels and shrink the tiles down so 5 icons fit across one card
+     column instead of a full-width card. */
+  .prop-quick-actions{gap:4px;margin-top:8px}
+  .prop-qa-btn>span:not(.qa-3d-icon){display:none}
   .prop-qa-btn,.prop-qa-icon{
-    height:40px;min-width:0;
-    border-radius:10px;
+    height:30px;min-width:0;
+    border-radius:8px;
     background:linear-gradient(145deg,#ffffff,#eef0f1);
     border:1px solid var(--border-2);
     box-shadow:0 2px 3px rgba(20,16,17,.08),inset 0 1px 0 rgba(255,255,255,.9);
   }
-  .qa-3d-icon{width:34px;max-width:100%;aspect-ratio:1/1;height:auto;border-radius:10px}
-  .qa-3d-icon svg{width:16px;height:16px}
-  .prop-views-icon{width:34px;max-width:100%;aspect-ratio:1/1;height:auto;border-radius:10px}
-  .prop-views-icon svg{width:16px;height:16px}
+  .qa-3d-icon{width:22px;max-width:100%;aspect-ratio:1/1;height:auto;border-radius:7px}
+  .qa-3d-icon svg{width:12px;height:12px}
+  .prop-views-icon{width:22px;max-width:100%;aspect-ratio:1/1;height:auto;border-radius:7px}
+  .prop-views-icon svg{width:12px;height:12px}
   .prop-qa-btn:active,.prop-qa-icon:active{
     box-shadow:inset 0 1px 3px rgba(20,16,17,.15);transform:scale(.95);
   }
@@ -2746,12 +2751,12 @@ ul{list-style:none}
   .prop-meta-row{gap:8px}
   .prop-views,.prop-posted{font-size:12px}
 
-  /* Equal-column layout for the 6 quick-action icons (Call/WhatsApp/
-     Visit/Compare/Shortlist/Views) — same repeat(N,1fr) technique as the
+  /* Equal-column layout for the 5 quick-action icons (Call/WhatsApp/
+     Visit/Compare/Views) — same repeat(N,1fr) technique as the
      top quick-menu-bar, so icons divide the full card width evenly instead
      of stretching with big gaps (flex:1 on undersized icons) or bunching
      to one side (fixed-width + left-align). */
-  .prop-quick-actions{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+  .prop-quick-actions{display:grid;grid-template-columns:repeat(6,1fr);gap:3px}
   .prop-quick-actions .prop-qa-btn.prop-qa-3d,
   .prop-quick-actions .prop-qa-icon.prop-qa-3d,
   .prop-quick-actions .prop-views{flex:none;width:100%}
