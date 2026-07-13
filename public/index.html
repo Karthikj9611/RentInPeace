@@ -6331,7 +6331,7 @@ function cardHTML(p, compact) {
         </span>` : ''}
         ${lift ? `<span class="prop-stat" title="Lift available"><span class="prop-stat-icon icon-lift">🛗</span></span>` : ''}
       </div>
-      ${compact ? '' : `<div class="prop-chip-row prop-chip-row-scroll">
+      <div class="prop-chip-row prop-chip-row-scroll">
         <span class="prop-chip chip-furnish" title="Furnishing">
           <span class="prop-chip-icon icon-furnish">🛋️</span>
           ${p.property?.furnish}
@@ -6358,7 +6358,7 @@ function cardHTML(p, compact) {
         ${chip('Room type', pg.room)}
         ${chip('Meals', pg.meals)}
         ${chip('Occupancy', pg.occupancy)}
-      </div>` : ''}`}
+      </div>` : ''}
       <div class="prop-footer">
         <div class="prop-quick-actions">
           <button class="prop-qa-btn prop-qa-3d qa-call" onclick="event.stopPropagation();openCall('${p.id}')" aria-label="Call owner">
@@ -6506,6 +6506,12 @@ function shortlistCardHTML(p) {
           <div class="prop-qa-icon prop-qa-3d qa-compare prop-action-compare${compared?' checked':''}${compareDisabled?' disabled':''}" onclick="event.stopPropagation();toggleCompare('${p.id}',this)" aria-label="${compared?'Remove from':'Add to'} compare" title="${compareDisabled?`You're comparing ${lockedType} properties`:'Compare'}">
             <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="8" height="16" rx="1.5"/><rect x="13" y="4" width="8" height="16" rx="1.5" opacity="0.55"/></svg></span>
           </div>
+          <span class="prop-views" title="${getViews(p).toLocaleString('en-IN')} views">
+            <span class="prop-views-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span class="prop-views-badge">${formatViews(getViews(p))}</span>
+            </span>
+          </span>
         </div>
       </div>
     </div>
