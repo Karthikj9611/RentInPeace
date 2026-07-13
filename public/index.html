@@ -77,6 +77,17 @@ ul{list-style:none}
   padding:4px 12px;border-radius:99px;
   border:1px solid #f5c0c8;
 }
+/* Type-matching divider pills — same accent pairs as the card type badges
+   (badge-rent/lease/pg/shortstay) so a section header visually matches the
+   cards beneath it instead of every section using the same pink pill. */
+.rent-label{color:#1a6640;background:#e8f5ee;padding:4px 12px;border-radius:99px;border:1px solid #bfe3cd}
+.lease-label{color:#1a4680;background:#dde9fa;padding:4px 12px;border-radius:99px;border:1px solid #c3d6f5}
+.pg-label{color:#4a2a9a;background:#eee8fa;padding:4px 12px;border-radius:99px;border:1px solid #d7c8f2}
+.shortstay-label{color:#00646e;background:#e0f7fa;padding:4px 12px;border-radius:99px;border:1px solid #b8ecf0}
+.rent-label .section-divider-count{background:#1a6640}
+.lease-label .section-divider-count{background:#1a4680}
+.pg-label .section-divider-count{background:#4a2a9a}
+.shortstay-label .section-divider-count{background:#00646e}
 .section-divider-count{
   margin-left:7px;font-weight:700;font-size:11px;
   background:var(--brand);color:#fff;
@@ -286,10 +297,18 @@ ul{list-style:none}
 }
 .qmb-item{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:3px;padding:8px 0;font-size:10px;font-weight:500;color:var(--text-2);cursor:pointer;
+  gap:4px;padding:8px 0;font-size:10px;font-weight:500;color:var(--text-2);cursor:pointer;
   white-space:nowrap;position:relative;
 }
-.qmb-icon{font-size:21px;line-height:1;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.18))}
+.qmb-item:active{transform:scale(.94)}
+.qmb-icon{
+  font-size:19px;line-height:1;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.18));
+  display:inline-flex;align-items:center;justify-content:center;
+  width:32px;height:32px;border-radius:11px;
+  background:var(--bg-2);
+  transition:transform .12s;
+}
+.qmb-item:active .qmb-icon{transform:scale(.9)}
 .qmb-rupee-coin{
   display:inline-flex;align-items:center;justify-content:center;
   width:24px;height:24px;border-radius:50%;
@@ -804,6 +823,10 @@ ul{list-style:none}
 .qa-compare.disabled{cursor:not-allowed}
 .qa-compare.disabled .qa-3d-icon{filter:grayscale(.55) opacity(.55);box-shadow:none}
 .qa-compare.disabled:active .qa-3d-icon{transform:none}
+.qa-shortlist .qa-3d-icon{background:linear-gradient(150deg,#d9a3ae 0%,#a85c6e 55%,#7a3d4a 100%)}
+.qa-shortlist.liked .qa-3d-icon{background:linear-gradient(150deg,#ff8fa3 0%,#e63950 55%,#a8203a 100%)}
+.qa-shortlist.liked .qa-3d-icon svg{fill:#fff}
+.prop-card.prop-card-promoted .qa-shortlist.liked .qa-3d-icon{background:linear-gradient(150deg,#ff8a7a 0%,#ff4d3d 55%,#c9291a 100%)}
 .prop-card.prop-card-promoted .qa-call .qa-3d-icon{background:linear-gradient(150deg,#ff8a7a 0%,#ff4d3d 55%,#c9291a 100%)}
 .prop-card.prop-card-promoted .qa-visit .qa-3d-icon{background:linear-gradient(150deg,#ffcc66 0%,#f4a300 55%,#c47f00 100%)}
 .prop-card.prop-card-promoted .qa-compare .qa-3d-icon{background:linear-gradient(150deg,#7ea8ff 0%,#3f6fe0 55%,#2648a8 100%)}
@@ -2670,45 +2693,47 @@ ul{list-style:none}
   .ad-slide{padding:0 14px;gap:10px;font-size:12.5px}
   .ad-slide-icon{font-size:18px}
   .ad-slide-cta{font-size:11px;padding:5px 12px}
-  .prop-grid{grid-template-columns:1fr 1fr;gap:10px;padding:0 12px}
+  /* Single full-width column — a 2-up grid on a ~370px phone left each card
+     too narrow to hold the full field set (chips, PG details, view count)
+     and wasted the leftover column as blank space next to lone cards. One
+     wide card per row gives every field room and reads like a proper
+     listing rather than a cramped thumbnail. */
+  .prop-grid{grid-template-columns:1fr;gap:14px;padding:0 12px}
   .prop-card{min-height:0}
   .view-toggle{display:none}
-  .prop-grid.list-view,.prop-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .prop-grid.list-view,.prop-grid{grid-template-columns:1fr;gap:14px}
   .prop-card.list-view{flex-direction:column}
   .prop-card.list-view .prop-img{width:100%;aspect-ratio:4/3;height:auto;min-height:0;border-radius:16px 16px 0 0}
+  .prop-img{aspect-ratio:16/10}
 
-  /* Compact sizing for the 2-up mobile card so title/price/deposit/buttons
-     don't get squeezed or overflow the narrower card width. */
-  .prop-body{padding:10px 10px 10px}
-  .prop-title{font-size:11px}
-  .prop-price{font-size:11px}
-  .prop-price-unit{font-size:11px}
-  .prop-deposit-inline{font-size:11px;gap:3px}
-  .prop-deposit-inline svg{width:10px;height:10px}
-  .prop-price-row{flex-wrap:wrap;row-gap:2px}
-  .prop-loc{font-size:11px}
-  .prop-stats{gap:2px 0;margin-top:7px}
-  .prop-stat{font-size:11px;padding:0 6px 0 0}
-  .prop-stat-icon{width:19px;height:19px}
-  .prop-chip{font-size:11px;padding:2px 8px 2px 3px}
-  .prop-chip-icon,.chip-ico-wrap{width:16px;height:16px}
+  .prop-body{padding:13px 14px 12px}
+  .prop-title{font-size:14px}
+  .prop-price{font-size:15px}
+  .prop-price-unit{font-size:12px}
+  .prop-deposit-inline{font-size:12px;gap:4px}
+  .prop-deposit-inline svg{width:12px;height:12px}
+  .prop-price-row{flex-wrap:wrap;row-gap:4px}
+  .prop-loc{font-size:12.5px}
+  .prop-stats{gap:4px 0;margin-top:8px}
+  .prop-stat{font-size:12.5px;padding:0 8px 0 0}
+  .prop-stat-icon{width:20px;height:20px}
+  .prop-chip{font-size:12px;padding:3px 10px 3px 4px}
+  .prop-chip-icon,.chip-ico-wrap{width:17px;height:17px}
 
-  /* Quick-action row already renders as equal-size icon-only buttons at
-     every width (see base .prop-qa-btn/.prop-qa-icon rules) — on mobile we
-     additionally give them a raised "3D" look to stand out on the compact
-     2-up card layout. */
-  .prop-quick-actions{gap:2px}
+  /* Quick-action row keeps its raised "3D" look, sized comfortably now
+     that a single-column card has the width to spare. */
+  .prop-quick-actions{gap:5px}
   .prop-qa-btn,.prop-qa-icon{
-    height:32px;min-width:0;
-    border-radius:9px;
+    height:40px;min-width:0;
+    border-radius:10px;
     background:linear-gradient(145deg,#ffffff,#eef0f1);
     border:1px solid var(--border-2);
     box-shadow:0 2px 3px rgba(20,16,17,.08),inset 0 1px 0 rgba(255,255,255,.9);
   }
-  .qa-3d-icon{width:25px;max-width:100%;aspect-ratio:1/1;height:auto;border-radius:8px}
-  .qa-3d-icon svg{width:12px;height:12px}
-  .prop-views-icon{width:25px;max-width:100%;aspect-ratio:1/1;height:auto;border-radius:8px}
-  .prop-views-icon svg{width:12px;height:12px}
+  .qa-3d-icon{width:34px;max-width:100%;aspect-ratio:1/1;height:auto;border-radius:10px}
+  .qa-3d-icon svg{width:16px;height:16px}
+  .prop-views-icon{width:34px;max-width:100%;aspect-ratio:1/1;height:auto;border-radius:10px}
+  .prop-views-icon svg{width:16px;height:16px}
   .prop-qa-btn:active,.prop-qa-icon:active{
     box-shadow:inset 0 1px 3px rgba(20,16,17,.15);transform:scale(.95);
   }
@@ -2718,8 +2743,18 @@ ul{list-style:none}
   .prop-qa-icon.checked{
     background:linear-gradient(145deg,var(--brand-light),#fbdfe4);border-color:var(--brand);
   }
-  .prop-meta-row{gap:6px}
-  .prop-views,.prop-posted{font-size:11px}
+  .prop-meta-row{gap:8px}
+  .prop-views,.prop-posted{font-size:12px}
+
+  /* Equal-column layout for the 6 quick-action icons (Call/WhatsApp/
+     Visit/Compare/Shortlist/Views) — same repeat(N,1fr) technique as the
+     top quick-menu-bar, so icons divide the full card width evenly instead
+     of stretching with big gaps (flex:1 on undersized icons) or bunching
+     to one side (fixed-width + left-align). */
+  .prop-quick-actions{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+  .prop-quick-actions .prop-qa-btn.prop-qa-3d,
+  .prop-quick-actions .prop-qa-icon.prop-qa-3d,
+  .prop-quick-actions .prop-views{flex:none;width:100%}
   
   .shortlist-btn span.shortlist-txt{display:none}
   .shortlist-panel{width:100%}
@@ -3901,7 +3936,7 @@ ul{list-style:none}
   <div id="rentSection">
     <div class="section-divider" id="rentDivider" style="display:none">
       <div class="section-divider-inner">
-        <span class="section-divider-label promoted-label">Rent<span class="section-divider-count" id="rentCount"></span></span>
+        <span class="section-divider-label rent-label">Rent<span class="section-divider-count" id="rentCount"></span></span>
       </div>
     </div>
     <div class="prop-grid" id="rentGrid"></div>
@@ -3909,7 +3944,7 @@ ul{list-style:none}
   <div id="leaseSection">
     <div class="section-divider" id="leaseDivider" style="display:none">
       <div class="section-divider-inner">
-        <span class="section-divider-label promoted-label">Lease<span class="section-divider-count" id="leaseCount"></span></span>
+        <span class="section-divider-label lease-label">Lease<span class="section-divider-count" id="leaseCount"></span></span>
       </div>
     </div>
     <div class="prop-grid" id="leaseGrid"></div>
@@ -3917,7 +3952,7 @@ ul{list-style:none}
   <div id="pgSection">
     <div class="section-divider" id="pgDivider" style="display:none">
       <div class="section-divider-inner">
-        <span class="section-divider-label promoted-label">PG<span class="section-divider-count" id="pgCount"></span></span>
+        <span class="section-divider-label pg-label">PG<span class="section-divider-count" id="pgCount"></span></span>
       </div>
     </div>
     <div class="prop-grid" id="pgGrid"></div>
@@ -3925,7 +3960,7 @@ ul{list-style:none}
   <div id="shortstaySection">
     <div class="section-divider" id="shortstayDivider" style="display:none">
       <div class="section-divider-inner">
-        <span class="section-divider-label promoted-label">Short Stay<span class="section-divider-count" id="shortstayCount"></span></span>
+        <span class="section-divider-label shortstay-label">Short Stay<span class="section-divider-count" id="shortstayCount"></span></span>
       </div>
     </div>
     <div class="prop-grid" id="shortstayGrid"></div>
@@ -5908,6 +5943,13 @@ let pgPage = 0;
 let shortstayPage = 0;
 const PAGE_SIZE = 8;
 
+// Mirrors the CSS @media(max-width:640px) breakpoint used everywhere else,
+// so JS layout decisions (e.g. skipping pagination on mobile) stay in sync
+// with the CSS that actually reflows the cards.
+function isMobileView() {
+  return window.innerWidth <= 640;
+}
+
 // Which of the four on-page sections a (non-promoted) listing belongs in,
 // mirroring the backend's rent/lease/pg collection split.
 function sectionKeyFor(p) {
@@ -5948,6 +5990,10 @@ function renderCards() {
   const gridClass = 'prop-grid' + (isListView ? ' list-view' : '');
   const pageGetters = { promoted: () => promotedPage, rent: () => rentPage, lease: () => leasePage, pg: () => pgPage, shortstay: () => shortstayPage };
   const pageSetters = { promoted: v => promotedPage = v, rent: v => rentPage = v, lease: v => leasePage = v, pg: v => pgPage = v, shortstay: v => shortstayPage = v };
+  // On mobile there's no room for numbered page buttons and tapping "Next"
+  // breaks the scroll flow, so every section just lists all its matching
+  // properties in one continuous vertically-scrollable feed instead.
+  const mobile = isMobileView();
 
   SECTIONS.forEach(key => {
     const items = groups[key];
@@ -5963,6 +6009,12 @@ function renderCards() {
 
     divider.style.display = '';
     document.getElementById(key + 'Count').textContent = items.length;
+
+    if (mobile) {
+      grid.innerHTML = items.map(p => cardHTML(p, false)).join('');
+      return;
+    }
+
     let page = Math.min(pageGetters[key](), Math.floor((items.length - 1) / PAGE_SIZE));
     pageSetters[key](page);
     const slice = items.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
@@ -6283,7 +6335,7 @@ function cardHTML(p, compact) {
           <span class="prop-badge-type badge-${pType.toLowerCase()}">${pType}</span>
         </div>
         <div class="prop-right-badges">
-          <div class="prop-heart${liked?' liked':''}" onclick="event.stopPropagation();toggleShortlist('${p.id}',this)" aria-label="${liked?'Remove from':'Add to'} shortlist">
+          <div class="prop-heart${liked?' liked':''}" data-shortlist-id="${p.id}" onclick="event.stopPropagation();toggleShortlist('${p.id}',this)" aria-label="${liked?'Remove from':'Add to'} shortlist">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
           </div>
           ${p.promoted ? '<div class="prop-icon-badge prop-icon-promoted" title="Promoted"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.26 6.9.8-5.1 4.7 1.4 6.84L12 17.3l-6.1 3.3 1.4-6.84-5.1-4.7 6.9-.8z"/></svg></div>' : ''}
@@ -6380,6 +6432,9 @@ function cardHTML(p, compact) {
           <div class="prop-qa-icon prop-qa-3d qa-compare prop-action-compare${compared?' checked':''}${compareDisabled?' disabled':''}" onclick="event.stopPropagation();toggleCompare('${p.id}',this)" aria-label="${compared?'Remove from':'Add to'} compare" title="${compareDisabled?`You're comparing ${lockedType} properties`:'Compare'}">
             <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="8" height="16" rx="1.5"/><rect x="13" y="4" width="8" height="16" rx="1.5" opacity="0.55"/></svg></span>
           </div>
+          <div class="prop-qa-icon prop-qa-3d qa-shortlist${liked?' liked':''}" data-shortlist-id="${p.id}" onclick="event.stopPropagation();toggleShortlist('${p.id}',this)" aria-label="${liked?'Remove from':'Add to'} shortlist" title="${liked?'Remove from':'Add to'} shortlist">
+            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>
+          </div>
           <span class="prop-views" title="${getViews(p).toLocaleString('en-IN')} views">
             <span class="prop-views-icon">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -6400,15 +6455,19 @@ function toggleShortlist(id, el) {
   if (shortlisted.has(id)) {
     shortlisted.delete(id);
     delete shortlistedData[id];
-    el.classList.remove('liked');
     showToast('Removed from shortlist');
   } else {
     shortlisted.add(id);
     const p = PROPERTIES.find(x => String(x.id) === id);
     if (p) shortlistedData[id] = p;
-    el.classList.add('liked');
     showToast('Added to shortlist ♥');
   }
+  const isLiked = shortlisted.has(id);
+  document.querySelectorAll(`[data-shortlist-id="${id}"]`).forEach(node => {
+    node.classList.toggle('liked', isLiked);
+    node.setAttribute('aria-label', (isLiked ? 'Remove from' : 'Add to') + ' shortlist');
+    if (node.hasAttribute('title')) node.setAttribute('title', (isLiked ? 'Remove from' : 'Add to') + ' shortlist');
+  });
   saveShortlist();
   saveShortlistData();
   updateShortlistCount();
@@ -6456,9 +6515,10 @@ function removeShortlist(id) {
   delete shortlistedData[id];
   saveShortlist();
   saveShortlistData();
-  const hearts = document.querySelectorAll('.prop-heart');
-  hearts.forEach(h => {
-    if (h.onclick && h.onclick.toString().includes(`toggleShortlist('${id}',`)) h.classList.remove('liked');
+  document.querySelectorAll(`[data-shortlist-id="${id}"]`).forEach(node => {
+    node.classList.remove('liked');
+    node.setAttribute('aria-label', 'Add to shortlist');
+    if (node.hasAttribute('title')) node.setAttribute('title', 'Add to shortlist');
   });
   updateShortlistCount();
   renderShortlistPanel();
@@ -7340,6 +7400,14 @@ window.addEventListener('scroll', function() {
   pop.style.left = left + 'px';
 }, true);
 window.addEventListener('resize', closeAllFd);
+let _lastMobileViewState = isMobileView();
+window.addEventListener('resize', () => {
+  const nowMobile = isMobileView();
+  if (nowMobile !== _lastMobileViewState) {
+    _lastMobileViewState = nowMobile;
+    renderCards();
+  }
+});
 
 /* ── Read all active filter state ── */
 function getFilterState() {
