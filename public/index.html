@@ -290,6 +290,15 @@ ul{list-style:none}
   white-space:nowrap;position:relative;
 }
 .qmb-icon{font-size:21px;line-height:1;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.18))}
+.qmb-rupee-coin{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:24px;height:24px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #ffe9a8, #e8b923 55%, #b8860b 100%);
+  border:1px solid #a97a0a;
+  color:#7a4e00;font-size:14px;font-weight:800;
+  font-family:Arial, sans-serif;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.6), inset 0 -1px 1px rgba(0,0,0,.25);
+}
 .qmb-item:active{color:var(--brand)}
 .qmb-badge{
   position:absolute;top:2px;right:14px;
@@ -2931,22 +2940,6 @@ ul{list-style:none}
 
 <!-- ─── Quick Menu Bar (mobile-only, replaces topnav) ────── -->
 <div class="quick-menu-bar" id="quickMenuBar">
-  <div class="qmb-item" onclick="openChargesModal()">
-    <span class="qmb-icon">💳</span>
-    Charges
-  </div>
-  <div class="qmb-item" onclick="openReferModal()">
-    <span class="qmb-icon">🎁</span>
-    Refer
-  </div>
-  <div class="qmb-item" onclick="openAboutModal()">
-    <span class="qmb-icon">🏛️</span>
-    About
-  </div>
-  <div class="qmb-item" onclick="openHelpModal()">
-    <span class="qmb-icon">❓</span>
-    Help
-  </div>
   <div class="qmb-item" onclick="handleMenuAuthClick()">
     <span class="qmb-icon">🧑‍💼</span>
     Profile
@@ -2955,6 +2948,22 @@ ul{list-style:none}
     <span class="qmb-icon">🔔</span>
     Notifications
     <span class="qmb-badge" id="qmbNotifCount">0</span>
+  </div>
+  <div class="qmb-item" onclick="openChargesModal()">
+    <span class="qmb-icon qmb-rupee-coin">₹</span>
+    Charges
+  </div>
+  <div class="qmb-item" onclick="openReferModal()">
+    <span class="qmb-icon">🎁</span>
+    Refer
+  </div>
+  <div class="qmb-item" onclick="openHelpModal()">
+    <span class="qmb-icon">❓</span>
+    Help
+  </div>
+  <div class="qmb-item" onclick="openAboutModal()">
+    <span class="qmb-icon">🏛️</span>
+    About
   </div>
 </div>
 
