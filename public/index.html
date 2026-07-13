@@ -2954,6 +2954,7 @@ ul{list-style:none}
   <div class="qmb-item" onclick="openNotifModal()">
     <span class="qmb-icon">🔔</span>
     Notifications
+    <span class="qmb-badge" id="qmbNotifCount">0</span>
   </div>
 </div>
 
@@ -9088,7 +9089,7 @@ async function refreshNotifCount() {
   } catch (err) { /* silent — badge just skips this cycle */ }
 }
 function updateNotifBadge(count) {
-  [document.getElementById('navNotifCount'), document.getElementById('menuNotifCount')].forEach(el => {
+  [document.getElementById('navNotifCount'), document.getElementById('menuNotifCount'), document.getElementById('qmbNotifCount')].forEach(el => {
     if (!el) return;
     el.textContent = count > 9 ? '9+' : String(count);
   });
