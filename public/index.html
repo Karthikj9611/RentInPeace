@@ -5966,7 +5966,7 @@ function renderCards() {
     let page = Math.min(pageGetters[key](), Math.floor((items.length - 1) / PAGE_SIZE));
     pageSetters[key](page);
     const slice = items.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
-    grid.innerHTML = slice.map(p => cardHTML(p, key !== 'promoted')).join('') +
+    grid.innerHTML = slice.map(p => cardHTML(p, false)).join('') +
       paginationHTML(key, page, items.length);
   });
 }
