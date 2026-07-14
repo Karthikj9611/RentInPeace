@@ -1429,6 +1429,9 @@ ul{list-style:none}
 }
 .compare-modal-title{font-size:17px;font-weight:700}
 .compare-modal-header-actions{display:flex;align-items:center;gap:8px}
+.compare-modal-header-actions .modal-close{
+  position:static;top:auto;right:auto;
+}
 .compare-share-btn{
   display:flex;align-items:center;gap:6px;
   background:linear-gradient(150deg,#3dcc7e,#189e50);color:#fff;
@@ -1440,8 +1443,21 @@ ul{list-style:none}
 .compare-share-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(24,158,80,.42)}
 .compare-share-btn:active{transform:translateY(0)}
 .compare-share-btn svg{width:15px;height:15px;fill:#fff;flex-shrink:0}
+.compare-diff-toggle{
+  display:flex;align-items:center;gap:6px;
+  background:var(--bg);color:var(--text-2);
+  border:1.5px solid var(--border-2);border-radius:99px;padding:7px 13px;
+  font-size:12.5px;font-weight:600;cursor:pointer;
+  transition:background .15s,border-color .15s,color .15s;
+}
+.compare-diff-toggle:hover{border-color:var(--brand)}
+.compare-diff-toggle.active{
+  background:var(--brand-light);border-color:var(--brand);color:var(--brand);
+}
+.compare-diff-toggle .compare-diff-dot{background:var(--border-2)}
+.compare-diff-toggle.active .compare-diff-dot{background:var(--brand)}
 .compare-table-wrap{overflow-x:auto;padding:0 24px 24px;overscroll-behavior-x:contain}
-.compare-table{width:100%;border-collapse:collapse;min-width:560px}
+.compare-table{width:100%;border-collapse:separate;border-spacing:0;min-width:560px}
 .compare-table th,.compare-table td{
   padding:10px 14px;text-align:left;
   border-bottom:1px solid var(--border);
@@ -1489,6 +1505,14 @@ ul{list-style:none}
   background:var(--brand-light);position:sticky;left:0;
 }
 .compare-section-row:first-child td{border-top:none}
+.compare-diff-dot{
+  display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:var(--brand);margin-left:6px;vertical-align:middle;flex-shrink:0;
+}
+.compare-diff-row td{background:var(--brand-light)}
+.compare-diff-row .compare-row-label{background:var(--brand-light)!important}
+.compare-table-wrap.diff-only tr:not(.compare-diff-row):not(.compare-section-row){display:none}
+.compare-table-wrap.diff-only .compare-section-row{scroll-margin-top:40px}
 .compare-desc-cell{
   display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;
   overflow:hidden;font-size:12px;line-height:1.4;color:var(--text-2);
@@ -5437,7 +5461,10 @@ ul{list-style:none}
         </div>
         <div style="flex:1;min-width:0">
           <div class="about-office-name">Quatar</div>
-          <div class="about-office-addr">AECS Layout, Singasandra, Bengaluru, Karnataka 560068</div>Mon–Sun, 10 AM – 10 PM
+          <div class="about-office-addr">AECS Layout, Singasandra, Bengaluru, Karnataka 560068</div>
+          <div class="about-office-meta">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Mon–Sun, 10 AM – 10 PM
           </div>
         </div>
       </div>
@@ -5554,6 +5581,9 @@ ul{list-style:none}
     <div class="compare-modal-header">
       <span class="compare-modal-title">Compare properties</span>
       <div class="compare-modal-header-actions">
+        <button class="compare-diff-toggle" id="compareDiffToggle" onclick="toggleCompareDiffOnly()" aria-pressed="false" title="Show only rows that differ">
+          <span class="compare-diff-dot"></span><span>Diffs only</span>
+        </button>
         <button class="compare-share-btn" onclick="shareCompareViaWhatsApp()" aria-label="Share comparison via WhatsApp">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg>
           <span>Share</span>
@@ -5877,6 +5907,13 @@ function renderRecentlyViewed() {
   strip.innerHTML = ids.map(id => recentlyViewedCardHTML(recentlyViewedData[id])).join('');
 }
 let compareSet = new Set();
+let compareDiffOnly = false;
+function toggleCompareDiffOnly(){
+  compareDiffOnly = !compareDiffOnly;
+  const btn = document.getElementById('compareDiffToggle');
+  if (btn) btn.classList.toggle('active', compareDiffOnly);
+  renderCompareTable();
+}
 const COMPARE_MAX = 4;
 let isListView = false;
 let searchQuery = '';
@@ -6353,7 +6390,7 @@ function cardHTML(p, compact) {
           Available From ${availableFmt}
         </span>` : ''}
       </div>
-      ${isPGCard ? `<div class="prop-chip-row">
+      ${isPGCard ? `<div class="prop-chip-row prop-chip-row-scroll">
         ${chip('Gender', pg.gender)}
         ${chip('Room type', pg.room)}
         ${chip('Meals', pg.meals)}
@@ -6833,11 +6870,15 @@ function renderCompareTable() {
     if (r.section) {
       return `<tr class="compare-section-row"><td colspan="${props.length + 1}">${esc(r.section)}</td></tr>`;
     }
-    return `<tr>
-      <td class="compare-row-label">${r.label}</td>
-      ${props.map(p => `<td>${r.get(p)}</td>`).join('')}
+    const vals = props.map(p => r.get(p));
+    const isDiff = props.length > 1 && vals.some(v => v !== vals[0]);
+    return `<tr class="${isDiff ? 'compare-diff-row' : ''}">
+      <td class="compare-row-label">${r.label}${isDiff ? '<span class="compare-diff-dot" title="Differs across properties"></span>' : ''}</td>
+      ${vals.map(v => `<td>${v}</td>`).join('')}
     </tr>`;
   }).join('');
+
+  document.getElementById('compareTableWrap').classList.toggle('diff-only', !!compareDiffOnly);
 
   document.getElementById('compareTableWrap').innerHTML = `
     <table class="compare-table">
