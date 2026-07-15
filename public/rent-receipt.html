@@ -541,10 +541,13 @@ padding: 12px;
     gap: 8px;
   }
   #buildingName {
-    max-width: 42% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    white-space: normal !important;
   }
   #buildingAddress {
-    max-width: 42% !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
   .bill-two-columns {
     gap: 8px;
@@ -623,12 +626,11 @@ padding: 12px;
 <div class="header">
 <div class="address">
 <div class="kr-monogram">
-<input type="text" id="buildingName" placeholder="Enter building name" oninput="autosizeInputWidth(this)" style="background:transparent;border:none;border-bottom:1px dashed rgba(255,255,255,.6);color:white;font-weight:700;font-size:13px;padding:2px 0;width:150px;max-width:100%;text-align:left;white-space:nowrap">
+<textarea id="buildingName" placeholder="Enter building name" rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="background:transparent;border:none;border-bottom:1px dashed rgba(255,255,255,.6);color:white;font-weight:700;font-size:13px;font-family:inherit;padding:2px 0;width:100%;max-width:100%;text-align:left;resize:none;overflow:hidden;white-space:pre-wrap;word-break:break-word"></textarea>
 </div>
 <textarea id="buildingAddress" placeholder="Enter address" rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="background:transparent;border:none;border-bottom:1px dashed rgba(255,255,255,.5);color:white;font-size:11px;font-weight:500;font-family:inherit;padding:2px 0;width:220px;max-width:100%;text-align:left;margin-top:4px;resize:none;overflow:hidden;white-space:pre-wrap;word-break:break-word"></textarea>
 <div class="phone-buttons">
 <a href="tel:9611459960" class="call-link" id="callLink" style="text-decoration:none;background:transparent;padding:4px 0;">
-<i class="fas fa-phone-alt"></i>
 <input type="tel" id="ownerContact" maxlength="10" placeholder="Enter number" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10);syncContactLinks();" onclick="event.preventDefault()" style="background:transparent;border:none;border-bottom:1px dashed rgba(255,255,255,.5);color:white;font-weight:bold;font-size:inherit;font-family:inherit;width:80px;padding:0;text-align:left">
 </a>
 </div>
@@ -642,7 +644,7 @@ padding: 12px;
 <!-- CUSTOMER DETAILS -->
 <div class="info-grid">
 <div class="info-item">
-<span class="label">🏠 Flat No.</span>
+<span class="label">🏠 Flat Number</span>
 <input type="text" id="house" placeholder="e.g. A-101" style="flex:1; border:1px solid #ccd7e8; padding:6px 8px; border-radius:12px; font-size:10px; background:white;text-align:center">
 </div>
 <div class="info-item"><span class="label">🏢 Tenant Name</span><input type="text" id="name" placeholder="Enter tenant name"></div>
@@ -763,11 +765,9 @@ padding: 12px;
 <div class="notes">
 <b>📌 Important Guidelines:</b>
 <ul>
-<li>✅ <strong>Left Section:</strong> Monthly Rent + Current Electricity Bill (EB / sub-meter).</li>
-<li>✅ <strong>Right Section:</strong> Arrears (previous dues), Maintenance, Sanitary, and Parking fees combined.</li>
-<li>💧 <strong>Water Charges:</strong> Calculated based on meter readings (Rate: ₹0.15 per 1 liter).</li>
-<li>⚠️ Late payment attracts 10% penalty on outstanding after due date (10th of every month).</li>
-<li>📞 For disputes or clarification, contact management within 7 days.</li>
+<li>💧 <strong>Water Charges:</strong> Rate: ₹0.15 per 1 liter.</li>
+<li>⚠️ Late payment attracts penalty on outstanding after due date.</li>
+<li>📞 For disputes or clarification, contact management.</li>
 </ul>
 </div>
 
@@ -999,7 +999,6 @@ function autosizeInputWidth(el) {
   ruler.textContent = el.value || el.placeholder || '';
   el.style.width = (ruler.offsetWidth + 12) + 'px';
 }
-autosizeInputWidth(document.getElementById('buildingName'));
 autosizeInputWidth(document.getElementById('ownerName'));
 
 // Keeps the header's Call and WhatsApp buttons pointed at whatever number
@@ -1045,7 +1044,9 @@ async function pickTenantContact() {
   }
 }
 
-// size the address textarea to fit its pre-filled default text
+// size the building name & address textareas to fit any pre-filled text
+const _nameEl = document.getElementById('buildingName');
+if (_nameEl) { _nameEl.style.height = 'auto'; _nameEl.style.height = _nameEl.scrollHeight + 'px'; }
 const _addrEl = document.getElementById('buildingAddress');
 if (_addrEl) { _addrEl.style.height = 'auto'; _addrEl.style.height = _addrEl.scrollHeight + 'px'; }
 
