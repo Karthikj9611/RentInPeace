@@ -4048,7 +4048,16 @@ ul{list-style:none}
         </div>
       </div>
 
-     
+      <div class="service-card" onclick="openRentReceiptTool()">
+        <img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=420&q=70" alt="Rent Receipt Generator" loading="lazy" />
+        <div class="service-card-overlay"></div>
+        <div class="service-card-icon">🧾</div>
+        <div class="service-card-content">
+          <span class="service-card-badge">📄 Tools</span>
+          <div class="service-card-title">Rent Receipt Generator</div>
+          <div class="service-card-desc">Generate &amp; download a rent receipt in seconds — free to use</div>
+        </div>
+      </div>
 
     </div>
     <button class="services-arrow next" onclick="scrollServices(1)" aria-label="Scroll right">
@@ -4167,6 +4176,21 @@ ul{list-style:none}
         WhatsApp
       </a>
     </div>
+  </div>
+</div>
+
+<!-- ─── Rent Receipt Generator tool: loaded in an isolated iframe so its own
+     full-page CSS (generic selectors like table/input/.header) never
+     collides with the main site's styles ─── -->
+<div class="add-modal-overlay" id="rentReceiptModal" role="dialog" aria-modal="true" aria-label="Rent Receipt Generator">
+  <div class="add-modal" style="max-width:900px;width:100%;height:92vh;padding:0;display:flex;flex-direction:column;overflow:hidden">
+    <div class="add-modal-header" style="padding:14px 16px;margin-bottom:0;border-bottom:1px solid var(--border-2);flex-shrink:0">
+      <div class="add-modal-title">🧾 Rent Receipt Generator</div>
+      <button class="modal-close" onclick="closeRentReceiptTool()" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <iframe id="rentReceiptFrame" title="Rent Receipt Generator" style="flex:1;width:100%;border:0;background:#fff"></iframe>
   </div>
 </div>
 
@@ -9581,6 +9605,23 @@ function closeServiceModal() {
 
 document.getElementById('serviceModal').addEventListener('click', function(e) {
   if (e.target === this) closeServiceModal();
+});
+
+// Rent Receipt Generator — loaded lazily into the iframe on first open so it
+// doesn't fetch/run until the person actually wants it, then left in place
+// (not reset) so re-opening keeps whatever they'd already filled in.
+function openRentReceiptTool() {
+  const frame = document.getElementById('rentReceiptFrame');
+  if (!frame.src) frame.src = '/rent-receipt.html';
+  document.getElementById('rentReceiptModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeRentReceiptTool() {
+  document.getElementById('rentReceiptModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('rentReceiptModal').addEventListener('click', function(e) {
+  if (e.target === this) closeRentReceiptTool();
 });
 
 function closeHelpModal() {
