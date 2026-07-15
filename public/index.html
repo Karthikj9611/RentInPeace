@@ -364,7 +364,7 @@ ul{list-style:none}
 /* ─── Main Layout ──────────────────────────────── */
 .main{
   
-  padding:20px 0 80px;
+  padding:20px 0 24px;
 }
 .results-header{padding:0 20px}
 .results-header{
@@ -425,8 +425,7 @@ ul{list-style:none}
 /* ─── Property Grid ────────────────────────────── */
 .prop-grid{
   display:grid;
-  grid-template-columns:repeat(auto-fill, 280px);
-  justify-content:start;
+  grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
   gap:16px;
   padding:0 20px;
 }
@@ -2708,7 +2707,7 @@ ul{list-style:none}
   .nav-tabs{display:none}
   .topnav{display:none}
   .filter-dd-bar{top:var(--qmb-h)}
-  .main{padding:14px 0 80px}
+  .main{padding:14px 0 20px}
   .results-header{padding:0 12px}
   .ad-banner{height:52px}
   .ad-slide{padding:0 14px;gap:10px;font-size:12.5px}
@@ -2827,104 +2826,6 @@ ul{list-style:none}
 }
 .slide-dot.active{background:#fff}
 
-/* ─── Welcome / Offer Modal ────────────────────── */
-#welcomeModal{
-  position:fixed;inset:0;z-index:9999;
-  display:flex;align-items:center;justify-content:center;
-  background:rgba(0,0,0,.93);
-  opacity:0;pointer-events:none;
-  transition:opacity .3s;
-  padding:0;
-}
-#welcomeModal.open{opacity:1;pointer-events:all}
-.welcome-box{
-  position:relative;
-  width:min(420px,90vw);
-  max-height:85vh;
-  margin:auto;
-  background:#0a0a0a;
-  border-radius:18px;
-  overflow:hidden;
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:flex-start;
-  box-shadow:0 20px 60px rgba(0,0,0,.5);
-  transform:scale(.93);opacity:0;
-  transition:transform .3s,opacity .3s;
-}
-#welcomeModal.open .welcome-box{transform:scale(1);opacity:1}
-@keyframes wm-pop{from{transform:scale(.93);opacity:0}to{transform:scale(1);opacity:1}}
-.welcome-close{
-  position:absolute;top:10px;right:10px;
-  width:34px;height:34px;border-radius:50%;
-  background:rgba(0,0,0,.45);border:none;
-  color:#fff;font-size:17px;font-weight:700;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  z-index:10000;
-}
-.welcome-close:hover{background:rgba(255,255,255,.3)}
-.welcome-slides{
-  position:relative;
-  width:100%;
-  height:auto;
-  max-height:60vh;
-  overflow-y:auto;
-  overflow-x:hidden;
-  background:#000;
-  flex-shrink:0;
-}
-.welcome-slide{
-  position:relative;
-  width:100%;
-  opacity:0;transition:opacity .5s;
-  display:none;
-  flex-direction:column;
-  align-items:stretch;justify-content:flex-start;
-}
-.welcome-slide.active{opacity:1;display:flex;animation:wm-pop .35s cubic-bezier(.34,1.56,.64,1) both}
-.welcome-slide-title{
-  padding:12px 16px 8px;
-  font-size:13.5px;font-weight:700;color:#fff;
-  text-align:center;letter-spacing:.01em;line-height:1.3;
-  background:#0a0a0a;
-}
-.welcome-slide-title span{
-  display:block;font-size:11px;font-weight:600;color:var(--brand);
-  text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;
-}
-.welcome-slide img{
-  width:100%;
-  height:auto;
-  max-height:none;
-  object-fit:cover;
-  cursor:zoom-in;
-  display:block;
-}
-.welcome-dots{
-  display:flex;gap:10px;justify-content:center;
-  position:absolute;bottom:14px;left:0;right:0;z-index:10000;
-}
-.welcome-dot{
-  width:8px;height:8px;border-radius:50%;
-  background:rgba(255,255,255,.4);border:none;cursor:pointer;
-  transition:background .3s,transform .3s;padding:0;
-}
-.welcome-dot.active{background:#fff;transform:scale(1.35)}
-.welcome-footer{
-  display:flex;flex-direction:column;gap:12px;
-  width:100%;padding:18px 22px 22px;
-  background:#0a0a0a;color:#fff;text-align:center;
-}
-.welcome-footer h3{margin:0;font-size:18px}
-.welcome-footer p{margin:0;font-size:13px;color:rgba(255,255,255,.7);line-height:1.4}
-.welcome-actions{display:flex;gap:10px;margin-top:4px}
-.welcome-actions button{
-  flex:1;padding:11px 0;border-radius:10px;border:none;
-  font-size:14px;font-weight:600;cursor:pointer;
-}
-.welcome-noted{background:#E03A52;color:#fff}
-.welcome-noted:hover{background:#c8324a}
-.welcome-skip{background:rgba(255,255,255,.12);color:#fff}
-.welcome-skip:hover{background:rgba(255,255,255,.22)}
 /* ─── Image Zoom Lightbox ───────────────────────── */
 #imgZoomOverlay{
   position:fixed;inset:0;z-index:99999;
@@ -3988,9 +3889,6 @@ ul{list-style:none}
   </div>
 
   <div class="services-scroll-wrap">
-    <button class="services-arrow prev" onclick="scrollServices(-1)" aria-label="Scroll left">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
-    </button>
     <div class="services-scroll" id="servicesScroll">
 
       <div class="service-card" onclick="openServiceModal('KR Webcrafts','DIGITAL','💻','https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=420&q=70')">
@@ -4062,9 +3960,6 @@ ul{list-style:none}
 
 
     </div>
-    <button class="services-arrow next" onclick="scrollServices(1)" aria-label="Scroll right">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-    </button>
   </div>
 </section>
 
@@ -4082,15 +3977,9 @@ ul{list-style:none}
   </div>
 
   <div class="hr-scroll-wrap">
-    <button class="hr-arrow prev" onclick="scrollHonestReviews(-1)" aria-label="Scroll left">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
-    </button>
     <div class="hr-scroll" id="honestReviewsScroll">
       <div class="hr-loading" id="honestReviewsLoading">Loading reviews…</div>
     </div>
-    <button class="hr-arrow next" onclick="scrollHonestReviews(1)" aria-label="Scroll right">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-    </button>
   </div>
 </section>
 
@@ -10864,53 +10753,6 @@ document.getElementById('addModal').addEventListener('change', function(e){
   }
 });
 
-// ── Welcome Modal ──
-(function(){
-  if(localStorage.getItem('welcomeModalNoted')==='1') return;
-  setTimeout(()=>{
-    document.getElementById('welcomeModal').classList.add('open');
-  }, 800);
-})();
-
-function welcomeNoted(){
-  localStorage.setItem('welcomeModalNoted','1');
-  closeWelcomeModal();
-}
-function welcomeSkip(){
-  closeWelcomeModal();
-}
-
-let _wmIdx = 0;
-function goWelcomeSlide(n){
-  const slides = document.querySelectorAll('.welcome-slide');
-  const dots   = document.querySelectorAll('.welcome-dot');
-  slides[_wmIdx].classList.remove('active');
-  dots[_wmIdx].classList.remove('active');
-  _wmIdx = n;
-  slides[_wmIdx].classList.add('active');
-  dots[_wmIdx].classList.add('active');
-}
-function closeWelcomeModal(){
-  document.getElementById('welcomeModal').classList.remove('open');
-}
-let _wmTimer = null;
-function _wmStart(){ _wmTimer = setInterval(()=>{ goWelcomeSlide((_wmIdx+1)%3); }, 3000); }
-function _wmStop(){ clearInterval(_wmTimer); _wmTimer = null; }
-_wmStart();
-document.addEventListener('DOMContentLoaded',function(){
-  const slides = document.querySelector('.welcome-slides');
-  if(!slides) return;
-  slides.addEventListener('mouseenter', _wmStop);
-  slides.addEventListener('mouseleave', _wmStart);
-  slides.addEventListener('touchstart', _wmStop, {passive:true});
-  slides.addEventListener('touchend',   ()=>{ setTimeout(_wmStart, 2000); }, {passive:true});
-});
-document.addEventListener('DOMContentLoaded',function(){
-  document.getElementById('welcomeModal').addEventListener('click',function(e){
-    if(e.target===this) closeWelcomeModal();
-  });
-});
-
 // ── Image Zoom Lightbox ──
 function openImgZoom(src, evt, label, title){
   if(evt) evt.stopPropagation();
@@ -10925,45 +10767,14 @@ function openImgZoom(src, evt, label, title){
     cap.innerHTML='';
   }
   overlay.classList.add('open');
-  if(typeof _wmStop==='function') _wmStop();
 }
 function closeImgZoom(){
   document.getElementById('imgZoomOverlay').classList.remove('open');
-  if(typeof _wmStart==='function') _wmStart();
 }
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape') closeImgZoom();
 });
 </script>
-
-<!-- ── Welcome / Offer Modal ── -->
-<div id="welcomeModal">
-  <div class="welcome-box">
-    <button class="welcome-close" onclick="closeWelcomeModal()">&#x2715;</button>
-    <div class="welcome-slides">
-      <div class="welcome-slide active">
-        <img src="Images/1st Month.png" alt="Offer - Month 1" loading="eager" onclick="openImgZoom(this.src, event, 'The Problem', 'Tired of rental struggles searching on your own?')">
-      </div>
-      <div class="welcome-slide">
-        <img src="Images/2nd month.png" alt="Offer - Month 2" loading="lazy" onclick="openImgZoom(this.src, event, 'Other Platforms &amp; Brokers', 'Endless listings, fake photos, broker hassles — sound familiar?')">
-      </div>
-      <div class="welcome-slide">
-        <img src="Images/3rd Month.png" alt="Offer - Month 3" loading="lazy" onclick="openImgZoom(this.src, event, 'Why Choose Us', 'Verified homes, real photos, zero stress — find your perfect home in 1 day')">
-      </div>
-      <div class="welcome-dots">
-        <button class="welcome-dot active" onclick="goWelcomeSlide(0)"></button>
-        <button class="welcome-dot" onclick="goWelcomeSlide(1)"></button>
-        <button class="welcome-dot" onclick="goWelcomeSlide(2)"></button>
-      </div>
-    </div>
-    <div class="welcome-footer">
-      <div class="welcome-actions">
-        <button class="welcome-skip" onclick="welcomeSkip()">Skip for now</button>
-        <button class="welcome-noted" onclick="welcomeNoted()">Noted</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- ── Image Zoom Lightbox ── -->
 <div id="imgZoomOverlay" onclick="if(event.target===this)closeImgZoom()">
