@@ -1991,10 +1991,11 @@ ul{list-style:none}
 .form-label{font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:5px;display:block}
 .form-input{
   width:100%;border:1.5px solid var(--border-2);border-radius:9px;
-  padding:9px 12px;font-size:13px;color:var(--text);background:var(--bg);
+  padding:9px 12px;font-size:13px;color:var(--brand);background:var(--bg);
   outline:none;transition:border-color .12s;
 }
 .form-input:focus{border-color:var(--brand)}
+.form-input::placeholder{color:var(--text-3)}
 .add-modal.view-mode input:disabled,
 .add-modal.view-mode select:disabled,
 .add-modal.view-mode textarea:disabled{
@@ -2078,12 +2079,31 @@ ul{list-style:none}
 .detail-gallery .img-slide{object-fit:contain;background:var(--bg-3)}
 .form-select{
   width:100%;border:1.5px solid var(--border-2);border-radius:9px;
-  padding:9px 12px;font-size:13px;color:var(--text);background:var(--bg);
+  padding:9px 12px;font-size:13px;color:var(--brand);background:var(--bg);
   outline:none;transition:border-color .12s;appearance:none;
   cursor:pointer;
 }
 .form-select:focus{border-color:var(--brand)}
 .form-select:disabled{background:var(--bg-2);color:var(--text-2);cursor:not-allowed;opacity:1}
+.form-group.has-error .form-input,
+.form-group.has-error .form-select{border-color:var(--brand);background:var(--brand-light)}
+.field-error-text{display:block;color:var(--brand);font-size:11px;font-weight:600;margin-top:4px}
+.input-icon-wrap{position:relative}
+.input-icon-wrap .form-input{padding-right:44px}
+.contact-pick-btn{
+  position:absolute;top:50%;right:6px;transform:translateY(-50%);
+  width:30px;height:30px;border-radius:50%;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(150deg,#ff8a9a 0%,var(--brand) 55%,var(--brand-hover) 100%);
+  box-shadow:0 2px 5px rgba(224,58,82,.45),inset 0 1px 1px rgba(255,255,255,.55),inset 0 -2px 2px rgba(0,0,0,.18);
+  color:#fff;transition:transform .12s,box-shadow .12s;
+}
+.contact-pick-btn:hover{transform:translateY(-50%) scale(1.08)}
+.contact-pick-btn:active{
+  transform:translateY(-50%) scale(.94);
+  box-shadow:0 1px 2px rgba(224,58,82,.4),inset 0 1px 2px rgba(0,0,0,.25);
+}
+.contact-pick-btn svg{width:15px;height:15px;filter:drop-shadow(0 1px 0.5px rgba(0,0,0,.15))}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media (max-width:640px){
   /* Post Property and View Property share this form — keep every row to
@@ -4516,14 +4536,20 @@ ul{list-style:none}
     </div>
     
 
-    <!-- ===== 2. LOCATION ===== -->
-    <div class="lm-section">📍 Location</div>
+    <input type="hidden" id="f-latitude"/><input type="hidden" id="f-longitude"/>
+
+    <!-- ===== 2/3. OWNER DETAILS (incl. Location) ===== -->
+    <div id="ownerDetailsSection">
+    <div class="lm-section">👤 Owner Details</div>
     <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+	<div class="form-group">
+      <label class="form-label">Property name</label>
+      <input class="form-input" type="text" id="f-title" />
+    </div>
 	  <div class="form-group">
         <label class="form-label">Area <span style="color:var(--brand)">*</span></label>
         <input class="form-input" type="text" id="f-location" />
       </div>
-	  
       <div class="form-group">
         <label class="form-label">City</label>
         <input class="form-input" type="text" id="f-city" value="Bengaluru" />
@@ -4548,21 +4574,26 @@ ul{list-style:none}
         <label class="form-label">Google Maps link (optional)</label>
         <input class="form-input" type="url" id="f-googleMapsLink" />
       </div>
-    </div>
-    <input type="hidden" id="f-latitude"/><input type="hidden" id="f-longitude"/>
-
-    <!-- ===== 3. OWNER DETAILS ===== -->
-    <div id="ownerDetailsSection">
-    <div class="lm-section">👤 Owner Details</div>
-    <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
-	<div class="form-group">
-      <label class="form-label">Property name</label>
-      <input class="form-input" type="text" id="f-title" />
-    </div>
       <div class="form-group"><label class="form-label">Owner name <span style="color:var(--brand)">*</span></label><input class="form-input" type="text" id="f-ownerName"/></div>
-      <div class="form-group"><label class="form-label">Phone number <span style="color:var(--brand)">*</span></label><input class="form-input" type="tel" id="f-ownerPhone" inputmode="numeric" maxlength="10" oninput="sanitizeMobileInput(this)"/></div>
+      <div class="form-group">
+        <label class="form-label">Phone number <span style="color:var(--brand)">*</span></label>
+        <div class="input-icon-wrap">
+          <input class="form-input" type="tel" id="f-ownerPhone" inputmode="numeric" maxlength="10" oninput="sanitizeMobileInput(this)"/>
+          <button type="button" class="contact-pick-btn" onclick="pickContactFromDevice('f-ownerPhone','f-ownerName')" title="Pick from contacts">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </button>
+        </div>
+      </div>
       <div class="form-group"><label class="form-label">Email (optional)</label><input class="form-input" type="email" id="f-ownerEmail"/></div>
-      <div class="form-group"><label class="form-label">Alternate number</label><input class="form-input" type="tel" id="f-ownerAltPhone" inputmode="numeric" maxlength="10" oninput="sanitizeMobileInput(this)"/></div>
+      <div class="form-group">
+        <label class="form-label">Alternate number</label>
+        <div class="input-icon-wrap">
+          <input class="form-input" type="tel" id="f-ownerAltPhone" inputmode="numeric" maxlength="10" oninput="sanitizeMobileInput(this)"/>
+          <button type="button" class="contact-pick-btn" onclick="pickContactFromDevice('f-ownerAltPhone')" title="Pick from contacts">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </button>
+        </div>
+      </div>
       <div class="form-group">
         <label class="form-label">Preferred contact time</label>
         <select class="form-select" id="f-contactTime"><option>Any</option><option>Morning (10am - 1pm)</option><option>Afternoon (1pm - 5pm)</option><option>Evening (6pm - 9pm)</option></select>
@@ -4576,7 +4607,12 @@ ul{list-style:none}
         <div class="form-row" style="grid-template-columns:1fr 1fr;margin-top:4px">
           <div class="form-group">
             <label class="form-label">Agent phone number</label>
-            <input class="form-input" type="tel" id="f-agentPhone" inputmode="numeric" maxlength="10" oninput="sanitizeMobileInput(this)" />
+            <div class="input-icon-wrap">
+              <input class="form-input" type="tel" id="f-agentPhone" inputmode="numeric" maxlength="10" oninput="sanitizeMobileInput(this)" />
+              <button type="button" class="contact-pick-btn" onclick="pickContactFromDevice('f-agentPhone')" title="Pick from contacts">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </button>
+            </div>
           </div>
           <div class="form-group">
             <label class="form-label">Agent service area</label>
@@ -10212,7 +10248,102 @@ function fCaptureLocation() {
   }, function() { btnTxt.textContent = 'Live'; status.textContent = 'Permission denied.'; });
 }
 
+// ═══════════════════════════════════════════════
+// REQUIRED-FIELD VALIDATION (listing form)
+// Every field in the Add/Post Property form is mandatory except a small set
+// of true meta/utility inputs (hidden coords, file pickers, the bulk-import
+// helper, and per-amenity quantity boxes that only matter if their checkbox
+// is checked). Missing fields get a red border + an inline message right
+// under that field.
+// ═══════════════════════════════════════════════
+const OPTIONAL_FIELD_IDS = new Set([
+  'f-importFile', 'f-importText',
+  'f-latitude', 'f-longitude', 'f-latLngDisplay',
+  'f-imgFileInput', 'f-imgCameraInput',
+  'f-amenities-extra',
+]);
+function isUnitField(id) { return /Units$/.test(id); }
+
+function getAllListingFields() {
+  return Array.from(document.querySelectorAll(
+    '#addModal input[id^="f-"], #addModal select[id^="f-"], #addModal textarea[id^="f-"]'
+  )).filter(el =>
+    el.type !== 'hidden' && el.type !== 'file' && !el.readOnly &&
+    !OPTIONAL_FIELD_IDS.has(el.id) && !isUnitField(el.id)
+  );
+}
+function isFieldVisible(el) {
+  return !!el && !!el.offsetParent && window.getComputedStyle(el).display !== 'none';
+}
+function markRequiredLabels() {
+  getAllListingFields().forEach(el => {
+    const group = el.closest('.form-group');
+    const label = group ? group.querySelector('.form-label') : null;
+    if (!label) return;
+    // Every field is now mandatory — strip any leftover "(optional)" wording.
+    label.innerHTML = label.innerHTML
+      .replace(/\s*\(₹,\s*optional\)/i, ' (₹)')
+      .replace(/\s*\(optional\)/i, '');
+    const hasStar = Array.from(label.querySelectorAll('span')).some(s => s.textContent.trim() === '*');
+    if (!hasStar) {
+      label.insertAdjacentHTML('beforeend', ' <span style="color:var(--brand)">*</span>');
+    }
+  });
+}
+function setGroupError(group, message) {
+  if (!group) return;
+  group.classList.add('has-error');
+  let msg = group.querySelector('.field-error-text');
+  if (!msg) {
+    msg = document.createElement('div');
+    msg.className = 'field-error-text';
+    group.appendChild(msg);
+  }
+  msg.textContent = message;
+}
+function clearAllFieldErrors() {
+  document.querySelectorAll('#addModal .form-group.has-error').forEach(g => {
+    g.classList.remove('has-error');
+    const msg = g.querySelector('.field-error-text');
+    if (msg) msg.remove();
+  });
+}
+function fieldLabelText(el) {
+  const group = el.closest('.form-group');
+  const label = group ? group.querySelector('.form-label') : null;
+  if (!label) return 'This field';
+  // Strip the trailing red "*" and any stray whitespace, keep just the label text.
+  return label.textContent.replace(/\*\s*$/, '').trim();
+}
+function validateListingForm() {
+  clearAllFieldErrors();
+  let firstErrorEl = null;
+  getAllListingFields().forEach(el => {
+    if (!isFieldVisible(el)) return; // field belongs to a hidden section (e.g. PG fields while Rent is selected)
+    const val = (el.value || '').trim();
+    const missing = el.tagName === 'SELECT' ? (val === '' || val === 'Select') : (val === '');
+    if (missing) {
+      setGroupError(el.closest('.form-group'), fieldLabelText(el) + ' is required');
+      if (!firstErrorEl) firstErrorEl = el;
+    }
+  });
+  // Property images — at least one is required
+  const imgGroup = document.getElementById('imgFormGroup');
+  if (imgGroup && isFieldVisible(imgGroup) && (!Array.isArray(fImages) || fImages.length === 0)) {
+    setGroupError(imgGroup, 'Please add at least one property image');
+    if (!firstErrorEl) firstErrorEl = imgGroup;
+  }
+  return firstErrorEl;
+}
+
 function submitListing() {
+  const firstError = validateListingForm();
+  if (firstError) {
+    showToast('Please fill in all required fields');
+    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (typeof firstError.focus === 'function') firstError.focus();
+    return;
+  }
   const title = document.getElementById('f-title').value.trim();
   const rent = document.getElementById('f-rent').value;
   const loc = document.getElementById('f-location').value.trim();
@@ -10458,6 +10589,45 @@ function sanitizeMobileInput(el) {
   el.value = digits.slice(0, 10);
 }
 
+// Lets the person pick a number straight from their phone's contacts
+// instead of typing it. Uses the browser Contact Picker API, which only
+// exists on some mobile browsers (e.g. Chrome on Android) over HTTPS —
+// everywhere else we just tell them to type the number in manually.
+async function pickContactFromDevice(fieldId, nameFieldId) {
+  if (!('contacts' in navigator && 'ContactsManager' in window)) {
+    showToast("Contact picker isn't supported on this device/browser — please type the number in.", 'error');
+    return;
+  }
+  try {
+    const contacts = await navigator.contacts.select(['tel', 'name'], { multiple: false });
+    if (!contacts || !contacts.length) return;
+    const picked = contacts[0];
+    const rawTel = (picked.tel && picked.tel[0]) || '';
+    let digits = rawTel.replace(/\D/g, '').slice(-10);
+    while (digits.length && !/[6-9]/.test(digits[0])) digits = digits.slice(1);
+    if (!digits) {
+      showToast('That contact has no usable mobile number.', 'error');
+      return;
+    }
+    const field = document.getElementById(fieldId);
+    if (field) {
+      field.value = digits;
+      field.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    if (nameFieldId && picked.name && picked.name[0]) {
+      const nameField = document.getElementById(nameFieldId);
+      if (nameField && !nameField.value.trim()) {
+        nameField.value = picked.name[0];
+        nameField.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    }
+  } catch (err) {
+    if (err && err.name !== 'AbortError') {
+      showToast('Could not read that contact — please type the number in.', 'error');
+    }
+  }
+}
+
 /* ── Confirm dialog (Promise-based replacement for window.confirm()) ──
    Usage: if (!await showConfirmDialog({ message: 'Delete this?' })) return; */
 function showConfirmDialog({ title = 'Are you sure?', message = 'This action cannot be undone.', okText = 'Confirm', cancelText = 'Cancel', variant = 'danger' } = {}) {
@@ -10623,6 +10793,35 @@ renderShortlistPanel();
 renderRecentlyViewed();
 updateNavAuth();
 loadHonestReviews();
+markRequiredLabels();
+document.getElementById('addModal').addEventListener('input', function(e){
+  const group = e.target.closest && e.target.closest('.form-group');
+  if (group && group.classList.contains('has-error')) {
+    const val = (e.target.value || '').trim();
+    if (val !== '' && val !== 'Select') {
+      group.classList.remove('has-error');
+      const msg = group.querySelector('.field-error-text');
+      if (msg) msg.remove();
+    }
+  }
+});
+document.getElementById('addModal').addEventListener('change', function(e){
+  const group = e.target.closest && e.target.closest('.form-group');
+  if (group && group.classList.contains('has-error')) {
+    const val = (e.target.value || '').trim();
+    if (val !== '' && val !== 'Select') {
+      group.classList.remove('has-error');
+      const msg = group.querySelector('.field-error-text');
+      if (msg) msg.remove();
+    }
+  }
+  const imgGroup = document.getElementById('imgFormGroup');
+  if (imgGroup && imgGroup.classList.contains('has-error') && Array.isArray(fImages) && fImages.length > 0) {
+    imgGroup.classList.remove('has-error');
+    const msg = imgGroup.querySelector('.field-error-text');
+    if (msg) msg.remove();
+  }
+});
 
 // ── Welcome Modal ──
 (function(){
