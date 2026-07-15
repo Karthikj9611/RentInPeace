@@ -850,6 +850,105 @@ function validatePropertyFields(fields) {
   return null;
 }
 
+// ────────────────────────────────────────────────────────────────────────────
+// ── REQUIRED-FIELD ENFORCEMENT ──
+// The listing form now marks nearly every field mandatory client-side, but a
+// client-side check can always be bypassed (a direct API call, a modified
+// request, etc.) — so the same requiredness is enforced again here before
+// anything is written to Mongo. Fields intentionally left null for a given
+// listing type (e.g. property.bhk for a PG, price.deposit for a Lease — the
+// form hides those inputs entirely for that type) are NOT required for that
+// type; only fields the form actually shows are enforced, matching the
+// per-status field visibility in onFTypeChange() on the frontend.
+// ────────────────────────────────────────────────────────────────────────────
+function getPath(obj, path) {
+  return path.split('.').reduce((o, k) => (o == null ? o : o[k]), obj);
+}
+function isEmptyValue(v) {
+  return v === undefined || v === null || (typeof v === 'string' && v.trim() === '');
+}
+
+// Required for every listing type — propertyName/area/price.rent are already
+// checked (with a type-specific label) right before this runs, so they're
+// deliberately left out here to avoid a duplicate message.
+const BASE_REQUIRED_FIELDS = [
+  ['location.city',     'Location: City'],
+  ['location.address',  'Location: Building live address'],
+  ['location.mapLink',  'Location: Google Maps link'],
+  ['owner.name',        'Owner name'],
+  ['owner.phone',       'Owner phone number'],
+  ['owner.email',       'Owner email'],
+  ['owner.altPhone',    'Owner alternate number'],
+  ['owner.contactTime', 'Preferred contact time'],
+  ['owner.address',     'Owner address'],
+  ['media.desc',        'Description'],
+  ['media.video',       'Video tour URL'],
+];
+
+// Extra fields required only for the listing types whose form section
+// actually shows them.
+const TYPE_REQUIRED_FIELDS = {
+  'For Rent': [
+    ['price.deposit',      'Security deposit'],
+    ['price.maintenance',  'Maintenance'],
+    ['price.negotiable',   'Price negotiable'],
+    ['property.type',      'Property type'],
+    ['property.bhk',       'BHK'],
+    ['property.floor',     'Floor'],
+    ['property.area',      'Area (sqft)'],
+    ['property.age',       'Age of property'],
+    ['property.available', 'Available from'],
+    ['terms.lease',        'Lease duration'],
+    ['rules.pets',         'Pets allowed'],
+    ['rules.nonVeg',       'Non-veg allowed'],
+  ],
+  'Lease': [
+    ['price.maintenance',  'Maintenance'],
+    ['property.type',      'Property type'],
+    ['property.bhk',       'BHK'],
+    ['property.floor',     'Floor'],
+    ['property.area',      'Area (sqft)'],
+    ['property.available', 'Available from'],
+    ['terms.leaseType',    'Lease type'],
+    ['rules.pets',         'Pets allowed'],
+    ['rules.nonVeg',       'Non-veg allowed'],
+  ],
+  'PG': [
+    ['pg.meals',     'Meals'],
+    ['pg.occupancy', 'Occupancy available'],
+    ['pg.bathroom',  'Attached bathroom'],
+    ['pg.furnish',   'Room furnishing'],
+    ['pg.kitchen',   'Kitchen access'],
+    ['pg.available', 'Available from'],
+    ['pg.visitors',  'Visitor policy'],
+    ['pg.nonVeg',    'Non-veg allowed'],
+    ['pg.food',      'Food type'],
+  ],
+  'Short Stay': [
+    ['shortStay.maxGuests',      'Max guests'],
+    ['shortStay.minDays',        'Minimum stay (days)'],
+    ['shortStay.checkinTime',    'Check-in time'],
+    ['shortStay.checkoutTime',   'Check-out time'],
+    ['shortStay.cancellation',   'Free cancellation window'],
+    ['shortStay.idProof',        'ID proof required'],
+    ['shortStay.couplesAllowed', 'Unmarried couples allowed'],
+  ],
+};
+
+// Returns a list of human-readable labels for every required field that's
+// missing/empty for this listing's status — empty array means nothing's missing.
+function findMissingRequiredFields(fields, status) {
+  const required = BASE_REQUIRED_FIELDS.concat(TYPE_REQUIRED_FIELDS[status] || []);
+  if ((fields.basic || {}).listedBy === 'Agent') {
+    required.push(['owner.agentPhone', 'Agent phone number'], ['owner.agentArea', 'Agent service area']);
+  }
+  const missing = required.filter(([path]) => isEmptyValue(getPath(fields, path)));
+  const labels = missing.map(([, label]) => label);
+  const images = (fields.media || {}).images;
+  if (!Array.isArray(images) || images.length === 0) labels.push('Property images');
+  return labels;
+}
+
 // ── Rate limiter ──
 const listingLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, max: 10,
@@ -895,6 +994,13 @@ app.post('/api/properties', listingLimiter, requireUser, async (req, res) => {
     }
     if (status === 'Short Stay' && !fields.shortStay.roomType) {
       return res.status(400).json({ message: 'shortStay.roomType is required for Short Stay listings.' });
+    }
+
+    // Every other field the form shows for this listing type must be filled
+    // in too — reject the whole request rather than silently storing nulls.
+    const missingFields = findMissingRequiredFields(fields, status);
+    if (missingFields.length) {
+      return res.status(400).json({ message: `Please fill in all required fields: ${missingFields.join(', ')}.` });
     }
 
     const displayPrice = formatPrice(fields.price.rent, status);
@@ -1572,6 +1678,7 @@ app.get('/api/admin/properties', requireAdmin, async (req, res) => {
       const amenities = doc.amenities || {};
       const media     = doc.media     || {};
       const pg        = doc.pg        || {};
+      const shortStay = doc.shortStay || {};
 
       return {
         _id:          String(doc._id),
@@ -1587,7 +1694,7 @@ app.get('/api/admin/properties', requireAdmin, async (req, res) => {
         full: {
           basic, location, owner, price, property,
           amenities, terms: doc.terms || {}, rules: doc.rules || {},
-          media, pg,
+          media, pg, shortStay,
           verified:         !!doc.verified,
           promoted:         !!doc.promoted,
           promotedPriority: doc.promotedPriority != null ? doc.promotedPriority : null,
@@ -1625,6 +1732,17 @@ app.get('/api/admin/properties', requireAdmin, async (req, res) => {
         pgOccupancy:  pg.occupancy || '',
         pgNotice:     pg.notice || '',
         pgBathroom:   pg.bathroom || '',
+
+        // Short Stay Details
+        ssRoomType:      shortStay.roomType || '',
+        ssMaxGuests:     shortStay.maxGuests || '',
+        ssMinDays:       shortStay.minDays || '',
+        ssCheckinTime:   shortStay.checkinTime || '',
+        ssCheckoutTime:  shortStay.checkoutTime || '',
+        ssExtraDayRate:  shortStay.extraDayRate != null ? shortStay.extraDayRate : null,
+        ssCancellation:  shortStay.cancellation || '',
+        ssIdProof:       shortStay.idProof || '',
+        ssCouplesAllowed:shortStay.couplesAllowed || '',
 
         // Owner Info
         ownerName:    owner.name || '',

@@ -83,43 +83,6 @@ body{
 .header-badge::before{content:'';width:7px;height:7px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
 
-/* ── STATS ── */
-.stats-grid{
-  display:grid;grid-template-columns:repeat(4,1fr);
-  gap:16px;margin-bottom:28px;
-}
-@media(max-width:768px){.stats-grid{grid-template-columns:repeat(2,1fr);gap:12px}}
-@media(max-width:360px){.stats-grid{grid-template-columns:1fr}}
-
-.stat-card{
-  background:var(--surface);border-radius:var(--radius);
-  padding:20px 22px;border:1px solid var(--border);
-  box-shadow:var(--shadow);transition:all 0.2s;position:relative;overflow:hidden;
-}
-.stat-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
-.stat-card::after{
-  content:'';position:absolute;right:-20px;top:-20px;
-  width:80px;height:80px;border-radius:50%;opacity:0.06;
-}
-.stat-card:nth-child(1)::after{background:var(--gold)}
-.stat-card:nth-child(2)::after{background:var(--green)}
-.stat-card:nth-child(3)::after{background:#5b7be8}
-.stat-card:nth-child(4)::after{background:#e67e22}
-.stat-icon{
-  width:38px;height:38px;border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:0.95rem;margin-bottom:12px;
-}
-.stat-card:nth-child(1) .stat-icon{background:var(--gold-light);color:var(--gold)}
-.stat-card:nth-child(2) .stat-icon{background:var(--green-light);color:var(--green)}
-.stat-card:nth-child(3) .stat-icon{background:#eef1fc;color:#5b7be8}
-.stat-card:nth-child(4) .stat-icon{background:#fff3e0;color:#e67e22}
-.stat-number{
-  font-family:'Cormorant Garamond',serif;
-  font-size:2.2rem;font-weight:700;color:var(--ink);line-height:1;
-}
-.stat-label{font-size:0.75rem;color:var(--ink3);margin-top:5px;font-weight:600;letter-spacing:0.3px}
-
 /* ── TAB BAR ── */
 .tab-bar{
   display:flex;align-items:center;gap:6px;
@@ -187,7 +150,7 @@ body{
 
 /* ── BULK DELETE TOOLBAR ── */
 .bulk-toolbar{
-  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:20px;
   padding:12px 20px;border-bottom:1px solid var(--border);
   background:var(--surface2);
 }
@@ -507,6 +470,7 @@ table.dataTable.no-footer{border-bottom:none!important}
 .status-sold  {background:#f5f5f5;color:#999}
 .status-lease {background:#fff3e0;color:#e67e22}
 .status-pg    {background:#fce4ec;color:#c2185b}
+.status-shortstay{background:#ede7f6;color:#6a3fb5}
 
 /* ── DATATABLES CONTROLS ── */
 .dataTables_wrapper .dataTables_filter{margin-bottom:16px}
@@ -546,7 +510,8 @@ table.dataTable.no-footer{border-bottom:none!important}
 }
 
 /* ── EXPORT BUTTONS ── */
-.dt-buttons{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.dt-buttons{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;float:none!important}
+.top-controls{clear:both;overflow:hidden}
 .dt-button{
   display:inline-flex!important;align-items:center!important;gap:6px!important;
   background:var(--surface)!important;color:var(--ink2)!important;
@@ -813,11 +778,6 @@ footer i{color:var(--gold)}
   .header-title h1{font-size:1.2rem}
   .header-title p{font-size:0.72rem}
 
-  /* Stats */
-  .stat-number{font-size:1.75rem}
-  .stat-label{font-size:0.68rem}
-  .stat-icon{width:34px;height:34px;font-size:0.88rem;margin-bottom:9px}
-
   /* Tab bar */
   .tab-bar{
     width:100%;border-radius:var(--radius-sm);
@@ -872,20 +832,6 @@ footer i{color:var(--gold)}
 
 /* ── 600 px and below ── */
 @media(max-width:600px){
-  /* Stats: horizontal scroll strip */
-  .stats-grid{
-    display:flex;flex-direction:row;gap:10px;
-    overflow-x:auto;-webkit-overflow-scrolling:touch;
-    padding-bottom:4px;margin-bottom:20px;
-    scrollbar-width:none;
-  }
-  .stats-grid::-webkit-scrollbar{display:none}
-  .stat-card{
-    min-width:130px;flex:0 0 auto;
-    padding:14px 14px;border-radius:var(--radius-sm);
-  }
-  .stat-number{font-size:1.55rem}
-
   /* Prop filters full-width wrap */
   .card-header{flex-direction:column;align-items:stretch}
   .prop-filters{width:100%}
@@ -924,12 +870,6 @@ footer i{color:var(--gold)}
   .tab-btn{padding:10px 8px;gap:4px;flex-direction:column;font-size:0.62rem}
   .tab-btn i{font-size:1rem;margin-bottom:1px}
 
-  /* Stat cards smaller */
-  .stat-card{min-width:116px;padding:12px 12px}
-  .stat-icon{width:30px;height:30px;font-size:0.78rem;border-radius:8px;margin-bottom:7px}
-  .stat-number{font-size:1.4rem}
-  .stat-label{font-size:0.64rem;letter-spacing:0}
-
   /* Remark input full width */
   .remark-input{width:100%;max-width:200px}
 
@@ -958,8 +898,6 @@ footer i{color:var(--gold)}
 @media(max-width:360px){
   body{padding:10px 10px 28px}
   .tab-btn{padding:8px 4px}
-  .stat-card{min-width:104px;padding:10px 10px}
-  .stat-number{font-size:1.25rem}
   .login-card{margin:8px;padding:22px 16px 20px}
 }
 
@@ -1154,30 +1092,6 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
     </div>
   </div>
 
-  <!-- STATS -->
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-icon"><i class="fas fa-users"></i></div>
-      <div class="stat-number" id="totalCount">—</div>
-      <div class="stat-label">Total Leads</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
-      <div class="stat-number" id="todayCount">—</div>
-      <div class="stat-label">Today's Sign-ups</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon"><i class="fas fa-phone"></i></div>
-      <div class="stat-number" id="phoneCount">—</div>
-      <div class="stat-label">With Mobile</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon"><i class="fas fa-building"></i></div>
-      <div class="stat-number" id="propCount">—</div>
-      <div class="stat-label">Total Properties</div>
-    </div>
-  </div>
-
   <!-- TAB BAR -->
   <div class="tab-bar">
     <button class="tab-btn" id="tab-customers" onclick="switchTab('customers')">
@@ -1262,6 +1176,9 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
       <button class="cat-tab-btn" data-cat="PG" onclick="switchPropCategory('PG')">
         <i class="fas fa-bed"></i><span>PG</span><span class="cat-count" id="cat-count-PG">—</span>
       </button>
+      <button class="cat-tab-btn" data-cat="Short Stay" onclick="switchPropCategory('Short Stay')">
+        <i class="fas fa-suitcase-rolling"></i><span>Short Stay</span><span class="cat-count" id="cat-count-Short Stay">—</span>
+      </button>
     </div>
     <div class="card">
       <div class="card-header">
@@ -1269,42 +1186,27 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
           <div class="card-title">Property Listings</div>
           <div class="card-sub">All listed properties · Owner contact details included</div>
         </div>
-        <!-- Dynamic filter dropdowns -->
-        <div class="prop-filters" id="propFilters">
-          <select class="prop-filter-select" id="filterStatus" onchange="applyPropFilters()">
-            <option value="">All Status</option>
-          </select>
-          <select class="prop-filter-select" id="filterCity" onchange="applyPropFilters()">
-            <option value="">All Cities</option>
-          </select>
-          <select class="prop-filter-select" id="filterBhk" onchange="applyPropFilters()">
-            <option value="">All BHK</option>
-          </select>
-          <button class="filter-clear-btn" id="filterClearBtn" onclick="clearPropFilters()">
-            <i class="fas fa-times"></i> Clear
-          </button>
-        </div>
-      </div>
-      <!-- Bulk delete toolbar -->
-      <div class="bulk-toolbar" id="bulkToolbar">
-        <div class="bulk-toolbar-left">
-          <span class="bulk-selected-count" id="bulkSelectedCount" style="display:none">
-            <i class="fas fa-check-circle"></i> <span id="bulkSelectedNum">0</span> selected
-          </span>
-          <button class="bulk-btn bulk-btn-clear" id="bulkClearBtn" style="display:none" onclick="clearPropSelection()">
-            <i class="fas fa-xmark"></i> Clear selection
-          </button>
-        </div>
-        <div class="bulk-toolbar-right">
-          <button class="bulk-btn bulk-btn-danger" id="bulkDeleteSelectedBtn" style="display:none" onclick="deleteSelectedProperties()">
-            <i class="fas fa-trash-alt"></i> Delete Selected (<span id="bulkDeleteCount">0</span>)
-          </button>
-          <button class="bulk-btn bulk-btn-outline-danger" onclick="deleteAllProperties()">
-            <i class="fas fa-triangle-exclamation"></i> Delete All Properties
-          </button>
-        </div>
       </div>
       <div class="table-wrapper">
+        <!-- Bulk delete toolbar -->
+        <div class="bulk-toolbar" id="bulkToolbar">
+          <div class="bulk-toolbar-left">
+            <span class="bulk-selected-count" id="bulkSelectedCount" style="display:none">
+              <i class="fas fa-check-circle"></i> <span id="bulkSelectedNum">0</span> selected
+            </span>
+            <button class="bulk-btn bulk-btn-clear" id="bulkClearBtn" style="display:none" onclick="clearPropSelection()">
+              <i class="fas fa-xmark"></i> Clear selection
+            </button>
+          </div>
+          <div class="bulk-toolbar-right">
+            <button class="bulk-btn bulk-btn-danger" id="bulkDeleteSelectedBtn" style="display:none" onclick="deleteSelectedProperties()">
+              <i class="fas fa-trash-alt"></i> Delete Selected (<span id="bulkDeleteCount">0</span>)
+            </button>
+            <button class="bulk-btn bulk-btn-outline-danger" onclick="deleteAllProperties()">
+              <i class="fas fa-triangle-exclamation"></i> Delete All Properties
+            </button>
+          </div>
+        </div>
         <table id="propertyTable" class="display nowrap" style="width:100%">
           <thead>
             <tr>
@@ -1351,33 +1253,6 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
         <div>
           <div class="card-title">Customer Appointments</div>
           <div class="card-sub">Manage site visit & enquiry appointments · Update status inline</div>
-        </div>
-        <!-- Appointment filters -->
-        <div class="prop-filters" id="apptFilters">
-          <select class="prop-filter-select" id="filterApptStatus" onchange="applyApptFilters()">
-            <option value="">All Status</option>
-            <option value="pending">Pending</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="cancelled">Cancelled</option>
-            <option value="completed">Completed</option>
-          </select>
-          <select class="prop-filter-select" id="filterApptPurpose" onchange="applyApptFilters()">
-            <option value="">All Purpose</option>
-            <option value="For Sale">For Sale</option>
-            <option value="For Rent">For Rent</option>
-            <option value="Lease">Lease</option>
-            <option value="PG">PG</option>
-            <option value="General Enquiry">General Enquiry</option>
-          </select>
-          <select class="prop-filter-select" id="filterApptSlot" onchange="applyApptFilters()">
-            <option value="">All Slots</option>
-            <option value="Morning">Morning</option>
-            <option value="Afternoon">Afternoon</option>
-            <option value="Evening">Evening</option>
-          </select>
-          <button class="filter-clear-btn" id="apptFilterClearBtn" onclick="clearApptFilters()">
-            <i class="fas fa-times"></i> Clear
-          </button>
         </div>
       </div>
       <div class="table-wrapper">
@@ -1472,7 +1347,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
 <script>
 let dataTable, propTable, apptTable;
 
-const BASE = 'https://rentinpeace.onrender.com';
+const BASE = 'http://localhost:5000';
 
 /* ── ADMIN KEY – set after login ── */
 let ADMIN_KEY = sessionStorage.getItem('kr_admin_key') || '';
@@ -1678,27 +1553,13 @@ function statusBadge(s){
   const map = {
     'For Sale':'status-sale','For Rent':'status-rent',
     'New Launch':'status-launch','Sold':'status-sold',
-    'Lease':'status-lease','PG':'status-pg'
+    'Lease':'status-lease','PG':'status-pg','Short Stay':'status-shortstay'
   };
   return `<span class="status-badge ${map[s]||'status-sale'}">${escapeHtml(s)||'—'}</span>`;
 }
 function renderOwnerPhone(row){
   if(row.ownerNumber) return `<a href="tel:${row.ownerNumber}" class="phone-link"><i class="fas fa-phone-flip"></i>${escapeHtml(row.ownerNumber)}</a>`;
   return `<span class="no-contact">—</span>`;
-}
-
-/* ── STATS ── */
-function updateStats(data){
-  const today = new Date().toISOString().split('T')[0];
-  let total=data.length, todayCount=0, mobileCount=0;
-  data.forEach(r=>{
-    if(r.createdAt && r.createdAt.startsWith(today)) todayCount++;
-    if(r.mobile) mobileCount++;
-  });
-  document.getElementById('totalCount').innerText = total;
-  document.getElementById('todayCount').innerText = todayCount;
-  document.getElementById('phoneCount').innerText = mobileCount;
-  document.getElementById('tab-customers-count').innerText = total;
 }
 
 /* ── DELETE HANDLERS ── */
@@ -1712,7 +1573,6 @@ window.deleteBooking = async function(mobile){
     setTimeout(()=>{
       const total = dataTable.data().count();
       document.getElementById('tab-customers-count').innerText = total;
-      document.getElementById('totalCount').innerText = total;
     }, 600);
   } else {
     alert(data.message || 'Delete failed');
@@ -1730,7 +1590,6 @@ window.deleteProperty = async function(id){
     setTimeout(()=>{
       const total = propTable.data().count();
       document.getElementById('tab-properties-count').innerText = total;
-      document.getElementById('propCount').innerText = total;
     }, 600);
   } else {
     alert(data.message || 'Delete failed');
@@ -1883,7 +1742,6 @@ window.deleteSelectedProperties = async function(){
     setTimeout(()=>{
       const total = propTable.data().count();
       document.getElementById('tab-properties-count').innerText = total;
-      document.getElementById('propCount').innerText = total;
     }, 600);
     updateBulkToolbarUI();
   } catch(err){
@@ -1896,7 +1754,7 @@ window.deleteAllProperties = async function(){
   if(!allRows.length){ alert('There are no properties to delete.'); return; }
   const ok = await showConfirmModal({
     title: `Delete all ${allRows.length} properties?`,
-    message: 'Every property listing — Rent, Lease, and PG — will be permanently deleted. This cannot be undone.',
+    message: 'Every property listing — Rent, Lease, PG, and Short Stay — will be permanently deleted. This cannot be undone.',
     okText: 'Delete All'
   });
   if(!ok) return;
@@ -1914,7 +1772,6 @@ window.deleteAllProperties = async function(){
     setTimeout(()=>{
       const total = propTable.data().count();
       document.getElementById('tab-properties-count').innerText = total;
-      document.getElementById('propCount').innerText = total;
     }, 600);
     updateBulkToolbarUI();
   } catch(err){
@@ -2135,7 +1992,7 @@ $(document).ready(function(){
       error: function(){ },
       dataSrc: function(res){
         if(!Array.isArray(res)) return [];
-        updateStats(res);
+        document.getElementById('tab-customers-count').innerText = res.length;
         return res;
       }
     },
@@ -2190,12 +2047,11 @@ $(document).ready(function(){
     language:{
       emptyTable:'<div class="empty-state"><i class="fas fa-inbox"></i>No customers yet</div>',
       zeroRecords:'<div class="empty-state"><i class="fas fa-magnifying-glass"></i>No matching records</div>',
-      search:'', searchPlaceholder:'Search customers…',
       lengthMenu:'Show _MENU_ entries',
       info:'Showing _START_–_END_ of _TOTAL_ leads',
       paginate:{previous:'‹ Prev',next:'Next ›'}
     },
-    dom:'<"top-controls"Bf>rt<"bottom-controls"ip>',
+    dom:'<"top-controls"B>rt<"bottom-controls"ip>',
     buttons:[
       {
         extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV', title:'KR Real-Estate Leads',
@@ -2277,7 +2133,6 @@ $(document).ready(function(){
       error: function(){ },
       dataSrc: function(res){
         if(!Array.isArray(res)) return [];
-        document.getElementById('propCount').innerText = res.length;
         document.getElementById('tab-properties-count').innerText = res.length;
         buildPropFilters(res);
         return res;
@@ -2349,12 +2204,11 @@ $(document).ready(function(){
     language:{
       emptyTable:'<div class="empty-state"><i class="fas fa-building"></i>No properties yet</div>',
       zeroRecords:'<div class="empty-state"><i class="fas fa-magnifying-glass"></i>No matching records</div>',
-      search:'', searchPlaceholder:'Search properties…',
       lengthMenu:'Show _MENU_ entries',
       info:'Showing _START_–_END_ of _TOTAL_ properties',
       paginate:{previous:'‹ Prev',next:'Next ›'}
     },
-    dom:'<"top-controls"Bf>rt<"bottom-controls"ip>',
+    dom:'<"top-controls"B>rt<"bottom-controls"ip>',
     buttons:[
       {
         extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV', title:'KR Properties',
@@ -2440,6 +2294,11 @@ $(document).ready(function(){
     ],
     drawCallback:function(){ try{ syncPropSelectionUI(); }catch(e){ /* table not fully initialized yet */ } }
   });
+  // Physically reposition the bulk-delete toolbar so it renders below the
+  // CSV/Excel/PDF/Print export buttons (DataTables always inserts its
+  // "top-controls" button row immediately above the <table>, so we move
+  // the toolbar to sit right after that generated row).
+  $('#bulkToolbar').insertAfter($('#propertyTable_wrapper .top-controls'));
   } catch(e){ console.error('Properties table failed to initialize:', e); }
 
   /* ════════════════════════════════════
@@ -2533,12 +2392,11 @@ $(document).ready(function(){
     language:{
       emptyTable:'<div class="empty-state"><i class="fas fa-calendar-xmark"></i>No appointments yet</div>',
       zeroRecords:'<div class="empty-state"><i class="fas fa-magnifying-glass"></i>No matching appointments</div>',
-      search:'', searchPlaceholder:'Search appointments…',
       lengthMenu:'Show _MENU_ entries',
       info:'Showing _START_–_END_ of _TOTAL_ appointments',
       paginate:{previous:'‹ Prev',next:'Next ›'}
     },
-    dom:'<"top-controls"Bf>rt<"bottom-controls"ip>',
+    dom:'<"top-controls"B>rt<"bottom-controls"ip>',
     buttons:[
       {
         extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV', title:'KR Appointments',
@@ -2652,6 +2510,20 @@ const MODAL_FIELD_GROUPS = [
     ]
   },
   {
+    label: 'Short Stay Details',
+    fields: [
+      ['ssRoomType',      'Room Type'],
+      ['ssMaxGuests',     'Max Guests'],
+      ['ssMinDays',       'Minimum Days'],
+      ['ssCheckinTime',   'Check-in Time'],
+      ['ssCheckoutTime',  'Check-out Time'],
+      ['ssExtraDayRate',  'Extra Day Rate (₹)'],
+      ['ssCancellation',  'Cancellation Policy'],
+      ['ssIdProof',       'ID Proof Required'],
+      ['ssCouplesAllowed','Couples Allowed'],
+    ]
+  },
+  {
     label: 'Owner Info',
     fields: [
       ['ownerName',  'Owner Name'],
@@ -2674,6 +2546,7 @@ const STATUS_COLOR_MAP = {
   'Sold'     : 'background:#f5f5f5;color:#999',
   'Lease'    : 'background:#fff3e0;color:#e67e22',
   'PG'       : 'background:#fce4ec;color:#c2185b',
+  'Short Stay': 'background:#ede7f6;color:#6a3fb5',
 };
 
 function _adminModalEsc(str){
@@ -2877,8 +2750,6 @@ function closeAdminPropModal(){
 function buildPropFilters(data){
   updatePropCategoryCounts(data);
   const statuses = [...new Set(data.map(r=>r.status).filter(Boolean))].sort();
-  const cities   = [...new Set(data.map(r=>r.city||r.loc).filter(Boolean))].sort();
-  const bhks     = [...new Set(data.map(r=>r.bhk).filter(v=>v!=null&&v!==''))].sort((a,b)=>Number(a)-Number(b));
 
   function populate(id, values, prefix=''){
     const sel = document.getElementById(id);
@@ -2887,47 +2758,8 @@ function buildPropFilters(data){
       values.map(v=>`<option value="${_adminModalEsc(v)}" ${cur===String(v)?'selected':''}>${prefix}${_adminModalEsc(String(v))}</option>`).join('');
   }
 
-  populate('filterStatus', statuses);
-  populate('filterCity',   cities);
-  populate('filterBhk',    bhks, '');
   populate('colFilterStatus', statuses);
 }
-
-function applyPropFilters(){
-  const status = document.getElementById('filterStatus').value;
-  const city   = document.getElementById('filterCity').value;
-  const bhk    = document.getElementById('filterBhk').value;
-
-  // Mark active
-  ['filterStatus','filterCity','filterBhk'].forEach(id=>{
-    document.getElementById(id).classList.toggle('active-filter', !!document.getElementById(id).value);
-  });
-
-  const anyActive = !!(status||city||bhk);
-  document.getElementById('filterClearBtn').classList.toggle('visible', anyActive);
-
-  /* Custom DataTables search using $.fn.dataTable.ext.search */
-  // We use a single filter function registered once, driven by closure variables
-  _propFilterState.status = status;
-  _propFilterState.city   = city;
-  _propFilterState.bhk    = bhk;
-
-  if(propTable) propTable.draw();
-}
-
-function clearPropFilters(){
-  ['filterStatus','filterCity','filterBhk'].forEach(id=>{
-    document.getElementById(id).value='';
-    document.getElementById(id).classList.remove('active-filter');
-  });
-  document.getElementById('filterClearBtn').classList.remove('visible');
-  _propFilterState.status = '';
-  _propFilterState.city   = '';
-  _propFilterState.bhk    = '';
-  if(propTable) propTable.draw();
-}
-
-const _propFilterState = {status:'', city:'', bhk:''};
 
 // Per-column header search filters (Property, Status, Price, Owner Name,
 // Owner Number, Location, Listed On, Promoted, Verified, Remarks).
@@ -2942,11 +2774,13 @@ window.onPropColumnFilter = function(field, value, inputEl){
   if(propTable) propTable.draw();
 };
 
-// Which of the 3 backend collections (rent / lease / pg) a row belongs to,
-// mirrors server.js's modelForStatus(): Lease->Lease, PG->PG, else->Rent.
+// Which of the 4 backend collections (rent / lease / pg / hourlyStay) a row
+// belongs to, mirrors server.js's modelForStatus(): Lease->Lease, PG->PG,
+// Short Stay->Short Stay, else->Rent.
 function propCategoryOf(status){
-  if(status === 'Lease') return 'Lease';
-  if(status === 'PG')    return 'PG';
+  if(status === 'Lease')      return 'Lease';
+  if(status === 'PG')         return 'PG';
+  if(status === 'Short Stay') return 'Short Stay';
   return 'Rent';
 }
 
@@ -2961,13 +2795,13 @@ function switchPropCategory(cat){
 }
 
 function updatePropCategoryCounts(data){
-  const counts = {all:data.length, Promoted:0, Verified:0, Rent:0, Lease:0, PG:0};
+  const counts = {all:data.length, Promoted:0, Verified:0, Rent:0, Lease:0, PG:0, 'Short Stay':0};
   data.forEach(r=>{
     counts[propCategoryOf(r.status)]++;
     if(r.promoted) counts.Promoted++;
     if(r.verified) counts.Verified++;
   });
-  ['all','Promoted','Verified','Rent','Lease','PG'].forEach(cat=>{
+  ['all','Promoted','Verified','Rent','Lease','PG','Short Stay'].forEach(cat=>{
     const el = document.getElementById('cat-count-'+cat);
     if(el) el.innerText = counts[cat];
   });
@@ -2984,13 +2818,6 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex){
   } else if(_propCategoryState !== 'all' && propCategoryOf(row.status) !== _propCategoryState){
     return false;
   }
-  const {status, city, bhk} = _propFilterState;
-  if(status && (row.status||'') !== status) return false;
-  const rowCity = row.city || row.loc || '';
-  if(city && rowCity !== city) return false;
-  if(bhk && String(row.bhk||'') !== String(bhk)) return false;
-
-  // Per-column header search filters
   const cf = _propColumnFilters;
   const contains = (val, needle) => String(val||'').toLowerCase().includes(needle.toLowerCase());
   if(cf.title && !contains(row.title, cf.title)) return false;
@@ -3099,7 +2926,6 @@ function updateApptStats(data){
 }
 
 const _apptCache = {};
-const _apptFilterState = {status:'', purpose:'', slot:''};
 
 /* ── APPOINTMENTS: PER-COLUMN HEADER SEARCH FILTERS ── */
 const _apptColumnFilters = {
@@ -3113,40 +2939,10 @@ window.onApptColumnFilter = function(field, value, inputEl){
   if(apptTable) apptTable.draw();
 };
 
-function applyApptFilters(){
-  ['filterApptStatus','filterApptPurpose','filterApptSlot'].forEach(id=>{
-    document.getElementById(id).classList.toggle('active-filter', !!document.getElementById(id).value);
-  });
-  const anyActive = !!(document.getElementById('filterApptStatus').value ||
-                       document.getElementById('filterApptPurpose').value ||
-                       document.getElementById('filterApptSlot').value);
-  document.getElementById('apptFilterClearBtn').classList.toggle('visible', anyActive);
-  _apptFilterState.status  = document.getElementById('filterApptStatus').value;
-  _apptFilterState.purpose = document.getElementById('filterApptPurpose').value;
-  _apptFilterState.slot    = document.getElementById('filterApptSlot').value;
-  if(apptTable) apptTable.draw();
-}
-
-function clearApptFilters(){
-  ['filterApptStatus','filterApptPurpose','filterApptSlot'].forEach(id=>{
-    document.getElementById(id).value='';
-    document.getElementById(id).classList.remove('active-filter');
-  });
-  document.getElementById('apptFilterClearBtn').classList.remove('visible');
-  _apptFilterState.status  = '';
-  _apptFilterState.purpose = '';
-  _apptFilterState.slot    = '';
-  if(apptTable) apptTable.draw();
-}
-
 $.fn.dataTable.ext.search.push(function(settings, data, dataIndex){
   if(settings.nTable.id !== 'appointmentTable') return true;
   const row = apptTable ? apptTable.row(dataIndex).data() : null;
   if(!row) return true;
-  const {status, purpose, slot} = _apptFilterState;
-  if(status  && (row.status ||'') !== status)  return false;
-  if(purpose && (row.purpose||'') !== purpose) return false;
-  if(slot    && (row.timeSlot||'') !== slot)   return false;
 
   // Per-column header search filters
   const cf = _apptColumnFilters;
