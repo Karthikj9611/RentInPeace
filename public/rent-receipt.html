@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=717, initial-scale=1.0, user-scalable=yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>KR Rent Bill</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -117,35 +117,6 @@ padding: 20px 10px;
   border: 1px solid #e0e7f0;
 }
 
-/* Add this media query at the end of your style section */
-@media (max-width: 700px) {
-  #bill {
-    width: 100%;
-    padding: 12px;
-    box-sizing: border-box;
-  }
-  body {
-    padding: 10px 5px;
-  }
-  .header {
-    flex-direction: column;
-    gap: 10px;
-  }
-  .info-grid {
-    grid-template-columns: 1fr;
-  }
-  .bill-two-columns {
-    flex-direction: column;
-  }
-  .footer {
-    flex-direction: column;
-    text-align: center;
-  }
-  .signature, .signature2 {
-    width: 100%;
-    text-align: center;
-  }
-}
 .watermark {
 position: absolute;
 top: 42%;
@@ -224,7 +195,7 @@ margin: 4px 0;
 /* CUSTOMER INFO GRID */
 .info-grid {
 display: grid;
-grid-template-columns: repeat(2, 1fr);
+grid-template-columns: 1fr;
 gap: 12px;
 background: #f9fbfe;
 border: 1px solid var(--border);
@@ -237,6 +208,7 @@ display: flex;
 align-items: center;
 gap: 10px;
 flex-wrap: wrap;
+min-width: 0;
 }
 .info-item .label {
 font-weight: 700;
@@ -249,6 +221,7 @@ min-width: 85px;
 }
 .info-item input {
 flex: 1;
+min-width: 0;
 border: 1px solid #ccd7e8;
 padding: 6px 8px;
 border-radius: 12px;
@@ -550,6 +523,90 @@ padding: 12px;
 }
 
 
+/* Mobile overrides — placed last so they win over base rules of equal
+   specificity (e.g. .info-item, .info-grid, .signature) regardless of
+   where those base rules sit earlier in this file. */
+@media (max-width: 700px) {
+  body {
+    font-size: 8px;
+    padding: 10px 5px;
+  }
+  #bill {
+    width: 100%;
+    padding: 12px;
+    box-sizing: border-box;
+  }
+  .header {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+  #buildingName {
+    max-width: 42% !important;
+  }
+  #buildingAddress {
+    max-width: 42% !important;
+  }
+  .bill-two-columns {
+    gap: 8px;
+  }
+  .bill-left, .bill-right {
+    min-width: 0;
+  }
+  .info-grid {
+    grid-template-columns: 1fr;
+    padding: 10px 12px;
+    gap: 8px;
+  }
+  /* One field per row: label and its input sit on the same line,
+     e.g. "Flat No.  [value]", never wrapping to a second line. */
+  .info-item {
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+  .info-item .label {
+    min-width: 62px;
+    flex: 0 0 auto;
+    font-size: 8px;
+    padding: 3px 8px;
+    white-space: nowrap;
+  }
+  .info-item input,
+  .info-item > div {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+  }
+  .info-item input {
+    font-size: 8px;
+  }
+  th {
+    font-size: 8px;
+    padding: 6px 4px;
+  }
+  td {
+    font-size: 8px;
+    padding: 6px 4px;
+  }
+  .signature, .signature2 {
+    width: 48%;
+  }
+  .controls {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    padding-bottom: 10px;
+  }
+  .controls button {
+    flex: 1;
+    width: auto;
+    margin-right: 0 !important;
+    padding: 12px 0;
+    font-size: 16px;
+  }
+  .controls button .btn-label {
+    display: none;
+  }
+}
 </style>
 </head>
 <body>
@@ -570,15 +627,15 @@ padding: 12px;
 </div>
 <textarea id="buildingAddress" placeholder="Enter address" rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="background:transparent;border:none;border-bottom:1px dashed rgba(255,255,255,.5);color:white;font-size:11px;font-weight:500;font-family:inherit;padding:2px 0;width:220px;max-width:100%;text-align:left;margin-top:4px;resize:none;overflow:hidden;white-space:pre-wrap;word-break:break-word"></textarea>
 <div class="phone-buttons">
-<a href="tel:9611459960" class="call-link" id="callLink" style="text-decoration:none;"><i class="fas fa-phone-alt"></i>
-<input type="tel" id="ownerContact" maxlength="10" placeholder="Enter number" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10);syncContactLinks();" onclick="event.preventDefault()" style="background:transparent;border:none;color:white;font-weight:bold;font-size:inherit;font-family:inherit;width:80px;padding:0;text-align:left">
+<a href="tel:9611459960" class="call-link" id="callLink" style="text-decoration:none;background:transparent;padding:4px 0;">
+<i class="fas fa-phone-alt"></i>
+<input type="tel" id="ownerContact" maxlength="10" placeholder="Enter number" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10);syncContactLinks();" onclick="event.preventDefault()" style="background:transparent;border:none;border-bottom:1px dashed rgba(255,255,255,.5);color:white;font-weight:bold;font-size:inherit;font-family:inherit;width:80px;padding:0;text-align:left">
 </a>
-<a href="https://wa.me/919611459960" target="_blank" class="whatsapp-link" id="whatsappLink"><i class="fab fa-whatsapp"></i></a>
 </div>
-</div>
-<div id="billNoDiv" style="margin-top: 14px;">
+<div id="billNoDiv" style="margin-top: 10px;">
 <div><strong>Bill No</strong> : <span id="billNo">001</span></div>
 <div><strong>Date</strong> : <span id="billDate"></span></div>
+</div>
 </div>
 </div>
 
@@ -591,7 +648,7 @@ padding: 12px;
 <div class="info-item"><span class="label">🏢 Tenant Name</span><input type="text" id="name" placeholder="Enter tenant name"></div>
 <div class="info-item">
 <span class="label">📞 Contact No.</span>
-<div style="flex:1;position:relative;display:flex;align-items:center">
+<div style="flex:1;min-width:0;position:relative;display:flex;align-items:center">
 <input type="tel" id="tenantContact" maxlength="10" placeholder="Tenant contact number" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)" style="width:100%;text-align:center;padding-right:34px;box-sizing:border-box">
 <button type="button" onclick="pickTenantContact()" title="Pick from contacts" style="position:absolute;right:4px;width:24px;height:24px;border:none;border-radius:50%;background:var(--main);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0">
 <i class="fas fa-address-book" style="font-size:10px"></i>
@@ -746,13 +803,13 @@ padding: 12px;
 
 <div class="controls">
 <button onclick="downloadPDF()" style="margin-right: 12px; background: #1f4e8c;">
-<i class="fas fa-download"></i> Download PDF
+<i class="fas fa-download"></i> <span class="btn-label">Download PDF</span>
 </button>
 <button onclick="shareOnWhatsApp()" style="margin-right: 12px; background: #25D366;">
-<i class="fab fa-whatsapp"></i> Share as Image
+<i class="fab fa-whatsapp"></i> <span class="btn-label">Share as Image</span>
 </button>
 <button onclick="sharePDFOnWhatsApp()" style="background: #128C7E;">
-<i class="fas fa-file-pdf"></i> Share as PDF
+<i class="fas fa-file-pdf"></i> <span class="btn-label">Share as PDF</span>
 </button>
 </div>
 </div>
@@ -950,7 +1007,6 @@ autosizeInputWidth(document.getElementById('ownerName'));
 function syncContactLinks() {
   const digits = (document.getElementById('ownerContact').value || '').replace(/\D/g, '');
   document.getElementById('callLink').href = digits ? `tel:${digits}` : '#';
-  document.getElementById('whatsappLink').href = digits ? `https://wa.me/91${digits}` : '#';
 }
 syncContactLinks();
 
