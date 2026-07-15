@@ -9430,9 +9430,7 @@ function renderHonestReviews(reviews) {
         <div class="hr-thumb">
           <img src="${esc(safeUrl(r.thumbUrl))}" alt="${esc(r.title || 'Customer review video')}" loading="lazy" />
           <div class="hr-thumb-overlay"></div>
-          <div class="hr-caption">${esc(r.caption)}</div>
           <div class="hr-play">${HR_PLAY_ICON}</div>
-          <div class="hr-verified">${HR_VERIFIED_ICON}${esc(r.verifiedLabel || 'Verified tenant')}</div>
         </div>
         <div class="hr-card-title">${esc(r.title)}</div>
         ${r.meta ? `<div class="hr-card-meta">${esc(r.meta)}</div>` : ''}
