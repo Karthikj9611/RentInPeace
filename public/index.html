@@ -4609,7 +4609,7 @@ ul{list-style:none}
             <label class="form-label">Agent phone number</label>
             <div class="input-icon-wrap">
               <input class="form-input" type="tel" id="f-agentPhone" inputmode="numeric" maxlength="10" oninput="sanitizeMobileInput(this)" />
-              <button type="button" class="contact-pick-btn" onclick="pickContactFromDevice('f-agentPhone')" title="Pick from contacts">
+              <button type="button" class="contact-pick-btn" onclick="pickContactFromDevice('f-agentPhone','f-agentArea')" title="Pick from contacts">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
               </button>
             </div>
@@ -10614,7 +10614,7 @@ async function pickContactFromDevice(fieldId, nameFieldId) {
     }
     if (nameFieldId && picked.name && picked.name[0]) {
       const nameField = document.getElementById(nameFieldId);
-      if (nameField && !nameField.value.trim()) {
+      if (nameField) {
         nameField.value = picked.name[0];
         nameField.dispatchEvent(new Event('input', { bubbles: true }));
       }
