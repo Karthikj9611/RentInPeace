@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=717, initial-scale=1.0, user-scalable=yes">
+<title>KR Rent Bill</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+/* Add at the very beginning of your style tag */
+html {
+  width: 100%;
+  overflow-x: auto;
+}
+
+body {
+  overflow-x: auto;
+  min-width: 320px;
+}
+
+#bill {
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 0 auto;
+}
+
+/* Keep original width for PDF - no change to download */
+@media (max-width: 768px) {
+  #bill {
+    width: auto;
+    min-width: 320px;
+  }
+}
+
+
+/* Center all input values */
+input, input[type="text"], input[type="number"] {
+text-align: center;
+}
+
+/* Ensure number inputs are centered */
+input[type="number"] {
+text-align: center;
+}
+
+/* Center inputs within table cells */
+td input {
+text-align: center;
+display: block;
+margin: 0 auto;
+}
+
+input {
+text-align: center;
+}
+
+input::placeholder {
+text-align: left; /* Keep placeholder left-aligned if needed */
+}
+
+@media print {
+body {
+background: white;
+padding: 0;
+margin: 0;
+}
+.controls {
+display: none;
+}
+/* Keep all footer elements visible in print */
+.footer, .signature, .dev-sign {
+display: block !important;
+}
+}
+
+
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+:root {
+  --main: #0f766e;
+  --light: #e6fffa;
+  --border: #99f6e4;
+  --text: #083344;
+}
+
+body {
+font-family: 'Segoe UI', Arial, sans-serif;
+font-size: 10px;
+background: #e2e8f0;
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 20px 10px;
+}
+
+#bill {
+  width: 100%;
+  min-height: 100%;
+  margin: 0 auto;
+  padding: 30px 30px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+  position: relative;
+  border: 1px solid #e0e7f0;
+}
+
+/* Add this media query at the end of your style section */
+@media (max-width: 700px) {
+  #bill {
+    width: 100%;
+    padding: 12px;
+    box-sizing: border-box;
+  }
+  body {
+    padding: 10px 5px;
+  }
+  .header {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+  .bill-two-columns {
+    flex-direction: column;
+  }
+  .footer {
+    flex-direction: column;
+    text-align: center;
+  }
+  .signature, .signature2 {
+    width: 100%;
+    text-align: center;
+  }
+}
+.watermark {
+position: absolute;
+top: 42%;
+left: 50%;
+transform: translate(-50%, -50%) rotate(-28deg);
+font-size: 150px;
+font-weight: 800;
+letter-spacing: 35px;
+pointer-events: none;
+opacity: 0.18;
+z-index: 0;
+}
+.watermark .black { color: #1e3a5f; }
+.watermark .red { color: #b22234; }
+
+/* HEADER */
+.header {
+display: flex;
+justify-content: space-between;
+align-items: flex-start;
+flex-wrap: wrap;
+background: var(--main);
+padding: 14px 20px;
+border-radius: 16px;
+margin-bottom: 20px;
+color: white;
+position: relative;
+z-index: 2;
+box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.address {
+line-height: 1.3;
+}
+.address img {
+height: 38px;
+width: auto;
+background: white;
+border-radius: 10px;
+padding: 4px 8px;
+margin-bottom: 6px;
+}
+.phone-buttons {
+display: flex;
+gap: 8px;
+margin-top: 6px;
+flex-wrap: wrap;
+}
+.call-link, .whatsapp-link {
+text-decoration: none;
+font-size: 9px;
+font-weight: bold;
+padding: 4px 10px;
+border-radius: 40px;
+display: inline-flex;
+align-items: center;
+gap: 5px;
+transition: 0.2s;
+}
+.call-link { background: #0a58ca; color: white; }
+.whatsapp-link { background: #25D366; color: white; }
+
+/*
+#billNoDiv {
+background: rgba(255,255,255,0.15);
+padding: 8px 14px;
+border-radius: 20px;
+text-align: right;
+font-weight: 600;
+font-size: 11px;
+}
+*/
+#billNoDiv div {
+margin: 4px 0;
+}
+
+/* CUSTOMER INFO GRID */
+.info-grid {
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 12px;
+background: #f9fbfe;
+border: 1px solid var(--border);
+border-radius: 18px;
+padding: 14px 18px;
+margin-bottom: 18px;
+}
+.info-item {
+display: flex;
+align-items: center;
+gap: 10px;
+flex-wrap: wrap;
+}
+.info-item .label {
+font-weight: 700;
+background: var(--light);
+padding: 4px 12px;
+border-radius: 30px;
+font-size: 10px;
+color: var(--main);
+min-width: 85px;
+}
+.info-item input {
+flex: 1;
+border: 1px solid #ccd7e8;
+padding: 6px 8px;
+border-radius: 12px;
+font-size: 10px;
+background: white;
+transition: 0.2s;
+}
+.info-item input:focus {
+border-color: var(--main);
+outline: none;
+box-shadow: 0 0 0 2px rgba(31,78,140,0.2);
+}
+
+/* TWO COLUMN LAYOUT FOR BILL SECTIONS */
+.bill-two-columns {
+display: flex;
+gap: 20px;
+margin: 15px 0;
+flex-wrap: wrap;
+}
+.bill-left, .bill-right {
+flex: 1;
+min-width: 180px;
+}
+
+/* TABLE STYLES */
+table {
+width: 100%;
+border-collapse: collapse;
+border-radius: 14px;
+overflow: hidden;
+box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+margin-bottom: 0;
+}
+th {
+background: var(--main);
+color: white;
+padding: 10px 8px;
+font-size: 11px;
+font-weight: 600;
+border: 1px solid #2c6aac;
+text-align: center;
+}
+td {
+border: 1px solid var(--border);
+padding: 10px 8px;
+font-size: 10.5px;
+color: var(--text);
+vertical-align: middle;
+}
+.label-cell {
+background: var(--light);
+font-weight: 700;
+color: var(--main);
+width: 55%;
+}
+.center {
+text-align: center;
+}
+.total-highlight {
+background: #fff2f0;
+font-weight: 800;
+color: #b91c1c;
+font-size: 13px;
+}
+input {
+width: 100%;
+border: none;
+background: transparent;
+font-size: 10.5px;
+font-weight: 500;
+padding: 4px 0;
+text-align: left;
+}
+input:focus {
+outline: none;
+border-bottom: 1px solid var(--main);
+}
+input[type="number"] {
+-moz-appearance: textfield;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+-webkit-appearance: none;
+margin: 0;
+}
+
+/* WATER TABLE FULL WIDTH */
+.water-section {
+margin: 15px 0;
+}
+.section-title {
+font-size: 12px;
+font-weight: 800;
+background: linear-gradient(135deg, #e9ecef, #dee2e6);
+padding: 6px 12px;
+border-radius: 10px;
+margin: 12px 0 8px 0;
+color: var(--main);
+border-left: 4px solid var(--main);
+}
+
+/* AMOUNT IN WORDS */
+.words-section {
+background: #fef6e0;
+border-left: 5px solid #d9534f;
+padding: 8px 12px;
+margin: 15px 0 10px;
+border-radius: 12px;
+font-weight: bold;
+font-size: 10px;
+}
+
+/* NOTES */
+.notes {
+background: #fafcff;
+border: 1px solid #e2edf7;
+border-radius: 20px;
+padding: 14px 18px;
+margin: 18px 0 12px;
+font-size: 10px;
+}
+.notes b {
+font-size: 11px;
+color: var(--main);
+}
+.notes ul {
+margin: 8px 0 0 20px;
+}
+.notes li {
+margin: 4px 0;
+}
+
+/* FOOTER */
+.footer {
+display: flex;
+justify-content: space-between;
+margin-top: 25px;
+padding-top: 10px;
+border-top: 2px dashed #cbdbe0;
+}
+.signature {
+text-align: left;
+font-size: 10px;
+width: 45%;
+}
+
+.signature2 {
+text-align: right;
+font-size: 10px;
+width: 45%;
+}
+.dev-sign {
+background: #f4f7fc;
+border-radius: 40px;
+text-align: center;
+margin-top: 18px;
+padding: 10px 5px;
+display: flex;
+justify-content: center;
+gap: 12px;
+flex-wrap: wrap;
+}
+.dev-sign a {
+text-decoration: none;
+background: #1f4e8c;
+padding: 5px 12px;
+border-radius: 30px;
+font-size: 9px;
+color: white;
+display: inline-flex;
+align-items: center;
+gap: 6px;
+}
+.dev-sign a:nth-child(2) { background: #0a58ca; }
+.dev-sign a:nth-child(3) { background: #25D366; }
+.controls {
+text-align: center;
+margin: 20px auto 10px;
+}
+button {
+background: #1f4e8c;
+border: none;
+padding: 10px 28px;
+font-size: 13px;
+font-weight: bold;
+border-radius: 40px;
+color: white;
+cursor: pointer;
+transition: 0.2s;
+box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+button:hover {
+background: #0e3a6b;
+transform: translateY(-1px);
+}
+
+@media print {
+body {
+background: white;
+padding: 0;
+margin: 0;
+}
+.controls, .dev-sign a {
+display: none;
+}
+#bill {
+box-shadow: none;
+margin: 0;
+padding: 12px;
+}
+}
+
+
+/* Modal Popup - Mobile Optimized */
+.modal-alert {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    backdrop-filter: blur(3px);
+}
+.modal-content {
+    background: white;
+    padding: 25px 20px;
+    border-radius: 24px;
+    width: 85%;
+    max-width: 300px;
+    text-align: center;
+    box-shadow: 0 25px 40px rgba(0,0,0,0.25);
+    animation: fadeIn 0.25s ease;
+    margin: 20px;
+}
+.modal-content i {
+    font-size: 50px;
+    color: #f39c12;
+    margin-bottom: 12px;
+}
+.modal-content h4 {
+    font-size: 18px;
+    margin: 12px 0 8px;
+    color: #1f4e8c;
+    font-weight: 700;
+}
+.modal-content p {
+    font-size: 14px;
+    margin: 8px 0 20px;
+    color: #555;
+    line-height: 1.4;
+}
+.modal-content button {
+    background: #1f4e8c;
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 40px;
+    margin-top: 5px;
+    width: 100%;
+    max-width: 180px;
+    border: none;
+    cursor: pointer;
+}
+.modal-content button:active {
+    transform: scale(0.97);
+    background: #0e3a6b;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+    .modal-content {
+        width: 90%;
+        padding: 22px 18px;
+    }
+    .modal-content i {
+        font-size: 44px;
+    }
+    .modal-content h4 {
+        font-size: 17px;
+    }
+    .modal-content p {
+        font-size: 13px;
+    }
+    .modal-content button {
+        padding: 10px 24px;
+        font-size: 14px;
+    }
+}
+
+
+</style>
+</head>
+<body>
+
+<div id="bill">
+<!--
+<div class="watermark">
+    <span class="black">SS</span><span class="red">R</span>
+</div>
+	
+-->
+
+<!-- HEADER -->
+<div class="header">
+<div class="address">
+<div class="kr-monogram">
+<input type="text" id="buildingName" value="KR Building" placeholder="Building Name" style="background:transparent;border:none;border-bottom:1px dashed rgba(255,255,255,.6);color:white;font-weight:700;font-size:13px;padding:2px 0;width:150px;text-align:left">
+</div>
+<input type="text" id="buildingAddress" value="AECS Layout" placeholder="Building Address" style="background:transparent;border:none;border-bottom:1px dashed rgba(255,255,255,.5);color:white;font-size:11px;font-weight:500;padding:2px 0;width:150px;text-align:left;margin-top:4px">
+<div class="phone-buttons">
+<a href="tel:9611459960" class="call-link" style="text-decoration:none;"><i class="fas fa-phone-alt"></i> 9611459960</a>
+<a href="https://wa.me/919611459960" target="_blank" class="whatsapp-link"><i class="fab fa-whatsapp"></i></a>
+</div>
+</div>
+<div id="billNoDiv" style="margin-top: 14px;">
+<div><strong>Bill No</strong> : <span id="billNo">001</span></div>
+<div><strong>Date</strong> : <span id="billDate"></span></div>
+</div>
+</div>
+
+<!-- CUSTOMER DETAILS -->
+<div class="info-grid">
+<div class="info-item">
+<span class="label">🏠 Flat No.</span>
+<input type="text" id="house" placeholder="e.g. A-101" style="flex:1; border:1px solid #ccd7e8; padding:6px 8px; border-radius:12px; font-size:10px; background:white;text-align:center">
+</div>
+<div class="info-item"><span class="label">🏢 Tenant Name</span><input type="text" id="name" placeholder="Enter tenant name"></div>
+<div class="info-item"><span class="label">📞 Contact No.</span><input type="tel" id="tenantContact" maxlength="10" placeholder="Tenant contact number" oninput="allowOnlyNumbers(this)"></div>
+</div>
+
+<!-- WATER BILL SECTION (Full Width) -->
+<div class="water-section">
+<div class="section-title">💧 WATER CONSUMPTION ( Total Liters * 0.15 * 10)</div>
+<table class="water-table">
+<thead>
+<tr>
+<th style="width:25%">Previous Reading</th>
+<th style="width:25%">Current Reading</th>
+<th style="width:25%">Usage</th>
+<th style="width:25%">Water Amount (₹)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="center"><input type="number" id="prev" value="" step="any" placeholder="" oninput="allowOnlyNumbers(this)"></td>
+<td class="center"><input type="number" id="current" value="" step="any" placeholder="" oninput="allowOnlyNumbers(this)"></td>
+<td class="center" id="usage">0.00</td>
+<td class="center" id="waterAmt">0.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+<!-- TWO COLUMN LAYOUT: LEFT = RENT + CURRENT BILL | RIGHT = ARREARS + MAINTENANCE + SANITARY + PARKING -->
+<div class="bill-two-columns">
+<!-- LEFT SIDE: Rent & Current Bill -->
+<div class="bill-left">
+<table class="rent-table">
+<thead>
+<tr><th colspan="2">🏠 RENT & UTILITY BILLS</th></tr>
+</thead>
+<tbody>
+<tr>
+<td class="label-cell">🏠 Rent Amount (₹)</td>
+<td><input type="number" id="rent" value="" step="any" placeholder="" oninput="allowOnlyNumbers(this)"></td>
+</tr>
+<tr>
+<td class="label-cell">⚡ Electricity Bill(₹)</td>
+<td><input type="number" id="currentBill" value="" step="any" placeholder="" oninput="allowOnlyNumbers(this)"></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<!-- RIGHT SIDE: Combined Table - Arrears, Maintenance, Sanitary, Parking -->
+<div class="bill-right">
+<table class="combined-table">
+<thead>
+<tr><th colspan="2">💰 ADDITIONAL CHARGES & ARREARS</th></tr>
+</thead>
+<tbody>
+<tr>
+<td class="label-cell">💰 Arrears (Previous Dues)</td>
+<td><input type="number" id="arrears" value="" step="any" placeholder="" oninput="allowOnlyNumbers(this)"></td>
+</tr>
+<tr>
+<td class="label-cell">🔧 Maintenance Charges</td>
+<td><input type="number" id="maintenance" value="" step="any" placeholder="" oninput="allowOnlyNumbers(this)"></td>
+</tr>
+<tr>
+<td class="label-cell">🧹 Sanitary / SWM Charges</td>
+<td><input type="number" id="sanitary" value="" step="any" placeholder="" oninput="allowOnlyNumbers(this)"></td>
+</tr>
+<tr>
+<td class="label-cell">🅿️ Parking Fee</td>
+<td><input type="number" id="parking" value="" step="any" placeholder="" oninput="allowOnlyNumbers(this)"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+<!-- GRAND TOTAL SECTION - Properly arranged -->
+<table class="total-table" style="margin: 20px 0 15px 0;">
+<tbody>
+<tr>
+<td class="label-cell" style="width: 65%; font-size: 14px; background: linear-gradient(135deg, #e9ecef, #dee2e6); font-weight: 800; color: #1f4e8c; text-align: left; padding: 12px 20px;">
+💰 GRAND TOTAL PAYABLE (₹)
+</td>
+<td class="center total-highlight" id="total" style="font-size: 22px; font-weight: 800; color: #b91c1c; background: #fff2f0; padding: 12px 20px; width: 35%; text-align: right;">
+₹ 0.00
+</td>
+</tr>
+</tbody>
+</table>
+
+<!-- AMOUNT IN WORDS - Properly arranged -->
+<table style="width: 100%; margin: 10px 0 20px 0; border-collapse: collapse;">
+<tbody>
+<tr>
+<td style="background: #fef6e0; border: 1px solid #ffdd99; border-radius: 10px; padding: 12px 18px;">
+<div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+<span style="font-weight: 800; font-size: 12px; color: #b63e32; background: #fff0d0; padding: 4px 12px; border-radius: 20px;">📝 AMOUNT IN WORDS</span>
+<span style="font-weight: 600; font-size: 11px; color: #b63e32; letter-spacing: 0.3px; flex: 1;" id="totalWords">Zero Rupees Only</span>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+
+<!-- NOTES -->
+<div class="notes">
+<b>📌 Important Guidelines:</b>
+<ul>
+<li>✅ <strong>Left Section:</strong> Monthly Rent + Current Electricity Bill (EB / sub-meter).</li>
+<li>✅ <strong>Right Section:</strong> Arrears (previous dues), Maintenance, Sanitary, and Parking fees combined.</li>
+<li>💧 <strong>Water Charges:</strong> Calculated based on meter readings (Rate: ₹0.15 per 1 liter).</li>
+<li>⚠️ Late payment attracts 10% penalty on outstanding after due date (10th of every month).</li>
+<li>📞 For disputes or clarification, contact management within 7 days.</li>
+</ul>
+</div>
+
+<!-- FOOTER SIGNATURE -->
+<div class="footer">
+<div class="signature">
+<input type="text" id="tenantSignature" placeholder="Type your name to sign" style="font-family:'Segoe Script','Brush Script MT',cursive;font-size:14px;font-weight:600;color:var(--main);border:none;border-bottom:1px solid #999;background:transparent;width:100%;padding:2px 0 4px;">
+<div>Resident / Tenant Signature</div>
+<div style="font-size:8px; color:#666;">(Acknowledgment of receipt)</div>
+</div>
+<div class="signature2">
+<div style="font-weight:bold;">Karthik J</div>
+<div style="font-size:9px;">Authorized Signatory</div>
+<div style="font-size:8px;">KR Enclave Management</div>
+</div>
+</div>
+
+<div class="dev-sign">
+<a href="https://kr-webcrafts.onrender.com" target="_blank"><i class="fas fa-code"></i> KR Webcrafts</a>
+<a href="tel:+919611459960" style="text-decoration:none; background:#0a58ca; color:white; padding:5px 12px; border-radius:30px; font-size:9px; display:inline-flex; align-items:center; gap:6px;">
+<i class="fas fa-phone-alt"></i>
+</a>
+<a href="https://wa.me/919611459960" target="_blank"><i class="fab fa-whatsapp"></i> </a>
+</div>
+<div class="controls">
+<button onclick="downloadPDF()" style="margin-right: 12px; background: #1f4e8c;">
+<i class="fas fa-download"></i> Download PDF
+</button>
+<button onclick="shareOnWhatsApp()" style="margin-right: 12px; background: #25D366;">
+<i class="fab fa-whatsapp"></i> Share as Image
+</button>
+<button onclick="sharePDFOnWhatsApp()" style="background: #128C7E;">
+<i class="fas fa-file-pdf"></i> Share as PDF
+</button>
+</div>
+</div>
+
+<script>
+// BILL NUMBER auto-increment
+let billNumber = localStorage.getItem("ssrBillNo");
+if(!billNumber){
+billNumber = 1;
+} else {
+billNumber = parseInt(billNumber) + 1;
+}
+localStorage.setItem("ssrBillNo", billNumber);
+document.getElementById("billNo").innerText = String(billNumber).padStart(3,'0');
+
+// AUTO DATE
+const today = new Date();
+let dd = today.getDate(), mm = today.getMonth()+1, yyyy = today.getFullYear();
+if(dd<10) dd='0'+dd;
+if(mm<10) mm='0'+mm;
+document.getElementById("billDate").innerText = `${dd}-${mm}-${yyyy}`;
+
+// attach all input events
+const allInputs = document.querySelectorAll("input");
+allInputs.forEach(el => {
+el.addEventListener("input", calculate);
+});
+
+// Number to words function
+function numberToWords(num){
+if(num === 0 || isNaN(num)) return "Zero Rupees Only";
+const ones = ["", "One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
+const tens = ["", "", "Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
+function convert(n){
+if(n < 20) return ones[n];
+if(n < 100) return tens[Math.floor(n/10)] + (n%10 ? " " + ones[n%10] : "");
+if(n < 1000) return ones[Math.floor(n/100)] + " Hundred" + (n%100 ? " " + convert(n%100) : "");
+if(n < 100000) return convert(Math.floor(n/1000)) + " Thousand" + (n%1000 ? " " + convert(n%1000) : "");
+if(n < 10000000) return convert(Math.floor(n/100000)) + " Lakh" + (n%100000 ? " " + convert(n%100000) : "");
+return convert(Math.floor(n/10000000)) + " Crore" + (n%10000000 ? " " + convert(n%10000000) : "");
+}
+let numeric = parseFloat(num).toFixed(2);
+let parts = numeric.split(".");
+let rupees = parseInt(parts[0]);
+let paisa = parseInt(parts[1] || 0);
+let words = "";
+if(rupees > 0) words += convert(rupees) + " Rupee" + (rupees>1 ? "s" : "");
+if(paisa > 0){
+if(words) words += " and ";
+words += convert(paisa) + " Paisa";
+}
+return words + " Only";
+}
+
+// Core calculation
+function calculate(){
+// LEFT side
+let rent = parseFloat(document.getElementById("rent").value) || 0;
+let currentBill = parseFloat(document.getElementById("currentBill").value) || 0;
+
+// RIGHT side (combined table)
+let arrears = parseFloat(document.getElementById("arrears").value) || 0;
+let maintenance = parseFloat(document.getElementById("maintenance").value) || 0;
+let sanitary = parseFloat(document.getElementById("sanitary").value) || 0;
+let parking = parseFloat(document.getElementById("parking").value) || 0;
+
+// Water charges
+let prev = parseFloat(document.getElementById("prev").value) || 0;
+let current = parseFloat(document.getElementById("current").value) || 0;
+let usageRaw = current - prev;
+let usage = usageRaw < 0 ? 0 : usageRaw;
+let waterRate = 0.15;   // per 10 liters
+let waterAmt = usage * 10 * waterRate;
+
+// GRAND TOTAL
+let total = rent + currentBill + arrears + maintenance + sanitary + parking + waterAmt;
+
+// Update UI
+document.getElementById("usage").innerText = usage.toFixed(2);
+document.getElementById("waterAmt").innerText = waterAmt.toFixed(2);
+document.getElementById("total").innerText = total.toFixed(2);
+
+let wordsFinal = numberToWords(total);
+document.getElementById("totalWords").innerText = wordsFinal;
+}
+
+function allowOnlyNumbers(input){
+input.value = input.value.replace(/[^0-9.]/g, '');
+if((input.value.match(/\./g)||[]).length > 1) input.value = input.value.replace(/\.+$/, '');
+calculate();
+}
+
+function showModal(message) {
+    // Remove any existing modal first
+    const existingModal = document.querySelector('.modal-alert');
+    if (existingModal) existingModal.remove();
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal-alert';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h4>⚠️ Missing Info</h4>
+            <p>${message}</p>
+            <button>OK</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Close on button click
+    const closeBtn = modal.querySelector('button');
+    closeBtn.addEventListener('click', () => modal.remove());
+    
+    // Close on background click (touch friendly)
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
+    
+    // Auto-close after 3 seconds on mobile (optional)
+    setTimeout(() => {
+        if (document.body.contains(modal)) modal.remove();
+    }, 4000);
+}
+
+// PDF generation
+function downloadPDF(){
+
+if (!validateBillFields()) return;
+let controlsDiv = document.querySelector(".controls");
+let devBar = document.querySelector(".dev-sign");
+
+// Only hide the download button and dev bar links, NOT the signature footer
+if(controlsDiv) controlsDiv.style.display = "none";
+// Don't hide devBar anymore - let it print
+// if(devBar) devBar.style.display = "none";
+
+const element = document.getElementById("bill");
+const originalOverflow = document.body.style.overflow;
+document.body.style.overflow = "hidden";
+
+const opt = {
+margin: [0.2, 0.2, 0.2, 0.2],
+filename: `Rent_Bill_Of_${document.getElementById("name").value}.pdf`,
+image: { type: 'jpeg', quality: 0.98 },
+enableLinks: true,
+html2canvas: { 
+scale: 3, 
+useCORS: true, 
+letterRendering: true, 
+scrollY: 0,
+logging: false
+},
+jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+};
+
+html2pdf().set(opt).from(element).save().then(() => {
+if(controlsDiv) controlsDiv.style.display = "block";
+// Don't restore devBar display if it wasn't hidden
+// if(devBar) devBar.style.display = "flex";
+document.body.style.overflow = originalOverflow;
+}).catch(err => {
+console.warn(err);
+if(controlsDiv) controlsDiv.style.display = "block";
+document.body.style.overflow = originalOverflow;
+});
+}
+
+// initial calculation
+calculate();
+
+// prevent right-click context menu on bill
+document.getElementById("bill")?.addEventListener("contextmenu", function(e){
+e.preventDefault();
+});
+
+// All fields are empty by default - no prefilled values
+// Just ensure calculation runs on empty inputs (already done)
+
+
+// Flat No. and Building Name are now entered directly by the user —
+// no auto-fill mapping needed.
+
+
+// Share as Image (Direct WhatsApp Share)
+async function shareOnWhatsApp() {
+if (!validateBillFields()) return;
+const element = document.getElementById("bill");
+const billNo = document.getElementById("billNo").innerText;
+calculate();
+const totalAmount = document.getElementById("total").innerText;
+const tenantName = document.getElementById("name").value || "Tenant";
+const flatNo = document.getElementById("house").value || "Flat";
+const billDate = document.getElementById("billDate").innerText;
+
+if (!navigator.share) {
+alert("⚠️ Direct share not supported. Please use Download PDF button.");
+return;
+}
+
+const shareBtn = event.target.closest('button');
+const originalText = shareBtn.innerHTML;
+shareBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Capturing Image...';
+shareBtn.disabled = true;
+
+try {
+// Hide controls for clean capture
+const controlsDiv = document.querySelector(".controls");
+const devSign = document.querySelector(".dev-sign");
+if(controlsDiv) controlsDiv.style.display = "none";
+if(devSign) devSign.style.display = "none";
+
+// Capture bill as high quality image
+const canvas = await html2canvas(element, {
+scale: 2.5,
+backgroundColor: '#ffffff',
+logging: false,
+useCORS: true
+});
+
+// Restore controls
+if(controlsDiv) controlsDiv.style.display = "block";
+if(devSign) devSign.style.display = "flex";
+
+// Convert to blob for sharing
+const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.95));
+const file = new File([blob], `Rent_Bill_${billNo}.jpg`, { type: 'image/jpeg' });
+
+// Create message text
+const message = `🏢 *Flat :* ${flatNo}\n` +
+`👤 *Tenant :* ${tenantName}\n` +
+`📅 *Date :* ${billDate}\n` +
+`💰 *Total Amount :* ₹${totalAmount}\n\n` +
+`Thank you,\n KR`;
+
+// Share directly to WhatsApp
+await navigator.share({
+title: 'Rent Bill',
+text: message,
+files: [file]
+});
+
+<!--        alert("✅ Bill shared successfully on WhatsApp!"); -->
+
+} catch (error) {
+console.error("Share error:", error);
+if (error.name !== 'AbortError') {
+alert("❌ Error: " + error.message + "\n\nTry using Download PDF button instead.");
+}
+const controlsDiv = document.querySelector(".controls");
+const devSign = document.querySelector(".dev-sign");
+if(controlsDiv) controlsDiv.style.display = "block";
+if(devSign) devSign.style.display = "flex";
+} finally {
+shareBtn.innerHTML = originalText;
+shareBtn.disabled = false;
+}
+}
+
+// Share as PDF (Direct WhatsApp Share) - FIXED
+async function sharePDFOnWhatsApp() {
+if (!validateBillFields()) return;
+const element = document.getElementById("bill");
+const billNo = document.getElementById("billNo").innerText;
+calculate();
+const totalAmount = document.getElementById("total").innerText;
+const tenantName = document.getElementById("name").value || "Tenant";
+const flatNo = document.getElementById("house").value || "Flat";
+const billDate = document.getElementById("billDate").innerText;
+
+if (!navigator.share) {
+alert("⚠️ Direct share not supported. Please use Download PDF button.");
+return;
+}
+
+const shareBtn = event.target.closest('button');
+const originalText = shareBtn.innerHTML;
+shareBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Generating PDF...';
+shareBtn.disabled = true;
+
+try {
+// Hide controls for clean PDF
+const controlsDiv = document.querySelector(".controls");
+const devSign = document.querySelector(".dev-sign");
+if(controlsDiv) controlsDiv.style.display = "none";
+if(devSign) devSign.style.display = "none";
+
+// PDF configuration
+const opt = {
+margin: [0.2, 0.2, 0.2, 0.2],
+image: { type: 'jpeg', quality: 0.98 },
+html2canvas: { scale: 3, useCORS: true, logging: false },
+jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+};
+
+// Create a temporary element to generate PDF
+const worker = html2pdf().set(opt).from(element);
+
+// Get PDF as blob using output method
+const pdfBlob = await new Promise((resolve, reject) => {
+worker.outputPdf('blob').then(resolve).catch(reject);
+});
+
+// Restore controls
+if(controlsDiv) controlsDiv.style.display = "block";
+if(devSign) devSign.style.display = "flex";
+
+// Check if blob is valid
+if (!pdfBlob || pdfBlob.size === 0) {
+throw new Error("Generated PDF is empty");
+}
+
+// Create file from blob
+const file = new File([pdfBlob], `Rent_Bill_${billNo}.pdf`, { type: 'application/pdf' });
+
+// Create message text
+const message = `🏠 *KR ENCLAVE RENT BILL* 🏠\n\n` +
+`📄 *Bill No:* ${billNo}\n` +
+`🏢 *Flat:* ${flatNo}\n` +
+`👤 *Tenant:* ${tenantName}\n` +
+`📅 *Date:* ${billDate}\n` +
+`💰 *Total Amount:* ${totalAmount}\n\n` +
+`PDF bill attached.\n\n` +
+`Thank you,\nKR Enclave Management`;
+
+// Share directly to WhatsApp
+await navigator.share({
+title: `Rent Bill ${billNo}`,
+text: message,
+files: [file]
+});
+
+<!--        alert("✅ PDF bill shared successfully on WhatsApp!"); -->
+
+} catch (error) {
+console.error("PDF Share error:", error);
+if (error.name !== 'AbortError') {
+alert("❌ Error: " + error.message + "\n\nTry using Share as Image instead.");
+}
+const controlsDiv = document.querySelector(".controls");
+const devSign = document.querySelector(".dev-sign");
+if(controlsDiv) controlsDiv.style.display = "block";
+if(devSign) devSign.style.display = "flex";
+} finally {
+shareBtn.innerHTML = originalText;
+shareBtn.disabled = false;
+}
+}
+
+// Direct Share (Already Working)
+async function directShareOnMobile() {
+const element = document.getElementById("bill");
+const billNo = document.getElementById("billNo").innerText;
+const totalAmount = document.getElementById("total").innerText;
+const tenantName = document.getElementById("name").value || "Tenant";
+const flatNo = document.getElementById("house").value || "Flat";
+
+if (!navigator.share) {
+alert("⚠️ Direct share not supported. Use Download PDF button.");
+return;
+}
+
+const shareBtn = event.target.closest('button');
+const originalText = shareBtn.innerHTML;
+shareBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Preparing...';
+shareBtn.disabled = true;
+
+try {
+// Hide controls
+const controlsDiv = document.querySelector(".controls");
+const devSign = document.querySelector(".dev-sign");
+if(controlsDiv) controlsDiv.style.display = "none";
+if(devSign) devSign.style.display = "none";
+
+// Capture as image
+const canvas = await html2canvas(element, {
+scale: 2.5,
+backgroundColor: '#ffffff',
+logging: false
+});
+
+// Restore controls
+if(controlsDiv) controlsDiv.style.display = "block";
+if(devSign) devSign.style.display = "flex";
+
+// Convert to blob
+const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.95));
+const file = new File([blob], `Rent_Bill_${billNo}.jpg`, { type: 'image/jpeg' });
+
+// Create message
+const message = `KR ENCLAVE RENT BILL\nFlat: ${flatNo}\nTenant: ${tenantName}\nTotal: ₹${totalAmount}`;
+
+// Share directly
+await navigator.share({
+title: 'Rent Bill',
+text: message,
+files: [file]
+});
+
+alert("✅ Bill shared successfully!");
+
+} catch (error) {
+if (error.name !== 'AbortError') {
+alert("❌ Error: " + error.message);
+}
+const controlsDiv = document.querySelector(".controls");
+const devSign = document.querySelector(".dev-sign");
+if(controlsDiv) controlsDiv.style.display = "block";
+if(devSign) devSign.style.display = "flex";
+} finally {
+shareBtn.innerHTML = originalText;
+shareBtn.disabled = false;
+}
+}
+
+// Ensure all inputs trigger calculation
+document.querySelectorAll('input, select').forEach(el => {
+el.addEventListener('input', calculate);
+el.addEventListener('change', calculate);
+});
+
+function validateBillFields() {
+    const flatNo = document.getElementById("house").value;
+    const tenantName = document.getElementById("name").value;
+    const rent = parseFloat(document.getElementById("rent").value) || 0;
+    const prevReading = parseFloat(document.getElementById("prev").value);
+    const currentReading = parseFloat(document.getElementById("current").value);
+    
+    if (!flatNo) {
+        showModal("Please select Flat No. before downloading.");
+        return false;
+    }
+    
+    if (!tenantName) {
+        showModal("Please enter Tenant Name before downloading.");
+        return false;
+    }
+    
+/*    if (rent <= 0) {
+        showModal("Please enter Rent Amount before downloading.");
+        return false;
+    }
+    
+    if (isNaN(prevReading) || isNaN(currentReading)) {
+        showModal("Please enter both Previous and Current Water Readings before downloading.");
+        return false;
+    }
+	
+*/
+    
+    return true;
+}
+</script>
