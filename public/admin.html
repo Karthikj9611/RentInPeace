@@ -1347,7 +1347,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
 <script>
 let dataTable, propTable, apptTable;
 
-const BASE = 'https://rentinpeace.onrender.com';
+const BASE = 'http://localhost:5000';
 
 /* ── ADMIN KEY – set after login ── */
 let ADMIN_KEY = sessionStorage.getItem('kr_admin_key') || '';
@@ -2053,7 +2053,7 @@ $(document).ready(function(){
     },
     dom:'<"top-controls"B>rt<"bottom-controls"ip>',
     buttons:[
-      {
+      /*{
         extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV', title:'KR Real-Estate Leads',
         exportOptions:{ columns:[0,1,2,3,4,5,6,7],
           format:{ body:function(data,row,col){
@@ -2086,6 +2086,18 @@ $(document).ready(function(){
             return data;
           }}
         }
+      }, */
+      {
+        extend:'print', text:'<i class="fas fa-print"></i> Print', title:'KR Real-Estate Leads',
+        exportOptions:{columns:[0,1,2,3,4,5,6,7]},
+        customize:function(win){
+          $(win.document.head).append('<style>table td a{color:inherit;text-decoration:underline}table td a.ph{color:#1a7a5e}table td a.em{color:#8a6820}</style>');
+          $(win.document.body).find('table tbody tr').each(function(){
+            var cells=$(this).find('td');
+            var phText=cells.eq(2).text().trim(); if(phText&&phText!=='—') cells.eq(2).html('<a class="ph" href="tel:'+phText+'">'+phText+'</a>');
+            var emText=cells.eq(3).text().trim(); if(emText&&emText!=='—') cells.eq(3).html('<a class="em" href="mailto:'+emText+'">'+emText+'</a>');
+          });
+        }
       },
       {
         extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
@@ -2102,18 +2114,6 @@ $(document).ready(function(){
             var phone=plainPhone(rd); var email=plainEmail(rd);
             if(phone&&pdfRow[2]) pdfRow[2]={text:phone,link:'tel:'+phone,color:'#1a7a5e',decoration:'underline',fontSize:9};
             if(email&&pdfRow[3]) pdfRow[3]={text:email,link:'mailto:'+email,color:'#8a6820',decoration:'underline',fontSize:9};
-          });
-        }
-      },
-      {
-        extend:'print', text:'<i class="fas fa-print"></i> Print', title:'KR Real-Estate Leads',
-        exportOptions:{columns:[0,1,2,3,4,5,6,7]},
-        customize:function(win){
-          $(win.document.head).append('<style>table td a{color:inherit;text-decoration:underline}table td a.ph{color:#1a7a5e}table td a.em{color:#8a6820}</style>');
-          $(win.document.body).find('table tbody tr').each(function(){
-            var cells=$(this).find('td');
-            var phText=cells.eq(2).text().trim(); if(phText&&phText!=='—') cells.eq(2).html('<a class="ph" href="tel:'+phText+'">'+phText+'</a>');
-            var emText=cells.eq(3).text().trim(); if(emText&&emText!=='—') cells.eq(3).html('<a class="em" href="mailto:'+emText+'">'+emText+'</a>');
           });
         }
       }
@@ -2210,7 +2210,7 @@ $(document).ready(function(){
     },
     dom:'<"top-controls"B>rt<"bottom-controls"ip>',
     buttons:[
-      {
+      /*{
         extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV', title:'KR Properties',
         exportOptions:{ columns:[1,2,3,4,5,6,7,8,9,10],
           format:{ body:function(data,row,col){
@@ -2247,8 +2247,27 @@ $(document).ready(function(){
             return data;
           }}
         }
-      },
+      },*/
       {
+        extend:'print', text:'<i class="fas fa-print"></i> Print', title:'KR Properties',
+        exportOptions:{columns:[1,2,3,4,5,6,7,8,9,10],
+          format:{ body:function(data,row,col){
+            var rd=propTable.row(row).data(); if(!rd) return data;
+            if(col===8) return rd.promoted ? 'Yes' : 'No';
+            if(col===9) return rd.verified ? 'Yes' : 'No';
+            return data;
+          }}
+        },
+        customize:function(win){
+          $(win.document.head).append('<style>table td a{color:#1a7a5e;text-decoration:underline}</style>');
+          $(win.document.body).find('table tbody tr').each(function(){
+            var cells=$(this).find('td');
+            var phText=cells.eq(4).text().trim();
+            if(phText&&phText!=='—') cells.eq(4).html('<a href="tel:'+phText+'">'+phText+'</a>');
+          });
+        }
+      },
+	  {
         extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
         orientation:'landscape', pageSize:'A4', title:'KR Real-Estate — Properties',
         exportOptions:{columns:[1,2,3,4,5,6,7,8,9,10],
@@ -2269,25 +2288,6 @@ $(document).ready(function(){
             var pdfRow=tableBody[i+1]; if(!pdfRow) return;
             var ph=rd.ownerNumber||'';
             if(ph&&pdfRow[4]) pdfRow[4]={text:ph,link:'tel:'+ph,color:'#1a7a5e',decoration:'underline',fontSize:8};
-          });
-        }
-      },
-      {
-        extend:'print', text:'<i class="fas fa-print"></i> Print', title:'KR Properties',
-        exportOptions:{columns:[1,2,3,4,5,6,7,8,9,10],
-          format:{ body:function(data,row,col){
-            var rd=propTable.row(row).data(); if(!rd) return data;
-            if(col===8) return rd.promoted ? 'Yes' : 'No';
-            if(col===9) return rd.verified ? 'Yes' : 'No';
-            return data;
-          }}
-        },
-        customize:function(win){
-          $(win.document.head).append('<style>table td a{color:#1a7a5e;text-decoration:underline}</style>');
-          $(win.document.body).find('table tbody tr').each(function(){
-            var cells=$(this).find('td');
-            var phText=cells.eq(4).text().trim();
-            if(phText&&phText!=='—') cells.eq(4).html('<a href="tel:'+phText+'">'+phText+'</a>');
           });
         }
       }
@@ -2398,7 +2398,7 @@ $(document).ready(function(){
     },
     dom:'<"top-controls"B>rt<"bottom-controls"ip>',
     buttons:[
-      {
+      /*{
         extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV', title:'KR Appointments',
         exportOptions:{ columns:[0,1,2,3,4,5,6,7,8,9,10,11],
           format:{ body:function(data,row,col){
@@ -2439,6 +2439,10 @@ $(document).ready(function(){
             return data;
           }}
         }
+      },*/
+      {
+        extend:'print', text:'<i class="fas fa-print"></i> Print', title:'KR Appointments',
+        exportOptions:{columns:[0,1,2,3,4,5,6,7,8,9,10,11]}
       },
       {
         extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
@@ -2448,10 +2452,6 @@ $(document).ready(function(){
           doc.styles.tableHeader={fillColor:'#0c0d10',color:'white',bold:true,fontSize:9,alignment:'center'};
           doc.defaultStyle={fontSize:8,color:'#0c0d10'};
         }
-      },
-      {
-        extend:'print', text:'<i class="fas fa-print"></i> Print', title:'KR Appointments',
-        exportOptions:{columns:[0,1,2,3,4,5,6,7,8,9,10,11]}
       }
     ],
     drawCallback:function(){}
