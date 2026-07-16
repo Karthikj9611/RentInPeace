@@ -149,6 +149,10 @@ box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 .address {
 line-height: 1.3;
+width: 100%;
+flex: 1 1 100%;
+min-width: 0;
+box-sizing: border-box;
 }
 .address img {
 height: 38px;
@@ -933,6 +937,23 @@ function showModal(message) {
     }, 4000);
 }
 
+// Re-measures the Building Name / Building Address textareas against
+// whatever width they're actually rendered at right now, and grows their
+// height to fit. html2canvas/html2pdf snapshot elements exactly as laid
+// out at capture time — if the height set by the last 'oninput' event is
+// even slightly stale (prefilled text, autofill, orientation change,
+// hidden controls reflowing the layout), the extra text is silently
+// clipped instead of shown. Calling this immediately before every
+// capture guarantees the box is always tall enough for its current text.
+function syncBillTextareas(){
+[document.getElementById('buildingName'), document.getElementById('buildingAddress')]
+.forEach(el => {
+if (!el) return;
+el.style.height = 'auto';
+el.style.height = el.scrollHeight + 'px';
+});
+}
+
 // PDF generation
 function downloadPDF(){
 
@@ -944,6 +965,8 @@ let devBar = document.querySelector(".dev-sign");
 if(controlsDiv) controlsDiv.style.display = "none";
 // Don't hide devBar anymore - let it print
 // if(devBar) devBar.style.display = "none";
+
+syncBillTextareas();
 
 const element = document.getElementById("bill");
 const originalOverflow = document.body.style.overflow;
@@ -1095,6 +1118,7 @@ const controlsDiv = document.querySelector(".controls");
 const devSign = document.querySelector(".dev-sign");
 if(controlsDiv) controlsDiv.style.display = "none";
 if(devSign) devSign.style.display = "none";
+syncBillTextareas();
 
 // Capture bill as high quality image
 const canvas = await html2canvas(element, {
@@ -1171,6 +1195,7 @@ const controlsDiv = document.querySelector(".controls");
 const devSign = document.querySelector(".dev-sign");
 if(controlsDiv) controlsDiv.style.display = "none";
 if(devSign) devSign.style.display = "none";
+syncBillTextareas();
 
 // PDF configuration
 const opt = {
@@ -1259,6 +1284,7 @@ const controlsDiv = document.querySelector(".controls");
 const devSign = document.querySelector(".dev-sign");
 if(controlsDiv) controlsDiv.style.display = "none";
 if(devSign) devSign.style.display = "none";
+syncBillTextareas();
 
 // Capture as image
 const canvas = await html2canvas(element, {
