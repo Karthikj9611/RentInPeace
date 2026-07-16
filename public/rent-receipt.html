@@ -766,7 +766,6 @@ padding: 12px;
 <b>📌 Important Guidelines:</b>
 <ul>
 <li>💧 <strong>Water Charges:</strong> Rate: ₹0.15 per 1 liter.</li>
-<li>⚠️ Late payment attracts penalty on outstanding after due date.</li>
 <li>📞 For disputes or clarification, contact management.</li>
 </ul>
 </div>
@@ -774,7 +773,7 @@ padding: 12px;
 <!-- FOOTER SIGNATURE -->
 <div class="footer">
 <div class="signature">
-<input type="text" id="tenantSignature" placeholder="Type your name to sign" style="font-weight:bold;font-size:11px;border:none;border-bottom:1px solid #999;background:transparent;color:var(--text);text-align:left;width:100%;height:24px;line-height:24px;box-sizing:border-box;padding:0;margin:0;">
+<input type="text" id="tenantSignature" placeholder="" style="font-weight:bold;font-size:11px;border:none;border-bottom:1px solid #999;background:transparent;color:var(--text);text-align:left;width:100%;height:24px;line-height:24px;box-sizing:border-box;padding:0;margin:0;">
 <div>Resident / Tenant Signature</div>
 <div style="font-size:8px; color:#666;">(Acknowledgment of receipt)</div>
 </div>
@@ -1014,34 +1013,40 @@ syncContactLinks();
 // Only works on browsers with the Contact Picker API (e.g. Chrome/Android
 // over HTTPS) — everywhere else, just type it in.
 async function pickTenantContact() {
-  if (!('contacts' in navigator && 'ContactsManager' in window)) {
-    showModal("Contact picker isn't supported on this device/browser — please type the number in.");
-    return;
-  }
-  try {
-    const contacts = await navigator.contacts.select(['tel', 'name'], { multiple: false });
-    if (!contacts || !contacts.length) return;
-    const picked = contacts[0];
-    const rawTel = (picked.tel && picked.tel[0]) || '';
-    const digits = rawTel.replace(/\D/g, '').slice(-10);
-    if (!digits) {
-      showModal('That contact has no usable phone number.');
-      return;
-    }
-    const phoneField = document.getElementById('tenantContact');
-    phoneField.value = digits;
-    phoneField.dispatchEvent(new Event('input', { bubbles: true }));
 
-    if (picked.name && picked.name[0]) {
-      const nameField = document.getElementById('name');
-      nameField.value = picked.name[0];
-      nameField.dispatchEvent(new Event('input', { bubbles: true }));
+    console.log("contacts:", 'contacts' in navigator);
+    console.log("ContactsManager:", 'ContactsManager' in window);
+
+    if (!('contacts' in navigator)) {
+        alert("navigator.contacts not available");
+        return;
     }
-  } catch (err) {
-    if (err && err.name !== 'AbortError') {
-      showModal('Could not read that contact — please type the number in.');
+
+    if (!('ContactsManager' in window)) {
+        alert("ContactsManager not supported");
+        return;
     }
-  }
+
+    try {
+        const contacts = await navigator.contacts.select(
+            ['name', 'tel'],
+            { multiple: false }
+        );
+
+        console.log(contacts);
+
+        if (!contacts.length) return;
+
+        document.getElementById("name").value =
+            contacts[0].name?.[0] || "";
+
+        document.getElementById("tenantContact").value =
+            (contacts[0].tel?.[0] || "").replace(/\D/g, "").slice(-10);
+
+    } catch (e) {
+        console.log(e);
+        alert(e.message);
+    }
 }
 
 // size the building name & address textareas to fit any pre-filled text
