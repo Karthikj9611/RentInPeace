@@ -645,13 +645,13 @@ padding: 12px;
 <div class="info-grid">
 <div class="info-item">
 <span class="label">🏠 Flat Number</span>
-<input type="text" id="house" placeholder="e.g. A-101" style="flex:1; border:1px solid #ccd7e8; padding:6px 8px; border-radius:12px; font-size:10px; background:white;text-align:center">
+<input type="text" id="house" placeholder="" style="flex:1; border:1px solid #ccd7e8; padding:6px 8px; border-radius:12px; font-size:10px; background:white;text-align:center">
 </div>
-<div class="info-item"><span class="label">🏢 Tenant Name</span><input type="text" id="name" placeholder="Enter tenant name"></div>
+<div class="info-item"><span class="label">🏢 Tenant Name</span><input type="text" id="name" placeholder=""></div>
 <div class="info-item">
 <span class="label">📞 Contact No.</span>
 <div style="flex:1;min-width:0;position:relative;display:flex;align-items:center">
-<input type="tel" id="tenantContact" maxlength="10" placeholder="Tenant contact number" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)" style="width:100%;text-align:center;padding-right:34px;box-sizing:border-box">
+<input type="tel" id="tenantContact" maxlength="10" placeholder="" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10)" style="width:100%;text-align:center;padding-right:34px;box-sizing:border-box">
 <button type="button" onclick="pickTenantContact()" title="Pick from contacts" style="position:absolute;right:4px;width:24px;height:24px;border:none;border-radius:50%;background:var(--main);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0">
 <i class="fas fa-address-book" style="font-size:10px"></i>
 </button>
@@ -693,11 +693,11 @@ padding: 12px;
 </thead>
 <tbody>
 <tr>
-<td class="label-cell">🏠 Rent Amount (₹)</td>
+<td class="label-cell">🏠 Rent Amount</td>
 <td><input type="number" id="rent" value="" step="any" placeholder="" oninput="allowOnlyNumbers(this)"></td>
 </tr>
 <tr>
-<td class="label-cell">⚡ Electricity Bill(₹)</td>
+<td class="label-cell">⚡ Electricity Bill</td>
 <td><input type="number" id="currentBill" value="" step="any" placeholder="" oninput="allowOnlyNumbers(this)"></td>
 </tr>
 </tbody>
@@ -712,7 +712,7 @@ padding: 12px;
 </thead>
 <tbody>
 <tr>
-<td class="label-cell">💰 Arrears (Previous Dues)</td>
+<td class="label-cell">💰 Previous Dues</td>
 <td><input type="number" id="arrears" value="" step="any" placeholder="" oninput="allowOnlyNumbers(this)"></td>
 </tr>
 <tr>
@@ -720,7 +720,7 @@ padding: 12px;
 <td><input type="number" id="maintenance" value="" step="any" placeholder="" oninput="allowOnlyNumbers(this)"></td>
 </tr>
 <tr>
-<td class="label-cell">🧹 Sanitary / SWM Charges</td>
+<td class="label-cell">🧹 Sanitary Charges</td>
 <td><input type="number" id="sanitary" value="" step="any" placeholder="" oninput="allowOnlyNumbers(this)"></td>
 </tr>
 <tr>
