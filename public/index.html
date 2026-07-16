@@ -4827,58 +4827,79 @@ ul{list-style:none}
       </button>
     </div>
 
-    <div class="auth-tabs">
+    <div class="auth-tabs" id="authTabsRow">
       <div class="auth-tab active" id="authTabLogin" onclick="switchAuthTab('login')">Log in</div>
       <div class="auth-tab" id="authTabSignup" onclick="switchAuthTab('signup')">Sign up</div>
     </div>
 
-    <div id="authSignupNameField" style="display:none">
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">First name</label>
-          <input class="form-input" type="text" id="auth-firstname" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Last name</label>
-          <input class="form-input" type="text" id="auth-lastname" />
+    <div id="authFormStep">
+      <div id="authSignupNameField" style="display:none">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">First name</label>
+            <input class="form-input" type="text" id="auth-firstname" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last name</label>
+            <input class="form-input" type="text" id="auth-lastname" />
+          </div>
         </div>
       </div>
-    </div>
-    <div id="authLoginContactField">
+      <div id="authLoginContactField">
+        <div class="form-group">
+          <label class="form-label">Phone or email</label>
+          <input class="form-input" type="text" id="auth-contact" />
+        </div>
+      </div>
+      <div id="authSignupContactFields" style="display:none">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input class="form-input" type="email" id="auth-email" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mobile number</label>
+            <input class="form-input" type="tel" id="auth-mobile" inputmode="numeric" maxlength="10" oninput="sanitizeMobileInput(this)" />
+          </div>
+        </div>
+      </div>
       <div class="form-group">
-        <label class="form-label">Phone or email</label>
-        <input class="form-input" type="text" id="auth-contact" />
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="auth-password" />
       </div>
-    </div>
-    <div id="authSignupContactFields" style="display:none">
-      <div class="form-row">
+      <div id="authSignupConfirmField" style="display:none">
         <div class="form-group">
-          <label class="form-label">Email</label>
-          <input class="form-input" type="email" id="auth-email" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Mobile number</label>
-          <input class="form-input" type="tel" id="auth-mobile" inputmode="numeric" maxlength="10" oninput="sanitizeMobileInput(this)" />
+          <label class="form-label">Re-enter password</label>
+          <input class="form-input" type="password" id="auth-confirm-password" />
         </div>
       </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Password</label>
-      <input class="form-input" type="password" id="auth-password" />
-    </div>
-    <div id="authSignupConfirmField" style="display:none">
-      <div class="form-group">
-        <label class="form-label">Re-enter password</label>
-        <input class="form-input" type="password" id="auth-confirm-password" />
+      <div id="authForgotRow" style="text-align:right;margin-bottom:6px">
+        <span style="font-size:12px;color:var(--brand);font-weight:600;cursor:pointer" onclick="showToast('Password reset link sent (demo)')">Forgot password?</span>
       </div>
-    </div>
-    <div id="authForgotRow" style="text-align:right;margin-bottom:6px">
-      <span style="font-size:12px;color:var(--brand);font-weight:600;cursor:pointer" onclick="showToast('Password reset link sent (demo)')">Forgot password?</span>
+
+      <button class="form-submit" id="authSubmitBtn" onclick="submitAuth()">Log in</button>
+
+      <div class="auth-foot" id="authFoot">New to Quatar? <a onclick="switchAuthTab('signup')">Sign up</a></div>
     </div>
 
-    <button class="form-submit" id="authSubmitBtn" onclick="submitAuth()">Log in</button>
-
-    <div class="auth-foot" id="authFoot">New to Quatar? <a onclick="switchAuthTab('signup')">Sign up</a></div>
+    <!-- ── Signup email verification step — shown after "Sign up" is submitted,
+         in place of the form above, until the emailed code is confirmed. ── -->
+    <div id="authOtpStep" style="display:none">
+      <p style="font-size:13px;color:var(--text-2);margin:0 0 14px;line-height:1.5">
+        We've sent a 6-digit code to <strong id="authOtpEmailLabel"></strong>. Enter it below to verify your email and finish creating your account.
+      </p>
+      <div class="form-group">
+        <label class="form-label">Verification code</label>
+        <input class="form-input" type="text" id="auth-otp" inputmode="numeric" maxlength="6"
+               style="letter-spacing:6px;font-weight:700;text-align:center"
+               oninput="this.value=this.value.replace(/\D/g,'').slice(0,6)" />
+      </div>
+      <button class="form-submit" id="authOtpVerifyBtn" onclick="verifySignupOtp()">Verify &amp; create account</button>
+      <div class="auth-foot" style="display:flex;justify-content:space-between;gap:10px">
+        <a onclick="backToSignupForm()">&larr; Change details</a>
+        <a id="authOtpResendLink" onclick="resendSignupOtp()">Resend code</a>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -8654,10 +8675,12 @@ async function confirmClearAddModalDraft() {
 function openAuthModal() {
   document.getElementById('authModal').classList.add('open');
   document.body.style.overflow = 'hidden';
+  backToSignupForm();
 }
 function closeAuthModal() {
   document.getElementById('authModal').classList.remove('open');
   document.body.style.overflow = '';
+  backToSignupForm();
 }
 
 function openProfileModal() {
@@ -8736,6 +8759,7 @@ function updateNavAuth() {
   refreshNotifPolling();
 }
 function switchAuthTab(tab) {
+  backToSignupForm();
   const isLogin = tab === 'login';
   document.getElementById('authTabLogin').classList.toggle('active', isLogin);
   document.getElementById('authTabSignup').classList.toggle('active', !isLogin);
@@ -8750,6 +8774,10 @@ function switchAuthTab(tab) {
     ? 'New to Quatar? <a onclick="switchAuthTab(\'signup\')">Sign up</a>'
     : 'Already have an account? <a onclick="switchAuthTab(\'login\')">Log in</a>';
 }
+// Holds the collected signup form data between "send OTP" and "verify OTP",
+// since the account isn't actually created until the code is confirmed.
+let pendingSignupBody = null;
+
 async function submitAuth() {
   const isLogin  = document.getElementById('authTabLogin').classList.contains('active');
   const password = document.getElementById('auth-password').value;
@@ -8778,11 +8806,31 @@ async function submitAuth() {
   }
 
   btn.disabled = true;
-  btn.textContent = isLogin ? 'Logging in…' : 'Creating account…';
+  btn.textContent = isLogin ? 'Logging in…' : 'Sending code…';
 
   try {
-    const endpoint = isLogin ? '/api/user/login' : '/api/user/signup';
-    const res      = await fetch(endpoint, {
+    if (!isLogin) {
+      // Signup: don't create the account yet — send the email OTP first, and
+      // only call /api/user/signup once verifySignupOtp() confirms the code.
+      const otpRes  = await fetch('/api/user/signup/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: body.email })
+      });
+      const otpData = await otpRes.json();
+      if (!otpRes.ok) { showToast(otpData.message || 'Could not send verification code'); return; }
+
+      pendingSignupBody = body;
+      document.getElementById('authOtpEmailLabel').textContent = body.email;
+      document.getElementById('auth-otp').value = '';
+      document.getElementById('authFormStep').style.display = 'none';
+      document.getElementById('authTabsRow').style.display = 'none';
+      document.getElementById('authOtpStep').style.display = '';
+      document.getElementById('authModalTitle').textContent = 'Verify your email';
+      return;
+    }
+
+    const res  = await fetch('/api/user/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
@@ -8792,21 +8840,100 @@ async function submitAuth() {
       showToast(data.message || 'Something went wrong');
       return;
     }
-    localStorage.setItem('quatar_user', JSON.stringify({
-      id: data._id, userId: data.userId,
-      firstName: data.firstName, lastName: data.lastName, name: data.name,
-      email: data.email, mobile: data.mobile,
-      userKey: data.userKey
-    }));
-    closeAuthModal();
-    updateNavAuth();
-    showToast(data.message);
+    finishAuthSuccess(data);
   } catch (err) {
     showToast('Network error. Please try again.');
   } finally {
     btn.disabled = false;
     btn.textContent = isLogin ? 'Log in' : 'Sign up';
   }
+}
+
+// Shared by login and (post-verification) signup — stashes the session and
+// updates the UI the same way either path finishes.
+function finishAuthSuccess(data) {
+  localStorage.setItem('quatar_user', JSON.stringify({
+    id: data._id, userId: data.userId,
+    firstName: data.firstName, lastName: data.lastName, name: data.name,
+    email: data.email, mobile: data.mobile,
+    userKey: data.userKey
+  }));
+  closeAuthModal();
+  updateNavAuth();
+  showToast(data.message);
+}
+
+// Called from the OTP step's "Verify & create account" button.
+async function verifySignupOtp() {
+  if (!pendingSignupBody) { backToSignupForm(); return; }
+  const otp = document.getElementById('auth-otp').value.trim();
+  if (!/^\d{6}$/.test(otp)) { showToast('Enter the 6-digit code from your email'); return; }
+
+  const btn = document.getElementById('authOtpVerifyBtn');
+  btn.disabled = true;
+  btn.textContent = 'Verifying…';
+
+  try {
+    const verifyRes  = await fetch('/api/user/signup/verify-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: pendingSignupBody.email, otp })
+    });
+    const verifyData = await verifyRes.json();
+    if (!verifyRes.ok) { showToast(verifyData.message || 'Incorrect code'); return; }
+
+    btn.textContent = 'Creating account…';
+    const signupRes  = await fetch('/api/user/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(pendingSignupBody)
+    });
+    const signupData = await signupRes.json();
+    if (!signupRes.ok) { showToast(signupData.message || 'Something went wrong'); return; }
+
+    pendingSignupBody = null;
+    finishAuthSuccess(signupData);
+  } catch (err) {
+    showToast('Network error. Please try again.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Verify & create account';
+  }
+}
+
+// "Resend code" link on the OTP step.
+async function resendSignupOtp() {
+  if (!pendingSignupBody) return;
+  const link = document.getElementById('authOtpResendLink');
+  link.style.pointerEvents = 'none';
+  link.style.opacity = '0.5';
+  try {
+    const res  = await fetch('/api/user/signup/send-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: pendingSignupBody.email })
+    });
+    const data = await res.json();
+    showToast(res.ok ? 'Code resent' : (data.message || 'Could not resend code'));
+  } catch (err) {
+    showToast('Network error. Please try again.');
+  } finally {
+    setTimeout(() => { link.style.pointerEvents = ''; link.style.opacity = ''; }, 15000);
+  }
+}
+
+// "← Change details" link on the OTP step, and the reset called whenever the
+// modal opens/closes or the login/signup tab is switched.
+function backToSignupForm() {
+  pendingSignupBody = null;
+  const otpStep = document.getElementById('authOtpStep');
+  if (otpStep) otpStep.style.display = 'none';
+  const formStep = document.getElementById('authFormStep');
+  if (formStep) formStep.style.display = '';
+  const tabsRow = document.getElementById('authTabsRow');
+  if (tabsRow) tabsRow.style.display = '';
+  const isLogin = document.getElementById('authTabLogin')?.classList.contains('active');
+  document.getElementById('authModalTitle').textContent = isLogin ? 'Welcome back' : 'Create your account';
 }
 
 /* ═══════════════════════════════════════════════

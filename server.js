@@ -9,6 +9,7 @@ const rateLimit  = require('express-rate-limit');
 const bcrypt     = require('bcryptjs');
 const multer     = require('multer');
 const sharp      = require('sharp');
+const { sendEmailWithBrevo, otpEmailTemplate } = require('./mail');
 
 // ── Env checks ──
 if (!process.env.MONGODB_URI)   throw new Error('MONGODB_URI env var is required');
@@ -18,6 +19,9 @@ if (!process.env.ALLOWED_ORIGIN) {
 }
 if (process.env.NODE_ENV === 'production' && (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD)) {
   throw new Error('ADMIN_EMAIL and ADMIN_PASSWORD env vars are required in production (hardcoded admin/admin login is dev-only)');
+}
+if (!process.env.BREVO_API_KEY) {
+  console.warn('⚠️  BREVO_API_KEY not set — signup OTP emails will fail to send');
 }
 
 const app = express();
@@ -119,6 +123,37 @@ const UserSchema = new mongoose.Schema({
 });
 const User = mongoose.model('User', UserSchema);
 
+// ────────────────────────────────────────────────────────────────────────────
+// ── SIGNUP EMAIL OTP ──
+// One doc per email, overwritten on every resend. The OTP itself is bcrypt-hashed
+// (same pattern as passwords) so a DB read alone doesn't leak a usable code.
+// `verified` flips true once the correct OTP is submitted; /api/user/signup checks
+// this flag before creating the account. expiresAt carries a Mongo TTL index so
+// stale/unverified docs (and used ones, past their window) clean themselves up —
+// no cron job needed.
+// ────────────────────────────────────────────────────────────────────────────
+const OTP_TTL_MS          = 5  * 60 * 1000; // matches "Valid for 5 minutes" in the email template
+const OTP_RESEND_COOLDOWN_MS = 30 * 1000;   // minimum gap between sends for the same email
+const OTP_MAX_ATTEMPTS     = 5;             // wrong-code guesses allowed before the code is dead
+
+const EmailOtpSchema = new mongoose.Schema({
+  email:      { type: String, required: true, lowercase: true, trim: true, unique: true, index: true },
+  otpHash:    { type: String, required: true },
+  attempts:   { type: Number, default: 0 },
+  verified:   { type: Boolean, default: false },
+  lastSentAt: { type: Date, default: Date.now },
+  expiresAt:  { type: Date, required: true, index: { expires: 0 } }, // TTL: Mongo auto-deletes once this passes
+});
+const EmailOtp = mongoose.model('EmailOtp', EmailOtpSchema);
+
+// Rate limiter for the OTP endpoints specifically — tighter than the general
+// auth limiter since each hit sends a real email (Brevo has its own quota/cost).
+const otpLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, max: 8,
+  standardHeaders: true, legacyHeaders: false,
+  message: { message: 'Too many OTP requests. Please try again later.' }
+});
+
 // Rate limiter for user auth
 const userAuthLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, max: 20,
@@ -209,6 +244,83 @@ async function attachUserIfPresent(req, res, next) {
   }
 }
 
+// ── Signup: Step 1 — send email OTP ──
+// Called when the person fills in their email on the signup form, before the
+// account is actually created. Generates a 6-digit code, bcrypt-hashes it into
+// EmailOtp (upsert — a resend just overwrites the previous code), and emails it
+// via Brevo. Doesn't require the account to exist yet (it doesn't, at this point).
+app.post('/api/user/signup/send-otp', otpLimiter, async (req, res) => {
+  try {
+    const { email } = req.body || {};
+    if (!email || !String(email).trim()) return res.status(400).json({ message: 'Email is required' });
+    const cleanEmail = String(email).toLowerCase().trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) return res.status(400).json({ message: 'Please enter a valid email address' });
+
+    const existingUser = await User.findOne({ email: cleanEmail });
+    if (existingUser) return res.status(409).json({ message: 'Account already exists for this email. Please log in.' });
+
+    // Cheap resend-spam guard on top of the IP-based otpLimiter above — stops
+    // someone from hammering "resend" for one target email from many IPs.
+    const existingOtp = await EmailOtp.findOne({ email: cleanEmail }).lean();
+    if (existingOtp && (Date.now() - new Date(existingOtp.lastSentAt).getTime()) < OTP_RESEND_COOLDOWN_MS) {
+      return res.status(429).json({ message: 'Please wait a few seconds before requesting another code.' });
+    }
+
+    const otp = String(crypto.randomInt(100000, 1000000)); // 6-digit, zero can't lead since randomInt floor is 100000
+    const otpHash = await bcrypt.hash(otp, 10);
+
+    await EmailOtp.findOneAndUpdate(
+      { email: cleanEmail },
+      { email: cleanEmail, otpHash, attempts: 0, verified: false, lastSentAt: new Date(), expiresAt: new Date(Date.now() + OTP_TTL_MS) },
+      { upsert: true }
+    );
+
+    const mailResult = await sendEmailWithBrevo(cleanEmail, 'Your Quatar verification code', otpEmailTemplate(otp));
+    if (!mailResult.success) {
+      console.error('Failed to send signup OTP email:', mailResult.error);
+      return res.status(502).json({ message: 'Could not send the verification email. Please try again in a moment.' });
+    }
+
+    return res.json({ message: 'Verification code sent to your email' });
+  } catch (err) {
+    console.error('Send signup OTP error:', err);
+    res.status(500).json({ message: 'Server error. Please try again.' });
+  }
+});
+
+// ── Signup: Step 2 — verify the OTP ──
+// Marks the EmailOtp doc `verified: true` on a correct code, which /api/user/signup
+// below checks before creating the account. Wrong guesses are capped at
+// OTP_MAX_ATTEMPTS so the 6-digit space can't just be brute-forced within the
+// 5-minute window.
+app.post('/api/user/signup/verify-otp', otpLimiter, async (req, res) => {
+  try {
+    const { email, otp } = req.body || {};
+    if (!email || !otp) return res.status(400).json({ message: 'Email and code are required' });
+    const cleanEmail = String(email).toLowerCase().trim();
+
+    const record = await EmailOtp.findOne({ email: cleanEmail });
+    if (!record) return res.status(400).json({ message: 'Code expired or not found. Please request a new one.' });
+    if (record.attempts >= OTP_MAX_ATTEMPTS) {
+      return res.status(429).json({ message: 'Too many incorrect attempts. Please request a new code.' });
+    }
+
+    const match = await bcrypt.compare(String(otp).trim(), record.otpHash);
+    if (!match) {
+      record.attempts += 1;
+      await record.save();
+      return res.status(400).json({ message: 'Incorrect code. Please try again.' });
+    }
+
+    record.verified = true;
+    await record.save();
+    return res.json({ message: 'Email verified' });
+  } catch (err) {
+    console.error('Verify signup OTP error:', err);
+    res.status(500).json({ message: 'Server error. Please try again.' });
+  }
+});
+
 // ── User Signup ──
 app.post('/api/user/signup', userAuthLimiter, async (req, res) => {
   try {
@@ -233,6 +345,13 @@ app.post('/api/user/signup', userAuthLimiter, async (req, res) => {
     if (existingEmail)  return res.status(409).json({ message: 'Account already exists for this email. Please log in.' });
     if (existingMobile) return res.status(409).json({ message: 'Account already exists for this mobile number. Please log in.' });
 
+    // Email must have gone through the OTP flow above and come back verified —
+    // this is what actually stops an account from being created on an email the
+    // person doesn't own. The OTP doc still carries its original 5-minute TTL,
+    // so this also enforces "finish signup shortly after verifying".
+    const otpRecord = await EmailOtp.findOne({ email: cleanEmail, verified: true });
+    if (!otpRecord) return res.status(403).json({ message: 'Please verify your email with the code we sent before continuing.' });
+
     const hashed = await bcrypt.hash(password, 10);
     const userId = await nextSequenceId('USER');
     const name = `${String(firstName).trim()} ${String(lastName).trim()}`.trim();
@@ -246,6 +365,7 @@ app.post('/api/user/signup', userAuthLimiter, async (req, res) => {
       userId,
     });
     const userKey = await issueUserSession(user);
+    await EmailOtp.deleteOne({ email: cleanEmail }); // one-time use — clear it now that the account exists
     return res.status(201).json({
       message: 'Account created successfully',
       _id: user._id, userId: user.userId,
