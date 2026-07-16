@@ -9247,12 +9247,24 @@ function copyReferralCode() {
   }
 }
 function shareReferralCode() {
-  const code = document.getElementById('referCodeText').textContent.trim();
-  const text = 'Join me on Quatar and find your next home in Bengaluru! Use my code ' + code + ' to get a reward.';
+  const website = "https://rentinpeace.com"; // Replace with your website URL
+
+  const text = `🏠 Looking for a home in Bengaluru?
+
+Find verified Rentals, PGs, Leases, Short Stays, and more—all in one place.
+
+🌐 ${website}`;
+
   if (navigator.share) {
-    navigator.share({ title: 'Quatar', text: text }).catch(() => {});
+    navigator.share({
+      title: "RentInPeace",
+      text: text,
+      url: website
+    }).catch(() => {});
   } else {
-    showToast('Invite link copied to share!');
+    navigator.clipboard.writeText(`${text}\n${website}`).then(() => {
+      showToast("Website link copied!");
+    });
   }
 }
 
