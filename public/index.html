@@ -9670,6 +9670,45 @@ function closeRentReceiptTool() {
   document.getElementById('rentReceiptModal').classList.remove('open');
   document.body.style.overflow = '';
 }
+
+// The Rent Receipt tool runs in an <iframe>, and the browser's Contact
+// Picker API (navigator.contacts.select) only works from a top-level
+// browsing context — calling it inside the iframe throws "Failed to
+// execute 'select' on 'ContactsManager'". So when the iframe's tenant
+// "pick from contacts" button is tapped, it posts a message here, this
+// (top-level) page runs the actual picker, and the result is posted back.
+window.addEventListener('message', async function(e) {
+  const data = e.data;
+  if (!data || data.type !== 'kr-rr-pick-contact') return;
+  const frame = document.getElementById('rentReceiptFrame');
+  if (!frame || !frame.contentWindow) return;
+
+  if (!('contacts' in navigator && 'ContactsManager' in window)) {
+    frame.contentWindow.postMessage({
+      type: 'kr-rr-contact-pick-error',
+      message: "Contact picker isn't supported on this device/browser — please type the number in."
+    }, '*');
+    return;
+  }
+
+  try {
+    const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: false });
+    if (!contacts || !contacts.length) return;
+    const picked = contacts[0];
+    frame.contentWindow.postMessage({
+      type: 'kr-rr-contact-picked',
+      name: (picked.name && picked.name[0]) || '',
+      tel: (picked.tel && picked.tel[0]) || ''
+    }, '*');
+  } catch (err) {
+    if (err && err.name !== 'AbortError') {
+      frame.contentWindow.postMessage({
+        type: 'kr-rr-contact-pick-error',
+        message: 'Could not read that contact — please type the number in.'
+      }, '*');
+    }
+  }
+});
 document.getElementById('rentReceiptModal').addEventListener('click', function(e) {
   if (e.target === this) closeRentReceiptTool();
 });

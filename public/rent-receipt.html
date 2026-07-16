@@ -200,19 +200,25 @@ margin: 4px 0;
 .info-grid {
 display: grid;
 grid-template-columns: 1fr;
-gap: 12px;
+gap: 16px;
 background: #f9fbfe;
 border: 1px solid var(--border);
 border-radius: 18px;
-padding: 14px 18px;
+padding: 16px 18px;
 margin-bottom: 18px;
 }
 .info-item {
-display: flex;
+display: grid;
+grid-template-columns: 112px 1fr;
 align-items: center;
 gap: 10px;
-flex-wrap: wrap;
 min-width: 0;
+padding-bottom: 14px;
+border-bottom: 1px dashed var(--border);
+}
+.info-item:last-child {
+padding-bottom: 0;
+border-bottom: none;
 }
 .info-item .label {
 font-weight: 700;
@@ -221,7 +227,9 @@ padding: 4px 12px;
 border-radius: 30px;
 font-size: 10px;
 color: var(--main);
-min-width: 85px;
+white-space: nowrap;
+text-align: center;
+box-sizing: border-box;
 }
 .info-item input {
 flex: 1;
@@ -232,6 +240,7 @@ border-radius: 12px;
 font-size: 10px;
 background: white;
 transition: 0.2s;
+text-align: center;
 }
 .info-item input:focus {
 border-color: var(--main);
@@ -561,27 +570,19 @@ padding: 12px;
   }
   .info-grid {
     grid-template-columns: 1fr;
-    padding: 10px 12px;
-    gap: 8px;
+    padding: 12px 12px;
+    gap: 10px;
   }
   /* One field per row: label and its input sit on the same line,
-     e.g. "Flat No.  [value]", never wrapping to a second line. */
+     e.g. "Flat No.  [value]", never wrapping to a second line. A fixed
+     label-column width (not flex/min-width) keeps every row's input box
+     starting at exactly the same x position. */
   .info-item {
-    flex-wrap: nowrap;
-    align-items: center;
+    grid-template-columns: 76px 1fr;
   }
   .info-item .label {
-    min-width: 62px;
-    flex: 0 0 auto;
     font-size: 8px;
-    padding: 3px 8px;
-    white-space: nowrap;
-  }
-  .info-item input,
-  .info-item > div {
-    flex: 1 1 auto;
-    min-width: 0;
-    width: auto;
+    padding: 3px 6px;
   }
   .info-item input {
     font-size: 8px;
@@ -630,12 +631,12 @@ padding: 12px;
 <div class="header">
 <div class="address">
 <div class="kr-monogram">
-<textarea id="buildingName" placeholder="Enter building name" rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="background:transparent;border:none;border-bottom:1px dashed rgba(255,255,255,.6);color:white;font-weight:700;font-size:13px;font-family:inherit;padding:2px 0;width:100%;max-width:100%;text-align:left;resize:none;overflow:hidden;white-space:pre-wrap;word-break:break-word"></textarea>
+<textarea id="buildingName" placeholder="Enter building name" rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="background:transparent;border:none;color:white;font-weight:700;font-size:13px;font-family:inherit;padding:2px 0;width:100%;max-width:100%;text-align:left;resize:none;overflow:hidden;white-space:pre-wrap;word-break:break-word"></textarea>
 </div>
-<textarea id="buildingAddress" placeholder="Enter address" rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="background:transparent;border:none;border-bottom:1px dashed rgba(255,255,255,.5);color:white;font-size:11px;font-weight:500;font-family:inherit;padding:2px 0;width:220px;max-width:100%;text-align:left;margin-top:4px;resize:none;overflow:hidden;white-space:pre-wrap;word-break:break-word"></textarea>
+<textarea id="buildingAddress" placeholder="Enter address" rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="background:transparent;border:none;color:white;font-size:11px;font-weight:500;font-family:inherit;padding:2px 0;width:220px;max-width:100%;text-align:left;margin-top:4px;resize:none;overflow:hidden;white-space:pre-wrap;word-break:break-word"></textarea>
 <div class="phone-buttons">
 <a href="tel:9611459960" class="call-link" id="callLink" style="text-decoration:none;background:transparent;padding:4px 0;">
-<input type="tel" id="ownerContact" maxlength="10" placeholder="Enter number" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10);syncContactLinks();" onclick="event.preventDefault()" style="background:transparent;border:none;border-bottom:1px dashed rgba(255,255,255,.5);color:white;font-weight:bold;font-size:inherit;font-family:inherit;width:80px;padding:0;text-align:left">
+<input type="tel" id="ownerContact" maxlength="10" placeholder="Enter number" oninput="this.value=this.value.replace(/\D/g,'').slice(0,10);syncContactLinks();" onclick="event.preventDefault()" style="background:transparent;border:none;color:white;font-weight:bold;font-size:inherit;font-family:inherit;width:80px;padding:0;text-align:left">
 </a>
 </div>
 <div id="billNoDiv" style="margin-top: 10px;">
@@ -789,6 +790,66 @@ padding: 12px;
 </div>
 
 <script>
+// ─── Remember entered bill details across refreshes ────────────────────
+// Everything typed into the bill (owner/building info, rates, tenant
+// details, meter readings, signatures) is saved to localStorage on every
+// keystroke and restored on load — except Bill No. and Date, which are
+// meant to auto-advance/auto-set each time (handled separately below).
+// To start a bill for a new tenant, just overwrite Tenant Name and
+// Contact No. — everything else stays as last entered.
+const RENT_BILL_STORAGE_KEY = 'krRentBillFormData';
+const RENT_BILL_FIELD_IDS = [
+  'buildingName', 'buildingAddress', 'ownerContact',
+  'house', 'name', 'tenantContact',
+  'prev', 'current', 'rent', 'currentBill', 'arrears', 'maintenance', 'sanitary', 'parking',
+  'tenantSignature', 'ownerName'
+];
+
+function restoreRentBillFormData() {
+  let saved;
+  try { saved = JSON.parse(localStorage.getItem(RENT_BILL_STORAGE_KEY) || '{}'); }
+  catch (e) { saved = {}; }
+  RENT_BILL_FIELD_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && typeof saved[id] === 'string') el.value = saved[id];
+  });
+}
+
+function saveRentBillFormData() {
+  const data = {};
+  RENT_BILL_FIELD_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) data[id] = el.value;
+  });
+  try { localStorage.setItem(RENT_BILL_STORAGE_KEY, JSON.stringify(data)); }
+  catch (e) { /* storage full/unavailable — nothing more we can do */ }
+}
+
+// Wipes every saved field (building/owner info, tenant details, rates,
+// meter readings, signatures) from localStorage and clears them on screen.
+// Bill No. and Date are untouched — they're auto-generated, not saved here.
+function clearBillForm() {
+  if (!confirm("Clear all saved bill details from this device?\nThis can't be undone.")) return;
+  try { localStorage.removeItem(RENT_BILL_STORAGE_KEY); } catch (e) {}
+  RENT_BILL_FIELD_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.value = '';
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+}
+
+// Restore first, before any other setup script below reads these fields
+// (building-label sync, calculate(), textarea autosize, etc.).
+restoreRentBillFormData();
+
+RENT_BILL_FIELD_IDS.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', saveRentBillFormData);
+});
+</script>
+
+<script>
 // Keep the owner's "Authorized Signatory" line in sync with whatever
 // Building Name is typed above, instead of a hardcoded management name.
 (function () {
@@ -811,8 +872,11 @@ padding: 12px;
 <button onclick="shareOnWhatsApp()" style="margin-right: 12px; background: #25D366;">
 <i class="fab fa-whatsapp"></i> <span class="btn-label">Image</span>
 </button>
-<button onclick="sharePDFOnWhatsApp()" style="background: #128C7E;">
+<button onclick="sharePDFOnWhatsApp()" style="margin-right: 12px; background: #128C7E;">
 <i class="fas fa-file-pdf"></i> <span class="btn-label">Share</span>
+</button>
+<button type="button" onclick="clearBillForm()" title="Clear all saved details" style="background: #b3261e;">
+<i class="fas fa-trash-can"></i> <span class="btn-label">Clear</span>
 </button>
 </div>
 </div>
@@ -1035,7 +1099,19 @@ syncContactLinks();
 // phone's contacts, same idea as the owner-phone picker in the main app.
 // Only works on browsers with the Contact Picker API (e.g. Chrome/Android
 // over HTTPS) — everywhere else, just type it in.
+//
+// NOTE: this page is normally loaded inside an <iframe> by index.html (the
+// "Rent Receipt Generator" modal). Browsers only allow
+// navigator.contacts.select() to run from a top-level browsing context —
+// calling it from inside an iframe throws "Failed to execute 'select' on
+// 'ContactsManager'". So when embedded, we ask the parent page (which IS
+// top-level) to open the picker for us and post the result back in.
 async function pickTenantContact() {
+
+    if (window.top !== window.self) {
+        window.parent.postMessage({ type: 'kr-rr-pick-contact' }, '*');
+        return;
+    }
 
     console.log("contacts:", 'contacts' in navigator);
     console.log("ContactsManager:", 'ContactsManager' in window);
@@ -1060,17 +1136,41 @@ async function pickTenantContact() {
 
         if (!contacts.length) return;
 
-        document.getElementById("name").value =
-            contacts[0].name?.[0] || "";
-
-        document.getElementById("tenantContact").value =
-            (contacts[0].tel?.[0] || "").replace(/\D/g, "").slice(-10);
+        applyTenantContact(contacts[0].name?.[0] || "", contacts[0].tel?.[0] || "");
 
     } catch (e) {
         console.log(e);
-        alert(e.message);
+        if (e && e.name !== 'AbortError') alert(e.message);
     }
 }
+
+// Fills in the tenant name/number fields and fires 'input' so any
+// listeners bound to those fields (e.g. calculate()) still run — used by
+// both the direct picker path above and the parent-postMessage path below.
+function applyTenantContact(name, tel) {
+    const nameField = document.getElementById("name");
+    const contactField = document.getElementById("tenantContact");
+    if (name && nameField) {
+        nameField.value = name;
+        nameField.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    if (contactField) {
+        contactField.value = (tel || "").replace(/\D/g, "").slice(-10);
+        contactField.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+}
+
+// Receives the picked contact (or an error) back from the parent page
+// when we handed the picker off to it above.
+window.addEventListener('message', function(e) {
+    const data = e.data;
+    if (!data || typeof data !== 'object') return;
+    if (data.type === 'kr-rr-contact-picked') {
+        applyTenantContact(data.name || '', data.tel || '');
+    } else if (data.type === 'kr-rr-contact-pick-error' && data.message) {
+        alert(data.message);
+    }
+});
 
 // size the building name & address textareas to fit any pre-filled text
 const _nameEl = document.getElementById('buildingName');
