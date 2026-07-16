@@ -3264,39 +3264,6 @@ ul{list-style:none}
     </div>
   </div>
 
-  <!-- RENT + LEASE: Notice period -->
-  <div class="fd-btn fd-rent fd-lease fd-pg" id="fdb-notice" onclick="toggleFd('notice',this)">
-    <span class="fd-icon">🔔</span>
-    <span class="fd-label">Notice</span> <span class="fd-badge" id="fdbc-notice" style="display:none"></span>
-    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-    <div class="fd-pop" id="fdp-notice" onclick="event.stopPropagation()">
-      <div class="fd-pop-label">Notice period</div>
-      <div class="fd-opts" id="fdo-notice"></div>
-      <div class="fd-pop-footer">
-        <button class="fd-clear-btn" onclick="clearFd('notice')">Clear</button>
-        <button class="fd-apply-btn" onclick="applyFd('notice')">Apply</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- RENT + LEASE: Lease duration -->
-  <div class="fd-btn fd-rent fd-lease" id="fdb-leaseDuration" onclick="toggleFd('leaseDuration',this)">
-    <span class="fd-icon">📜</span>
-    <span class="fd-label">Lease Term</span> <span class="fd-badge" id="fdbc-leaseDuration" style="display:none"></span>
-    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-    <div class="fd-pop" id="fdp-leaseDuration" onclick="event.stopPropagation()">
-      <div class="fd-pop-label">Lease duration</div>
-      <div class="fd-opts" id="fdo-leaseDuration"></div>
-      <div class="fd-pop-footer">
-        <button class="fd-clear-btn" onclick="clearFd('leaseDuration')">Clear</button>
-        <button class="fd-apply-btn" onclick="applyFd('leaseDuration')">Apply</button>
-      </div>
-    </div>
-  </div>
-
-  
-
-  
 
   <!-- LEASE: Lease type -->
   <div class="fd-btn fd-lease" id="fdb-leaseType" onclick="toggleFd('leaseType',this)">
@@ -3309,21 +3276,6 @@ ul{list-style:none}
       <div class="fd-pop-footer">
         <button class="fd-clear-btn" onclick="clearFd('leaseType')">Clear</button>
         <button class="fd-apply-btn" onclick="applyFd('leaseType')">Apply</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- LEASE: Lock-in period -->
-  <div class="fd-btn fd-lease" id="fdb-lockIn" onclick="toggleFd('lockIn',this)">
-    <span class="fd-icon">🔒</span>
-    Lock-in <span class="fd-badge" id="fdbc-lockIn" style="display:none"></span>
-    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-    <div class="fd-pop" id="fdp-lockIn" onclick="event.stopPropagation()">
-      <div class="fd-pop-label">Lock-in period</div>
-      <div class="fd-opts" id="fdo-lockIn"></div>
-      <div class="fd-pop-footer">
-        <button class="fd-clear-btn" onclick="clearFd('lockIn')">Clear</button>
-        <button class="fd-apply-btn" onclick="applyFd('lockIn')">Apply</button>
       </div>
     </div>
   </div>
@@ -3478,95 +3430,6 @@ ul{list-style:none}
       <div class="fd-pop-footer">
         <button class="fd-clear-btn" onclick="clearFd('ssCouples')">Clear</button>
         <button class="fd-apply-btn" onclick="applyFd('ssCouples')">Apply</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- SHORT STAY: Minimum stay -->
-  <div class="fd-btn fd-shortstay" id="fdb-ssMinDays" onclick="toggleFd('ssMinDays',this)">
-    <span class="fd-icon">🗓️</span>
-    <span class="fd-label">Min stay</span> <span class="fd-badge" id="fdbc-ssMinDays" style="display:none"></span>
-    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-    <div class="fd-pop" id="fdp-ssMinDays" onclick="event.stopPropagation()">
-      <div class="fd-pop-label">Minimum stay (days)</div>
-      <div class="fd-opts" id="fdo-ssMinDays"></div>
-      <div class="fd-pop-footer">
-        <button class="fd-clear-btn" onclick="clearFd('ssMinDays')">Clear</button>
-        <button class="fd-apply-btn" onclick="applyFd('ssMinDays')">Apply</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- SHORT STAY: Check-in / Check-out timings -->
-  <div class="fd-btn fd-shortstay" id="fdb-ssTimings" onclick="toggleFd('ssTimings',this)">
-    <span class="fd-icon">⏰</span>
-    <span class="fd-label">Timings</span> <span class="fd-badge" id="fdbc-ssTimings" style="display:none"></span>
-    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-    <div class="fd-pop fd-pop right" id="fdp-ssTimings" onclick="event.stopPropagation()">
-      <div class="fd-pop-label">Check-in time</div>
-      <div class="fd-opts" id="fdo-ssCheckinTime"></div>
-      <div class="fd-pop-label" style="margin-top:6px">Check-out time</div>
-      <div class="fd-opts" id="fdo-ssCheckoutTime"></div>
-      <div class="fd-pop-footer">
-        <button class="fd-clear-btn" onclick="clearFd('ssTimings')">Clear</button>
-        <button class="fd-apply-btn" onclick="applyFd('ssTimings')">Apply</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- SHORT STAY: Extra day rate -->
-  <div class="fd-btn fd-shortstay" id="fdb-ssExtraDayRate" onclick="toggleFd('ssExtraDayRate',this)">
-    <span class="fd-icon">➕</span>
-    <span class="fd-label">Extra day</span> <span class="fd-badge" id="fdbc-ssExtraDayRate" style="display:none"></span>
-    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-    <div class="fd-pop fd-pop right" id="fdp-ssExtraDayRate" onclick="event.stopPropagation()">
-      <div class="fd-pop-label">Extra day rate</div>
-      <div class="fd-opts">
-        <div class="fp-opt" data-filter="_ssExtraDayRateBucket" data-val="0-500" onclick="toggleOpt(this,'ssExtraDayRate')">Under ₹500</div>
-        <div class="fp-opt" data-filter="_ssExtraDayRateBucket" data-val="500-1000" onclick="toggleOpt(this,'ssExtraDayRate')">₹500 – ₹1k</div>
-        <div class="fp-opt" data-filter="_ssExtraDayRateBucket" data-val="1000-2000" onclick="toggleOpt(this,'ssExtraDayRate')">₹1k – ₹2k</div>
-        <div class="fp-opt" data-filter="_ssExtraDayRateBucket" data-val="2000-3500" onclick="toggleOpt(this,'ssExtraDayRate')">₹2k – ₹3.5k</div>
-        <div class="fp-opt" data-filter="_ssExtraDayRateBucket" data-val="3500-" onclick="toggleOpt(this,'ssExtraDayRate')">Above ₹3.5k</div>
-      </div>
-      <div class="fd-pop-footer">
-        <button class="fd-clear-btn" onclick="clearFd('ssExtraDayRate')">Clear</button>
-        <button class="fd-apply-btn" onclick="applyFd('ssExtraDayRate')">Apply</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- SHORT STAY: ID proof required -->
-  <div class="fd-btn fd-shortstay" id="fdb-ssIdProof" onclick="toggleFd('ssIdProof',this)">
-    <span class="fd-icon">🪪</span>
-    <span class="fd-label">ID proof</span> <span class="fd-badge" id="fdbc-ssIdProof" style="display:none"></span>
-    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-    <div class="fd-pop fd-pop right" id="fdp-ssIdProof" onclick="event.stopPropagation()">
-      <div class="fd-pop-label">ID proof required</div>
-      <div class="fd-opts" id="fdo-ssIdProof"></div>
-      <div class="fd-pop-footer">
-        <button class="fd-clear-btn" onclick="clearFd('ssIdProof')">Clear</button>
-        <button class="fd-apply-btn" onclick="applyFd('ssIdProof')">Apply</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- SHORT STAY: Security deposit -->
-  <div class="fd-btn fd-shortstay" id="fdb-ssDeposit" onclick="toggleFd('ssDeposit',this)">
-    <span class="fd-icon">🔒</span>
-    <span class="fd-label">Deposit</span> <span class="fd-badge" id="fdbc-ssDeposit" style="display:none"></span>
-    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-    <div class="fd-pop fd-pop right" id="fdp-ssDeposit" onclick="event.stopPropagation()">
-      <div class="fd-pop-label">Security deposit</div>
-      <div class="fd-opts">
-        <div class="fp-opt" data-filter="_ssDepositBucket" data-val="0-1000" onclick="toggleOpt(this,'ssDeposit')">No deposit / Under ₹1k</div>
-        <div class="fp-opt" data-filter="_ssDepositBucket" data-val="1000-3000" onclick="toggleOpt(this,'ssDeposit')">₹1k – ₹3k</div>
-        <div class="fp-opt" data-filter="_ssDepositBucket" data-val="3000-5000" onclick="toggleOpt(this,'ssDeposit')">₹3k – ₹5k</div>
-        <div class="fp-opt" data-filter="_ssDepositBucket" data-val="5000-10000" onclick="toggleOpt(this,'ssDeposit')">₹5k – ₹10k</div>
-        <div class="fp-opt" data-filter="_ssDepositBucket" data-val="10000-" onclick="toggleOpt(this,'ssDeposit')">Above ₹10k</div>
-      </div>
-      <div class="fd-pop-footer">
-        <button class="fd-clear-btn" onclick="clearFd('ssDeposit')">Clear</button>
-        <button class="fd-apply-btn" onclick="applyFd('ssDeposit')">Apply</button>
       </div>
     </div>
   </div>
