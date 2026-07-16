@@ -1744,7 +1744,8 @@ ul{list-style:none}
 }
 .services-scroll::-webkit-scrollbar{display:none}
 .service-card{
-  position:relative;flex:0 0 280px;width:280px;min-width:280px;max-width:280px;
+  position:relative;flex:0 0 var(--matched-card-w, 260px);
+  width:var(--matched-card-w, 260px);min-width:var(--matched-card-w, 260px);max-width:var(--matched-card-w, 260px);
   height:390px;min-height:390px;max-height:390px;
   border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;
   background:var(--bg-3);box-shadow:var(--shadow);border:1px solid var(--border);
@@ -1787,11 +1788,15 @@ ul{list-style:none}
 .services-arrow svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2}
 .services-arrow.prev{left:-6px}
 .services-arrow.next{right:-6px}
-@media (max-width:680px){
+@media (max-width:640px){
   .services-section{padding:8px 16px 24px}
   .services-title{font-size:23px}
   .services-sub{font-size:13px}
-  .service-card{width:170px;min-width:170px;max-width:170px;height:230px;min-height:230px;max-height:230px}
+  .service-card{
+    flex:0 0 var(--matched-card-w, calc((100vw - 34px)/2));
+    width:var(--matched-card-w, calc((100vw - 34px)/2));min-width:var(--matched-card-w, calc((100vw - 34px)/2));max-width:var(--matched-card-w, calc((100vw - 34px)/2));
+    height:250px;min-height:250px;max-height:250px;
+  }
   .services-arrow{display:none}
 }
 
@@ -1814,9 +1819,9 @@ ul{list-style:none}
   overscroll-behavior-x:contain;
 }
 .hr-scroll::-webkit-scrollbar{display:none}
-.hr-card{flex:0 0 280px;width:280px;min-width:280px;max-width:280px;cursor:pointer}
+.hr-card{flex:0 0 var(--matched-card-w, 260px);width:var(--matched-card-w, 260px);min-width:var(--matched-card-w, 260px);max-width:var(--matched-card-w, 260px);cursor:pointer}
 .hr-thumb{
-  position:relative;width:280px;min-width:280px;max-width:280px;
+  position:relative;width:var(--matched-card-w, 260px);min-width:var(--matched-card-w, 260px);max-width:var(--matched-card-w, 260px);
   height:390px;min-height:390px;max-height:390px;border-radius:var(--radius-lg);
   overflow:hidden;background:var(--bg-3);box-shadow:var(--shadow);border:1px solid var(--border);
   transition:transform .18s ease, box-shadow .18s ease;
@@ -1935,12 +1940,18 @@ ul{list-style:none}
 .hr-arrow svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2}
 .hr-arrow.prev{left:-6px}
 .hr-arrow.next{right:-6px}
-@media (max-width:680px){
+@media (max-width:640px){
   .hr-section{padding:8px 16px 24px}
   .hr-head-title{font-size:18px}
   .hr-arrow{display:none}
-  .hr-card{width:170px;min-width:170px;max-width:170px}
-  .hr-thumb{width:170px;min-width:170px;max-width:170px;height:230px;min-height:230px;max-height:230px}
+  .hr-card{
+    flex:0 0 var(--matched-card-w, calc((100vw - 34px)/2));
+    width:var(--matched-card-w, calc((100vw - 34px)/2));min-width:var(--matched-card-w, calc((100vw - 34px)/2));max-width:var(--matched-card-w, calc((100vw - 34px)/2));
+  }
+  .hr-thumb{
+    width:var(--matched-card-w, calc((100vw - 34px)/2));min-width:var(--matched-card-w, calc((100vw - 34px)/2));max-width:var(--matched-card-w, calc((100vw - 34px)/2));
+    height:250px;min-height:250px;max-height:250px;
+  }
 }
 
 /* ─── Service Request Modal ────────────────────── */
@@ -5958,7 +5969,32 @@ function renderCards() {
     grid.innerHTML = slice.map(p => cardHTML(p, key !== 'promoted')).join('') +
       paginationHTML(key, page, items.length);
   });
+
+  // Premium Services / Honest Reviews cards are fixed-width horizontal
+  // scroll strips, but property cards are a fluid CSS Grid (auto-fill) —
+  // their real rendered width changes with viewport size and column count
+  // in a way no single formula captures. So instead of guessing a number,
+  // measure an actual rendered .prop-card and mirror that width via a CSS
+  // variable, keeping the two visually identical at any screen size.
+  syncScrollCardWidth();
 }
+
+function syncScrollCardWidth() {
+  const propCard = document.querySelector('.prop-card');
+  if (!propCard) return;
+  const w = propCard.getBoundingClientRect().width;
+  if (w > 0) {
+    document.documentElement.style.setProperty('--matched-card-w', w + 'px');
+  }
+}
+// Re-measure on resize (debounced) so rotating a phone or resizing a
+// desktop window keeps the Premium Services / Honest Reviews card width
+// in sync with whatever width property cards are actually rendering at.
+let _syncCardWidthTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(_syncCardWidthTimer);
+  _syncCardWidthTimer = setTimeout(syncScrollCardWidth, 150);
+});
 
 function pageNumberButtons(section, page, totalPages) {
   // Builds a dynamic list of page numbers, with ellipses for long ranges.
