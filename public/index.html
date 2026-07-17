@@ -4512,7 +4512,7 @@ ul{list-style:none}
       <div class="lm-section">📅 Availability &amp; Terms</div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
         <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-noticePeriod"><option value="">Select</option><option>15 Days</option><option>1 Month</option><option>2 Months</option><option selected>3 Months</option></select></div>
-        <div class="form-group"><label class="form-label">Lease duration</label><select class="form-select" id="f-leaseDuration"><option value="">Any</option><option>6 Months</option><option>12 Months</option><option>24+ Months</option></select></div>
+        <div class="form-group"><label class="form-label">Lease duration</label><select class="form-select" id="f-leaseDuration"><option value="">Any</option><option>6 Months</option><option selected>12 Months</option><option>24 Months</option><option>36 Months</option><option>48 Months</option><option>48+ Months</option></select></div>
       </div>
       <div class="lm-section">⚖️ Tenant Rules</div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
@@ -4530,7 +4530,7 @@ ul{list-style:none}
       </div>
       <div class="lm-section">📋 Lease Terms</div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
-        <div class="form-group"><label class="form-label">Lease duration</label><select class="form-select" id="f-leaseDurationVal"><option value="">Select</option><option>1 Year</option><option>2 Years</option><option>3 Years</option><option>5 Years</option><option>9 Years</option><option>15 Years</option><option>30 Years</option></select></div>
+        <div class="form-group"><label class="form-label">Lease duration</label><select class="form-select" id="f-leaseDurationVal"><option value="">Select</option><option>1 Year</option><option selected>2 Years</option><option>3 Years</option><option>5 Years</option><option>9 Years</option><option>15 Years</option><option>30 Years</option></select></div>
         <div class="form-group"><label class="form-label">Lease type</label><select class="form-select" id="f-leaseType"><option value="">Select</option><option>Residential</option><option>Commercial</option><option>Industrial</option><option>Mixed Use</option></select></div>
         <div class="form-group"><label class="form-label">Lock-in period</label><select class="form-select" id="f-lockInPeriod"><option value="">None</option><option>1 Year</option><option>2 Years</option><option>3 Years</option></select></div>
         <div class="form-group"><label class="form-label">Available from</label><input class="form-input" type="date" id="f-leaseAvailableFrom" /></div>
@@ -6890,7 +6890,7 @@ const FD_SORT_ORDER = {
   bathrooms: ['1','2','3','4','Yes','Shared'],
   pgMeals: ['All 3 Meals','Breakfast only','No meals'],
   notice: ['15 Days','1 Month','2 Months','3 Months'],
-  leaseDuration: ['6 Months','12 Months','24+ Months','1 Year','2 Years','3 Years','5 Years','9 Years','15 Years','30 Years'],
+  leaseDuration: ['6 Months','12 Months','24 Months','36 Months','48 Months','48+ Months','1 Year','2 Years','3 Years','5 Years','9 Years','15 Years','30 Years'],
   petsAllowed: ['Yes','No','Restricted'],
   nonVegAllowed: ['Yes','No'],
   leaseType: ['Residential','Commercial','Industrial','Mixed Use'],
@@ -8231,6 +8231,12 @@ function resetListingForm() {
   if (noticeRent) noticeRent.value = '3 Months';
   if (noticeLease) noticeLease.value = '3 Months';
   if (noticePg) noticePg.value = '15 Days';
+  // Re-apply default lease durations (12 Months for Rent, 2 Years for Lease)
+  // which the blanket reset above just cleared back to the placeholder.
+  const leaseDurRent = document.getElementById('f-leaseDuration');
+  const leaseDurLease = document.getElementById('f-leaseDurationVal');
+  if (leaseDurRent) leaseDurRent.value = '12 Months';
+  if (leaseDurLease) leaseDurLease.value = '2 Years';
   // Undo the maintenance>0 lock on electricity/water so a fresh form starts unlocked
   const elecReset = document.getElementById('f-electricityIncluded');
   const waterReset = document.getElementById('f-waterCharge');
@@ -10531,9 +10537,9 @@ function submitListing() {
       // Deposit/electricity/water/negotiable live in #addPricingSection, which is hidden
       // for Lease — reading them here would silently save stale/default values the user
       // never saw or entered. Lease simply doesn't collect these, so they're sent as null.
-      // Monthly rent and rent escalation fields were removed from the Lease form too.
+      // Monthly rent and rent escalation fields were removed from the Lease form too,
+      // and monthlyRent is no longer sent by any form at all.
       deposit:      null,
-      monthlyRent:  null,
       maintenance:  parseFloat(gv('f-leaseMaintenance')) || null,
       rentIncrease: null,
       electricity:  null,
@@ -10586,15 +10592,16 @@ function submitListing() {
         // there would always save null anyway, but do it explicitly so it's not relying
         // on a hidden field by accident.
         : ((isPG || isShortStay) ? null : (gv('f-leaseDuration') || null)),
-      leaseType: isLease ? (gv('f-leaseType') || null) : null,
-      lockIn:    isLease ? (gv('f-lockInPeriod') || null) : null,
+      // Lease-only fields — omitted entirely (not even sent as null) for every
+      // other listing type, including Rent.
+      ...(isLease ? { leaseType: gv('f-leaseType') || null, lockIn: gv('f-lockInPeriod') || null } : {}),
     },
     rules: {
       pets:   isPG ? null : isLease ? (gv('f-leasePets') || null) : isShortStay ? null : (gv('f-petsAllowed') || null),
       nonVeg: isPG ? (gv('f-pgNonVeg') || null) : isLease ? (gv('f-leaseNonVeg') || null) : isShortStay ? null : (gv('f-nonVegAllowed') || null),
-      // Piped gas dropdown was removed — amenities already has a "Piped gas
-      // connection" checkbox (am-pipedgas), so derive Yes/No from that instead.
-      gas:    (isPG || isLease || isShortStay) ? null : (gb('am-pipedgas') ? 'Yes' : 'No'),
+      // "gas" field removed entirely from the Rent form submission — the piped
+      // gas checkbox (am-pipedgas) still adds "Piped gas connection" to the
+      // amenities list, it just no longer also writes a separate rules.gas value.
     },
     media: {
       video: gv('f-videoUrl') || null,

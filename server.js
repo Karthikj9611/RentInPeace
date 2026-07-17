@@ -542,7 +542,7 @@ const OwnerSchema = new mongoose.Schema({
 const PriceSchema = new mongoose.Schema({
   rent:         { type: Number, required: true },
   deposit:      { type: Number, default: null },
-  monthlyRent:  { type: Number, default: null }, // Legacy field — Lease's separate "Monthly rent" input was removed from the form; kept here only to preserve older saved listings, new submissions send null
+  monthlyRent:  { type: Number }, // Legacy field — no form sends this anymore (not even Lease); no default so it no longer appears on newly saved listings
   maintenance:  { type: Number, default: null }, // Not collected for PG or Short Stay listings (form hides this field for both) — sent as null
   rentIncrease: { type: String, default: null }, // Legacy field — Lease's "Rent escalation" dropdown was removed from the form; kept only to preserve older saved listings, new submissions send null
   electricity:  { type: String, default: null }, // Not collected for PG or Short Stay listings (form hides this field for both) — sent as null
@@ -573,14 +573,14 @@ const AmenitiesSchema = new mongoose.Schema({
 const TermsSchema = new mongoose.Schema({
   notice:    { type: String, default: null }, // noticePeriod / leaseNotice / pgNotice
   lease:     { type: String, default: null }, // leaseDuration (Rent) / leaseDurationVal (Lease)
-  leaseType: { type: String, default: null }, // Lease only: Residential / Commercial / Industrial / Mixed Use
-  lockIn:    { type: String, default: null }, // Lease only: lock-in period
+  leaseType: { type: String }, // Lease only: Residential / Commercial / Industrial / Mixed Use — no default, so Rent (and other non-Lease) listings omit this field entirely
+  lockIn:    { type: String }, // Lease only: lock-in period — no default, so Rent (and other non-Lease) listings omit this field entirely
 }, { _id: false });
 
 const RulesSchema = new mongoose.Schema({
   pets:   { type: String, default: null }, // petsAllowed / leasePets — PG's "Pets allowed" field was removed from the form, so PG listings always send null here now
   nonVeg: { type: String, default: null }, // nonVegAllowed / leaseNonVeg / pgNonVeg
-  gas:    { type: String, default: null }, // Derived from the "Piped gas connection" amenity checkbox now — the standalone pipedGas dropdown was removed from the form
+  gas:    { type: String }, // No longer sent by the Rent form (or any form) — no default, so it's omitted entirely from newly saved listings
 }, { _id: false });
 
 const MediaSchema = new mongoose.Schema({
