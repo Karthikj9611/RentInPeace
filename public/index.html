@@ -7169,6 +7169,8 @@ document.addEventListener('click', function(e) {
    reaches the top of the viewport the button stops moving anyway. */
 window.addEventListener('scroll', function() {
   if (!openFd) return;
+  const active = document.activeElement;
+  if (active && active.closest('.fd-pop')) return;
   const btnEl = document.getElementById('fdb-' + openFd);
   const pop = document.getElementById('fdp-' + openFd);
   if (!btnEl || !pop) { closeAllFd(); return; }
@@ -7182,7 +7184,16 @@ window.addEventListener('scroll', function() {
   pop.style.top  = (rect.bottom + 6) + 'px';
   pop.style.left = left + 'px';
 }, true);
-window.addEventListener('resize', closeAllFd);
+window.addEventListener('resize', () => {
+  // On mobile, focusing one of the Min/Max range inputs opens the on-screen
+  // keyboard, which shrinks the visual viewport and fires this same resize
+  // event — closing the dropdown right then would blur the input and dismiss
+  // the keyboard before a single digit could be typed. Only auto-close for
+  // resizes that aren't just the keyboard appearing over an active field.
+  const active = document.activeElement;
+  if (active && active.closest('.fd-pop')) return;
+  closeAllFd();
+});
 
 /* ── Read all active filter state ── */
 function getFilterState() {
