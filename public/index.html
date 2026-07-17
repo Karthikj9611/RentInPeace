@@ -257,6 +257,16 @@ ul{list-style:none}
 .fd-range{display:flex;flex-direction:column;gap:6px;padding:2px 0}
 .fd-range input[type=range]{width:100%;accent-color:var(--brand);cursor:pointer}
 .fd-range-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--text-3)}
+/* Min/Max number-input pair used by the unified Price / Deposit / Maintenance filters */
+.fd-range-inputs{display:flex;align-items:center;gap:8px}
+.fd-range-input{
+  width:100%;border:1px solid var(--border-2);border-radius:7px;
+  padding:8px 10px;font-size:13px;color:var(--text-1);background:var(--bg);
+}
+.fd-range-input::-webkit-outer-spin-button,.fd-range-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.fd-range-input:focus{outline:none;border-color:var(--brand)}
+.fd-range-sep{color:var(--text-3);font-size:12px;flex-shrink:0}
+.fd-range-hint{font-size:10.5px;color:var(--text-3)}
 /* Pop footer */
 .fd-pop-footer{display:flex;justify-content:space-between;align-items:center;padding-top:6px;border-top:1px solid var(--border);margin-top:2px}
 .fd-clear-btn{font-size:12px;color:var(--text-3);background:none;border:none;cursor:pointer;padding:2px 0}
@@ -3014,74 +3024,62 @@ ul{list-style:none}
     </div>
   </div>
 
-  <!-- RENT: Max Rent -->
-  <div class="fd-btn fd-rent" id="fdb-rent" onclick="toggleFd('rent',this)">
+  <!-- ALL TYPES: Price (Rent / Lease amount / PG rent / Per-day rate — same underlying price.rent field) -->
+  <div class="fd-btn fd-rent fd-lease fd-pg fd-shortstay" id="fdb-price" onclick="toggleFd('price',this)">
     <span class="fd-icon">💰</span>
-    <span class="fd-label">Rent</span> <span class="fd-badge" id="fdbc-rent" style="display:none"></span>
+    <span class="fd-label">Price</span> <span class="fd-badge" id="fdbc-price" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-    <div class="fd-pop" id="fdp-rent" onclick="event.stopPropagation()">
-      <div class="fd-pop-label">Rent / month</div>
-      <div class="fd-opts">
-        <div class="fp-opt" data-filter="_rentBucket" data-val="0-10000" onclick="toggleOpt(this,'rent')">Under ₹10k</div>
-        <div class="fp-opt" data-filter="_rentBucket" data-val="10000-20000" onclick="toggleOpt(this,'rent')">₹10k – ₹20k</div>
-        <div class="fp-opt" data-filter="_rentBucket" data-val="20000-30000" onclick="toggleOpt(this,'rent')">₹20k – ₹30k</div>
-        <div class="fp-opt" data-filter="_rentBucket" data-val="30000-50000" onclick="toggleOpt(this,'rent')">₹30k – ₹50k</div>
-        <div class="fp-opt" data-filter="_rentBucket" data-val="50000-75000" onclick="toggleOpt(this,'rent')">₹50k – ₹75k</div>
-        <div class="fp-opt" data-filter="_rentBucket" data-val="75000-100000" onclick="toggleOpt(this,'rent')">₹75k – ₹1L</div>
-        <div class="fp-opt" data-filter="_rentBucket" data-val="100000-" onclick="toggleOpt(this,'rent')">Above ₹1L</div>
+    <div class="fd-pop" id="fdp-price" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Price (₹)</div>
+      <div class="fd-range-inputs">
+        <input class="fd-range-input" type="number" min="0" step="1" inputmode="numeric" placeholder="Min" id="fd-price-min" oninput="refreshFdRangeBtn('price')">
+        <span class="fd-range-sep">–</span>
+        <input class="fd-range-input" type="number" min="0" step="1" inputmode="numeric" placeholder="Max" id="fd-price-max" oninput="refreshFdRangeBtn('price')">
       </div>
+      <div class="fd-range-hint">Enter any range, e.g. 0 – 10000</div>
       <div class="fd-pop-footer">
-        <button class="fd-clear-btn" onclick="clearFd('rent')">Clear</button>
-        <button class="fd-apply-btn" onclick="applyFd('rent')">Apply</button>
+        <button class="fd-clear-btn" onclick="clearFdRange('price')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFdRange('price')">Apply</button>
       </div>
     </div>
   </div>
 
-  <!-- RENT: Deposit -->
-  <div class="fd-btn fd-rent" id="fdb-deposit" onclick="toggleFd('deposit',this)">
+  <!-- ALL TYPES: Deposit (security deposit — same underlying price.deposit field) -->
+  <div class="fd-btn fd-rent fd-lease fd-pg fd-shortstay" id="fdb-deposit" onclick="toggleFd('deposit',this)">
     <span class="fd-icon">🏦</span>
     <span class="fd-label">Deposit</span> <span class="fd-badge" id="fdbc-deposit" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     <div class="fd-pop" id="fdp-deposit" onclick="event.stopPropagation()">
-      <div class="fd-pop-label">Deposit amount</div>
-      <div class="fd-opts">
-        <div class="fp-opt" data-filter="_depositBucket" data-val="0-25000" onclick="toggleOpt(this,'deposit')">Under ₹25k</div>
-        <div class="fp-opt" data-filter="_depositBucket" data-val="25000-50000" onclick="toggleOpt(this,'deposit')">₹25k – ₹50k</div>
-        <div class="fp-opt" data-filter="_depositBucket" data-val="50000-100000" onclick="toggleOpt(this,'deposit')">₹50k – ₹1L</div>
-        <div class="fp-opt" data-filter="_depositBucket" data-val="100000-200000" onclick="toggleOpt(this,'deposit')">₹1L – ₹2L</div>
-        <div class="fp-opt" data-filter="_depositBucket" data-val="200000-300000" onclick="toggleOpt(this,'deposit')">₹2L – ₹3L</div>
-        <div class="fp-opt" data-filter="_depositBucket" data-val="300000-" onclick="toggleOpt(this,'deposit')">Above ₹3L</div>
+      <div class="fd-pop-label">Deposit amount (₹)</div>
+      <div class="fd-range-inputs">
+        <input class="fd-range-input" type="number" min="0" step="1" inputmode="numeric" placeholder="Min" id="fd-deposit-min" oninput="refreshFdRangeBtn('deposit')">
+        <span class="fd-range-sep">–</span>
+        <input class="fd-range-input" type="number" min="0" step="1" inputmode="numeric" placeholder="Max" id="fd-deposit-max" oninput="refreshFdRangeBtn('deposit')">
       </div>
+      <div class="fd-range-hint">Enter any range, e.g. 0 – 25000</div>
       <div class="fd-pop-footer">
-        <button class="fd-clear-btn" onclick="clearFd('deposit')">Clear</button>
-        <button class="fd-apply-btn" onclick="applyFd('deposit')">Apply</button>
+        <button class="fd-clear-btn" onclick="clearFdRange('deposit')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFdRange('deposit')">Apply</button>
       </div>
     </div>
   </div>
 
-  
-
-  
-
-  
-
-  <!-- RENT + LEASE: Maintenance -->
-  <div class="fd-btn fd-rent fd-lease" id="fdb-maintenance" onclick="toggleFd('maintenance',this)">
+  <!-- ALL TYPES: Maintenance (same underlying price.maintenance field) -->
+  <div class="fd-btn fd-rent fd-lease fd-pg fd-shortstay" id="fdb-maintenance" onclick="toggleFd('maintenance',this)">
     <span class="fd-icon">🛠️</span>
     <span class="fd-label">Maintenance</span> <span class="fd-badge" id="fdbc-maintenance" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     <div class="fd-pop" id="fdp-maintenance" onclick="event.stopPropagation()">
-      <div class="fd-pop-label">Maintenance / month</div>
-      <div class="fd-opts">
-        <div class="fp-opt" data-filter="_maintenanceBucket" data-val="0-1" onclick="toggleOpt(this,'maintenance')">None / Included</div>
-        <div class="fp-opt" data-filter="_maintenanceBucket" data-val="1-2000" onclick="toggleOpt(this,'maintenance')">Under ₹2k</div>
-        <div class="fp-opt" data-filter="_maintenanceBucket" data-val="2000-4000" onclick="toggleOpt(this,'maintenance')">₹2k – ₹4k</div>
-        <div class="fp-opt" data-filter="_maintenanceBucket" data-val="4000-6000" onclick="toggleOpt(this,'maintenance')">₹4k – ₹6k</div>
-        <div class="fp-opt" data-filter="_maintenanceBucket" data-val="6000-" onclick="toggleOpt(this,'maintenance')">Above ₹6k</div>
+      <div class="fd-pop-label">Maintenance / month (₹)</div>
+      <div class="fd-range-inputs">
+        <input class="fd-range-input" type="number" min="0" step="1" inputmode="numeric" placeholder="Min" id="fd-maintenance-min" oninput="refreshFdRangeBtn('maintenance')">
+        <span class="fd-range-sep">–</span>
+        <input class="fd-range-input" type="number" min="0" step="1" inputmode="numeric" placeholder="Max" id="fd-maintenance-max" oninput="refreshFdRangeBtn('maintenance')">
       </div>
+      <div class="fd-range-hint">Enter any range, e.g. 0 – 2000</div>
       <div class="fd-pop-footer">
-        <button class="fd-clear-btn" onclick="clearFd('maintenance')">Clear</button>
-        <button class="fd-apply-btn" onclick="applyFd('maintenance')">Apply</button>
+        <button class="fd-clear-btn" onclick="clearFdRange('maintenance')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFdRange('maintenance')">Apply</button>
       </div>
     </div>
   </div>
@@ -3103,29 +3101,6 @@ ul{list-style:none}
       </div>
     </div>
   </div>
-
-  <!-- LEASE: Lease Amount -->
-  <div class="fd-btn fd-lease" id="fdb-lease" onclick="toggleFd('lease',this)">
-    <span class="fd-icon">💵</span>
-    <span class="fd-label">Lease Amt</span> <span class="fd-badge" id="fdbc-lease" style="display:none"></span>
-    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-    <div class="fd-pop" id="fdp-lease" onclick="event.stopPropagation()">
-      <div class="fd-pop-label">Lease amount</div>
-      <div class="fd-opts">
-        <div class="fp-opt" data-filter="_leaseBucket" data-val="0-1000000" onclick="toggleOpt(this,'lease')">Under ₹10L</div>
-        <div class="fp-opt" data-filter="_leaseBucket" data-val="1000000-2500000" onclick="toggleOpt(this,'lease')">₹10L – ₹25L</div>
-        <div class="fp-opt" data-filter="_leaseBucket" data-val="2500000-5000000" onclick="toggleOpt(this,'lease')">₹25L – ₹50L</div>
-        <div class="fp-opt" data-filter="_leaseBucket" data-val="5000000-7500000" onclick="toggleOpt(this,'lease')">₹50L – ₹75L</div>
-        <div class="fp-opt" data-filter="_leaseBucket" data-val="7500000-10000000" onclick="toggleOpt(this,'lease')">₹75L – ₹1Cr</div>
-        <div class="fp-opt" data-filter="_leaseBucket" data-val="10000000-" onclick="toggleOpt(this,'lease')">Above ₹1Cr</div>
-      </div>
-      <div class="fd-pop-footer">
-        <button class="fd-clear-btn" onclick="clearFd('lease')">Clear</button>
-        <button class="fd-apply-btn" onclick="applyFd('lease')">Apply</button>
-      </div>
-    </div>
-  </div>
-
 
   <!-- RENT + LEASE: Furnishing -->
   <div class="fd-btn fd-rent fd-lease fd-pg" id="fdb-furnishing" onclick="toggleFd('furnishing',this)">
@@ -3326,65 +3301,6 @@ ul{list-style:none}
       <div class="fd-pop-footer">
         <button class="fd-clear-btn" onclick="clearFd('pgMeals')">Clear</button>
         <button class="fd-apply-btn" onclick="applyFd('pgMeals')">Apply</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="fd-btn fd-pg" id="fdb-pgRent" onclick="toggleFd('pgRent',this)">
-    <span class="fd-icon">💰</span>
-    <span class="fd-label">PG Rent</span> <span class="fd-badge" id="fdbc-pgRent" style="display:none"></span>
-    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-    <div class="fd-pop fd-pop right" id="fdp-pgRent" onclick="event.stopPropagation()">
-      <div class="fd-pop-label">PG rent / month</div>
-      <div class="fd-opts">
-        <div class="fp-opt" data-filter="_pgRentBucket" data-val="0-5000" onclick="toggleOpt(this,'pgRent')">Under ₹5k</div>
-        <div class="fp-opt" data-filter="_pgRentBucket" data-val="5000-8000" onclick="toggleOpt(this,'pgRent')">₹5k – ₹8k</div>
-        <div class="fp-opt" data-filter="_pgRentBucket" data-val="8000-12000" onclick="toggleOpt(this,'pgRent')">₹8k – ₹12k</div>
-        <div class="fp-opt" data-filter="_pgRentBucket" data-val="12000-18000" onclick="toggleOpt(this,'pgRent')">₹12k – ₹18k</div>
-        <div class="fp-opt" data-filter="_pgRentBucket" data-val="18000-" onclick="toggleOpt(this,'pgRent')">Above ₹18k</div>
-      </div>
-      <div class="fd-pop-footer">
-        <button class="fd-clear-btn" onclick="clearFd('pgRent')">Clear</button>
-        <button class="fd-apply-btn" onclick="applyFd('pgRent')">Apply</button>
-      </div>
-    </div>
-  </div>
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  <!-- SHORT STAY: Rate per day -->
-  <div class="fd-btn fd-shortstay" id="fdb-ssRent" onclick="toggleFd('ssRent',this)">
-    <span class="fd-icon">💰</span>
-    <span class="fd-label">Per day</span> <span class="fd-badge" id="fdbc-ssRent" style="display:none"></span>
-    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-    <div class="fd-pop" id="fdp-ssRent" onclick="event.stopPropagation()">
-      <div class="fd-pop-label">Rate per day</div>
-      <div class="fd-opts">
-        <div class="fp-opt" data-filter="_ssRentBucket" data-val="0-1000" onclick="toggleOpt(this,'ssRent')">Under ₹1k</div>
-        <div class="fp-opt" data-filter="_ssRentBucket" data-val="1000-2000" onclick="toggleOpt(this,'ssRent')">₹1k – ₹2k</div>
-        <div class="fp-opt" data-filter="_ssRentBucket" data-val="2000-3500" onclick="toggleOpt(this,'ssRent')">₹2k – ₹3.5k</div>
-        <div class="fp-opt" data-filter="_ssRentBucket" data-val="3500-5000" onclick="toggleOpt(this,'ssRent')">₹3.5k – ₹5k</div>
-        <div class="fp-opt" data-filter="_ssRentBucket" data-val="5000-" onclick="toggleOpt(this,'ssRent')">Above ₹5k</div>
-      </div>
-      <div class="fd-pop-footer">
-        <button class="fd-clear-btn" onclick="clearFd('ssRent')">Clear</button>
-        <button class="fd-apply-btn" onclick="applyFd('ssRent')">Apply</button>
       </div>
     </div>
   </div>
@@ -6667,11 +6583,7 @@ function handleSearch() {
 const FD_GROUPS = {
   type:       ['propertyType'],
   bhk:        ['bhk'],
-  rent:       ['_rentBucket'],
-  deposit:    ['_depositBucket'],
-  maintenance:['_maintenanceBucket'],
   negotiable: ['negotiable'],
-  lease:      ['_leaseBucket'],
   furnishing: ['furnishing'],
   tenant:     ['tenant'],
   facing:     ['facing'],
@@ -6694,13 +6606,11 @@ const FD_GROUPS = {
   pgGender:   ['pgGender'],
   pgRoom:     ['pgRoomType'],
   pgMeals:    ['pgMeals','pgFoodType'],
-  pgRent:     ['_pgRentBucket'],
   pgOccupancy:  ['pgOccupancy'],
   pgKitchen:    ['pgKitchen'],
   pgGateTime:   ['pgGateTime'],
   pgVisitors:   ['pgVisitors'],
   pgNonVeg:     ['pgNonVeg'],
-  ssRent:         ['_ssRentBucket'],
   ssGuests:       ['ssMaxGuests'],
   ssCancellation: ['ssCancellation'],
   ssCouples:      ['ssCouples'],
@@ -6708,7 +6618,6 @@ const FD_GROUPS = {
   ssTimings:      ['ssCheckinTime','ssCheckoutTime'],
   ssExtraDayRate: ['_ssExtraDayRateBucket'],
   ssIdProof:      ['ssIdProof'],
-  ssDeposit:      ['_ssDepositBucket'],
 };
 
 let openFd = null;
@@ -7102,7 +7011,7 @@ function refreshFdBtn(id) {
 }
 
 function refreshTotalBadge() {
-  const total = document.querySelectorAll('.fp-opt.sel').length;
+  const total = document.querySelectorAll('.fp-opt.sel').length + fdActiveRangeCount();
 
   const badge = document.getElementById('fdTotalBadge');
   const clearBtn = document.getElementById('fdClearAll');
@@ -7129,7 +7038,68 @@ function clearFd(id) {
 function clearFilters() {
   document.querySelectorAll('.fp-opt.sel').forEach(o => o.classList.remove('sel'));
   Object.keys(FD_GROUPS).forEach(id => refreshFdBtn(id));
+  FD_RANGE_IDS.forEach(id => {
+    const minEl = document.getElementById('fd-' + id + '-min');
+    const maxEl = document.getElementById('fd-' + id + '-max');
+    if (minEl) minEl.value = '';
+    if (maxEl) maxEl.value = '';
+    refreshFdRangeBtn(id, true);
+  });
   closeAllFd();
+  renderCards();
+}
+
+/* ── Unified min/max range filters: Price, Deposit, Maintenance ──
+   These apply the same underlying field (price.rent / price.deposit /
+   price.maintenance) across every property type — Rent, Lease, PG, and
+   Short Stay — instead of type-specific preset buckets. The user types
+   any custom range, e.g. 0–10000, or leaves Max blank for "0 and above". */
+const FD_RANGE_IDS = ['price', 'deposit', 'maintenance'];
+
+function fdActiveRangeCount() {
+  let n = 0;
+  FD_RANGE_IDS.forEach(id => {
+    const minEl = document.getElementById('fd-' + id + '-min');
+    const maxEl = document.getElementById('fd-' + id + '-max');
+    if ((minEl && minEl.value !== '') || (maxEl && maxEl.value !== '')) n++;
+  });
+  return n;
+}
+
+/* Refresh a range button's badge/has-sel state based on whether Min/Max
+   have values. Pass skipRender=true to avoid re-rendering cards (used when
+   just clearing inputs, where the caller already triggers a render). */
+function refreshFdRangeBtn(id, skipRender) {
+  const btn = document.getElementById('fdb-' + id);
+  const badge = document.getElementById('fdbc-' + id);
+  const minEl = document.getElementById('fd-' + id + '-min');
+  const maxEl = document.getElementById('fd-' + id + '-max');
+  const hasAny = !!((minEl && minEl.value !== '') || (maxEl && maxEl.value !== ''));
+
+  if (btn) btn.classList.toggle('has-sel', hasAny);
+  if (badge) {
+    badge.textContent = '1';
+    badge.style.display = hasAny ? '' : 'none';
+  }
+  refreshTotalBadge();
+  if (!skipRender) renderCards();
+}
+
+/* Apply = close popover and rerender (values are already live via oninput,
+   this just matches the existing Apply-button UX used by every other filter) */
+function applyFdRange(id) {
+  refreshFdRangeBtn(id, true);
+  closeAllFd();
+  renderCards();
+}
+
+/* Clear a single range filter's Min/Max inputs */
+function clearFdRange(id) {
+  const minEl = document.getElementById('fd-' + id + '-min');
+  const maxEl = document.getElementById('fd-' + id + '-max');
+  if (minEl) minEl.value = '';
+  if (maxEl) maxEl.value = '';
+  refreshFdRangeBtn(id, true);
   renderCards();
 }
 
@@ -7177,6 +7147,20 @@ function getFilterState() {
     if (!state[key]) state[key] = [];
     state[key].push(val);
   });
+
+  /* Unified Price / Deposit / Maintenance min-max ranges (common to all
+     property types) — read straight from the number inputs. */
+  const fdRange = (id) => {
+    const minEl = document.getElementById('fd-' + id + '-min');
+    const maxEl = document.getElementById('fd-' + id + '-max');
+    const min = minEl && minEl.value !== '' ? Number(minEl.value) : null;
+    const max = maxEl && maxEl.value !== '' ? Number(maxEl.value) : null;
+    return [min, max];
+  };
+  [state._priceMin, state._priceMax] = fdRange('price');
+  [state._depositMin, state._depositMax] = fdRange('deposit');
+  [state._maintenanceMin, state._maintenanceMax] = fdRange('maintenance');
+
   return state;
 }
 
@@ -7222,9 +7206,25 @@ function fdDaysFromToday(dateStr) {
   return Math.round((target - today) / 86400000);
 }
 
+/* Robust numeric coercion for price fields coming from the API — handles
+   plain numbers, numeric strings, and (just in case older/legacy records
+   have it) strings with stray currency symbols, commas, or text like
+   "₹2,000" or "2000/month". Anything unparseable/missing becomes 0,
+   exactly like the old bucket filters treated it. Used for rent/deposit/
+   maintenance so Maintenance is parsed exactly as defensively as Price. */
+function fdPriceNum(v) {
+  if (v === null || v === undefined || v === '') return 0;
+  if (typeof v === 'number') return isNaN(v) ? 0 : v;
+  const n = parseFloat(String(v).replace(/[^0-9.]/g, ''));
+  return isNaN(n) ? 0 : n;
+}
+
 function getFiltered() {
   const fs = getFilterState();
-  const hasFilters = Object.keys(fs).length > 0;
+  const hasFilters = Object.keys(fs).some(k => {
+    const v = fs[k];
+    return Array.isArray(v) ? v.length > 0 : v !== null && v !== undefined;
+  });
 
   let list = PROPERTIES.filter(p => {
     if (!matchesTab(p, currentTab)) return false;
@@ -7293,10 +7293,17 @@ function getFiltered() {
         return pAmList.includes(a.toLowerCase());
       })) return false;
     }
+    /* Unified Price / Deposit / Maintenance range filters — same
+       price.rent / price.deposit / price.maintenance fields, and the same
+       Min/Max inputs, apply across Rent, Lease, PG, and Short Stay alike. */
+    if (fs._priceMin != null && fdPriceNum(p.price?.rent) < fs._priceMin) return false;
+    if (fs._priceMax != null && fdPriceNum(p.price?.rent) > fs._priceMax) return false;
+    if (fs._depositMin != null && fdPriceNum(p.price?.deposit) < fs._depositMin) return false;
+    if (fs._depositMax != null && fdPriceNum(p.price?.deposit) > fs._depositMax) return false;
+    if (fs._maintenanceMin != null && fdPriceNum(p.price?.maintenance) < fs._maintenanceMin) return false;
+    if (fs._maintenanceMax != null && fdPriceNum(p.price?.maintenance) > fs._maintenanceMax) return false;
+
     if (pType==='Rent') {
-      if (fs._rentBucket && !fdValueInBuckets(p.price?.rent, fs._rentBucket)) return false;
-      if (fs._depositBucket && !fdValueInBuckets(p.price?.deposit, fs._depositBucket)) return false;
-      if (fs._maintenanceBucket && !fdValueInBuckets(p.price?.maintenance||0, fs._maintenanceBucket)) return false;
       if (fs._escalationBucket && !fdValueInBuckets(fdEscalationNum(p.price?.rentIncrease), fs._escalationBucket)) return false;
       if (fs.electricityIncluded && !fs.electricityIncluded.includes(p.price?.electricity)) return false;
       if (fs.waterCharge && !fs.waterCharge.includes(p.price?.water)) return false;
@@ -7307,8 +7314,6 @@ function getFiltered() {
       if (fs.nonVegAllowed && !fs.nonVegAllowed.includes(p.rules?.nonVeg)) return false;
     }
     if (pType==='Lease') {
-      if (fs._leaseBucket && !fdValueInBuckets(p.price?.rent||0, fs._leaseBucket)) return false;
-      if (fs._maintenanceBucket && !fdValueInBuckets(p.price?.maintenance||0, fs._maintenanceBucket)) return false;
       if (fs._floorBucket && !fdValueInBuckets(fdFloorNum(p.property?.floor), fs._floorBucket)) return false;
       if (fs._areaBucket && !fdValueInBuckets(fdAreaNum(p.property?.area), fs._areaBucket)) return false;
       if (fs.leaseDuration && !fs.leaseDuration.includes(p.terms?.lease)) return false;
@@ -7342,9 +7347,6 @@ function getFiltered() {
     if (fs.pgFoodType) {
       if (pType!=='PG' || !fs.pgFoodType.includes(p.pg?.food)) return false;
     }
-    if (fs._pgRentBucket) {
-      if (pType!=='PG' || !fdValueInBuckets(p.price?.rent, fs._pgRentBucket)) return false;
-    }
     if (fs.pgOccupancy) {
       if (pType!=='PG' || !fs.pgOccupancy.includes(String(p.pg?.occupancy ?? ''))) return false;
     }
@@ -7371,9 +7373,6 @@ function getFiltered() {
     if (fs.ssCouples) {
       if (pType!=='ShortStay' || !fs.ssCouples.includes(p.shortStay?.couplesAllowed)) return false;
     }
-    if (fs._ssRentBucket) {
-      if (pType!=='ShortStay' || !fdValueInBuckets(p.price?.rent, fs._ssRentBucket)) return false;
-    }
     if (fs.ssMinDays) {
       if (pType!=='ShortStay' || !fs.ssMinDays.includes(String(p.shortStay?.minDays ?? ''))) return false;
     }
@@ -7388,9 +7387,6 @@ function getFiltered() {
     }
     if (fs.ssIdProof) {
       if (pType!=='ShortStay' || !fs.ssIdProof.includes(p.shortStay?.idProof)) return false;
-    }
-    if (fs._ssDepositBucket) {
-      if (pType!=='ShortStay' || !fdValueInBuckets(p.price?.deposit||0, fs._ssDepositBucket)) return false;
     }
     return true;
   });
