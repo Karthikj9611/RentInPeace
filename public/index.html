@@ -6319,12 +6319,12 @@ function openCompareModal() {
   }
   renderCompareTable();
   document.getElementById('compareModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  lockBodyScroll();
 }
 
 function closeCompareModal() {
   document.getElementById('compareModal').classList.remove('open');
-  document.body.style.overflow = '';
+  unlockBodyScroll();
 }
 
 function shareCompareViaWhatsApp() {
@@ -6484,7 +6484,7 @@ function toggleShortlistPanel() {
   const backdrop = document.getElementById('panelBackdrop');
   panel.classList.toggle('open');
   backdrop.classList.toggle('open');
-  document.body.style.overflow = panel.classList.contains('open') ? 'hidden' : '';
+  if (panel.classList.contains('open')) lockBodyScroll(); else unlockBodyScroll();
 
   if (panel.classList.contains('open')) renderShortlistPanel();
 }
@@ -6494,7 +6494,7 @@ function toggleMenuPanel() {
   const backdrop = document.getElementById('menuBackdrop');
   panel.classList.toggle('open');
   backdrop.classList.toggle('open');
-  document.body.style.overflow = panel.classList.contains('open') ? 'hidden' : '';
+  if (panel.classList.contains('open')) lockBodyScroll(); else unlockBodyScroll();
 }
 
 /* ═══════════════════════════════════════════════
@@ -6939,6 +6939,40 @@ function syncFdBar() {
 }
 
 /* Toggle a dropdown open/closed */
+/* ── Robust body-scroll lock for modals/panels/overlays ──
+   Plain `overflow:hidden` on <body> is what every modal here used to set,
+   but iOS Safari still lets touch/momentum scrolling bleed through to the
+   page behind a modal even with that set. Pinning the body with
+   position:fixed (restoring the exact scroll offset on unlock) is the
+   reliable cross-browser fix. Counter-based so nested/stacked modals
+   (e.g. opening a picker on top of another modal) don't unlock too early. */
+let _scrollLockCount = 0;
+let _scrollLockY = 0;
+function lockBodyScroll() {
+  if (_scrollLockCount === 0) {
+    _scrollLockY = window.scrollY || window.pageYOffset || 0;
+    document.body.style.position = 'fixed';
+    document.body.style.top = (-_scrollLockY) + 'px';
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+    document.body.style.overflow = 'hidden';
+  }
+  _scrollLockCount++;
+}
+function unlockBodyScroll() {
+  _scrollLockCount = Math.max(0, _scrollLockCount - 1);
+  if (_scrollLockCount === 0) {
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
+    document.body.style.overflow = '';
+    window.scrollTo(0, _scrollLockY);
+  }
+}
+
 function toggleFd(id, btnEl) {
   const pop = document.getElementById('fdp-' + id);
   if (!pop) return;
@@ -7535,7 +7569,7 @@ function openDetail(id) {
   document.getElementById('addModalBox').classList.add('view-mode');
   document.getElementById('addModal').classList.add('view-mode');
   document.getElementById('addModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  lockBodyScroll();
 
   const scrollBody = document.getElementById('addModalScrollBody');
   if (scrollBody) scrollBody.scrollTop = 0;
@@ -7655,7 +7689,7 @@ function closeDetail() {
   document.getElementById('addModal').classList.remove('open');
   document.getElementById('addModalBox').classList.remove('view-mode');
   document.getElementById('addModal').classList.remove('view-mode');
-  document.body.style.overflow = '';
+  unlockBodyScroll();
   propertyViewMode = false;
   const gallerySlot = document.getElementById('detailGallerySlot');
   if (gallerySlot) gallerySlot.innerHTML = '';
@@ -7722,12 +7756,12 @@ function openScheduleModal(propId) {
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('sched-date').min = today;
   document.getElementById('scheduleModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  lockBodyScroll();
 }
 
 function closeScheduleModal() {
   document.getElementById('scheduleModal').classList.remove('open');
-  document.body.style.overflow = '';
+  unlockBodyScroll();
 }
 
 async function submitScheduleVisit() {
@@ -7829,12 +7863,12 @@ function openBookingModal(propId) {
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('book-checkin').min = today;
   document.getElementById('bookingModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  lockBodyScroll();
 }
 
 function closeBookingModal() {
   document.getElementById('bookingModal').classList.remove('open');
-  document.body.style.overflow = '';
+  unlockBodyScroll();
 }
 
 async function submitBookingRequest() {
@@ -8083,7 +8117,7 @@ function openAddModal(presetType) {
   const typeSelect = document.getElementById('f-type');
   if (typeSelect) typeSelect.disabled = !!presetType;
   document.getElementById('addModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  lockBodyScroll();
   onFTypeChange(document.getElementById('f-type').value);
   if (restored) showToast('Your unfinished listing was restored');
   // Fresh listing (no restored draft, no address yet): auto-fill the
@@ -8107,7 +8141,7 @@ function closeAddModal() {
   // successful submission or explicit "Clear form".
   saveListingDraftNow();
   document.getElementById('addModal').classList.remove('open');
-  document.body.style.overflow = '';
+  unlockBodyScroll();
 }
 /* ═══════════════════════════════════════════════
    IMPORT PROPERTY DATA (file upload or pasted JSON/DB text)
@@ -8378,12 +8412,12 @@ async function confirmClearAddModalDraft() {
 ═══════════════════════════════════════════════ */
 function openAuthModal() {
   document.getElementById('authModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  lockBodyScroll();
   backToSignupForm();
 }
 function closeAuthModal() {
   document.getElementById('authModal').classList.remove('open');
-  document.body.style.overflow = '';
+  unlockBodyScroll();
   backToSignupForm();
 }
 
@@ -8397,12 +8431,12 @@ function openProfileModal() {
   document.getElementById('profileTileEmail').textContent = user.email || '—';
   document.getElementById('profileTileMobile').textContent = user.mobile || '—';
   document.getElementById('profileModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  lockBodyScroll();
   switchProfileTab('info');
 }
 function closeProfileModal() {
   document.getElementById('profileModal').classList.remove('open');
-  document.body.style.overflow = '';
+  unlockBodyScroll();
   exitProfileEditMode();
   exitPasswordEditMode();
 }
@@ -8860,12 +8894,12 @@ function openEditListingFull(id) {
   if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Save changes'; }
 
   document.getElementById('addModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  lockBodyScroll();
 }
 
 function closeEditListingFull() {
   document.getElementById('addModal').classList.remove('open');
-  document.body.style.overflow = '';
+  unlockBodyScroll();
   editingPropertyId = null;
 
   const typeSelect = document.getElementById('f-type');
@@ -9038,7 +9072,7 @@ function updateNotifChrome(unreadCount) {
 }
 async function openNotifModal() {
   document.getElementById('notifModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  lockBodyScroll();
   const user = getLoggedInUser();
   const list = document.getElementById('notifList');
   if (!user) {
@@ -9085,7 +9119,7 @@ async function markAllNotifsRead() {
 }
 function closeNotifModal() {
   document.getElementById('notifModal').classList.remove('open');
-  document.body.style.overflow = '';
+  unlockBodyScroll();
 }
 
 /* ═══════════════════════════════════════════════
@@ -9093,11 +9127,11 @@ function closeNotifModal() {
 ═══════════════════════════════════════════════ */
 function openReferModal() {
   document.getElementById('referModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  lockBodyScroll();
 }
 function closeReferModal() {
   document.getElementById('referModal').classList.remove('open');
-  document.body.style.overflow = '';
+  unlockBodyScroll();
 }
 function copyVideoLink() {
   const url = document.getElementById('videoViewLink').dataset.url || '';
@@ -9142,16 +9176,16 @@ Find verified Rentals, PGs, Leases, Short Stays, and more—all in one place.`;
 ═══════════════════════════════════════════════ */
 function openChargesModal() {
   document.getElementById('chargesModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  lockBodyScroll();
 }
 function closeChargesModal() {
   document.getElementById('chargesModal').classList.remove('open');
-  document.body.style.overflow = '';
+  unlockBodyScroll();
 }
 
 function openHelpModal() {
   document.getElementById('helpModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  lockBodyScroll();
 }
 function scrollServices(dir) {
   const el = document.getElementById('servicesScroll');
@@ -9212,11 +9246,11 @@ async function loadHonestReviews() {
 function openSubmitVideoModal() {
   if (!getLoggedInUser()) { showToast('Please log in to submit your video'); openAuthModal(); return; }
   document.getElementById('submitVideoModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  lockBodyScroll();
 }
 function closeSubmitVideoModal() {
   document.getElementById('submitVideoModal').classList.remove('open');
-  document.body.style.overflow = '';
+  unlockBodyScroll();
 }
 async function submitVideoReview(evt) {
   evt.preventDefault();
@@ -9329,11 +9363,11 @@ function openServiceModal(name, category, icon, imgUrl) {
   document.getElementById('svc-pricing-block').innerHTML = pricingHTML;
 
   document.getElementById('serviceModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  lockBodyScroll();
 }
 function closeServiceModal() {
   document.getElementById('serviceModal').classList.remove('open');
-  document.body.style.overflow = '';
+  unlockBodyScroll();
 }
 
 document.getElementById('serviceModal').addEventListener('click', function(e) {
@@ -9347,11 +9381,11 @@ function openRentReceiptTool() {
   const frame = document.getElementById('rentReceiptFrame');
   if (!frame.src) frame.src = '/rent-receipt.html';
   document.getElementById('rentReceiptModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  lockBodyScroll();
 }
 function closeRentReceiptTool() {
   document.getElementById('rentReceiptModal').classList.remove('open');
-  document.body.style.overflow = '';
+  unlockBodyScroll();
 }
 
 // The Rent Receipt tool runs in an <iframe>, and the browser's Contact
@@ -9398,7 +9432,7 @@ document.getElementById('rentReceiptModal').addEventListener('click', function(e
 
 function closeHelpModal() {
   document.getElementById('helpModal').classList.remove('open');
-  document.body.style.overflow = '';
+  unlockBodyScroll();
 }
 function toggleFaq(el) {
   const item = el.parentElement;
@@ -9424,11 +9458,11 @@ function resetFaq() {
 ═══════════════════════════════════════════════ */
 function openAboutModal() {
   document.getElementById('aboutModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  lockBodyScroll();
 }
 function closeAboutModal() {
   document.getElementById('aboutModal').classList.remove('open');
-  document.body.style.overflow = '';
+  unlockBodyScroll();
 }
 
 /* ═══════════════════════════════════════════════
@@ -10361,7 +10395,7 @@ function submitListing() {
     clearListingDraft();
     resetListingForm();
     document.getElementById('addModal').classList.remove('open');
-    document.body.style.overflow = '';
+    unlockBodyScroll();
     showToast('Submitted! Will appear once our team verifies it.');
   })
   .catch(err => {
