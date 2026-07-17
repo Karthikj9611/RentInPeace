@@ -1634,13 +1634,13 @@ ul{list-style:none}
 .reviews-bar-row span:last-child{flex:0 0 26px;text-align:right;color:var(--text-3)}
 
 .review-form-card{
-  max-width:680px;margin:12px auto 0;padding:14px 16px;
+  max-width:1080px;margin:12px auto 0;padding:14px 16px;
   border:1px solid var(--border);border-radius:18px;background:var(--bg-1);
   box-shadow:0 2px 14px rgba(0,0,0,.04);
   transition:box-shadow .2s;
 }
 .review-form-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.06)}
-.review-form-logged-out{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.review-form-logged-out{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
 .review-form-logged-out p{font-size:13.5px;color:var(--text-2);margin:0}
 .review-login-btn{
   background:var(--brand);color:#fff;border:none;border-radius:10px;
@@ -1689,6 +1689,17 @@ ul{list-style:none}
   padding:4px 4px 8px;-ms-overflow-style:none;scrollbar-width:none;
 }
 .reviews-list::-webkit-scrollbar{display:none}
+@media (min-width:641px){
+  /* Desktop: show reviews two-to-a-row, divided equally, instead of the
+     mobile one-full-width-card-at-a-time swipeable row. The auto-slide
+     JS already no-ops once content stops overflowing, so it stays safely
+     inert here without needing a separate code path. */
+  .reviews-list{
+    display:grid;grid-template-columns:1fr 1fr;
+    overflow-x:visible;
+  }
+  .review-card{width:auto}
+}
 .reviews-loading,.reviews-empty{
   text-align:center;color:var(--text-3);font-size:13.5px;padding:40px;width:100%;flex-shrink:0;
 }
