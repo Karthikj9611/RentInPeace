@@ -520,7 +520,7 @@ const BasicSchema = new mongoose.Schema({
 
 const LocationSchema = new mongoose.Schema({
   area:    { type: String, required: true },
-  city:    { type: String, default: 'Bengaluru' },
+  city:    { type: String, default: 'Bangalore' },
   address: { type: String, default: '' },
   lat:     { type: Number, default: null },
   lng:     { type: Number, default: null },

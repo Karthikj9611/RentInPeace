@@ -4288,7 +4288,7 @@ ul{list-style:none}
       </div>
       <div class="form-group">
         <label class="form-label">City</label>
-        <input class="form-input" type="text" id="f-city" value="Bengaluru" />
+        <input class="form-input" type="text" id="f-city" value="Bangalore" />
       </div>
       <div class="form-group" id="fullAddressGroup" style="grid-column:span 3">
         <label class="form-label">Building Live Address</label>
@@ -8237,6 +8237,10 @@ function resetListingForm() {
   const leaseDurLease = document.getElementById('f-leaseDurationVal');
   if (leaseDurRent) leaseDurRent.value = '12 Months';
   if (leaseDurLease) leaseDurLease.value = '2 Years';
+  // Re-apply default City (Bangalore) which the blanket reset above just
+  // cleared back to blank.
+  const cityField = document.getElementById('f-city');
+  if (cityField) cityField.value = 'Bangalore';
   // Undo the maintenance>0 lock on electricity/water so a fresh form starts unlocked
   const elecReset = document.getElementById('f-electricityIncluded');
   const waterReset = document.getElementById('f-waterCharge');
@@ -8522,7 +8526,7 @@ function applyImportedProperty(p) {
 
   // Location
   sv('f-location', location.area);
-  sv('f-city', location.city || 'Bengaluru');
+  sv('f-city', location.city || 'Bangalore');
   sv('f-fullAddress', location.address);
   if (location.lat != null) sv('f-latitude', location.lat);
   if (location.lng != null) sv('f-longitude', location.lng);
@@ -10515,7 +10519,7 @@ function submitListing() {
     },
     location: {
       area:    loc,
-      city:    document.getElementById('f-city').value.trim() || 'Bengaluru',
+      city:    document.getElementById('f-city').value.trim() || 'Bangalore',
       address: document.getElementById('f-fullAddress').value.trim(),
       lat:     parseFloat(document.getElementById('f-latitude').value) || null,
       lng:     parseFloat(document.getElementById('f-longitude').value) || null,
