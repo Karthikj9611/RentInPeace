@@ -543,24 +543,24 @@ const PriceSchema = new mongoose.Schema({
   rent:         { type: Number, required: true },
   deposit:      { type: Number }, // Not collected for Lease listings (form hides this field) — no default, so it's omitted entirely instead of appearing as null
   monthlyRent:  { type: Number }, // Legacy field — no form sends this anymore (not even Lease); no default so it no longer appears on newly saved listings
-  maintenance:  { type: Number, default: null }, // Not collected for PG or Short Stay listings (form hides this field for both) — sent as null
-  rentIncrease: { type: String }, // Not collected for Lease listings (legacy "Rent escalation" dropdown was removed) — no default, so it's omitted entirely instead of appearing as null
-  electricity:  { type: String }, // Not collected for PG, Short Stay, or Lease listings — no default, so it's omitted entirely instead of appearing as null (PG/Short Stay still send it explicitly as null)
-  water:        { type: String }, // Not collected for PG, Short Stay, or Lease listings — no default, so it's omitted entirely instead of appearing as null (PG/Short Stay still send it explicitly as null)
+  maintenance:  { type: Number }, // Not collected for PG or Short Stay listings (form hides this field for both) — no default, so it's omitted entirely instead of appearing as null
+  rentIncrease: { type: String }, // Not collected for PG, Short Stay, or Lease listings — no default, so it's omitted entirely instead of appearing as null
+  electricity:  { type: String }, // Not collected for PG, Short Stay, or Lease listings — no default, so it's omitted entirely instead of appearing as null
+  water:        { type: String }, // Not collected for PG, Short Stay, or Lease listings — no default, so it's omitted entirely instead of appearing as null
   negotiable:   { type: String }, // 'Yes' | 'No' | not collected for Lease — no default, so it's omitted entirely instead of appearing as null
 }, { _id: false });
 
 const PropertyDetailsSchema = new mongoose.Schema({
-  type:      { type: String, default: null },   // propertyType (Apartment/Villa/etc.)
-  bhk:       { type: String, default: null },
+  type:      { type: String },   // propertyType (Apartment/Villa/etc.) — not collected for PG/Short Stay; no default, so omitted entirely for them
+  bhk:       { type: String },   // not collected for PG/Short Stay; no default, so omitted entirely for them
   bike:      { type: String, default: '0' },    // bikeparking: count as string, e.g. '0'..'4'
   car:       { type: String, default: '0' },    // carparking:  count as string, e.g. '0'..'4'
   floor:     { type: String, default: 'G' },
-  area:      { type: String, default: null },
+  area:      { type: String },   // not collected for PG/Short Stay; no default, so omitted entirely for them
   bathrooms: { type: String, default: '1' },     // toilet
   furnish:   { type: String, default: 'Unfurnished' }, // furnishing
   facing:    { type: String, default: 'North' },
-  age:       { type: String, default: null },
+  age:       { type: String },   // not collected for PG/Short Stay; no default, so omitted entirely for them
   tenant:    { type: String, default: 'Any' },   // tenantPref
   available: { type: String, default: null },    // availableFrom
 }, { _id: false });
@@ -572,13 +572,13 @@ const AmenitiesSchema = new mongoose.Schema({
 
 const TermsSchema = new mongoose.Schema({
   notice:    { type: String, default: null }, // noticePeriod / leaseNotice / pgNotice
-  lease:     { type: String, default: null }, // leaseDuration (Rent) / leaseDurationVal (Lease)
+  lease:     { type: String }, // leaseDuration (Rent) / leaseDurationVal (Lease) — not collected for PG/Short Stay; no default, so omitted entirely for them
   leaseType: { type: String }, // Lease only: Residential / Commercial / Industrial / Mixed Use — no default, so Rent (and other non-Lease) listings omit this field entirely
   lockIn:    { type: String }, // Lease only: lock-in period — no default, so Rent (and other non-Lease) listings omit this field entirely
 }, { _id: false });
 
 const RulesSchema = new mongoose.Schema({
-  pets:   { type: String, default: null }, // petsAllowed / leasePets — PG's "Pets allowed" field was removed from the form, so PG listings always send null here now
+  pets:   { type: String }, // petsAllowed / leasePets — PG's "Pets allowed" field was removed from the form; no default, so it's omitted entirely for PG listings
   nonVeg: { type: String, default: null }, // nonVegAllowed / leaseNonVeg / pgNonVeg
   gas:    { type: String }, // No longer sent by the Rent form (or any form) — no default, so it's omitted entirely from newly saved listings
 }, { _id: false });
@@ -596,8 +596,6 @@ const PgSchema = new mongoose.Schema({
   occupancy:     { type: String, default: null },
   notice:        { type: String, default: null }, // pgNotice (also mirrored into terms.notice)
   bathroom:      { type: String, default: null },
-  mealCost:      { type: Number, default: null }, // Legacy field — "Meals cost" input was removed from the PG form; kept only to preserve older saved listings, new submissions send null
-  beds:          { type: String, default: null }, // Legacy field — "Total beds" input was removed from the PG form; kept only to preserve older saved listings, new submissions send null
   furnish:       { type: String, default: null }, // pgRoomFurnishing
   food:          { type: String, default: null }, // pgFoodType
   kitchen:       { type: String, default: null }, // pgKitchenAccess
@@ -605,7 +603,10 @@ const PgSchema = new mongoose.Schema({
   visitors:      { type: String, default: null }, // pgVisitorPolicy
   gateTime:      { type: String, default: null },
   nonVeg:        { type: String, default: null },
-  pets:          { type: String, default: null }, // Legacy field — "Pets allowed" input was removed from the PG form; kept only to preserve older saved listings, new submissions send null
+  // mealCost, beds, pets — removed. These were legacy inputs dropped from the
+  // PG form long ago; they no longer have any UI to populate them. Any stray
+  // values sitting on old documents get dropped the next time that listing is
+  // edited (see the full-replace logic in PUT /api/user/listings/:id below).
 }, { _id: false });
 
 const ShortStaySchema = new mongoose.Schema({
@@ -2051,8 +2052,18 @@ app.put('/api/user/listings/:id', requireUser, async (req, res) => {
     const validationError = validatePropertyFields(fieldsForValidation);
     if (validationError) return res.status(400).json({ message: validationError });
 
+    // pg / shortStay are always sent in full by the form on every submit
+    // (create or edit) — there's no partial-field editing UI for them like
+    // there is for, say, price or amenities. So for these two, replace the
+    // section outright rather than merging over the existing stored object.
+    // This is what actually drops stale/legacy keys (e.g. old mealCost/beds/
+    // pets values on older PG listings) the next time the owner saves an edit,
+    // instead of carrying them forward forever via Object.assign.
+    const FULL_REPLACE_SECTIONS = new Set(['pg', 'shortStay']);
     for (const section of sentSections) {
-      prop[section] = Object.assign({}, prop[section]?.toObject ? prop[section].toObject() : prop[section], fields[section]);
+      prop[section] = FULL_REPLACE_SECTIONS.has(section)
+        ? fields[section]
+        : Object.assign({}, prop[section]?.toObject ? prop[section].toObject() : prop[section], fields[section]);
     }
 
     const savedDoc = await moveListingIfNeeded(prop, currentModel);

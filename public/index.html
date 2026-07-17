@@ -10289,7 +10289,7 @@ function onFTypeChange(val) {
   document.getElementById('addRentSection').style.display = (!isPG && !isLease && !isShortStay) ? '' : 'none';
   document.getElementById('addLeaseSection').style.display = isLease ? '' : 'none';
   document.getElementById('addPropDetailsSection').style.display = (isPG || isShortStay) ? 'none' : '';
-  document.getElementById('addAmenitiesSection').style.display = isPG ? 'none' : '';
+  document.getElementById('addAmenitiesSection').style.display = '';
   document.getElementById('addPricingSection').style.display = isLease ? 'none' : '';
   // Maintenance, rent escalation, electricity-included and water/borewell
   // charges aren't collected for PG or Short Stay (hourly-style) listings —
@@ -10547,26 +10547,28 @@ function submitListing() {
       rent:         parseInt(rent) || 0,
       deposit:      isShortStay ? (parseInt(gv('f-ssDeposit')) || 0) : (parseInt(document.getElementById('f-deposit').value) || 0),
       // Maintenance/escalation/electricity/water fields are hidden for PG and
-      // Short Stay — don't read stale/default values from them, send null instead.
-      maintenance:  (isPG || isShortStay) ? null : (parseFloat(gv('f-maintenance')) || null),
-      rentIncrease: (isPG || isShortStay) ? null : (parseFloat(gv('f-escalation')) ? gv('f-escalation') + '%' : null),
-      electricity:  (isPG || isShortStay) ? null : (gv('f-electricityIncluded') || null),
-      water:        (isPG || isShortStay) ? null : (gv('f-waterCharge') || null),
+      // Short Stay — omitted entirely rather than sending stale/default nulls.
+      ...((isPG || isShortStay) ? {} : {
+        maintenance:  parseFloat(gv('f-maintenance')) || null,
+        rentIncrease: parseFloat(gv('f-escalation')) ? gv('f-escalation') + '%' : null,
+        electricity:  gv('f-electricityIncluded') || null,
+        water:        gv('f-waterCharge') || null,
+      }),
       negotiable:   gv('f-negotiable').toLowerCase() === 'yes' ? 'Yes'
                   : gv('f-negotiable').toLowerCase() === 'no'  ? 'No'
                   : null,
     },
     property: {
-      type:      (isPG || isShortStay) ? null : gv('f-propertyType'),
-      bhk:       (isPG || isShortStay) ? null : gv('f-bhk'),
+      // type/bhk/area/age are only collected for Rent and Lease — PG and Short
+      // Stay have their own room/occupancy fields instead, so these are omitted
+      // entirely rather than sent as null.
+      ...((isPG || isShortStay) ? {} : { type: gv('f-propertyType'), bhk: gv('f-bhk'), area: gv('f-area'), age: gv('f-age') }),
       bike:      (isPG || isShortStay) ? '0' : String(parseInt(document.getElementById('f-bikepark').value, 10) || 0),
       car:       (isPG || isShortStay) ? '0' : String(parseInt(document.getElementById('f-carpark').value, 10) || 0),
       floor:     document.getElementById('f-floor').value || 'G',
-      area:      (isPG || isShortStay) ? null : gv('f-area'),
       bathrooms: isPG ? '1' : (document.getElementById('f-baths').value || '1'),
       furnish:   document.getElementById('f-furnishing').value,
       facing:    isPG ? 'North' : document.getElementById('f-facing').value,
-      age:       (isPG || isShortStay) ? null : gv('f-age'),
       tenant:    isPG
         ? (document.getElementById('f-pgGender').value === 'Girls' ? 'Female only' : 'Any')
         : document.getElementById('f-tenant').value,
@@ -10584,18 +10586,20 @@ function submitListing() {
             : isLease ? (gv('f-leaseNoticePeriod') || null)
             : isShortStay ? null
             : (gv('f-noticePeriod') || null),
-      lease:  isLease
-        ? (gv('f-leaseDurationVal') || null)
-        // f-leaseDuration lives in #addRentSection, which is hidden for PG — reading it
-        // there would always save null anyway, but do it explicitly so it's not relying
-        // on a hidden field by accident.
-        : ((isPG || isShortStay) ? null : (gv('f-leaseDuration') || null)),
+      // Rent's own lease-duration dropdown (f-leaseDuration) doesn't apply to
+      // PG or Short Stay, so the "lease" key is omitted entirely for them
+      // rather than sent as null.
+      ...(isLease ? { lease: gv('f-leaseDurationVal') || null }
+        : (isPG || isShortStay) ? {}
+        : { lease: gv('f-leaseDuration') || null }),
       // Lease-only fields — omitted entirely (not even sent as null) for every
       // other listing type, including Rent.
       ...(isLease ? { leaseType: gv('f-leaseType') || null, lockIn: gv('f-lockInPeriod') || null } : {}),
     },
     rules: {
-      pets:   isPG ? null : isLease ? (gv('f-leasePets') || null) : isShortStay ? null : (gv('f-petsAllowed') || null),
+      // PG's "Pets allowed" field was removed from the form, so this key is
+      // omitted entirely for PG rather than sent as null.
+      ...(isPG ? {} : { pets: isLease ? (gv('f-leasePets') || null) : isShortStay ? null : (gv('f-petsAllowed') || null) }),
       nonVeg: isPG ? (gv('f-pgNonVeg') || null) : isLease ? (gv('f-leaseNonVeg') || null) : isShortStay ? null : (gv('f-nonVegAllowed') || null),
       // "gas" field removed entirely from the Rent form submission — the piped
       // gas checkbox (am-pipedgas) still adds "Piped gas connection" to the
