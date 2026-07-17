@@ -3330,6 +3330,278 @@ ul{list-style:none}
     </div>
   </div>
 
+  <!-- RENT: Electricity included -->
+  <div class="fd-btn fd-rent" id="fdb-electricityIncluded" onclick="toggleFd('electricityIncluded',this)">
+    <span class="fd-icon">⚡</span>
+    <span class="fd-label">Electricity</span> <span class="fd-badge" id="fdbc-electricityIncluded" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-electricityIncluded" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Electricity included</div>
+      <div class="fd-opts" id="fdo-electricityIncluded"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('electricityIncluded')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('electricityIncluded')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RENT: Water charge -->
+  <div class="fd-btn fd-rent" id="fdb-waterCharge" onclick="toggleFd('waterCharge',this)">
+    <span class="fd-icon">🚰</span>
+    <span class="fd-label">Water</span> <span class="fd-badge" id="fdbc-waterCharge" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-waterCharge" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Water charge</div>
+      <div class="fd-opts" id="fdo-waterCharge"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('waterCharge')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('waterCharge')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RENT + LEASE + PG: Notice period -->
+  <div class="fd-btn fd-rent fd-lease fd-pg" id="fdb-notice" onclick="toggleFd('notice',this)">
+    <span class="fd-icon">📢</span>
+    <span class="fd-label">Notice</span> <span class="fd-badge" id="fdbc-notice" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-notice" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Notice period</div>
+      <div class="fd-opts" id="fdo-notice"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('notice')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('notice')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RENT + LEASE: Lease duration -->
+  <div class="fd-btn fd-rent fd-lease" id="fdb-leaseDuration" onclick="toggleFd('leaseDuration',this)">
+    <span class="fd-icon">📆</span>
+    <span class="fd-label">Duration</span> <span class="fd-badge" id="fdbc-leaseDuration" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-leaseDuration" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Lease duration</div>
+      <div class="fd-opts" id="fdo-leaseDuration"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('leaseDuration')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('leaseDuration')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RENT + LEASE: Pets allowed -->
+  <div class="fd-btn fd-rent fd-lease" id="fdb-petsAllowed" onclick="toggleFd('petsAllowed',this)">
+    <span class="fd-icon">🐾</span>
+    <span class="fd-label">Pets</span> <span class="fd-badge" id="fdbc-petsAllowed" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-petsAllowed" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Pets allowed</div>
+      <div class="fd-opts" id="fdo-petsAllowed"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('petsAllowed')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('petsAllowed')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RENT + LEASE: Non-veg allowed -->
+  <div class="fd-btn fd-rent fd-lease" id="fdb-nonVegAllowed" onclick="toggleFd('nonVegAllowed',this)">
+    <span class="fd-icon">🍗</span>
+    <span class="fd-label">Non-Veg</span> <span class="fd-badge" id="fdbc-nonVegAllowed" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-nonVegAllowed" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Non-veg allowed</div>
+      <div class="fd-opts" id="fdo-nonVegAllowed"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('nonVegAllowed')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('nonVegAllowed')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEASE: Lock-in period -->
+  <div class="fd-btn fd-lease" id="fdb-lockIn" onclick="toggleFd('lockIn',this)">
+    <span class="fd-icon">🔒</span>
+    <span class="fd-label">Lock-in</span> <span class="fd-badge" id="fdbc-lockIn" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-lockIn" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Lock-in period</div>
+      <div class="fd-opts" id="fdo-lockIn"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('lockIn')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('lockIn')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALL TYPES: Amenities -->
+  <div class="fd-btn fd-rent fd-lease fd-pg fd-shortstay" id="fdb-amenities" onclick="toggleFd('amenities',this)">
+    <span class="fd-icon">✨</span>
+    <span class="fd-label">Amenities</span> <span class="fd-badge" id="fdbc-amenities" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-amenities" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Amenities</div>
+      <div class="fd-opts" id="fdo-amenities"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('amenities')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('amenities')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PG: Occupancy -->
+  <div class="fd-btn fd-pg" id="fdb-pgOccupancy" onclick="toggleFd('pgOccupancy',this)">
+    <span class="fd-icon">👥</span>
+    <span class="fd-label">Occupancy</span> <span class="fd-badge" id="fdbc-pgOccupancy" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-pgOccupancy" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Occupancy</div>
+      <div class="fd-opts" id="fdo-pgOccupancy"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('pgOccupancy')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('pgOccupancy')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PG: Kitchen -->
+  <div class="fd-btn fd-pg" id="fdb-pgKitchen" onclick="toggleFd('pgKitchen',this)">
+    <span class="fd-icon">🍳</span>
+    <span class="fd-label">Kitchen</span> <span class="fd-badge" id="fdbc-pgKitchen" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-pgKitchen" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Kitchen</div>
+      <div class="fd-opts" id="fdo-pgKitchen"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('pgKitchen')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('pgKitchen')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PG: Gate time -->
+  <div class="fd-btn fd-pg" id="fdb-pgGateTime" onclick="toggleFd('pgGateTime',this)">
+    <span class="fd-icon">🌙</span>
+    <span class="fd-label">Gate Time</span> <span class="fd-badge" id="fdbc-pgGateTime" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-pgGateTime" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Gate closing time</div>
+      <div class="fd-opts" id="fdo-pgGateTime"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('pgGateTime')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('pgGateTime')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PG: Visitors -->
+  <div class="fd-btn fd-pg" id="fdb-pgVisitors" onclick="toggleFd('pgVisitors',this)">
+    <span class="fd-icon">🚶</span>
+    <span class="fd-label">Visitors</span> <span class="fd-badge" id="fdbc-pgVisitors" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-pgVisitors" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Visitors policy</div>
+      <div class="fd-opts" id="fdo-pgVisitors"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('pgVisitors')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('pgVisitors')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PG: Non-veg -->
+  <div class="fd-btn fd-pg" id="fdb-pgNonVeg" onclick="toggleFd('pgNonVeg',this)">
+    <span class="fd-icon">🍖</span>
+    <span class="fd-label">Non-Veg</span> <span class="fd-badge" id="fdbc-pgNonVeg" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-pgNonVeg" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Non-veg allowed</div>
+      <div class="fd-opts" id="fdo-pgNonVeg"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('pgNonVeg')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('pgNonVeg')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHORT STAY: Max guests -->
+  <div class="fd-btn fd-shortstay" id="fdb-ssGuests" onclick="toggleFd('ssGuests',this)">
+    <span class="fd-icon">🧳</span>
+    <span class="fd-label">Guests</span> <span class="fd-badge" id="fdbc-ssGuests" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-ssGuests" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Max guests</div>
+      <div class="fd-opts" id="fdo-ssGuests"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('ssGuests')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('ssGuests')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHORT STAY: Cancellation policy -->
+  <div class="fd-btn fd-shortstay" id="fdb-ssCancellation" onclick="toggleFd('ssCancellation',this)">
+    <span class="fd-icon">↩️</span>
+    <span class="fd-label">Cancellation</span> <span class="fd-badge" id="fdbc-ssCancellation" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-ssCancellation" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Cancellation policy</div>
+      <div class="fd-opts" id="fdo-ssCancellation"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('ssCancellation')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('ssCancellation')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHORT STAY: Min days -->
+  <div class="fd-btn fd-shortstay" id="fdb-ssMinDays" onclick="toggleFd('ssMinDays',this)">
+    <span class="fd-icon">🗓️</span>
+    <span class="fd-label">Min Days</span> <span class="fd-badge" id="fdbc-ssMinDays" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-ssMinDays" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Minimum stay (days)</div>
+      <div class="fd-opts" id="fdo-ssMinDays"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('ssMinDays')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('ssMinDays')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHORT STAY: Check-in / Check-out timings -->
+  <div class="fd-btn fd-shortstay" id="fdb-ssTimings" onclick="toggleFd('ssTimings',this)">
+    <span class="fd-icon">⏰</span>
+    <span class="fd-label">Timings</span> <span class="fd-badge" id="fdbc-ssTimings" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop fd-pop right" id="fdp-ssTimings" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Check-in time</div>
+      <div class="fd-opts" id="fdo-ssCheckinTime"></div>
+      <div class="fd-pop-label" style="margin-top:6px">Check-out time</div>
+      <div class="fd-opts" id="fdo-ssCheckoutTime"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('ssTimings')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('ssTimings')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHORT STAY: ID proof required -->
+  <div class="fd-btn fd-shortstay" id="fdb-ssIdProof" onclick="toggleFd('ssIdProof',this)">
+    <span class="fd-icon">🪪</span>
+    <span class="fd-label">ID Proof</span> <span class="fd-badge" id="fdbc-ssIdProof" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-ssIdProof" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">ID proof required</div>
+      <div class="fd-opts" id="fdo-ssIdProof"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('ssIdProof')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('ssIdProof')">Apply</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Bar right side: total count + clear all -->
   <div class="fd-bar-right">
     <span class="fd-total-badge" id="fdTotalBadge"></span>
