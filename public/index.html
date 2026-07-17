@@ -10538,17 +10538,11 @@ function submitListing() {
     },
     price: isLease ? {
       rent:         parseFloat(gv('f-leaseAmount')) || 0,
-      // Deposit/electricity/water/negotiable live in #addPricingSection, which is hidden
-      // for Lease — reading them here would silently save stale/default values the user
-      // never saw or entered. Lease simply doesn't collect these, so they're sent as null.
-      // Monthly rent and rent escalation fields were removed from the Lease form too,
-      // and monthlyRent is no longer sent by any form at all.
-      deposit:      null,
       maintenance:  parseFloat(gv('f-leaseMaintenance')) || null,
-      rentIncrease: null,
-      electricity:  null,
-      water:        null,
-      negotiable:   null,
+      // Deposit/rentIncrease/electricity/water/negotiable live in #addPricingSection,
+      // which is hidden for Lease — reading them here would silently save stale/default
+      // values the user never saw or entered. Lease simply doesn't collect these, so
+      // they're omitted entirely rather than sent as null.
     } : {
       rent:         parseInt(rent) || 0,
       deposit:      isShortStay ? (parseInt(gv('f-ssDeposit')) || 0) : (parseInt(document.getElementById('f-deposit').value) || 0),

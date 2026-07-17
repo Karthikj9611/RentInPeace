@@ -541,13 +541,13 @@ const OwnerSchema = new mongoose.Schema({
 
 const PriceSchema = new mongoose.Schema({
   rent:         { type: Number, required: true },
-  deposit:      { type: Number, default: null },
+  deposit:      { type: Number }, // Not collected for Lease listings (form hides this field) — no default, so it's omitted entirely instead of appearing as null
   monthlyRent:  { type: Number }, // Legacy field — no form sends this anymore (not even Lease); no default so it no longer appears on newly saved listings
   maintenance:  { type: Number, default: null }, // Not collected for PG or Short Stay listings (form hides this field for both) — sent as null
-  rentIncrease: { type: String, default: null }, // Legacy field — Lease's "Rent escalation" dropdown was removed from the form; kept only to preserve older saved listings, new submissions send null
-  electricity:  { type: String, default: null }, // Not collected for PG or Short Stay listings (form hides this field for both) — sent as null
-  water:        { type: String, default: null }, // Not collected for PG or Short Stay listings (form hides this field for both) — sent as null
-  negotiable:   { type: String, default: null }, // 'Yes' | 'No' | null (not answered)
+  rentIncrease: { type: String }, // Not collected for Lease listings (legacy "Rent escalation" dropdown was removed) — no default, so it's omitted entirely instead of appearing as null
+  electricity:  { type: String }, // Not collected for PG, Short Stay, or Lease listings — no default, so it's omitted entirely instead of appearing as null (PG/Short Stay still send it explicitly as null)
+  water:        { type: String }, // Not collected for PG, Short Stay, or Lease listings — no default, so it's omitted entirely instead of appearing as null (PG/Short Stay still send it explicitly as null)
+  negotiable:   { type: String }, // 'Yes' | 'No' | not collected for Lease — no default, so it's omitted entirely instead of appearing as null
 }, { _id: false });
 
 const PropertyDetailsSchema = new mongoose.Schema({
