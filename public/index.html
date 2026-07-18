@@ -3027,7 +3027,7 @@ ul{list-style:none}
   </div>
 
   <!-- ALL TYPES: Deposit (security deposit — same underlying price.deposit field) -->
-  <div class="fd-btn fd-rent fd-lease fd-pg fd-shortstay" id="fdb-deposit" onclick="toggleFd('deposit',this)">
+  <div class="fd-btn fd-rent fd-lease fd-pg" id="fdb-deposit" onclick="toggleFd('deposit',this)">
     <span class="fd-icon">🏦</span>
     <span class="fd-label">Deposit</span> <span class="fd-badge" id="fdbc-deposit" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
@@ -3495,21 +3495,6 @@ ul{list-style:none}
     </div>
   </div>
 
-  <!-- SHORT STAY: Max guests -->
-  <div class="fd-btn fd-shortstay" id="fdb-ssGuests" onclick="toggleFd('ssGuests',this)">
-    <span class="fd-icon">🧳</span>
-    <span class="fd-label">Guests</span> <span class="fd-badge" id="fdbc-ssGuests" style="display:none"></span>
-    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-    <div class="fd-pop" id="fdp-ssGuests" onclick="event.stopPropagation()">
-      <div class="fd-pop-label">Max guests</div>
-      <div class="fd-opts" id="fdo-ssGuests"></div>
-      <div class="fd-pop-footer">
-        <button class="fd-clear-btn" onclick="clearFd('ssGuests')">Clear</button>
-        <button class="fd-apply-btn" onclick="applyFd('ssGuests')">Apply</button>
-      </div>
-    </div>
-  </div>
-
   <!-- SHORT STAY: Cancellation policy -->
   <div class="fd-btn fd-shortstay" id="fdb-ssCancellation" onclick="toggleFd('ssCancellation',this)">
     <span class="fd-icon">↩️</span>
@@ -3525,49 +3510,17 @@ ul{list-style:none}
     </div>
   </div>
 
-  <!-- SHORT STAY: Min days -->
-  <div class="fd-btn fd-shortstay" id="fdb-ssMinDays" onclick="toggleFd('ssMinDays',this)">
-    <span class="fd-icon">🗓️</span>
-    <span class="fd-label">Min Days</span> <span class="fd-badge" id="fdbc-ssMinDays" style="display:none"></span>
-    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-    <div class="fd-pop" id="fdp-ssMinDays" onclick="event.stopPropagation()">
-      <div class="fd-pop-label">Minimum stay (days)</div>
-      <div class="fd-opts" id="fdo-ssMinDays"></div>
-      <div class="fd-pop-footer">
-        <button class="fd-clear-btn" onclick="clearFd('ssMinDays')">Clear</button>
-        <button class="fd-apply-btn" onclick="applyFd('ssMinDays')">Apply</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- SHORT STAY: Check-in / Check-out timings -->
-  <div class="fd-btn fd-shortstay" id="fdb-ssTimings" onclick="toggleFd('ssTimings',this)">
+  <!-- SHORT STAY: Available 24 hours -->
+  <div class="fd-btn fd-shortstay" id="fdb-ss24hrs" onclick="toggleFd('ss24hrs',this)">
     <span class="fd-icon">⏰</span>
-    <span class="fd-label">Timings</span> <span class="fd-badge" id="fdbc-ssTimings" style="display:none"></span>
+    <span class="fd-label">24 Hours</span> <span class="fd-badge" id="fdbc-ss24hrs" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-    <div class="fd-pop fd-pop right" id="fdp-ssTimings" onclick="event.stopPropagation()">
-      <div class="fd-pop-label">Check-in time</div>
-      <div class="fd-opts" id="fdo-ssCheckinTime"></div>
-      <div class="fd-pop-label" style="margin-top:6px">Check-out time</div>
-      <div class="fd-opts" id="fdo-ssCheckoutTime"></div>
+    <div class="fd-pop fd-pop right" id="fdp-ss24hrs" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Available 24 hours</div>
+      <div class="fd-opts" id="fdo-ss24hrs"></div>
       <div class="fd-pop-footer">
-        <button class="fd-clear-btn" onclick="clearFd('ssTimings')">Clear</button>
-        <button class="fd-apply-btn" onclick="applyFd('ssTimings')">Apply</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- SHORT STAY: ID proof required -->
-  <div class="fd-btn fd-shortstay" id="fdb-ssIdProof" onclick="toggleFd('ssIdProof',this)">
-    <span class="fd-icon">🪪</span>
-    <span class="fd-label">ID Proof</span> <span class="fd-badge" id="fdbc-ssIdProof" style="display:none"></span>
-    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-    <div class="fd-pop" id="fdp-ssIdProof" onclick="event.stopPropagation()">
-      <div class="fd-pop-label">ID proof required</div>
-      <div class="fd-opts" id="fdo-ssIdProof"></div>
-      <div class="fd-pop-footer">
-        <button class="fd-clear-btn" onclick="clearFd('ssIdProof')">Clear</button>
-        <button class="fd-apply-btn" onclick="applyFd('ssIdProof')">Apply</button>
+        <button class="fd-clear-btn" onclick="clearFd('ss24hrs')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('ss24hrs')">Apply</button>
       </div>
     </div>
   </div>
@@ -4424,7 +4377,121 @@ ul{list-style:none}
     </div>
     </div>
 
-    <!-- ===== 6. AMENITIES ===== -->
+
+    <!-- ===== 6. STATUS-SPECIFIC SECTIONS ===== -->
+
+    <!-- FOR RENT extras -->
+    <div id="addRentSection">
+      <div class="lm-section">📅 Availability &amp; Terms</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-noticePeriod"><option value="">Select</option><option>15 Days</option><option>1 Month</option><option>2 Months</option><option selected>3 Months</option></select></div>
+        <div class="form-group"><label class="form-label">Lease duration</label><select class="form-select" id="f-leaseDuration"><option value="">Any</option><option>6 Months</option><option selected>12 Months</option><option>24 Months</option><option>36 Months</option><option>48 Months</option><option>48+ Months</option></select></div>
+      </div>
+      <div class="lm-section">⚖️ Tenant Rules</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Pets allowed</label><select class="form-select" id="f-petsAllowed"><option value="">Select</option><option>Yes</option><option>No</option><option>Restricted</option></select></div>
+        <div class="form-group"><label class="form-label">Non-veg allowed</label><select class="form-select" id="f-nonVegAllowed"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
+      </div>
+    </div>
+
+    <!-- LEASE extras -->
+    <div id="addLeaseSection" style="display:none">
+      <div class="lm-section">💼 Lease Pricing</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Lease amount (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-leaseAmount" /></div>
+        <div class="form-group"><label class="form-label">Maintenance (₹/ Month)</label><input class="form-input" type="number" id="f-leaseMaintenance" /></div>
+      </div>
+      <div class="lm-section">📋 Lease Terms</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Lease duration</label><select class="form-select" id="f-leaseDurationVal"><option value="">Select</option><option>1 Year</option><option selected>2 Years</option><option>3 Years</option><option>5 Years</option><option>9 Years</option><option>15 Years</option><option>30 Years</option></select></div>
+        <div class="form-group"><label class="form-label">Lease type</label><select class="form-select" id="f-leaseType"><option value="">Select</option><option>Residential</option><option>Commercial</option><option>Industrial</option><option>Mixed Use</option></select></div>
+        <div class="form-group"><label class="form-label">Lock-in period</label><select class="form-select" id="f-lockInPeriod"><option value="">None</option><option>1 Year</option><option>2 Years</option><option>3 Years</option></select></div>
+        <div class="form-group"><label class="form-label">Available from</label><input class="form-input" type="date" id="f-leaseAvailableFrom" /></div>
+        <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-leaseNoticePeriod"><option value="">Select</option><option>1 Month</option><option>2 Months</option><option selected>3 Months</option></select></div>
+      </div>
+      <div class="lm-section">⚖️ House Rules</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Pets allowed</label><select class="form-select" id="f-leasePets"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
+        <div class="form-group"><label class="form-label">Non-veg allowed</label><select class="form-select" id="f-leaseNonVeg"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
+      </div>
+    </div>
+
+    <!-- ===== 6b. PG-ONLY FIELDS ===== -->
+    <div id="addPgSection" style="display:none">
+      <div class="lm-section">🛏 Room Details</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group">
+          <label class="form-label">Gender preference</label>
+          <select class="form-select" id="f-pgGender"><option>Any</option><option>Boys</option><option>Girls</option><option>Co-ed</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Room type</label>
+          <select class="form-select" id="f-pgRoomType"><option>Single</option><option>Double Sharing</option><option>Triple Sharing</option><option>Dormitory</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Attached bathroom</label><select class="form-select" id="f-pgBathroom"><option>Yes</option><option>Shared</option></select></div>
+        <div class="form-group"><label class="form-label">Occupancy available</label><input class="form-input" type="number" id="f-pgOccupancy" /></div>
+        <div class="form-group"><label class="form-label">Room furnishing</label><select class="form-select" id="f-pgRoomFurnishing"><option value="">Select</option><option>Fully Furnished</option><option>Semi-Furnished</option><option>Unfurnished</option></select></div>
+        <div class="form-group">
+          <label class="form-label">Bike Parking</label>
+          <select class="form-select" id="f-pgBikePark">
+            <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Car Parking</label>
+          <select class="form-select" id="f-pgCarPark">
+            <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
+          </select>
+        </div>
+      </div>
+      <div class="lm-section">📅 Availability &amp; Terms</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Available from</label><input class="form-input" type="date" id="f-pgAvailableFrom" /></div>
+        <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-pgNotice"><option value="">Select</option><option selected>15 Days</option><option>1 Month</option><option>2 Months</option><option>3 Months</option></select></div>
+        <div class="form-group"><label class="form-label">Security deposit (₹)</label><input class="form-input" type="number" id="f-pgDeposit" min="0" /></div>
+      </div>
+      <div class="lm-section">🍽 Meals &amp; Policies</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group">
+          <label class="form-label">Meals included</label>
+          <select class="form-select" id="f-pgMeals"><option value="">Select</option><option>No Meals</option><option>Breakfast Only</option><option>Dinner Only</option><option>Lunch + Dinner</option><option selected>All 3 Meals</option><option>On Request</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Food type</label><select class="form-select" id="f-pgFoodType"><option value="">Select</option><option>Veg Only</option><option>Veg + Non-veg</option></select></div>
+        <div class="form-group"><label class="form-label">Gate closing time</label><select class="form-select" id="f-pgGateTime"><option value="">No Curfew</option><option>9 PM</option><option>10 PM</option><option>11 PM</option></select></div>
+        <div class="form-group"><label class="form-label">Visitor policy</label><select class="form-select" id="f-pgVisitorPolicy"><option value="">Select</option><option>Allowed</option><option>Lobby Only</option><option>Not Allowed</option></select></div>
+      </div>
+    </div>
+
+    <!-- ===== 6c. SHORT STAY (PER DAY / OYO-STYLE) FIELDS ===== -->
+    <div id="addShortStaySection" style="display:none">
+      <div class="lm-section">🛎 Room &amp; Booking</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group">
+          <label class="form-label">Room type</label>
+          <select class="form-select" id="f-ssRoomType"><option>Single</option><option>Double</option><option>Deluxe</option><option>Suite</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Available 24 hours</label><select class="form-select" id="f-ss24hrs"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
+        <div class="form-group"><label class="form-label">Free cancellation window</label><select class="form-select" id="f-ssCancellation"><option value="">Select</option><option>No Cancellation</option><option>Free Till Check-in</option><option>24 Hours Before</option><option>48 Hours Before</option></select></div>
+        <div class="form-group">
+          <label class="form-label">Bike Parking</label>
+          <select class="form-select" id="f-ssBikePark">
+            <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Car Parking</label>
+          <select class="form-select" id="f-ssCarPark">
+            <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
+          </select>
+        </div>
+      </div>
+      <div class="lm-section">🪪 Guest Policy</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Unmarried couples allowed</label><select class="form-select" id="f-ssCouples"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
+      </div>
+    </div>
+
+    <!-- ===== 7. AMENITIES ===== -->
     <div id="addAmenitiesSection">
     <div class="lm-section">✨ Amenities</div>
     <div class="form-group" id="amSelectFormGroup">
@@ -4475,124 +4542,6 @@ ul{list-style:none}
     </div>
     </div>
 
-    <!-- ===== 7. STATUS-SPECIFIC SECTIONS ===== -->
-
-    <!-- FOR RENT extras -->
-    <div id="addRentSection">
-      <div class="lm-section">📅 Availability &amp; Terms</div>
-      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
-        <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-noticePeriod"><option value="">Select</option><option>15 Days</option><option>1 Month</option><option>2 Months</option><option selected>3 Months</option></select></div>
-        <div class="form-group"><label class="form-label">Lease duration</label><select class="form-select" id="f-leaseDuration"><option value="">Any</option><option>6 Months</option><option selected>12 Months</option><option>24 Months</option><option>36 Months</option><option>48 Months</option><option>48+ Months</option></select></div>
-      </div>
-      <div class="lm-section">⚖️ Tenant Rules</div>
-      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
-        <div class="form-group"><label class="form-label">Pets allowed</label><select class="form-select" id="f-petsAllowed"><option value="">Select</option><option>Yes</option><option>No</option><option>Restricted</option></select></div>
-        <div class="form-group"><label class="form-label">Non-veg allowed</label><select class="form-select" id="f-nonVegAllowed"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
-      </div>
-    </div>
-
-    <!-- LEASE extras -->
-    <div id="addLeaseSection" style="display:none">
-      <div class="lm-section">💼 Lease Pricing</div>
-      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
-        <div class="form-group"><label class="form-label">Lease amount (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-leaseAmount" /></div>
-        <div class="form-group"><label class="form-label">Maintenance (₹/ Month)</label><input class="form-input" type="number" id="f-leaseMaintenance" /></div>
-      </div>
-      <div class="lm-section">📋 Lease Terms</div>
-      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
-        <div class="form-group"><label class="form-label">Lease duration</label><select class="form-select" id="f-leaseDurationVal"><option value="">Select</option><option>1 Year</option><option selected>2 Years</option><option>3 Years</option><option>5 Years</option><option>9 Years</option><option>15 Years</option><option>30 Years</option></select></div>
-        <div class="form-group"><label class="form-label">Lease type</label><select class="form-select" id="f-leaseType"><option value="">Select</option><option>Residential</option><option>Commercial</option><option>Industrial</option><option>Mixed Use</option></select></div>
-        <div class="form-group"><label class="form-label">Lock-in period</label><select class="form-select" id="f-lockInPeriod"><option value="">None</option><option>1 Year</option><option>2 Years</option><option>3 Years</option></select></div>
-        <div class="form-group"><label class="form-label">Available from</label><input class="form-input" type="date" id="f-leaseAvailableFrom" /></div>
-        <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-leaseNoticePeriod"><option value="">Select</option><option>1 Month</option><option>2 Months</option><option selected>3 Months</option></select></div>
-      </div>
-      <div class="lm-section">⚖️ House Rules</div>
-      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
-        <div class="form-group"><label class="form-label">Pets allowed</label><select class="form-select" id="f-leasePets"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
-        <div class="form-group"><label class="form-label">Non-veg allowed</label><select class="form-select" id="f-leaseNonVeg"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
-      </div>
-    </div>
-
-    <!-- ===== 7b. PG-ONLY FIELDS ===== -->
-    <div id="addPgSection" style="display:none">
-      <div class="lm-section">🛏 Room Details</div>
-      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
-        <div class="form-group">
-          <label class="form-label">Gender preference</label>
-          <select class="form-select" id="f-pgGender"><option>Any</option><option>Boys</option><option>Girls</option><option>Co-ed</option></select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Room type</label>
-          <select class="form-select" id="f-pgRoomType"><option>Single</option><option>Double Sharing</option><option>Triple Sharing</option><option>Dormitory</option></select>
-        </div>
-        <div class="form-group"><label class="form-label">Attached bathroom</label><select class="form-select" id="f-pgBathroom"><option>Yes</option><option>Shared</option></select></div>
-        <div class="form-group"><label class="form-label">Occupancy available</label><input class="form-input" type="number" id="f-pgOccupancy" /></div>
-        <div class="form-group"><label class="form-label">Room furnishing</label><select class="form-select" id="f-pgRoomFurnishing"><option value="">Select</option><option>Fully Furnished</option><option>Semi-Furnished</option><option>Unfurnished</option></select></div>
-        <div class="form-group">
-          <label class="form-label">Bike Parking</label>
-          <select class="form-select" id="f-pgBikePark">
-            <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Car Parking</label>
-          <select class="form-select" id="f-pgCarPark">
-            <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
-          </select>
-        </div>
-      </div>
-      <div class="lm-section">📅 Availability &amp; Terms</div>
-      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
-        <div class="form-group"><label class="form-label">Available from</label><input class="form-input" type="date" id="f-pgAvailableFrom" /></div>
-        <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-pgNotice"><option value="">Select</option><option selected>15 Days</option><option>1 Month</option><option>2 Months</option><option>3 Months</option></select></div>
-        <div class="form-group"><label class="form-label">Security deposit (₹)</label><input class="form-input" type="number" id="f-pgDeposit" min="0" /></div>
-      </div>
-      <div class="lm-section">🍽 Meals &amp; Policies</div>
-      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
-        <div class="form-group">
-          <label class="form-label">Meals included</label>
-          <select class="form-select" id="f-pgMeals"><option value="">Select</option><option>No Meals</option><option>Breakfast Only</option><option>Dinner Only</option><option>Lunch + Dinner</option><option selected>All 3 Meals</option><option>On Request</option></select>
-        </div>
-        <div class="form-group"><label class="form-label">Food type</label><select class="form-select" id="f-pgFoodType"><option value="">Select</option><option>Veg Only</option><option>Veg + Non-veg</option></select></div>
-        <div class="form-group"><label class="form-label">Gate closing time</label><select class="form-select" id="f-pgGateTime"><option value="">No Curfew</option><option>9 PM</option><option>10 PM</option><option>11 PM</option></select></div>
-        <div class="form-group"><label class="form-label">Visitor policy</label><select class="form-select" id="f-pgVisitorPolicy"><option value="">Select</option><option>Allowed</option><option>Lobby Only</option><option>Not Allowed</option></select></div>
-      </div>
-    </div>
-
-    <!-- ===== 7c. SHORT STAY (PER DAY / OYO-STYLE) FIELDS ===== -->
-    <div id="addShortStaySection" style="display:none">
-      <div class="lm-section">🛎 Room &amp; Booking</div>
-      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
-        <div class="form-group">
-          <label class="form-label">Room type</label>
-          <select class="form-select" id="f-ssRoomType"><option>Single</option><option>Double</option><option>Deluxe</option><option>Suite</option></select>
-        </div>
-        <div class="form-group"><label class="form-label">Max guests</label><input class="form-input" type="number" id="f-ssMaxGuests" min="1" /></div>
-        <div class="form-group"><label class="form-label">Minimum stay (days)</label><input class="form-input" type="number" id="f-ssMinDays" min="1" /></div>
-        <div class="form-group"><label class="form-label">Check-in time</label><input class="form-input" type="time" id="f-ssCheckinTime" value="12:00" /></div>
-        <div class="form-group"><label class="form-label">Check-out time</label><input class="form-input" type="time" id="f-ssCheckoutTime" value="11:00" /></div>
-        <div class="form-group"><label class="form-label">Extra day rate (₹)</label><input class="form-input" type="number" id="f-ssExtraDayRate" min="0" /></div>
-        <div class="form-group"><label class="form-label">Free cancellation window</label><select class="form-select" id="f-ssCancellation"><option value="">Select</option><option>No Cancellation</option><option>Free Till Check-in</option><option>24 Hours Before</option><option>48 Hours Before</option></select></div>
-        <div class="form-group">
-          <label class="form-label">Bike Parking</label>
-          <select class="form-select" id="f-ssBikePark">
-            <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Car Parking</label>
-          <select class="form-select" id="f-ssCarPark">
-            <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
-          </select>
-        </div>
-      </div>
-      <div class="lm-section">🪪 Guest Policy</div>
-      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
-        <div class="form-group"><label class="form-label">ID proof required</label><select class="form-select" id="f-ssIdProof"><option>Yes</option><option>No</option></select></div>
-        <div class="form-group"><label class="form-label">Unmarried couples allowed</label><select class="form-select" id="f-ssCouples"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
-        <div class="form-group"><label class="form-label">Security deposit (₹, optional)</label><input class="form-input" type="number" id="f-ssDeposit" min="0" /></div>
-      </div>
-    </div>
 
     <!-- ===== 8. MEDIA & DESCRIPTION ===== -->
     <div id="mediaSection">
@@ -6162,10 +6111,10 @@ function cardHTML(p, compact) {
       </div>
       <div class="prop-price-row">
         <div class="prop-price">${fmtRupee(p.price?.rent||0)}<span class="prop-price-unit">/ ${pType === 'Lease' ? (leaseDur || 'Lease') : pType === 'ShortStay' ? 'Day' : 'Month'}</span></div>
-        <div class="prop-deposit-inline" title="Security deposit">
+        ${pType === 'ShortStay' ? '' : `<div class="prop-deposit-inline" title="Security deposit">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2"/><circle cx="12" cy="12.5" r="2.5"/></svg>
           <span class="prop-deposit-val">${fmtRupee(deposit)}</span><span class="prop-deposit-lbl">Deposit</span>
-        </div>
+        </div>`}
       </div>
       <div class="prop-loc">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -6305,10 +6254,10 @@ function shortlistCardHTML(p) {
       </div>
       <div class="prop-price-row">
         <div class="prop-price">${fmtRupee(p.price?.rent||0)}<span class="prop-price-unit">/ ${pType === 'Lease' ? (leaseDur || 'Lease') : pType === 'ShortStay' ? 'Day' : 'Month'}</span></div>
-        <div class="prop-deposit-inline" title="Security deposit">
+        ${pType === 'ShortStay' ? '' : `<div class="prop-deposit-inline" title="Security deposit">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2"/><circle cx="12" cy="12.5" r="2.5"/></svg>
           <span class="prop-deposit-val">${fmtRupee(deposit)}</span><span class="prop-deposit-lbl">Deposit</span>
-        </div>
+        </div>`}
       </div>
       <div class="prop-loc">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -6853,13 +6802,9 @@ const FD_GROUPS = {
   pgOccupancy:  ['pgOccupancy'],
   pgGateTime:   ['pgGateTime'],
   pgVisitors:   ['pgVisitors'],
-  ssGuests:       ['ssMaxGuests'],
   ssCancellation: ['ssCancellation'],
   ssCouples:      ['ssCouples'],
-  ssMinDays:      ['ssMinDays'],
-  ssTimings:      ['ssCheckinTime','ssCheckoutTime'],
-  ssExtraDayRate: ['_ssExtraDayRateBucket'],
-  ssIdProof:      ['ssIdProof'],
+  ss24hrs:        ['ss24hrs'],
 };
 
 let openFd = null;
@@ -6887,7 +6832,6 @@ const FD_SORT_ORDER = {
   lockIn: ['1 Year','2 Years','3 Years'],
   pgGateTime: ['9 PM','10 PM','11 PM'],
   pgVisitors: ['Allowed','Lobby Only','Not Allowed'],
-  ssIdProof: ['Yes','No'],
 };
 
 function fdLabel(filterKey, val) {
@@ -6942,13 +6886,9 @@ const FILTER_FIELD_PATHS = {
   pgGateTime:   ['pg','gateTime'],
   pgVisitors:   ['pg','visitors'],
   ssRoomType:     ['shortStay','roomType'],
-  ssMaxGuests:    ['shortStay','maxGuests'],
   ssCancellation: ['shortStay','cancellation'],
   ssCouples:      ['shortStay','couplesAllowed'],
-  ssMinDays:      ['shortStay','minDays'],
-  ssCheckinTime:  ['shortStay','checkinTime'],
-  ssCheckoutTime: ['shortStay','checkoutTime'],
-  ssIdProof:      ['shortStay','idProof'],
+  ss24hrs:        ['shortStay','available24hrs'],
 };
 function pFieldByPath(p, pathArr) {
   return pathArr.reduce((o, k) => (o == null ? o : o[k]), p);
@@ -7128,10 +7068,6 @@ function buildFilterOptions() {
     fdSortValues('pgVisitors', fdCollectValues('pgVisitors', p => pTypeLabel(p) === 'PG')), 'pgVisitors');
   restoreSel('fdo-pgVisitors');
 
-  fdRenderOpts('fdo-ssGuests', 'ssMaxGuests',
-    fdSortValues('ssMaxGuests', fdCollectValues('ssMaxGuests', p => pTypeLabel(p) === 'ShortStay')), 'ssGuests');
-  restoreSel('fdo-ssGuests');
-
   fdRenderOpts('fdo-ssCancellation', 'ssCancellation',
     fdSortValues('ssCancellation', fdCollectValues('ssCancellation', p => pTypeLabel(p) === 'ShortStay')), 'ssCancellation');
   restoreSel('fdo-ssCancellation');
@@ -7140,21 +7076,9 @@ function buildFilterOptions() {
     fdSortValues('ssCouples', fdCollectValues('ssCouples', p => pTypeLabel(p) === 'ShortStay')), 'ssCouples');
   restoreSel('fdo-ssCouples');
 
-  fdRenderOpts('fdo-ssMinDays', 'ssMinDays',
-    fdSortValues('ssMinDays', fdCollectValues('ssMinDays', p => pTypeLabel(p) === 'ShortStay')), 'ssMinDays');
-  restoreSel('fdo-ssMinDays');
-
-  fdRenderOpts('fdo-ssCheckinTime', 'ssCheckinTime',
-    fdSortValues('ssCheckinTime', fdCollectValues('ssCheckinTime', p => pTypeLabel(p) === 'ShortStay')), 'ssTimings');
-  restoreSel('fdo-ssCheckinTime');
-
-  fdRenderOpts('fdo-ssCheckoutTime', 'ssCheckoutTime',
-    fdSortValues('ssCheckoutTime', fdCollectValues('ssCheckoutTime', p => pTypeLabel(p) === 'ShortStay')), 'ssTimings');
-  restoreSel('fdo-ssCheckoutTime');
-
-  fdRenderOpts('fdo-ssIdProof', 'ssIdProof',
-    fdSortValues('ssIdProof', fdCollectValues('ssIdProof', p => pTypeLabel(p) === 'ShortStay')), 'ssIdProof');
-  restoreSel('fdo-ssIdProof');
+  fdRenderOpts('fdo-ss24hrs', 'ss24hrs',
+    fdSortValues('ss24hrs', fdCollectValues('ss24hrs', p => pTypeLabel(p) === 'ShortStay')), 'ss24hrs');
+  restoreSel('fdo-ss24hrs');
 
   // Refresh badges/has-sel state for every dropdown after rebuilding
   Object.keys(FD_GROUPS).forEach(id => refreshFdBtn(id));
@@ -7645,29 +7569,14 @@ function getFiltered() {
     }
     // Short-Stay-only filters — same unconditional-check pattern as the PG
     // filters above, so a Rent/Lease/PG row can never slip through them.
-    if (fs.ssMaxGuests) {
-      if (pType!=='ShortStay' || !fs.ssMaxGuests.includes(p.shortStay?.maxGuests)) return false;
-    }
     if (fs.ssCancellation) {
       if (pType!=='ShortStay' || !fs.ssCancellation.includes(p.shortStay?.cancellation)) return false;
     }
     if (fs.ssCouples) {
       if (pType!=='ShortStay' || !fs.ssCouples.includes(p.shortStay?.couplesAllowed)) return false;
     }
-    if (fs.ssMinDays) {
-      if (pType!=='ShortStay' || !fs.ssMinDays.includes(String(p.shortStay?.minDays ?? ''))) return false;
-    }
-    if (fs.ssCheckinTime) {
-      if (pType!=='ShortStay' || !fs.ssCheckinTime.includes(p.shortStay?.checkinTime)) return false;
-    }
-    if (fs.ssCheckoutTime) {
-      if (pType!=='ShortStay' || !fs.ssCheckoutTime.includes(p.shortStay?.checkoutTime)) return false;
-    }
-    if (fs._ssExtraDayRateBucket) {
-      if (pType!=='ShortStay' || !fdValueInBuckets(p.shortStay?.extraDayRate||0, fs._ssExtraDayRateBucket)) return false;
-    }
-    if (fs.ssIdProof) {
-      if (pType!=='ShortStay' || !fs.ssIdProof.includes(p.shortStay?.idProof)) return false;
+    if (fs.ss24hrs) {
+      if (pType!=='ShortStay' || !fs.ss24hrs.includes(p.shortStay?.available24hrs)) return false;
     }
     return true;
   });
@@ -7843,7 +7752,7 @@ function buildDetailTable(p) {
     row('Maintenance', price.maintenance != null ? fmtRupee(price.maintenance) : null);
   } else {
     row('Rent', price.rent != null ? fmtRupee(price.rent) + '/month' : null);
-    row('Deposit', price.deposit != null ? fmtRupee(price.deposit) : null);
+    if (!isShortStay) row('Deposit', price.deposit != null ? fmtRupee(price.deposit) : null);
     row('Maintenance', price.maintenance != null ? fmtRupee(price.maintenance) : null);
     row('Rent increase', price.rentIncrease);
     row('Electricity included', price.electricity);
@@ -7865,10 +7774,6 @@ function buildDetailTable(p) {
   row('Bathrooms', property.bathrooms);
   row('Furnishing', property.furnish);
   if (!isPG) row('Available from', property.available);
-
-  const selected = Array.isArray(amenities.selected) ? amenities.selected : [];
-  row('Amenities', selected.join(', '), true);
-  row('Additional amenities', amenities.extra, true);
 
   if (isLease) {
     row('Notice period', terms.notice);
@@ -7902,15 +7807,14 @@ function buildDetailTable(p) {
 
   if (isShortStay) {
     row('Room type', shortStay.roomType);
-    row('Max guests', shortStay.maxGuests);
-    row('Minimum stay (days)', shortStay.minDays);
-    row('Check-in time', shortStay.checkinTime);
-    row('Check-out time', shortStay.checkoutTime);
-    row('Extra day rate', shortStay.extraDayRate != null ? fmtRupee(shortStay.extraDayRate) : null);
+    row('Available 24 hours', shortStay.available24hrs);
     row('Free cancellation window', shortStay.cancellation);
-    row('ID proof required', shortStay.idProof);
     row('Unmarried couples allowed', shortStay.couplesAllowed);
   }
+
+  const selected = Array.isArray(amenities.selected) ? amenities.selected : [];
+  row('Amenities', selected.join(', '), true);
+  row('Additional amenities', amenities.extra, true);
 
   row('Description', media.desc, true);
 
@@ -8085,7 +7989,7 @@ function openBookingModal(propId) {
   document.getElementById('bookingModalSubtitle').textContent = (p.propertyId || '') + ' · ' + (p.location?.area || '');
   const user = getLoggedInUser();
   document.getElementById('book-checkin').value = '';
-  document.getElementById('book-days').value = p.shortStay?.minDays || '';
+  document.getElementById('book-days').value = '';
   document.getElementById('book-guests').value = '';
   const preloadName = (user && `${user.firstName || ''} ${user.lastName || ''}`.trim()) || (user && user.name) || '';
   document.getElementById('book-name').value = preloadName;
@@ -8524,8 +8428,7 @@ function applyImportedProperty(p) {
   } else {
     sv('f-rent', price.rent);
     if (isPG) sv('f-pgDeposit', price.deposit);
-    else if (isShortStay) sv('f-ssDeposit', price.deposit);
-    else sv('f-deposit', price.deposit);
+    else if (!isShortStay) sv('f-deposit', price.deposit);
     sv('f-maintenance', price.maintenance);
     if (price.rentIncrease) sv('f-escalation', parseFloat(price.rentIncrease));
     sv('f-electricityIncluded', price.electricity);
@@ -8619,13 +8522,8 @@ function applyImportedProperty(p) {
   // got restored when viewing a Short Stay listing).
   if (isShortStay) {
     sv('f-ssRoomType', shortStay.roomType);
-    sv('f-ssMaxGuests', shortStay.maxGuests);
-    sv('f-ssMinDays', shortStay.minDays);
-    sv('f-ssCheckinTime', shortStay.checkinTime);
-    sv('f-ssCheckoutTime', shortStay.checkoutTime);
-    sv('f-ssExtraDayRate', shortStay.extraDayRate);
+    sv('f-ss24hrs', shortStay.available24hrs);
     sv('f-ssCancellation', shortStay.cancellation);
-    sv('f-ssIdProof', shortStay.idProof);
     sv('f-ssCouples', shortStay.couplesAllowed);
   }
 
@@ -10517,9 +10415,12 @@ function submitListing() {
       // they're omitted entirely rather than sent as null.
     } : {
       rent:         parseInt(rent) || 0,
-      deposit:      isPG ? (parseInt(gv('f-pgDeposit')) || 0)
-                  : isShortStay ? (parseInt(gv('f-ssDeposit')) || 0)
-                  : (parseInt(document.getElementById('f-deposit').value) || 0),
+      // Deposit is not collected for Short Stay — omitted entirely rather
+      // than sending a stale/default value.
+      ...(isShortStay ? {} : {
+        deposit: isPG ? (parseInt(gv('f-pgDeposit')) || 0)
+                      : (parseInt(document.getElementById('f-deposit').value) || 0),
+      }),
       // Maintenance/escalation/electricity/water fields are hidden for PG and
       // Short Stay — omitted entirely rather than sending stale/default nulls.
       ...((isPG || isShortStay) ? {} : {
@@ -10542,33 +10443,36 @@ function submitListing() {
                  : String(parseInt(document.getElementById('f-bikepark').value, 10) || 0),
         car:       isShortStay ? String(parseInt(document.getElementById('f-ssCarPark').value, 10) || 0)
                  : String(parseInt(document.getElementById('f-carpark').value, 10) || 0),
-        floor:     document.getElementById('f-floor').value || 'G',
-        bathrooms: document.getElementById('f-baths').value || '1',
-        furnish:   document.getElementById('f-furnishing').value,
-        facing:    document.getElementById('f-facing').value,
-        tenant:    document.getElementById('f-tenant').value,
-        available: isLease ? gv('f-leaseAvailableFrom')
-                  : isShortStay ? null
-                  : (document.getElementById('f-avail').value || null),
+        // floor/bathrooms/furnish/facing/tenant/available live in
+        // #addPropDetailsSection, which is hidden entirely for Short Stay —
+        // reading them here would silently save stale/default values the
+        // user never saw or entered. Short Stay simply doesn't collect
+        // these, so they're omitted entirely rather than sent as null.
+        ...(isShortStay ? {} : {
+          floor:     document.getElementById('f-floor').value || 'G',
+          bathrooms: document.getElementById('f-baths').value || '1',
+          furnish:   document.getElementById('f-furnishing').value,
+          facing:    document.getElementById('f-facing').value,
+          tenant:    document.getElementById('f-tenant').value,
+          available: isLease ? gv('f-leaseAvailableFrom') : (document.getElementById('f-avail').value || null),
+        }),
       },
     }),
     amenities: {
       selected: amenitiesSelected,
       extra:    amenitiesExtra,
     },
-    // terms (notice/lease/leaseType/lockIn) is a Rent/Lease/Short-Stay concept —
-    // PG's notice period lives only in pg.notice below, so `terms` is omitted
-    // entirely for PG rather than duplicating it here.
-    ...(isPG ? {} : {
+    // terms (notice/lease/leaseType/lockIn) is a Rent/Lease concept — PG's
+    // notice period lives only in pg.notice, and Short Stay's cancellation
+    // policy lives only in shortStay.cancellation, so `terms` is omitted
+    // entirely for both rather than duplicating/nulling it here.
+    ...((isPG || isShortStay) ? {} : {
       terms: {
         notice: isLease ? (gv('f-leaseNoticePeriod') || null)
-              : isShortStay ? null
               : (gv('f-noticePeriod') || null),
         // Rent's own lease-duration dropdown (f-leaseDuration) doesn't apply to
-        // Short Stay, so the "lease" key is omitted entirely for it rather than
-        // sent as null.
+        // Lease, so the "lease" key uses the Lease-specific dropdown for it.
         ...(isLease ? { lease: gv('f-leaseDurationVal') || null }
-          : isShortStay ? {}
           : { lease: gv('f-leaseDuration') || null }),
         // Lease-only fields — omitted entirely (not even sent as null) for every
         // other listing type, including Rent.
@@ -10609,13 +10513,8 @@ function submitListing() {
     } : {},
     shortStay: isShortStay ? {
       roomType:      document.getElementById('f-ssRoomType').value,
-      maxGuests:     gv('f-ssMaxGuests') || null,
-      minDays:       gv('f-ssMinDays') || null,
-      checkinTime:   gv('f-ssCheckinTime') || null,
-      checkoutTime:  gv('f-ssCheckoutTime') || null,
-      extraDayRate:  parseFloat(gv('f-ssExtraDayRate')) || null,
+      available24hrs: document.getElementById('f-ss24hrs').value,
       cancellation:  gv('f-ssCancellation') || null,
-      idProof:       document.getElementById('f-ssIdProof').value,
       couplesAllowed: gv('f-ssCouples') || null,
     } : {},
   };

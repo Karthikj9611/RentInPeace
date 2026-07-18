@@ -555,14 +555,14 @@ const PropertyDetailsSchema = new mongoose.Schema({
   bhk:       { type: String },   // not collected for PG/Short Stay; no default, so omitted entirely for them
   bike:      { type: String, default: '0' },    // bikeparking: count as string, e.g. '0'..'4'
   car:       { type: String, default: '0' },    // carparking:  count as string, e.g. '0'..'4'
-  floor:     { type: String, default: 'G' },
+  floor:     { type: String }, // Not collected for Short Stay (form hides this field) — no default, so it's omitted entirely instead of appearing as a default value
   area:      { type: String },   // not collected for PG/Short Stay; no default, so omitted entirely for them
-  bathrooms: { type: String, default: '1' },     // toilet
-  furnish:   { type: String, default: 'Unfurnished' }, // furnishing
-  facing:    { type: String, default: 'North' },
+  bathrooms: { type: String }, // Not collected for Short Stay (form hides this field) — no default, so it's omitted entirely instead of appearing as a default value
+  furnish:   { type: String }, // Not collected for Short Stay (form hides this field) — no default, so it's omitted entirely instead of appearing as a default value
+  facing:    { type: String }, // Not collected for Short Stay (form hides this field) — no default, so it's omitted entirely instead of appearing as a default value
   age:       { type: String },   // not collected for PG/Short Stay; no default, so omitted entirely for them
-  tenant:    { type: String, default: 'Any' },   // tenantPref
-  available: { type: String, default: null },    // availableFrom
+  tenant:    { type: String }, // Not collected for Short Stay (form hides this field) — no default, so it's omitted entirely instead of appearing as a default value
+  available: { type: String }, // Not collected for Short Stay (form hides this field) — no default, so it's omitted entirely instead of appearing as null
 }, { _id: false });
 
 const AmenitiesSchema = new mongoose.Schema({
@@ -611,15 +611,10 @@ const PgSchema = new mongoose.Schema({
 }, { _id: false });
 
 const ShortStaySchema = new mongoose.Schema({
-  roomType:       { type: String, default: null }, // ssRoomType (Single/Double/Deluxe/Suite)
-  maxGuests:      { type: String, default: null }, // ssMaxGuests
-  minDays:        { type: String, default: null }, // ssMinDays
-  checkinTime:    { type: String, default: null }, // ssCheckinTime, e.g. '12:00'
-  checkoutTime:   { type: String, default: null }, // ssCheckoutTime, e.g. '11:00'
-  extraDayRate:   { type: Number, default: null }, // ssExtraDayRate
-  cancellation:   { type: String, default: null }, // ssCancellation
-  idProof:        { type: String, default: null }, // ssIdProof (Yes/No)
-  couplesAllowed: { type: String, default: null }, // ssCouples (Yes/No)
+  roomType:        { type: String, default: null }, // ssRoomType (Single/Double/Deluxe/Suite)
+  available24hrs:  { type: String, default: null }, // ss24hrs (Yes/No)
+  cancellation:    { type: String, default: null }, // ssCancellation
+  couplesAllowed:  { type: String, default: null }, // ssCouples (Yes/No)
 }, { _id: false });
 
 // ── Counter (atomic per-type sequence for human-readable property IDs) ──
@@ -1046,12 +1041,8 @@ const TYPE_REQUIRED_FIELDS = {
     ['pg.food',      'Food type'],
   ],
   'Short Stay': [
-    ['shortStay.maxGuests',      'Max guests'],
-    ['shortStay.minDays',        'Minimum stay (days)'],
-    ['shortStay.checkinTime',    'Check-in time'],
-    ['shortStay.checkoutTime',   'Check-out time'],
+    ['shortStay.available24hrs', 'Available 24 hours'],
     ['shortStay.cancellation',   'Free cancellation window'],
-    ['shortStay.idProof',        'ID proof required'],
     ['shortStay.couplesAllowed', 'Unmarried couples allowed'],
   ],
 };
@@ -1136,14 +1127,16 @@ app.post('/api/properties', listingLimiter, requireUser, async (req, res) => {
       location:  fields.location,
       owner:     fields.owner,
       price:     fields.price,
-      // property/terms/rules are Rent/Lease/Short-Stay concepts — PG data lives
-      // entirely in `pg` below, so these three stay unset for PG listings
-      // instead of storing duplicate/blank values (e.g. property.bike mirroring
-      // pg.bike, terms.notice mirroring pg.notice, or an all-null rules object).
+      // property/terms/rules are Rent/Lease concepts — PG data lives entirely
+      // in `pg` below, and Short Stay doesn't collect terms.notice or
+      // rules.nonVeg (no such fields on the Short Stay form), so terms/rules
+      // stay unset for both PG and Short Stay listings instead of storing
+      // duplicate/blank values (e.g. property.bike mirroring pg.bike,
+      // terms.notice mirroring pg.notice, or an all-null rules object).
       property:  status === 'PG' ? undefined : fields.property,
       amenities: fields.amenities,
-      terms:     status === 'PG' ? undefined : fields.terms,
-      rules:     status === 'PG' ? undefined : fields.rules,
+      terms:     (status === 'PG' || status === 'Short Stay') ? undefined : fields.terms,
+      rules:     (status === 'PG' || status === 'Short Stay') ? undefined : fields.rules,
       media:     fields.media,
       pg:        status === 'PG' ? fields.pg : undefined,
       shortStay: status === 'Short Stay' ? fields.shortStay : undefined,
@@ -1860,13 +1853,8 @@ app.get('/api/admin/properties', requireAdmin, async (req, res) => {
 
         // Short Stay Details
         ssRoomType:      shortStay.roomType || '',
-        ssMaxGuests:     shortStay.maxGuests || '',
-        ssMinDays:       shortStay.minDays || '',
-        ssCheckinTime:   shortStay.checkinTime || '',
-        ssCheckoutTime:  shortStay.checkoutTime || '',
-        ssExtraDayRate:  shortStay.extraDayRate != null ? shortStay.extraDayRate : null,
+        ssAvailable24hrs:shortStay.available24hrs || '',
         ssCancellation:  shortStay.cancellation || '',
-        ssIdProof:       shortStay.idProof || '',
         ssCouplesAllowed:shortStay.couplesAllowed || '',
 
         // Owner Info
@@ -2070,13 +2058,17 @@ app.put('/api/user/listings/:id', requireUser, async (req, res) => {
         : Object.assign({}, prop[section]?.toObject ? prop[section].toObject() : prop[section], fields[section]);
     }
 
-    // property/terms/rules are Rent/Lease/Short-Stay concepts, not PG ones —
-    // if this listing is (or is being changed into) a PG, drop all three so
-    // no duplicate/stale data lingers alongside `pg`, which already carries
-    // everything the PG form collects.
+    // property/terms/rules are Rent/Lease concepts, not PG ones — if this
+    // listing is (or is being changed into) a PG, drop all three so no
+    // duplicate/stale data lingers alongside `pg`, which already carries
+    // everything the PG form collects. Short Stay doesn't collect
+    // terms.notice or rules.nonVeg either, so drop just those two for it.
     const effectiveStatus = (fields.basic && fields.basic.status) || (prop.basic || {}).status;
     if (effectiveStatus === 'PG') {
       prop.property = undefined;
+      prop.terms = undefined;
+      prop.rules = undefined;
+    } else if (effectiveStatus === 'Short Stay') {
       prop.terms = undefined;
       prop.rules = undefined;
     }
