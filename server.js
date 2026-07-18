@@ -579,7 +579,7 @@ const TermsSchema = new mongoose.Schema({
 
 const RulesSchema = new mongoose.Schema({
   pets:   { type: String }, // petsAllowed / leasePets — PG's "Pets allowed" field was removed from the form; no default, so it's omitted entirely for PG listings
-  nonVeg: { type: String, default: null }, // nonVegAllowed / leaseNonVeg / pgNonVeg
+  nonVeg: { type: String, default: null }, // nonVegAllowed / leaseNonVeg
   gas:    { type: String }, // No longer sent by the Rent form (or any form) — no default, so it's omitted entirely from newly saved listings
 }, { _id: false });
 
@@ -594,19 +594,20 @@ const PgSchema = new mongoose.Schema({
   room:          { type: String, default: null }, // pgRoomType
   meals:         { type: String, default: null }, // pgMeals
   occupancy:     { type: String, default: null },
-  notice:        { type: String, default: null }, // pgNotice (also mirrored into terms.notice)
+  notice:        { type: String, default: null }, // pgNotice — lives here only, not mirrored into terms.notice
   bathroom:      { type: String, default: null },
   furnish:       { type: String, default: null }, // pgRoomFurnishing
   food:          { type: String, default: null }, // pgFoodType
-  kitchen:       { type: String, default: null }, // pgKitchenAccess
-  available:     { type: String, default: null }, // pgAvailableFrom
+  available:     { type: String, default: null }, // pgAvailableFrom — lives here only, not mirrored into property.available
   visitors:      { type: String, default: null }, // pgVisitorPolicy
   gateTime:      { type: String, default: null },
-  nonVeg:        { type: String, default: null },
-  // mealCost, beds, pets — removed. These were legacy inputs dropped from the
-  // PG form long ago; they no longer have any UI to populate them. Any stray
-  // values sitting on old documents get dropped the next time that listing is
-  // edited (see the full-replace logic in PUT /api/user/listings/:id below).
+  bike:          { type: String, default: '0' }, // pgBikePark — lives here only, not mirrored into property.bike
+  car:           { type: String, default: '0' }, // pgCarPark — lives here only, not mirrored into property.car
+  // kitchen, nonVeg — removed along with the "Kitchen access" and "Non-veg
+  // allowed" inputs on the PG form. mealCost, beds, pets were removed earlier
+  // for the same reason. Any stray values on old documents get dropped the
+  // next time that listing is edited (see the full-replace logic in
+  // PUT /api/user/listings/:id below).
 }, { _id: false });
 
 const ShortStaySchema = new mongoose.Schema({
@@ -688,10 +689,10 @@ function buildListingSchema() {
     location:   { type: LocationSchema,         required: true },
     owner:      { type: OwnerSchema,            required: true },
     price:      { type: PriceSchema,            required: true },
-    property:   { type: PropertyDetailsSchema,  default: () => ({}) },
+    property:   { type: PropertyDetailsSchema }, // no default — left unset for PG listings (see property: below), same reasoning as pg/shortStay
     amenities:  { type: AmenitiesSchema,        default: () => ({}) },
-    terms:      { type: TermsSchema,            default: () => ({}) },
-    rules:      { type: RulesSchema,            default: () => ({}) },
+    terms:      { type: TermsSchema }, // no default — left unset for PG listings, all PG term data (notice) lives in pg.notice instead
+    rules:      { type: RulesSchema }, // no default — left unset for PG listings, which don't collect pets/non-veg rules
     media:      { type: MediaSchema,            default: () => ({}) },
     pg:         { type: PgSchema }, // no default — left unset for non-PG listings so we don't store an all-null subdocument
     shortStay:  { type: ShortStaySchema }, // no default — left unset for non-Short-Stay listings, same reasoning as pg above
@@ -1035,14 +1036,13 @@ const TYPE_REQUIRED_FIELDS = {
     ['rules.nonVeg',       'Non-veg allowed'],
   ],
   'PG': [
+    ['price.deposit', 'Security deposit'],
     ['pg.meals',     'Meals'],
     ['pg.occupancy', 'Occupancy available'],
     ['pg.bathroom',  'Attached bathroom'],
     ['pg.furnish',   'Room furnishing'],
-    ['pg.kitchen',   'Kitchen access'],
     ['pg.available', 'Available from'],
     ['pg.visitors',  'Visitor policy'],
-    ['pg.nonVeg',    'Non-veg allowed'],
     ['pg.food',      'Food type'],
   ],
   'Short Stay': [
@@ -1136,10 +1136,14 @@ app.post('/api/properties', listingLimiter, requireUser, async (req, res) => {
       location:  fields.location,
       owner:     fields.owner,
       price:     fields.price,
-      property:  fields.property,
+      // property/terms/rules are Rent/Lease/Short-Stay concepts — PG data lives
+      // entirely in `pg` below, so these three stay unset for PG listings
+      // instead of storing duplicate/blank values (e.g. property.bike mirroring
+      // pg.bike, terms.notice mirroring pg.notice, or an all-null rules object).
+      property:  status === 'PG' ? undefined : fields.property,
       amenities: fields.amenities,
-      terms:     fields.terms,
-      rules:     fields.rules,
+      terms:     status === 'PG' ? undefined : fields.terms,
+      rules:     status === 'PG' ? undefined : fields.rules,
       media:     fields.media,
       pg:        status === 'PG' ? fields.pg : undefined,
       shortStay: status === 'Short Stay' ? fields.shortStay : undefined,
@@ -1840,10 +1844,10 @@ app.get('/api/admin/properties', requireAdmin, async (req, res) => {
         bhk:          property.bhk || '',
         area:         property.area || '',
         floor:        property.floor || '',
-        furnishing:   property.furnish || '',
-        carparking:   property.car || '',
-        bikeparking:  property.bike || '',
-        toilet:       property.bathrooms || '',
+        furnishing:   basic.status === 'PG' ? (pg.furnish || '') : (property.furnish || ''),
+        carparking:   basic.status === 'PG' ? (pg.car || '') : (property.car || ''),
+        bikeparking:  basic.status === 'PG' ? (pg.bike || '') : (property.bike || ''),
+        toilet:       basic.status === 'PG' ? (pg.bathroom || '') : (property.bathrooms || ''),
         deposit:      price.deposit != null ? price.deposit : null,
 
         // PG Details
@@ -2064,6 +2068,17 @@ app.put('/api/user/listings/:id', requireUser, async (req, res) => {
       prop[section] = FULL_REPLACE_SECTIONS.has(section)
         ? fields[section]
         : Object.assign({}, prop[section]?.toObject ? prop[section].toObject() : prop[section], fields[section]);
+    }
+
+    // property/terms/rules are Rent/Lease/Short-Stay concepts, not PG ones —
+    // if this listing is (or is being changed into) a PG, drop all three so
+    // no duplicate/stale data lingers alongside `pg`, which already carries
+    // everything the PG form collects.
+    const effectiveStatus = (fields.basic && fields.basic.status) || (prop.basic || {}).status;
+    if (effectiveStatus === 'PG') {
+      prop.property = undefined;
+      prop.terms = undefined;
+      prop.rules = undefined;
     }
 
     const savedDoc = await moveListingIfNeeded(prop, currentModel);

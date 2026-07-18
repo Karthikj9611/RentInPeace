@@ -3465,21 +3465,6 @@ ul{list-style:none}
     </div>
   </div>
 
-  <!-- PG: Kitchen -->
-  <div class="fd-btn fd-pg" id="fdb-pgKitchen" onclick="toggleFd('pgKitchen',this)">
-    <span class="fd-icon">🍳</span>
-    <span class="fd-label">Kitchen</span> <span class="fd-badge" id="fdbc-pgKitchen" style="display:none"></span>
-    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-    <div class="fd-pop" id="fdp-pgKitchen" onclick="event.stopPropagation()">
-      <div class="fd-pop-label">Kitchen</div>
-      <div class="fd-opts" id="fdo-pgKitchen"></div>
-      <div class="fd-pop-footer">
-        <button class="fd-clear-btn" onclick="clearFd('pgKitchen')">Clear</button>
-        <button class="fd-apply-btn" onclick="applyFd('pgKitchen')">Apply</button>
-      </div>
-    </div>
-  </div>
-
   <!-- PG: Gate time -->
   <div class="fd-btn fd-pg" id="fdb-pgGateTime" onclick="toggleFd('pgGateTime',this)">
     <span class="fd-icon">🌙</span>
@@ -3506,21 +3491,6 @@ ul{list-style:none}
       <div class="fd-pop-footer">
         <button class="fd-clear-btn" onclick="clearFd('pgVisitors')">Clear</button>
         <button class="fd-apply-btn" onclick="applyFd('pgVisitors')">Apply</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- PG: Non-veg -->
-  <div class="fd-btn fd-pg" id="fdb-pgNonVeg" onclick="toggleFd('pgNonVeg',this)">
-    <span class="fd-icon">🍖</span>
-    <span class="fd-label">Non-Veg</span> <span class="fd-badge" id="fdbc-pgNonVeg" style="display:none"></span>
-    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-    <div class="fd-pop" id="fdp-pgNonVeg" onclick="event.stopPropagation()">
-      <div class="fd-pop-label">Non-veg allowed</div>
-      <div class="fd-opts" id="fdo-pgNonVeg"></div>
-      <div class="fd-pop-footer">
-        <button class="fd-clear-btn" onclick="clearFd('pgNonVeg')">Clear</button>
-        <button class="fd-apply-btn" onclick="applyFd('pgNonVeg')">Apply</button>
       </div>
     </div>
   </div>
@@ -4375,7 +4345,7 @@ ul{list-style:none}
         <label class="form-label">Water / borewell charges</label>
         <select class="form-select" id="f-waterCharge"><option>Included</option><option>Separate</option><option>Tanker</option></select>
       </div>
-	  <div class="form-group">
+	  <div class="form-group" id="f-negotiableWrap">
         <label class="form-label">Price negotiable</label>
         <select class="form-select" id="f-negotiable"><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select>
       </div>
@@ -4558,23 +4528,34 @@ ul{list-style:none}
         <div class="form-group"><label class="form-label">Attached bathroom</label><select class="form-select" id="f-pgBathroom"><option>Yes</option><option>Shared</option></select></div>
         <div class="form-group"><label class="form-label">Occupancy available</label><input class="form-input" type="number" id="f-pgOccupancy" /></div>
         <div class="form-group"><label class="form-label">Room furnishing</label><select class="form-select" id="f-pgRoomFurnishing"><option value="">Select</option><option>Fully Furnished</option><option>Semi-Furnished</option><option>Unfurnished</option></select></div>
-        <div class="form-group"><label class="form-label">Kitchen access</label><select class="form-select" id="f-pgKitchenAccess"><option value="">Select</option><option>Shared Kitchen</option><option>No Kitchen</option><option>Private Kitchen</option></select></div>
+        <div class="form-group">
+          <label class="form-label">Bike Parking</label>
+          <select class="form-select" id="f-pgBikePark">
+            <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Car Parking</label>
+          <select class="form-select" id="f-pgCarPark">
+            <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
+          </select>
+        </div>
       </div>
       <div class="lm-section">📅 Availability &amp; Terms</div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
         <div class="form-group"><label class="form-label">Available from</label><input class="form-input" type="date" id="f-pgAvailableFrom" /></div>
         <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-pgNotice"><option value="">Select</option><option selected>15 Days</option><option>1 Month</option><option>2 Months</option><option>3 Months</option></select></div>
+        <div class="form-group"><label class="form-label">Security deposit (₹)</label><input class="form-input" type="number" id="f-pgDeposit" min="0" /></div>
       </div>
-      <div class="lm-section">🍽 Meals &amp; Rules</div>
+      <div class="lm-section">🍽 Meals &amp; Policies</div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
         <div class="form-group">
           <label class="form-label">Meals included</label>
-          <select class="form-select" id="f-pgMeals"><option value="">Select</option><option>No Meals</option><option>Breakfast Only</option><option>Dinner Only</option><option>Lunch + Dinner</option><option>All 3 Meals</option><option>On Request</option></select>
+          <select class="form-select" id="f-pgMeals"><option value="">Select</option><option>No Meals</option><option>Breakfast Only</option><option>Dinner Only</option><option>Lunch + Dinner</option><option selected>All 3 Meals</option><option>On Request</option></select>
         </div>
         <div class="form-group"><label class="form-label">Food type</label><select class="form-select" id="f-pgFoodType"><option value="">Select</option><option>Veg Only</option><option>Veg + Non-veg</option></select></div>
         <div class="form-group"><label class="form-label">Gate closing time</label><select class="form-select" id="f-pgGateTime"><option value="">No Curfew</option><option>9 PM</option><option>10 PM</option><option>11 PM</option></select></div>
         <div class="form-group"><label class="form-label">Visitor policy</label><select class="form-select" id="f-pgVisitorPolicy"><option value="">Select</option><option>Allowed</option><option>Lobby Only</option><option>Not Allowed</option></select></div>
-        <div class="form-group"><label class="form-label">Non-veg allowed</label><select class="form-select" id="f-pgNonVeg"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
       </div>
     </div>
 
@@ -4592,6 +4573,18 @@ ul{list-style:none}
         <div class="form-group"><label class="form-label">Check-out time</label><input class="form-input" type="time" id="f-ssCheckoutTime" value="11:00" /></div>
         <div class="form-group"><label class="form-label">Extra day rate (₹)</label><input class="form-input" type="number" id="f-ssExtraDayRate" min="0" /></div>
         <div class="form-group"><label class="form-label">Free cancellation window</label><select class="form-select" id="f-ssCancellation"><option value="">Select</option><option>No Cancellation</option><option>Free Till Check-in</option><option>24 Hours Before</option><option>48 Hours Before</option></select></div>
+        <div class="form-group">
+          <label class="form-label">Bike Parking</label>
+          <select class="form-select" id="f-ssBikePark">
+            <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Car Parking</label>
+          <select class="form-select" id="f-ssCarPark">
+            <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
+          </select>
+        </div>
       </div>
       <div class="lm-section">🪪 Guest Policy</div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
@@ -6114,16 +6107,18 @@ function cardHTML(p, compact) {
   const colors = {Rent:'#e8f5ee:#1a6640',Lease:'#dde9fa:#1a4680',PG:'#eee8fa:#4a2a9a',ShortStay:'#e0f7fa:#00646e'};
   const [bg, fg] = (colors[pType]||'#f0f0f0:#333').split(':');
   const listClass = isListView ? ' list-view' : '';
-  const bathrooms = parseInt(p.property?.bathrooms) || 1;
-  const carCount = parseInt(p.property?.car, 10) || 0;
-  const bikeCount = parseInt(p.property?.bike, 10) || 0;
+  const isPGCard = pType === 'PG';
+  const pg = p.pg || {};
+  const bathrooms = isPGCard ? (parseInt(pg.bathroom) || 1) : (parseInt(p.property?.bathrooms) || 1);
+  const carCount = isPGCard ? (parseInt(pg.car, 10) || 0) : (parseInt(p.property?.car, 10) || 0);
+  const bikeCount = isPGCard ? (parseInt(pg.bike, 10) || 0) : (parseInt(p.property?.bike, 10) || 0);
   const carpark = carCount > 0;
   const bikepark = bikeCount > 0;
   const lift = pHasLift(p);
   const deposit = p.price?.deposit || 0;
   const maintenance = p.price?.maintenance || 0;
-  const floor = p.property?.floor || '';
-  const available = p.property?.available || '';
+  const floor = isPGCard ? '' : (p.property?.floor || '');
+  const available = isPGCard ? (pg.available || '') : (p.property?.available || '');
   const waterLabel = p.price?.water || '';
   const electricLabel = p.price?.electricity || '';
   // ── Extra fields captured on the post-property form but not previously shown on cards ──
@@ -6131,8 +6126,6 @@ function cardHTML(p, compact) {
   const areaSqft = (p.property?.area || '').toString().replace(/\s*sqft\s*$/i, '').trim();
   const leaseDur = p.terms?.lease || '';
   const video = p.media?.video || '';
-  const pg = p.pg || {};
-  const isPGCard = pType === 'PG';
   // Plain-text chip, no icon — used for the long tail of fields below so we're not
   // hand-drawing an SVG per field. Skips rendering entirely when value is empty.
   const chip = (label, value) => value ? `<span class="prop-chip" title="${esc(label)}"><span class="prop-chip-val">${esc(value)}</span></span>` : '';
@@ -6277,9 +6270,11 @@ function shortlistCardHTML(p) {
   const compareDisabled = !compared && lockedType && pType !== lockedType;
   const colors = {Rent:'#e8f5ee:#1a6640',Lease:'#dde9fa:#1a4680',PG:'#eee8fa:#4a2a9a',ShortStay:'#e0f7fa:#00646e'};
   const [bg, fg] = (colors[pType]||'#f0f0f0:#333').split(':');
-  const bathrooms = parseInt(p.property?.bathrooms) || 1;
-  const carCount = parseInt(p.property?.car, 10) || 0;
-  const bikeCount = parseInt(p.property?.bike, 10) || 0;
+  const isPGCardSL = pType === 'PG';
+  const pgSL = p.pg || {};
+  const bathrooms = isPGCardSL ? (parseInt(pgSL.bathroom) || 1) : (parseInt(p.property?.bathrooms) || 1);
+  const carCount = isPGCardSL ? (parseInt(pgSL.car, 10) || 0) : (parseInt(p.property?.car, 10) || 0);
+  const bikeCount = isPGCardSL ? (parseInt(pgSL.bike, 10) || 0) : (parseInt(p.property?.bike, 10) || 0);
   const carpark = carCount > 0;
   const bikepark = bikeCount > 0;
   const lift = pHasLift(p);
@@ -6622,15 +6617,15 @@ function renderCompareTable() {
     { label: 'Configuration', get: p => dash(p.property?.bhk) },
     { label: 'Built-up area', get: p => p.property?.area ? `${String(p.property.area).replace(/\s*sqft\s*$/i, '').trim()} sqft` : '—' },
     { label: 'Age of property', get: p => dash(p.property?.age) },
-    { label: 'Furnishing', get: p => dash(p.property?.furnish) },
+    { label: 'Furnishing', get: p => dash(p.property?.furnish ?? p.pg?.furnish) },
     { label: 'Floor', get: p => dash(p.property?.floor) },
-    { label: 'Bathrooms', get: p => dash(p.property?.bathrooms) },
+    { label: 'Bathrooms', get: p => dash(p.property?.bathrooms ?? p.pg?.bathroom) },
     { label: 'Facing', get: p => dash(p.property?.facing) },
     { label: 'Tenant preferred', get: p => dash(p.property?.tenant) },
     { label: 'Lift', get: p => yn(pHasLift(p)) },
-    { label: 'Car park', get: p => (parseInt(p.property?.car, 10) || 0) > 0 ? `${parseInt(p.property?.car, 10)}` : 'No' },
-    { label: 'Bike park', get: p => (parseInt(p.property?.bike, 10) || 0) > 0 ? `${parseInt(p.property?.bike, 10)}` : 'No' },
-    { label: 'Available from', get: p => dash(p.property?.available) },
+    { label: 'Car park', get: p => (parseInt(p.property?.car ?? p.pg?.car, 10) || 0) > 0 ? `${parseInt(p.property?.car ?? p.pg?.car, 10)}` : 'No' },
+    { label: 'Bike park', get: p => (parseInt(p.property?.bike ?? p.pg?.bike, 10) || 0) > 0 ? `${parseInt(p.property?.bike ?? p.pg?.bike, 10)}` : 'No' },
+    { label: 'Available from', get: p => dash(p.property?.available ?? p.pg?.available) },
 
     section('Terms'),
     { label: 'Notice period', get: p => dash(p.terms?.notice) },
@@ -6651,12 +6646,9 @@ function renderCompareTable() {
       { label: 'Room type', get: p => dash(p.pg?.room) },
       { label: 'Occupancy', get: p => dash(p.pg?.occupancy) },
       { label: 'Attached bathroom', get: p => dash(p.pg?.bathroom) },
-      { label: 'Total beds', get: p => dash(p.pg?.beds) },
       { label: 'Room furnishing', get: p => dash(p.pg?.furnish) },
       { label: 'Meals included', get: p => dash(p.pg?.meals) },
-      { label: 'Meal cost', get: p => p.pg?.mealCost ? `₹${p.pg.mealCost}` : '—' },
       { label: 'Food type', get: p => dash(p.pg?.food) },
-      { label: 'Kitchen access', get: p => dash(p.pg?.kitchen) },
       { label: 'Visitor policy', get: p => dash(p.pg?.visitors) },
       { label: 'Gate time', get: p => dash(p.pg?.gateTime) },
     ] : []),
@@ -6859,10 +6851,8 @@ const FD_GROUPS = {
   pgRoom:     ['pgRoomType'],
   pgMeals:    ['pgMeals','pgFoodType'],
   pgOccupancy:  ['pgOccupancy'],
-  pgKitchen:    ['pgKitchen'],
   pgGateTime:   ['pgGateTime'],
   pgVisitors:   ['pgVisitors'],
-  pgNonVeg:     ['pgNonVeg'],
   ssGuests:       ['ssMaxGuests'],
   ssCancellation: ['ssCancellation'],
   ssCouples:      ['ssCouples'],
@@ -6895,10 +6885,8 @@ const FD_SORT_ORDER = {
   nonVegAllowed: ['Yes','No'],
   leaseType: ['Residential','Commercial','Industrial','Mixed Use'],
   lockIn: ['1 Year','2 Years','3 Years'],
-  pgKitchen: ['Private Kitchen','Shared Kitchen','No Kitchen'],
   pgGateTime: ['9 PM','10 PM','11 PM'],
   pgVisitors: ['Allowed','Lobby Only','Not Allowed'],
-  pgNonVeg: ['Yes','No'],
   ssIdProof: ['Yes','No'],
 };
 
@@ -6950,11 +6938,9 @@ const FILTER_FIELD_PATHS = {
   pgBathroom:   ['pg','bathroom'],
   pgOccupancy:  ['pg','occupancy'],
   pgFurnishing: ['pg','furnish'],
-  pgKitchen:    ['pg','kitchen'],
   pgNotice:     ['pg','notice'],
   pgGateTime:   ['pg','gateTime'],
   pgVisitors:   ['pg','visitors'],
-  pgNonVeg:     ['pg','nonVeg'],
   ssRoomType:     ['shortStay','roomType'],
   ssMaxGuests:    ['shortStay','maxGuests'],
   ssCancellation: ['shortStay','cancellation'],
@@ -7134,10 +7120,6 @@ function buildFilterOptions() {
     fdSortValues('pgOccupancy', fdCollectValues('pgOccupancy', p => pTypeLabel(p) === 'PG')), 'pgOccupancy');
   restoreSel('fdo-pgOccupancy');
 
-  fdRenderOpts('fdo-pgKitchen', 'pgKitchen',
-    fdSortValues('pgKitchen', fdCollectValues('pgKitchen', p => pTypeLabel(p) === 'PG')), 'pgKitchen');
-  restoreSel('fdo-pgKitchen');
-
   fdRenderOpts('fdo-pgGateTime', 'pgGateTime',
     fdSortValues('pgGateTime', fdCollectValues('pgGateTime', p => pTypeLabel(p) === 'PG')), 'pgGateTime');
   restoreSel('fdo-pgGateTime');
@@ -7145,10 +7127,6 @@ function buildFilterOptions() {
   fdRenderOpts('fdo-pgVisitors', 'pgVisitors',
     fdSortValues('pgVisitors', fdCollectValues('pgVisitors', p => pTypeLabel(p) === 'PG')), 'pgVisitors');
   restoreSel('fdo-pgVisitors');
-
-  fdRenderOpts('fdo-pgNonVeg', 'pgNonVeg',
-    fdSortValues('pgNonVeg', fdCollectValues('pgNonVeg', p => pTypeLabel(p) === 'PG')), 'pgNonVeg');
-  restoreSel('fdo-pgNonVeg');
 
   fdRenderOpts('fdo-ssGuests', 'ssMaxGuests',
     fdSortValues('ssMaxGuests', fdCollectValues('ssMaxGuests', p => pTypeLabel(p) === 'ShortStay')), 'ssGuests');
@@ -7577,12 +7555,13 @@ function getFiltered() {
     if (fs.age && !fs.age.includes(p.property?.age)) return false;
     if (fs.negotiable && !fs.negotiable.includes(String(p.price?.negotiable || '').toLowerCase())) return false;
     if (fs._availBucket) {
-      const days = fdDaysFromToday(p.property?.available);
+      const availVal = p.pg?.available ?? p.property?.available;
+      const days = fdDaysFromToday(availVal);
       if (days === null || !fdValueInBuckets(Math.max(days, 0), fs._availBucket)) return false;
     }
     const lift = pHasLift(p);
-    const carpark = (parseInt(p.property?.car, 10) || 0) > 0;
-    const bikepark = (parseInt(p.property?.bike, 10) || 0) > 0;
+    const carpark = (parseInt(p.pg?.car ?? p.property?.car, 10) || 0) > 0;
+    const bikepark = (parseInt(p.pg?.bike ?? p.property?.bike, 10) || 0) > 0;
     if (fs.lift && fs.lift.includes('true') && !lift) return false;
     if (fs.carpark && fs.carpark.includes('true') && !carpark) return false;
     if (fs.bikepark && fs.bikepark.includes('true') && !bikepark) return false;
@@ -7658,17 +7637,11 @@ function getFiltered() {
     if (fs.pgOccupancy) {
       if (pType!=='PG' || !fs.pgOccupancy.includes(String(p.pg?.occupancy ?? ''))) return false;
     }
-    if (fs.pgKitchen) {
-      if (pType!=='PG' || !fs.pgKitchen.includes(p.pg?.kitchen)) return false;
-    }
     if (fs.pgGateTime) {
       if (pType!=='PG' || !fs.pgGateTime.includes(p.pg?.gateTime)) return false;
     }
     if (fs.pgVisitors) {
       if (pType!=='PG' || !fs.pgVisitors.includes(p.pg?.visitors)) return false;
-    }
-    if (fs.pgNonVeg) {
-      if (pType!=='PG' || !fs.pgNonVeg.includes(p.pg?.nonVeg)) return false;
     }
     // Short-Stay-only filters — same unconditional-check pattern as the PG
     // filters above, so a Rent/Lease/PG row can never slip through them.
@@ -7922,11 +7895,9 @@ function buildDetailTable(p) {
     row('Bathroom', pg.bathroom);
     row('Room furnishing', pg.furnish);
     row('Food type', pg.food);
-    row('Kitchen access', pg.kitchen);
     row('Available from', pg.available);
     row('Visitor policy', pg.visitors);
     row('Gate closing time', pg.gateTime);
-    row('Non-veg allowed', pg.nonVeg);
   }
 
   if (isShortStay) {
@@ -8552,7 +8523,8 @@ function applyImportedProperty(p) {
     sv('f-leaseMaintenance', price.maintenance);
   } else {
     sv('f-rent', price.rent);
-    if (isShortStay) sv('f-ssDeposit', price.deposit);
+    if (isPG) sv('f-pgDeposit', price.deposit);
+    else if (isShortStay) sv('f-ssDeposit', price.deposit);
     else sv('f-deposit', price.deposit);
     sv('f-maintenance', price.maintenance);
     if (price.rentIncrease) sv('f-escalation', parseFloat(price.rentIncrease));
@@ -8574,10 +8546,12 @@ function applyImportedProperty(p) {
   }
   sv('f-bikepark', (isPG || isShortStay) ? '0' : property.bike);
   sv('f-carpark', (isPG || isShortStay) ? '0' : property.car);
+  if (isPG) { sv('f-pgBikePark', pg.bike); sv('f-pgCarPark', pg.car); }
+  if (isShortStay) { sv('f-ssBikePark', property.bike); sv('f-ssCarPark', property.car); }
   sv('f-floor', property.floor);
   sv('f-baths', isPG ? '1' : property.bathrooms);
   sv('f-furnishing', property.furnish);
-  if (isPG) sv('f-pgAvailableFrom', property.available);
+  if (isPG) sv('f-pgAvailableFrom', pg.available);
   else if (isLease) sv('f-leaseAvailableFrom', property.available);
   else if (!isShortStay) sv('f-avail', property.available);
 
@@ -8598,7 +8572,7 @@ function applyImportedProperty(p) {
 
   // Terms
   if (isPG) {
-    sv('f-pgNotice', terms.notice);
+    sv('f-pgNotice', pg.notice);
   } else if (isLease) {
     sv('f-leaseNoticePeriod', terms.notice);
     sv('f-leaseDurationVal', terms.lease);
@@ -8610,9 +8584,7 @@ function applyImportedProperty(p) {
   }
 
   // Rules
-  if (isPG) {
-    sv('f-pgNonVeg', rules.nonVeg);
-  } else if (isLease) {
+  if (isLease) {
     sv('f-leasePets', rules.pets);
     sv('f-leaseNonVeg', rules.nonVeg);
   } else {
@@ -8639,7 +8611,6 @@ function applyImportedProperty(p) {
     sv('f-pgBathroom', pg.bathroom);
     sv('f-pgRoomFurnishing', pg.furnish);
     sv('f-pgFoodType', pg.food);
-    sv('f-pgKitchenAccess', pg.kitchen);
     sv('f-pgVisitorPolicy', pg.visitors);
     sv('f-pgGateTime', pg.gateTime);
   }
@@ -10300,6 +10271,7 @@ function onFTypeChange(val) {
     if (el) el.style.display = (isPG || isShortStay) ? 'none' : '';
   });
   document.getElementById('f-depositWrap').style.display = (isPG || isShortStay) ? 'none' : '';
+  document.getElementById('f-negotiableWrap').style.display = (isPG || isShortStay) ? 'none' : '';
   // Lease has its own "Available from" dropdown in addLeaseSection — hide the
   // Property-Details date field for Lease so there isn't a second, unused one.
   document.getElementById('f-availWrap').style.display = (isLease || isShortStay) ? 'none' : '';
@@ -10545,7 +10517,9 @@ function submitListing() {
       // they're omitted entirely rather than sent as null.
     } : {
       rent:         parseInt(rent) || 0,
-      deposit:      isShortStay ? (parseInt(gv('f-ssDeposit')) || 0) : (parseInt(document.getElementById('f-deposit').value) || 0),
+      deposit:      isPG ? (parseInt(gv('f-pgDeposit')) || 0)
+                  : isShortStay ? (parseInt(gv('f-ssDeposit')) || 0)
+                  : (parseInt(document.getElementById('f-deposit').value) || 0),
       // Maintenance/escalation/electricity/water fields are hidden for PG and
       // Short Stay — omitted entirely rather than sending stale/default nulls.
       ...((isPG || isShortStay) ? {} : {
@@ -10553,63 +10527,71 @@ function submitListing() {
         rentIncrease: parseFloat(gv('f-escalation')) ? gv('f-escalation') + '%' : null,
         electricity:  gv('f-electricityIncluded') || null,
         water:        gv('f-waterCharge') || null,
+        negotiable:   gv('f-negotiable').toLowerCase() === 'yes' ? 'Yes'
+                    : gv('f-negotiable').toLowerCase() === 'no'  ? 'No'
+                    : null,
       }),
-      negotiable:   gv('f-negotiable').toLowerCase() === 'yes' ? 'Yes'
-                  : gv('f-negotiable').toLowerCase() === 'no'  ? 'No'
-                  : null,
     },
-    property: {
-      // type/bhk/area/age are only collected for Rent and Lease — PG and Short
-      // Stay have their own room/occupancy fields instead, so these are omitted
-      // entirely rather than sent as null.
-      ...((isPG || isShortStay) ? {} : { type: gv('f-propertyType'), bhk: gv('f-bhk'), area: gv('f-area'), age: gv('f-age') }),
-      bike:      (isPG || isShortStay) ? '0' : String(parseInt(document.getElementById('f-bikepark').value, 10) || 0),
-      car:       (isPG || isShortStay) ? '0' : String(parseInt(document.getElementById('f-carpark').value, 10) || 0),
-      floor:     document.getElementById('f-floor').value || 'G',
-      bathrooms: isPG ? '1' : (document.getElementById('f-baths').value || '1'),
-      furnish:   document.getElementById('f-furnishing').value,
-      facing:    isPG ? 'North' : document.getElementById('f-facing').value,
-      tenant:    isPG
-        ? (document.getElementById('f-pgGender').value === 'Girls' ? 'Female only' : 'Any')
-        : document.getElementById('f-tenant').value,
-      available: isPG ? gv('f-pgAvailableFrom')
-                : isLease ? gv('f-leaseAvailableFrom')
-                : isShortStay ? null
-                : (document.getElementById('f-avail').value || null),
-    },
+    ...(isPG ? {} : {
+      property: {
+        // type/bhk/area/age are only collected for Rent and Lease — PG and Short
+        // Stay have their own room/occupancy fields instead, so these are omitted
+        // entirely rather than sent as null.
+        ...(isShortStay ? {} : { type: gv('f-propertyType'), bhk: gv('f-bhk'), area: gv('f-area'), age: gv('f-age') }),
+        bike:      isShortStay ? String(parseInt(document.getElementById('f-ssBikePark').value, 10) || 0)
+                 : String(parseInt(document.getElementById('f-bikepark').value, 10) || 0),
+        car:       isShortStay ? String(parseInt(document.getElementById('f-ssCarPark').value, 10) || 0)
+                 : String(parseInt(document.getElementById('f-carpark').value, 10) || 0),
+        floor:     document.getElementById('f-floor').value || 'G',
+        bathrooms: document.getElementById('f-baths').value || '1',
+        furnish:   document.getElementById('f-furnishing').value,
+        facing:    document.getElementById('f-facing').value,
+        tenant:    document.getElementById('f-tenant').value,
+        available: isLease ? gv('f-leaseAvailableFrom')
+                  : isShortStay ? null
+                  : (document.getElementById('f-avail').value || null),
+      },
+    }),
     amenities: {
       selected: amenitiesSelected,
       extra:    amenitiesExtra,
     },
-    terms: {
-      notice: isPG ? (gv('f-pgNotice') || null)
-            : isLease ? (gv('f-leaseNoticePeriod') || null)
-            : isShortStay ? null
-            : (gv('f-noticePeriod') || null),
-      // Rent's own lease-duration dropdown (f-leaseDuration) doesn't apply to
-      // PG or Short Stay, so the "lease" key is omitted entirely for them
-      // rather than sent as null.
-      ...(isLease ? { lease: gv('f-leaseDurationVal') || null }
-        : (isPG || isShortStay) ? {}
-        : { lease: gv('f-leaseDuration') || null }),
-      // Lease-only fields — omitted entirely (not even sent as null) for every
-      // other listing type, including Rent.
-      ...(isLease ? { leaseType: gv('f-leaseType') || null, lockIn: gv('f-lockInPeriod') || null } : {}),
-    },
-    rules: {
-      // PG's "Pets allowed" field was removed from the form, so this key is
-      // omitted entirely for PG rather than sent as null.
-      ...(isPG ? {} : { pets: isLease ? (gv('f-leasePets') || null) : isShortStay ? null : (gv('f-petsAllowed') || null) }),
-      nonVeg: isPG ? (gv('f-pgNonVeg') || null) : isLease ? (gv('f-leaseNonVeg') || null) : isShortStay ? null : (gv('f-nonVegAllowed') || null),
-      // "gas" field removed entirely from the Rent form submission — the piped
-      // gas checkbox (am-pipedgas) still adds "Piped gas connection" to the
-      // amenities list, it just no longer also writes a separate rules.gas value.
-    },
+    // terms (notice/lease/leaseType/lockIn) is a Rent/Lease/Short-Stay concept —
+    // PG's notice period lives only in pg.notice below, so `terms` is omitted
+    // entirely for PG rather than duplicating it here.
+    ...(isPG ? {} : {
+      terms: {
+        notice: isLease ? (gv('f-leaseNoticePeriod') || null)
+              : isShortStay ? null
+              : (gv('f-noticePeriod') || null),
+        // Rent's own lease-duration dropdown (f-leaseDuration) doesn't apply to
+        // Short Stay, so the "lease" key is omitted entirely for it rather than
+        // sent as null.
+        ...(isLease ? { lease: gv('f-leaseDurationVal') || null }
+          : isShortStay ? {}
+          : { lease: gv('f-leaseDuration') || null }),
+        // Lease-only fields — omitted entirely (not even sent as null) for every
+        // other listing type, including Rent.
+        ...(isLease ? { leaseType: gv('f-leaseType') || null, lockIn: gv('f-lockInPeriod') || null } : {}),
+      },
+    }),
+    ...((isPG || isShortStay) ? {} : {
+      rules: {
+        pets:   isLease ? (gv('f-leasePets') || null) : (gv('f-petsAllowed') || null),
+        nonVeg: isLease ? (gv('f-leaseNonVeg') || null) : (gv('f-nonVegAllowed') || null),
+        // "gas" field removed entirely from the Rent form submission — the piped
+        // gas checkbox (am-pipedgas) still adds "Piped gas connection" to the
+        // amenities list, it just no longer also writes a separate rules.gas value.
+      },
+    }),
     media: {
       video: gv('f-videoUrl') || null,
       desc:  document.getElementById('f-desc').value.trim(),
       images: images,
     },
+    // All PG-specific data — including parking, which lives under property for
+    // every other listing type — is captured here only, so nothing about a PG
+    // listing is duplicated into property/terms/rules.
     pg: isPG ? {
       gender:    document.getElementById('f-pgGender').value,
       room:      document.getElementById('f-pgRoomType').value,
@@ -10619,11 +10601,11 @@ function submitListing() {
       bathroom:  gv('f-pgBathroom') || null,
       furnish:   gv('f-pgRoomFurnishing') || null,
       food:      gv('f-pgFoodType') || null,
-      kitchen:   gv('f-pgKitchenAccess') || null,
       available: gv('f-pgAvailableFrom') || null,
       visitors:  gv('f-pgVisitorPolicy') || null,
       gateTime:  gv('f-pgGateTime') || null,
-      nonVeg:    gv('f-pgNonVeg') || null,
+      bike:      String(parseInt(document.getElementById('f-pgBikePark').value, 10) || 0),
+      car:       String(parseInt(document.getElementById('f-pgCarPark').value, 10) || 0),
     } : {},
     shortStay: isShortStay ? {
       roomType:      document.getElementById('f-ssRoomType').value,
