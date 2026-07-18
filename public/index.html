@@ -1301,7 +1301,7 @@ ul{list-style:none}
 
 /* ─── FAB ──────────────────────────────────────── */
 .fab{
-  position:fixed;bottom:116px;right:24px;z-index:150;
+  position:fixed;bottom:162px;right:24px;z-index:150;
   width:36px;height:36px;border-radius:50%;
   background:var(--brand);color:#fff;
   display:flex;align-items:center;justify-content:center;
@@ -1312,10 +1312,10 @@ ul{list-style:none}
 .fab:hover{background:var(--brand-hover);transform:scale(1.05)}
 .fab svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2}
 
-/* ─── FAB stat pills (visitor count / registered users) ────── */
-/* Same 36px footprint and right offset as .fab, so the FAB and both stat
-   icons sit in one straight vertical column — FAB on top, Visitors/Users
-   stacked below it. */
+/* ─── FAB stat pills (visitor count / daily visits / registered users) ─── */
+/* Same 36px footprint and right offset as .fab, so the FAB and all three
+   stat icons sit in one straight vertical column — FAB on top, Visitors/
+   Daily/Users stacked below it. */
 .fab-stats{
   position:fixed;right:24px;bottom:24px;z-index:150;
   display:flex;flex-direction:column;gap:10px;
@@ -1333,6 +1333,7 @@ ul{list-style:none}
 }
 .fab-stat-icon svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.2}
 .fab-stat-icon.visitors{background:linear-gradient(135deg,#6f9bff,#2f5fd1)}
+.fab-stat-icon.daily{background:linear-gradient(135deg,#4bc9a4,#1a7a5e)}
 .fab-stat-icon.users{background:linear-gradient(135deg,var(--brand),var(--brand-hover))}
 .fab-stat-badge{
   position:absolute;top:-4px;right:-6px;
@@ -1353,7 +1354,7 @@ ul{list-style:none}
     left:calc(100% * 11 / 12);
     transform:translateX(-50%);
   }
-  .fab{bottom:160px}
+  .fab{bottom:206px}
   .fab:hover{background:var(--brand-hover);transform:translateX(-50%) scale(1.05)}
 }
 
@@ -3776,6 +3777,12 @@ ul{list-style:none}
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
     </span>
     <span class="fab-stat-badge" id="fabStatVisitors">–</span>
+  </div>
+  <div class="fab-stat-item" title="Today's site visits">
+    <span class="fab-stat-icon daily">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    </span>
+    <span class="fab-stat-badge" id="fabStatDaily">–</span>
   </div>
   <div class="fab-stat-item" title="Total registered users">
     <span class="fab-stat-icon users">
@@ -10706,7 +10713,7 @@ document.getElementById('aboutModal').addEventListener('click', function(e) {
 });
 
 /* ═══════════════════════════════════════════════
-   FAB STATS (website visitors / registered users)
+   FAB STATS (website visitors / daily visits / registered users)
 ═══════════════════════════════════════════════ */
 function formatStatCount(n){
   if (typeof n !== 'number' || isNaN(n)) return '–';
@@ -10726,6 +10733,7 @@ async function initFabStats(){
     if (!res.ok) return;
     const data = await res.json();
     document.getElementById('fabStatVisitors').textContent = formatStatCount(data.totalVisits);
+    document.getElementById('fabStatDaily').textContent = formatStatCount(data.todayVisits);
     document.getElementById('fabStatUsers').textContent = formatStatCount(data.totalUsers);
   }catch(err){
     console.error('initFabStats error:', err);

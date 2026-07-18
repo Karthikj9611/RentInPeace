@@ -2577,7 +2577,7 @@ app.post('/api/stats/visit', visitLimiterStats, async (req, res) => {
       { $inc: { value: 1 } },
       { upsert: true, new: true }
     );
-    bumpDailyStat('visit'); // fire-and-forget; doesn't block the response
+    await bumpDailyStat('visit');
     res.json({ totalVisits: doc.value });
   } catch (err) {
     console.error('POST /api/stats/visit error:', err.message);
@@ -2587,11 +2587,16 @@ app.post('/api/stats/visit', visitLimiterStats, async (req, res) => {
 
 app.get('/api/stats', async (req, res) => {
   try {
-    const [visitDoc, totalUsers] = await Promise.all([
+    const [visitDoc, totalUsers, todayVisitDoc] = await Promise.all([
       SiteStat.findOne({ key: 'totalVisits' }).lean(),
       User.countDocuments(),
+      DailyStat.findOne({ date: todayStr(), type: 'visit' }).lean(),
     ]);
-    res.json({ totalVisits: visitDoc ? visitDoc.value : 0, totalUsers });
+    res.json({
+      totalVisits: visitDoc ? visitDoc.value : 0,
+      totalUsers,
+      todayVisits: todayVisitDoc ? todayVisitDoc.count : 0,
+    });
   } catch (err) {
     console.error('GET /api/stats error:', err.message);
     res.status(500).json({ message: 'Error fetching stats' });
