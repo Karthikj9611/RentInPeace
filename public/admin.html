@@ -472,6 +472,68 @@ table.dataTable.no-footer{border-bottom:none!important}
 .status-pg    {background:#fce4ec;color:#c2185b}
 .status-shortstay{background:#ede7f6;color:#6a3fb5}
 
+/* ── HONEST REVIEWS TAB ── */
+.hr-thumb-wrap{display:flex;align-items:center;gap:12px}
+.hr-thumb{
+  width:56px;height:56px;border-radius:10px;object-fit:cover;
+  flex-shrink:0;background:var(--surface2);border:1px solid var(--border);
+}
+.hr-review-status{
+  display:inline-block;padding:4px 11px;border-radius:99px;
+  font-size:0.72rem;font-weight:700;letter-spacing:0.3px;
+}
+.hr-review-status.pending {background:var(--gold-light);color:var(--gold-dark)}
+.hr-review-status.approved{background:var(--green-light);color:var(--green)}
+.hr-review-status.rejected{background:var(--red-light);color:var(--red)}
+.hr-status-actions{display:flex;gap:6px;margin-top:6px;justify-content:center;flex-wrap:wrap}
+.hr-status-actions button{
+  border:none;background:transparent;cursor:pointer;font-size:0.68rem;font-weight:700;
+  padding:3px 8px;border-radius:99px;font-family:inherit;transition:all 0.15s;
+}
+.hr-approve-btn{color:var(--green);background:var(--green-light)}
+.hr-approve-btn:hover{background:var(--green);color:#fff}
+.hr-reject-btn{color:var(--red);background:var(--red-light)}
+.hr-reject-btn:hover{background:var(--red);color:#fff}
+.btn-add-review{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:8px 16px;border-radius:99px;border:none;
+  background:var(--ink);color:#fff;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:0.78rem;font-weight:700;
+  cursor:pointer;transition:all 0.18s;white-space:nowrap;
+}
+.btn-add-review:hover{box-shadow:0 4px 14px rgba(12,13,16,0.22)}
+
+/* ── HONEST REVIEW ADD/EDIT MODAL ── */
+.hr-form-row{margin-bottom:16px}
+.hr-form-row label{
+  display:block;font-size:0.78rem;font-weight:700;color:var(--ink2);
+  margin-bottom:6px;
+}
+.hr-form-row input[type=text],.hr-form-row input[type=number],.hr-form-row input[type=url],.hr-form-row select,.hr-form-row textarea{
+  width:100%;box-sizing:border-box;padding:10px 14px;
+  border:1.5px solid var(--border);border-radius:10px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:0.85rem;color:var(--ink);
+  outline:none;background:#fff;transition:border-color 0.15s,box-shadow 0.15s;
+}
+.hr-form-row input:focus,.hr-form-row select:focus,.hr-form-row textarea:focus{
+  border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,144,60,0.12);
+}
+.hr-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+@media(max-width:420px){.hr-form-grid{grid-template-columns:1fr}}
+.hr-form-check{display:flex;align-items:center;gap:8px;margin-top:8px}
+.hr-form-check input{width:16px;height:16px;accent-color:var(--ink);cursor:pointer}
+.hr-modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
+.hr-modal-actions button{
+  padding:10px 20px;border-radius:99px;border:none;font-family:inherit;
+  font-size:0.82rem;font-weight:700;cursor:pointer;transition:all 0.18s;
+}
+.hr-btn-cancel{background:var(--surface2);color:var(--ink2)}
+.hr-btn-cancel:hover{background:var(--border);color:var(--ink)}
+.hr-btn-save{background:var(--ink);color:#fff}
+.hr-btn-save:hover{box-shadow:0 6px 20px rgba(12,13,16,0.25)}
+.hr-form-error{color:var(--red);font-size:0.78rem;margin-bottom:12px;display:none}
+.hr-form-error.show{display:block}
+
 /* ── DATATABLES CONTROLS ── */
 .dataTables_wrapper .dataTables_filter{margin-bottom:16px}
 .dataTables_wrapper .dataTables_filter label{
@@ -1109,6 +1171,21 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
       <span class="tab-btn-label">Appointments</span>
       <span class="tab-count" id="tab-appointments-count">—</span>
     </button>
+    <button class="tab-btn" id="tab-daily-visits" onclick="switchTab('daily-visits')">
+      <i class="fas fa-chart-line"></i>
+      <span class="tab-btn-label">Daily Visits</span>
+      <span class="tab-count" id="tab-daily-visits-count">—</span>
+    </button>
+    <button class="tab-btn" id="tab-registered-users" onclick="switchTab('registered-users')">
+      <i class="fas fa-user-plus"></i>
+      <span class="tab-btn-label">Users Registered</span>
+      <span class="tab-count" id="tab-registered-users-count">—</span>
+    </button>
+    <button class="tab-btn" id="tab-honest-reviews" onclick="switchTab('honest-reviews')">
+      <i class="fas fa-video"></i>
+      <span class="tab-btn-label">Honest Reviews</span>
+      <span class="tab-count" id="tab-honest-reviews-count">—</span>
+    </button>
   </div>
 
   <!-- ══ CUSTOMERS PANEL ══ -->
@@ -1303,6 +1380,117 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
     </div>
   </div>
 
+  <!-- ══ DAILY VISITS PANEL ══ -->
+  <div class="tab-panel" id="panel-daily-visits">
+    <div class="card">
+      <div class="table-wrapper">
+        <div class="bulk-toolbar" id="dailyVisitsToolbar">
+          <div class="bulk-toolbar-left">
+            <span class="bulk-selected-count"><i class="fas fa-chart-line"></i> All-time: <span id="dailyVisitsTotal">0</span></span>
+          </div>
+          <div class="bulk-toolbar-right">
+            <button class="bulk-btn bulk-btn-clear" onclick="clearAllDailyStats('visit')">
+              <i class="fas fa-eraser"></i> Clear All Counts
+            </button>
+            <button class="bulk-btn bulk-btn-outline-danger" onclick="deleteAllDailyStats('visit')">
+              <i class="fas fa-trash-alt"></i> Delete All Records
+            </button>
+          </div>
+        </div>
+        <table id="dailyVisitsTable" class="display nowrap" style="width:100%">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Visits</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="3" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ USERS REGISTERED PANEL ══ -->
+  <div class="tab-panel" id="panel-registered-users">
+    <div class="card">
+      <div class="table-wrapper">
+        <div class="bulk-toolbar" id="registeredUsersToolbar">
+          <div class="bulk-toolbar-left">
+            <span class="bulk-selected-count"><i class="fas fa-user-plus"></i> All-time: <span id="registeredUsersTotal">0</span></span>
+          </div>
+          <div class="bulk-toolbar-right">
+            <button class="bulk-btn bulk-btn-clear" onclick="clearAllDailyStats('registration')">
+              <i class="fas fa-eraser"></i> Clear All Counts
+            </button>
+            <button class="bulk-btn bulk-btn-outline-danger" onclick="deleteAllDailyStats('registration')">
+              <i class="fas fa-trash-alt"></i> Delete All Records
+            </button>
+          </div>
+        </div>
+        <table id="registeredUsersTable" class="display nowrap" style="width:100%">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Registrations</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="3" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ HONEST REVIEWS PANEL ══ -->
+  <div class="tab-panel" id="panel-honest-reviews">
+    <div class="card">
+      <div class="table-wrapper">
+        <div class="bulk-toolbar" id="reviewBulkToolbar">
+          <div class="bulk-toolbar-left">
+            <span class="bulk-selected-count" id="reviewSelectedCount" style="display:none">
+              <i class="fas fa-check-circle"></i> <span id="reviewSelectedNum">0</span> selected
+            </span>
+            <button class="bulk-btn bulk-btn-clear" id="reviewClearBtn" style="display:none" onclick="clearReviewSelection()">
+              <i class="fas fa-xmark"></i> Clear selection
+            </button>
+          </div>
+          <div class="bulk-toolbar-right">
+            <button class="btn-add-review" onclick="openHonestReviewModal()">
+              <i class="fas fa-plus"></i> Add Review
+            </button>
+            <button class="bulk-btn bulk-btn-danger" id="reviewDeleteSelectedBtn" style="display:none" onclick="deleteSelectedReviews()">
+              <i class="fas fa-trash-alt"></i> Delete Selected (<span id="reviewDeleteCount">0</span>)
+            </button>
+            <button class="bulk-btn bulk-btn-outline-danger" onclick="deleteAllReviews()">
+              <i class="fas fa-triangle-exclamation"></i> Delete All Reviews
+            </button>
+          </div>
+        </div>
+        <table id="honestReviewsTable" class="display nowrap" style="width:100%">
+          <thead>
+            <tr>
+              <th><input type="checkbox" class="review-select-all-checkbox" id="reviewSelectAllCheckbox" onchange="onReviewSelectAllChange(this)"></th>
+              <th>Video</th>
+              <th>Meta</th>
+              <th>Status</th>
+              <th>Active</th>
+              <th>Order</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="7" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <footer>
     <i class="fas fa-mobile-screen-button"></i>
     Tap phone number to call · Tap email to open mail app
@@ -1327,7 +1515,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
 </div>
 
 <script>
-let dataTable, propTable, apptTable;
+let dataTable, propTable, apptTable, dailyVisitsTable, registeredUsersTable, honestReviewsTable;
 
 const BASE = 'https://rentinpeace.onrender.com';
 
@@ -1463,6 +1651,15 @@ function switchTab(tab){
   if(tab === 'appointments' && apptTable){
     setTimeout(()=>{ apptTable.columns.adjust().draw(false); }, 50);
   }
+  if(tab === 'daily-visits' && dailyVisitsTable){
+    setTimeout(()=>{ dailyVisitsTable.columns.adjust().draw(false); }, 50);
+  }
+  if(tab === 'registered-users' && registeredUsersTable){
+    setTimeout(()=>{ registeredUsersTable.columns.adjust().draw(false); }, 50);
+  }
+  if(tab === 'honest-reviews' && honestReviewsTable){
+    setTimeout(()=>{ honestReviewsTable.columns.adjust().draw(false); }, 50);
+  }
 }
 
 function escapeHtml(str){
@@ -1575,6 +1772,345 @@ window.deleteProperty = async function(id){
     }, 600);
   } else {
     alert(data.message || 'Delete failed');
+  }
+};
+
+/* ── DAILY VISITS / USERS REGISTERED ── */
+const DAILY_STAT_LABELS = { visit:{ tab:'daily-visits', countEl:'tab-daily-visits-count', totalEl:'dailyVisitsTotal', unit:'Visits', noun:'day' },
+                             registration:{ tab:'registered-users', countEl:'tab-registered-users-count', totalEl:'registeredUsersTotal', unit:'Registrations', noun:'day' } };
+
+function formatDailyStatDate(d){
+  if(!d) return '—';
+  return new Date(d+'T00:00:00').toLocaleDateString('en-GB', {weekday:'short', day:'2-digit', month:'short', year:'numeric'});
+}
+
+function buildDailyStatDtConfig(type){
+  const meta = DAILY_STAT_LABELS[type];
+  return {
+    ajax:{
+      url: BASE+'/api/admin/daily-stats/'+type,
+      beforeSend: function(xhr){ xhr.setRequestHeader('x-admin-key', ADMIN_KEY); },
+      error: function(){ },
+      dataSrc: function(res){
+        const days = (res && Array.isArray(res.days)) ? res.days : [];
+        document.getElementById(meta.countEl).innerText = days.length;
+        document.getElementById(meta.totalEl).innerText = res && typeof res.total === 'number' ? res.total : 0;
+        return days;
+      }
+    },
+    columns:[
+      { data:'date', render:(d,t)=> t==='display' ? formatDailyStatDate(d) : (d||'') },
+      { data:'count', className:'dt-body-center', render:(d)=> Number(d||0) },
+      { data:null, orderable:false, className:'dt-body-center', render:(d,t,row)=>{
+          if(t!=='display') return '';
+          return `<div style="display:inline-flex;gap:6px;flex-wrap:wrap;justify-content:center">
+            <button class="btn-view" onclick="clearOneDailyStat('${type}','${row.date}')"><i class="fas fa-eraser"></i> Clear</button>
+            <button class="btn-delete" onclick="deleteOneDailyStat('${type}','${row.date}')"><i class="fas fa-trash-alt"></i> Delete</button>
+          </div>`;
+      }}
+    ],
+    order:[[0,'desc']],
+    pageLength:10,
+    scrollX:true,
+    language:{
+      emptyTable:`<div class="empty-state"><i class="fas fa-chart-line"></i>No ${meta.unit.toLowerCase()} recorded yet</div>`,
+      zeroRecords:'<div class="empty-state"><i class="fas fa-magnifying-glass"></i>No matching rows</div>',
+      lengthMenu:'Show _MENU_ entries',
+      info:`Showing _START_–_END_ of _TOTAL_ days`,
+      paginate:{previous:'‹ Prev',next:'Next ›'}
+    },
+    drawCallback:function(){}
+  };
+}
+
+window.clearOneDailyStat = async function(type, date){
+  const meta = DAILY_STAT_LABELS[type];
+  const ok = await showConfirmModal({ title:'Clear this day\'s count?', message:`The ${date} row will be reset to 0. The row itself stays.`, okText:'Clear', variant:'info' });
+  if(!ok) return;
+  try{
+    const res = await fetch(`${BASE}/api/admin/daily-stats/${type}/${date}/clear`, { method:'PATCH', headers: authHeaders() });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok){ alert(data.message || 'Failed to clear count'); return; }
+    const table = type==='visit' ? dailyVisitsTable : registeredUsersTable;
+    if(table) table.ajax.reload(null, false);
+  } catch(err){ alert('Failed to clear count. Please try again.'); }
+};
+
+window.deleteOneDailyStat = async function(type, date){
+  const ok = await showConfirmModal({ title:'Delete this record?', message:`The ${date} row will be permanently removed.` });
+  if(!ok) return;
+  try{
+    const res = await fetch(`${BASE}/api/admin/daily-stats/${type}/${date}`, { method:'DELETE', headers: authHeaders() });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok){ alert(data.message || 'Failed to delete record'); return; }
+    const table = type==='visit' ? dailyVisitsTable : registeredUsersTable;
+    if(table) table.ajax.reload(null, false);
+  } catch(err){ alert('Failed to delete record. Please try again.'); }
+};
+
+window.clearAllDailyStats = async function(type){
+  const label = type==='visit' ? 'Daily Visits' : 'Users Registered';
+  const ok = await showConfirmModal({ title:`Clear all ${label} counts?`, message:'Every day\'s count will be reset to 0. The rows themselves stay.', okText:'Clear All', variant:'info' });
+  if(!ok) return;
+  try{
+    const res = await fetch(`${BASE}/api/admin/daily-stats/${type}/clear-all`, { method:'POST', headers: authHeaders() });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok){ alert(data.message || 'Failed to clear counts'); return; }
+    const table = type==='visit' ? dailyVisitsTable : registeredUsersTable;
+    if(table) table.ajax.reload(null, false);
+  } catch(err){ alert('Failed to clear counts. Please try again.'); }
+};
+
+window.deleteAllDailyStats = async function(type){
+  const label = type==='visit' ? 'Daily Visits' : 'Users Registered';
+  const ok = await showConfirmModal({ title:`Delete all ${label} records?`, message:'Every tracked day for this tab will be permanently removed. This cannot be undone.', okText:'Delete All' });
+  if(!ok) return;
+  try{
+    const res = await fetch(`${BASE}/api/admin/daily-stats/${type}/delete-all`, { method:'POST', headers: authHeaders() });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok){ alert(data.message || 'Failed to delete records'); return; }
+    const table = type==='visit' ? dailyVisitsTable : registeredUsersTable;
+    if(table) table.ajax.reload(null, false);
+  } catch(err){ alert('Failed to delete records. Please try again.'); }
+};
+
+/* ── HONEST REVIEWS: SELECTION & BULK DELETE ── */
+const _selectedReviewIds = new Set();
+let _hrCache = {};
+
+window.onReviewRowCheck = function(checkboxEl, id){
+  if(checkboxEl.checked) _selectedReviewIds.add(id);
+  else _selectedReviewIds.delete(id);
+  updateReviewBulkToolbarUI();
+  syncReviewSelectionUI();
+};
+
+window.onReviewSelectAllChange = function(headerCheckboxEl){
+  const filteredRows = honestReviewsTable.rows({search:'applied'}).data().toArray();
+  if(headerCheckboxEl.checked){
+    filteredRows.forEach(r => _selectedReviewIds.add(r._id));
+  } else {
+    filteredRows.forEach(r => _selectedReviewIds.delete(r._id));
+  }
+  honestReviewsTable.draw(false);
+  updateReviewBulkToolbarUI();
+  syncReviewSelectionUI();
+  setTimeout(syncReviewSelectionUI, 0);
+};
+
+function syncVisibleReviewCheckboxes(){
+  document.querySelectorAll('#honestReviewsTable tbody .review-row-check').forEach(cb=>{
+    cb.checked = _selectedReviewIds.has(cb.getAttribute('data-id'));
+  });
+}
+
+function syncReviewSelectAllCheckbox(){
+  if(typeof honestReviewsTable === 'undefined' || !honestReviewsTable) return;
+  const headerCbs = document.querySelectorAll('.review-select-all-checkbox');
+  if(!headerCbs.length) return;
+  const filteredRows = honestReviewsTable.rows({search:'applied'}).data().toArray();
+  let checked, indeterminate;
+  if(!filteredRows.length){
+    checked = false; indeterminate = false;
+  } else {
+    const selectedCount = filteredRows.filter(r => _selectedReviewIds.has(r._id)).length;
+    checked = selectedCount === filteredRows.length;
+    indeterminate = selectedCount > 0 && selectedCount < filteredRows.length;
+  }
+  headerCbs.forEach(cb=>{ cb.checked = checked; cb.indeterminate = indeterminate; });
+}
+
+function syncReviewSelectionUI(){
+  syncVisibleReviewCheckboxes();
+  syncReviewSelectAllCheckbox();
+}
+
+function updateReviewBulkToolbarUI(){
+  const n = _selectedReviewIds.size;
+  const countEl   = document.getElementById('reviewSelectedCount');
+  const numEl     = document.getElementById('reviewSelectedNum');
+  const clearBtn  = document.getElementById('reviewClearBtn');
+  const delBtn    = document.getElementById('reviewDeleteSelectedBtn');
+  const delCountEl= document.getElementById('reviewDeleteCount');
+  const show = n > 0;
+  countEl.style.display = show ? 'inline-flex' : 'none';
+  clearBtn.style.display = show ? 'inline-flex' : 'none';
+  delBtn.style.display = show ? 'inline-flex' : 'none';
+  numEl.textContent = n;
+  delCountEl.textContent = n;
+}
+
+window.clearReviewSelection = function(){
+  _selectedReviewIds.clear();
+  honestReviewsTable.draw(false);
+  updateReviewBulkToolbarUI();
+  syncReviewSelectionUI();
+  setTimeout(syncReviewSelectionUI, 0);
+};
+
+window.deleteSelectedReviews = async function(){
+  const ids = Array.from(_selectedReviewIds);
+  if(!ids.length) return;
+  const ok = await showConfirmModal({
+    title: `Delete ${ids.length} review${ids.length===1?'':'s'}?`,
+    message: 'This will permanently remove the selected honest reviews. This cannot be undone.'
+  });
+  if(!ok) return;
+  try{
+    const res = await fetch(`${BASE}/api/honest-reviews/bulk-delete`, {
+      method:'POST',
+      headers: authHeaders({'Content-Type':'application/json'}),
+      body: JSON.stringify({ ids })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok){ alert(data.error || data.message || 'Bulk delete failed'); return; }
+    _selectedReviewIds.clear();
+    honestReviewsTable.ajax.reload(null, false);
+    updateReviewBulkToolbarUI();
+  } catch(err){ alert('Bulk delete failed. Please try again.'); }
+};
+
+window.deleteAllReviews = async function(){
+  const allRows = honestReviewsTable.rows().data().toArray();
+  if(!allRows.length){ alert('There are no honest reviews to delete.'); return; }
+  const ok = await showConfirmModal({
+    title: `Delete all ${allRows.length} honest reviews?`,
+    message: 'Every video review card will be permanently deleted. This cannot be undone.',
+    okText: 'Delete All'
+  });
+  if(!ok) return;
+  try{
+    const ids = allRows.map(r => r._id);
+    const res = await fetch(`${BASE}/api/honest-reviews/bulk-delete`, {
+      method:'POST',
+      headers: authHeaders({'Content-Type':'application/json'}),
+      body: JSON.stringify({ ids })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok){ alert(data.error || data.message || 'Bulk delete failed'); return; }
+    _selectedReviewIds.clear();
+    honestReviewsTable.ajax.reload(null, false);
+    updateReviewBulkToolbarUI();
+  } catch(err){ alert('Bulk delete failed. Please try again.'); }
+};
+
+window.deleteHonestReview = async function(id){
+  if(!await showConfirmModal({ title:'Delete this review?', message:'This video card will be permanently removed.' })) return;
+  try{
+    const res = await fetch(`${BASE}/api/honest-reviews/${id}`, { method:'DELETE', headers: authHeaders() });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok){ alert(data.error || data.message || 'Delete failed'); return; }
+    _selectedReviewIds.delete(id);
+    honestReviewsTable.ajax.reload(null, false);
+    updateReviewBulkToolbarUI();
+  } catch(err){ alert('Delete failed. Please try again.'); }
+};
+
+window.toggleReviewActive = async function(id, checkboxEl){
+  const desired = checkboxEl.checked;
+  checkboxEl.disabled = true;
+  try{
+    const res = await fetch(`${BASE}/api/honest-reviews/${id}`, {
+      method:'PUT',
+      headers: authHeaders({'Content-Type':'application/json'}),
+      body: JSON.stringify({ active: desired })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok){ checkboxEl.checked = !desired; alert(data.error || data.message || 'Failed to update active status'); return; }
+  } catch(err){
+    checkboxEl.checked = !desired;
+    alert('Failed to update active status');
+  } finally {
+    checkboxEl.disabled = false;
+  }
+};
+
+window.setReviewStatus = async function(id, status){
+  try{
+    const res = await fetch(`${BASE}/api/honest-reviews/${id}`, {
+      method:'PUT',
+      headers: authHeaders({'Content-Type':'application/json'}),
+      body: JSON.stringify({ status })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok){ alert(data.error || data.message || 'Failed to update status'); return; }
+    honestReviewsTable.ajax.reload(null, false);
+  } catch(err){ alert('Failed to update status. Please try again.'); }
+};
+
+/* ── HONEST REVIEWS: ADD / EDIT MODAL ── */
+window.openHonestReviewModal = function(id){
+  const errEl = document.getElementById('hrFormError');
+  errEl.classList.remove('show'); errEl.textContent = '';
+  document.getElementById('hrFormId').value = id || '';
+
+  const row = id ? honestReviewsTable.rows().data().toArray().find(r => r._id === id) : null;
+  document.getElementById('honestReviewModalTitle').textContent = row ? 'Edit Honest Review' : 'Add Honest Review';
+  document.getElementById('hrFormVideoUrl').value = row ? (row.videoUrl||'') : '';
+  document.getElementById('hrFormThumbUrl').value = row ? (row.thumbUrl||'') : '';
+  document.getElementById('hrFormTitle').value = row ? (row.title||'') : '';
+  document.getElementById('hrFormCaption').value = row ? (row.caption||'') : '';
+  document.getElementById('hrFormMeta').value = row ? (row.meta||'') : '';
+  document.getElementById('hrFormVerifiedLabel').value = row ? (row.verifiedLabel||'Verified tenant') : 'Verified tenant';
+  document.getElementById('hrFormOrder').value = row ? Number(row.order||0) : 0;
+  document.getElementById('hrFormStatus').value = row ? (row.status||'approved') : 'approved';
+  document.getElementById('hrFormActive').checked = row ? row.active !== false : true;
+
+  document.getElementById('honestReviewModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+
+function closeHonestReviewModal(){
+  document.getElementById('honestReviewModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+window.closeHonestReviewModal = closeHonestReviewModal;
+
+window.saveHonestReview = async function(){
+  const errEl = document.getElementById('hrFormError');
+  errEl.classList.remove('show'); errEl.textContent = '';
+
+  const id        = document.getElementById('hrFormId').value.trim();
+  const videoUrl  = document.getElementById('hrFormVideoUrl').value.trim();
+  const thumbUrl  = document.getElementById('hrFormThumbUrl').value.trim();
+  const title     = document.getElementById('hrFormTitle').value.trim();
+  const caption   = document.getElementById('hrFormCaption').value.trim();
+  const meta      = document.getElementById('hrFormMeta').value.trim();
+  const verifiedLabel = document.getElementById('hrFormVerifiedLabel').value.trim();
+  const order     = Number(document.getElementById('hrFormOrder').value) || 0;
+  const status    = document.getElementById('hrFormStatus').value;
+  const active    = document.getElementById('hrFormActive').checked;
+
+  if(!videoUrl || !thumbUrl || !title || !caption){
+    errEl.textContent = 'Video URL, Thumbnail URL, Title and Caption are required.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  const payload = { videoUrl, thumbUrl, title, caption, meta, verifiedLabel, order, status, active };
+  const saveBtn = document.getElementById('hrFormSaveBtn');
+  saveBtn.disabled = true;
+  try{
+    const url = id ? `${BASE}/api/honest-reviews/${id}` : `${BASE}/api/honest-reviews`;
+    const method = id ? 'PUT' : 'POST';
+    const res = await fetch(url, {
+      method,
+      headers: authHeaders({'Content-Type':'application/json'}),
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok){
+      errEl.textContent = data.error || data.message || 'Save failed';
+      errEl.classList.add('show');
+      return;
+    }
+    closeHonestReviewModal();
+    honestReviewsTable.ajax.reload(null, false);
+  } catch(err){
+    errEl.textContent = 'Save failed. Please try again.';
+    errEl.classList.add('show');
+  } finally {
+    saveBtn.disabled = false;
   }
 };
 
@@ -2440,6 +2976,103 @@ $(document).ready(function(){
   });
   } catch(e){ console.error('Appointments table failed to initialize:', e); }
 
+  /* ════════════════════════════════════
+     DAILY VISITS TABLE
+  ════════════════════════════════════ */
+  try{
+  dailyVisitsTable = $('#dailyVisitsTable').DataTable(buildDailyStatDtConfig('visit'));
+  } catch(e){ console.error('Daily Visits table failed to initialize:', e); }
+
+  /* ════════════════════════════════════
+     USERS REGISTERED TABLE
+  ════════════════════════════════════ */
+  try{
+  registeredUsersTable = $('#registeredUsersTable').DataTable(buildDailyStatDtConfig('registration'));
+  } catch(e){ console.error('Users Registered table failed to initialize:', e); }
+
+  /* ════════════════════════════════════
+     HONEST REVIEWS TABLE
+  ════════════════════════════════════ */
+  try{
+  honestReviewsTable = $('#honestReviewsTable').DataTable({
+    ajax:{
+      url: BASE+'/api/honest-reviews/all',
+      beforeSend: function(xhr){ xhr.setRequestHeader('x-admin-key', ADMIN_KEY); },
+      error: function(){ },
+      dataSrc: function(res){
+        const reviews = (res && Array.isArray(res.reviews)) ? res.reviews : [];
+        document.getElementById('tab-honest-reviews-count').innerText = reviews.length;
+        return reviews;
+      }
+    },
+    columns:[
+      /* 0 – Select checkbox */
+      { data:null, orderable:false, className:'dt-body-center', render:(d,t,row)=>{
+          if(t!=='display') return '';
+          const checked = _selectedReviewIds.has(row._id) ? 'checked' : '';
+          return `<input type="checkbox" class="review-row-check" data-id="${row._id}" onchange="onReviewRowCheck(this,'${row._id}')" ${checked}>`;
+      }},
+      /* 1 – Video: thumbnail + title + caption */
+      { data:null, render:(d,t,row)=>{
+          if(t!=='display') return escapeHtml(row.title||'');
+          const thumb = row.thumbUrl ? `<img class="hr-thumb" src="${row.thumbUrl}" alt="">` : `<div class="hr-thumb"></div>`;
+          return `<div class="hr-thumb-wrap">
+            ${thumb}
+            <div>
+              <div class="prop-title">${escapeHtml(row.title||'Untitled')}</div>
+              <div class="prop-sub">${escapeHtml(row.caption||'')}</div>
+            </div>
+          </div>`;
+      }},
+      /* 2 – Meta */
+      { data:'meta', render:(d)=> escapeHtml(d||'—') },
+      /* 3 – Status (+ approve/reject quick actions when pending) */
+      { data:'status', className:'dt-body-center', render:(d,t,row)=>{
+          if(t!=='display') return d||'';
+          const status = d || 'approved';
+          const badge = `<span class="hr-review-status ${status}">${escapeHtml(status)}</span>`;
+          if(status === 'pending'){
+            return `${badge}<div class="hr-status-actions">
+              <button class="hr-approve-btn" onclick="setReviewStatus('${row._id}','approved')"><i class="fas fa-check"></i> Approve</button>
+              <button class="hr-reject-btn" onclick="setReviewStatus('${row._id}','rejected')"><i class="fas fa-xmark"></i> Reject</button>
+            </div>`;
+          }
+          return badge;
+      }},
+      /* 4 – Active toggle */
+      { data:null, orderable:false, className:'dt-body-center', render:(d,t,row)=>{
+          if(t!=='display') return row.active ? 'Yes' : 'No';
+          const checked = row.active ? 'checked' : '';
+          return `<div class="mini-toggle-wrap"><label class="mini-toggle">
+            <input type="checkbox" ${checked} onchange="toggleReviewActive('${row._id}', this)">
+            <span class="slider"></span>
+          </label></div>`;
+      }},
+      /* 5 – Order */
+      { data:'order', className:'dt-body-center', render:(d)=> Number(d||0) },
+      /* 6 – Action */
+      { data:null, orderable:false, render:(d,t,row)=>{
+          if(t!=='display') return '';
+          return `<div style="display:inline-flex;gap:6px;flex-wrap:wrap;justify-content:center">
+            <button class="btn-view" onclick="openHonestReviewModal('${row._id}')"><i class="fas fa-pen"></i> Edit</button>
+            <button class="btn-delete" onclick="deleteHonestReview('${row._id}')"><i class="fas fa-trash-alt"></i> Delete</button>
+          </div>`;
+      }}
+    ],
+    order:[[5,'asc']],
+    pageLength:10,
+    scrollX:true,
+    language:{
+      emptyTable:'<div class="empty-state"><i class="fas fa-video"></i>No honest reviews yet</div>',
+      zeroRecords:'<div class="empty-state"><i class="fas fa-magnifying-glass"></i>No matching reviews</div>',
+      lengthMenu:'Show _MENU_ entries',
+      info:'Showing _START_–_END_ of _TOTAL_ reviews',
+      paginate:{previous:'‹ Prev',next:'Next ›'}
+    },
+    drawCallback:function(){}
+  });
+  } catch(e){ console.error('Honest Reviews table failed to initialize:', e); }
+
 });
 
 /* ════════════════════════════════════
@@ -3200,6 +3833,86 @@ function closeApptModal(){
 
       <!-- Details -->
       <div class="prop-modal-grid" id="apptModalDetails"></div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ═════════ HONEST REVIEW ADD/EDIT MODAL ═════════ -->
+<div class="prop-modal-wrap" id="honestReviewModal" onclick="if(event.target===this)closeHonestReviewModal()">
+
+  <div class="prop-modal">
+
+    <div class="prop-modal-close-row">
+      <button class="prop-modal-close-btn" onclick="closeHonestReviewModal()">✕</button>
+    </div>
+
+    <div class="prop-modal-body">
+
+      <div style="text-align:center;font-size:1.4rem;font-weight:700;margin-bottom:20px;color:var(--ink)" id="honestReviewModalTitle">
+        Add Honest Review
+      </div>
+
+      <div class="hr-form-error" id="hrFormError"></div>
+
+      <input type="hidden" id="hrFormId">
+
+      <div class="hr-form-row">
+        <label>Video URL (YouTube link)</label>
+        <input type="url" id="hrFormVideoUrl" placeholder="https://youtube.com/watch?v=...">
+      </div>
+
+      <div class="hr-form-row">
+        <label>Thumbnail URL</label>
+        <input type="url" id="hrFormThumbUrl" placeholder="https://...">
+      </div>
+
+      <div class="hr-form-row">
+        <label>Title</label>
+        <input type="text" id="hrFormTitle" maxlength="120" placeholder="e.g. Priya &amp; Rohan — 2BHK in Indiranagar">
+      </div>
+
+      <div class="hr-form-row">
+        <label>Caption (overlay text on thumbnail)</label>
+        <input type="text" id="hrFormCaption" maxlength="120" placeholder="Short caption shown on the card">
+      </div>
+
+      <div class="hr-form-row">
+        <label>Meta (e.g. "Moved in April 2026")</label>
+        <input type="text" id="hrFormMeta" maxlength="80" placeholder="Optional context line">
+      </div>
+
+      <div class="hr-form-grid">
+        <div class="hr-form-row">
+          <label>Verified Label</label>
+          <input type="text" id="hrFormVerifiedLabel" placeholder="Verified tenant">
+        </div>
+        <div class="hr-form-row">
+          <label>Order (lower shows first)</label>
+          <input type="number" id="hrFormOrder" value="0">
+        </div>
+      </div>
+
+      <div class="hr-form-row">
+        <label>Status</label>
+        <select id="hrFormStatus">
+          <option value="approved">Approved</option>
+          <option value="pending">Pending</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </div>
+
+      <div class="hr-form-check">
+        <input type="checkbox" id="hrFormActive" checked>
+        <label for="hrFormActive" style="margin:0">Active (visible on site when approved)</label>
+      </div>
+
+      <div class="hr-modal-actions">
+        <button class="hr-btn-cancel" onclick="closeHonestReviewModal()">Cancel</button>
+        <button class="hr-btn-save" id="hrFormSaveBtn" onclick="saveHonestReview()">Save</button>
+      </div>
 
     </div>
 

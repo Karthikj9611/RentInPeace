@@ -366,6 +366,7 @@ app.post('/api/user/signup', userAuthLimiter, async (req, res) => {
     });
     const userKey = await issueUserSession(user);
     await EmailOtp.deleteOne({ email: cleanEmail }); // one-time use — clear it now that the account exists
+    bumpDailyStat('registration'); // fire-and-forget; doesn't block the response
     return res.status(201).json({
       message: 'Account created successfully',
       _id: user._id, userId: user.userId,
@@ -2415,6 +2416,23 @@ app.delete('/api/honest-reviews/:id', requireAdmin, async (req, res) => {
   }
 });
 
+// POST /api/honest-reviews/bulk-delete — admin-only, delete several cards at once
+app.post('/api/honest-reviews/bulk-delete', requireAdmin, async (req, res) => {
+  try {
+    const { ids } = req.body || {};
+    if (!Array.isArray(ids) || !ids.length) {
+      return res.status(400).json({ error: 'ids must be a non-empty array' });
+    }
+    const validIds = ids.filter(id => mongoose.Types.ObjectId.isValid(id));
+    if (!validIds.length) return res.status(400).json({ error: 'No valid review ids provided' });
+    const result = await HonestReview.deleteMany({ _id: { $in: validIds } });
+    res.json({ message: `${result.deletedCount} review${result.deletedCount === 1 ? '' : 's'} deleted`, deletedCount: result.deletedCount });
+  } catch (err) {
+    console.error('POST /api/honest-reviews/bulk-delete error:', err.message);
+    res.status(500).json({ error: 'Could not bulk delete honest reviews' });
+  }
+});
+
 
 
 // Accepts any number of images (multipart/form-data, field name 'images'), converts
@@ -2513,6 +2531,36 @@ const SiteStatSchema = new mongoose.Schema({
 });
 const SiteStat = mongoose.model('SiteStat', SiteStatSchema);
 
+// ── Daily breakdown backing the admin panel's "Daily Visits" and
+// "Users Registered" tabs. One doc per (date, type) — bumped once per page
+// load (type: 'visit') or once per new account (type: 'registration').
+// Kept separate from SiteStat (which only holds the all-time totals) so the
+// admin can clear or delete individual days without touching real data
+// (VisitRequest docs / User accounts).
+const DailyStatSchema = new mongoose.Schema({
+  date:  { type: String, required: true }, // 'YYYY-MM-DD'
+  type:  { type: String, required: true, enum: ['visit', 'registration'] },
+  count: { type: Number, default: 0 },
+});
+DailyStatSchema.index({ date: 1, type: 1 }, { unique: true });
+const DailyStat = mongoose.model('DailyStat', DailyStatSchema);
+
+function todayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+async function bumpDailyStat(type) {
+  try {
+    await DailyStat.findOneAndUpdate(
+      { date: todayStr(), type },
+      { $inc: { count: 1 } },
+      { upsert: true }
+    );
+  } catch (err) {
+    console.error(`bumpDailyStat(${type}) error:`, err.message);
+  }
+}
+
 // Light rate limit — this is a public, unauthenticated endpoint hit once per
 // page load, so it just needs to keep bots from spamming it, not restrict
 // normal browsing.
@@ -2529,6 +2577,7 @@ app.post('/api/stats/visit', visitLimiterStats, async (req, res) => {
       { $inc: { value: 1 } },
       { upsert: true, new: true }
     );
+    bumpDailyStat('visit'); // fire-and-forget; doesn't block the response
     res.json({ totalVisits: doc.value });
   } catch (err) {
     console.error('POST /api/stats/visit error:', err.message);
@@ -2546,6 +2595,83 @@ app.get('/api/stats', async (req, res) => {
   } catch (err) {
     console.error('GET /api/stats error:', err.message);
     res.status(500).json({ message: 'Error fetching stats' });
+  }
+});
+
+// ── ADMIN: Daily Visits / Users Registered tabs ──
+// :type is 'visit' (Daily Visits tab) or 'registration' (Users Registered tab).
+const DAILY_STAT_TYPES = ['visit', 'registration'];
+function checkDailyStatType(req, res) {
+  if (!DAILY_STAT_TYPES.includes(req.params.type)) {
+    res.status(400).json({ message: 'Invalid stat type' });
+    return false;
+  }
+  return true;
+}
+
+// GET /api/admin/daily-stats/:type — list every tracked day, newest first, plus the all-time total.
+app.get('/api/admin/daily-stats/:type', requireAdmin, async (req, res) => {
+  try {
+    if (!checkDailyStatType(req, res)) return;
+    const days = await DailyStat.find({ type: req.params.type }).sort({ date: -1 }).lean();
+    const total = days.reduce((sum, d) => sum + (d.count || 0), 0);
+    res.json({ days, total });
+  } catch (err) {
+    console.error('GET /api/admin/daily-stats error:', err.message);
+    res.status(500).json({ message: 'Error fetching daily stats' });
+  }
+});
+
+// PATCH /api/admin/daily-stats/:type/:date/clear — reset one day's count to 0, keep the row.
+app.patch('/api/admin/daily-stats/:type/:date/clear', requireAdmin, async (req, res) => {
+  try {
+    if (!checkDailyStatType(req, res)) return;
+    const doc = await DailyStat.findOneAndUpdate(
+      { type: req.params.type, date: req.params.date },
+      { $set: { count: 0 } },
+      { new: true }
+    );
+    if (!doc) return res.status(404).json({ message: 'Record not found' });
+    res.json({ message: 'Count cleared', day: doc });
+  } catch (err) {
+    console.error('PATCH /api/admin/daily-stats/:type/:date/clear error:', err.message);
+    res.status(500).json({ message: 'Error clearing count' });
+  }
+});
+
+// DELETE /api/admin/daily-stats/:type/:date — remove that day's row entirely.
+app.delete('/api/admin/daily-stats/:type/:date', requireAdmin, async (req, res) => {
+  try {
+    if (!checkDailyStatType(req, res)) return;
+    await DailyStat.deleteOne({ type: req.params.type, date: req.params.date });
+    res.json({ message: 'Record deleted' });
+  } catch (err) {
+    console.error('DELETE /api/admin/daily-stats/:type/:date error:', err.message);
+    res.status(500).json({ message: 'Error deleting record' });
+  }
+});
+
+// POST /api/admin/daily-stats/:type/clear-all — reset every day's count to 0, keep the rows.
+app.post('/api/admin/daily-stats/:type/clear-all', requireAdmin, async (req, res) => {
+  try {
+    if (!checkDailyStatType(req, res)) return;
+    await DailyStat.updateMany({ type: req.params.type }, { $set: { count: 0 } });
+    res.json({ message: 'All counts cleared' });
+  } catch (err) {
+    console.error('POST /api/admin/daily-stats/:type/clear-all error:', err.message);
+    res.status(500).json({ message: 'Error clearing counts' });
+  }
+});
+
+// POST /api/admin/daily-stats/:type/delete-all — remove every tracked day for this type.
+app.post('/api/admin/daily-stats/:type/delete-all', requireAdmin, async (req, res) => {
+  try {
+    if (!checkDailyStatType(req, res)) return;
+    await DailyStat.deleteMany({ type: req.params.type });
+    res.json({ message: 'All records deleted' });
+  } catch (err) {
+    console.error('POST /api/admin/daily-stats/:type/delete-all error:', err.message);
+    res.status(500).json({ message: 'Error deleting records' });
   }
 });
 
