@@ -3080,8 +3080,8 @@ ul{list-style:none}
     </div>
   </div>
 
-  <!-- RENT + LEASE: Property Type -->
-  <div class="fd-btn fd-rent fd-lease" id="fdb-type" onclick="toggleFd('type',this)">
+  <!-- RENT + LEASE + PG + SHORT STAY: Property Type -->
+  <div class="fd-btn fd-rent fd-lease fd-pg fd-shortstay" id="fdb-type" onclick="toggleFd('type',this)">
     <span class="fd-icon">🏢</span>
     <span class="fd-label">Type</span> <span class="fd-badge" id="fdbc-type" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
@@ -4435,6 +4435,10 @@ ul{list-style:none}
       <div class="lm-section">🛏 Room Details</div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
         <div class="form-group">
+          <label class="form-label">Property type</label>
+          <select class="form-select" id="f-pgPropertyType"><option>Apartment</option><option>Independent House</option><option>Villa</option><option>Studio</option></select>
+        </div>
+        <div class="form-group">
           <label class="form-label">Gender preference</label>
           <select class="form-select" id="f-pgGender"><option>Any</option><option>Boys</option><option>Girls</option><option>Co-ed</option></select>
         </div>
@@ -4480,6 +4484,10 @@ ul{list-style:none}
     <div id="addShortStaySection" style="display:none">
       <div class="lm-section">🛎 Room &amp; Booking</div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group">
+          <label class="form-label">Property type</label>
+          <select class="form-select" id="f-ssPropertyType"><option>Apartment</option><option>Independent House</option><option>Villa</option><option>Studio</option></select>
+        </div>
         <div class="form-group">
           <label class="form-label">Room type</label>
           <select class="form-select" id="f-ssRoomType"><option>Single</option><option>Double</option><option>Deluxe</option><option>Suite</option></select>
@@ -6088,7 +6096,7 @@ function cardHTML(p, compact) {
   const waterLabel = p.price?.water || '';
   const electricLabel = p.price?.electricity || '';
   // ── Extra fields captured on the post-property form but not previously shown on cards ──
-  const ptype = p.property?.type || '';
+  const ptype = p.property?.type || pg.type || shortStay.type || '';
   const areaSqft = (p.property?.area || '').toString().replace(/\s*sqft\s*$/i, '').trim();
   const leaseDur = p.terms?.lease || '';
   const video = p.media?.video || '';
@@ -6128,7 +6136,12 @@ function cardHTML(p, compact) {
       </div>
       <div class="prop-price-row">
         <div class="prop-price">${fmtRupee(p.price?.rent||0)}<span class="prop-price-unit">/ ${pType === 'Lease' ? (leaseDur || 'Lease') : pType === 'ShortStay' ? 'Day' : 'Month'}</span></div>
-        ${pType === 'ShortStay' ? '' : `<div class="prop-deposit-inline" title="Security deposit">
+        ${pType === 'ShortStay' ? '' : pType === 'Lease'
+          ? (maintenance > 0 ? `<div class="prop-deposit-inline" title="Monthly maintenance">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span class="prop-deposit-val">${fmtRupee(maintenance)}</span><span class="prop-deposit-lbl">Maint.</span>
+            </div>` : '')
+          : `<div class="prop-deposit-inline" title="Security deposit">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2"/><circle cx="12" cy="12.5" r="2.5"/></svg>
           <span class="prop-deposit-val">${fmtRupee(deposit)}</span><span class="prop-deposit-lbl">Deposit</span>
         </div>`}
@@ -6301,7 +6314,12 @@ function shortlistCardHTML(p) {
       </div>
       <div class="prop-price-row">
         <div class="prop-price">${fmtRupee(p.price?.rent||0)}<span class="prop-price-unit">/ ${pType === 'Lease' ? (leaseDur || 'Lease') : pType === 'ShortStay' ? 'Day' : 'Month'}</span></div>
-        ${pType === 'ShortStay' ? '' : `<div class="prop-deposit-inline" title="Security deposit">
+        ${pType === 'ShortStay' ? '' : pType === 'Lease'
+          ? (maintenance > 0 ? `<div class="prop-deposit-inline" title="Monthly maintenance">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span class="prop-deposit-val">${fmtRupee(maintenance)}</span><span class="prop-deposit-lbl">Maint.</span>
+            </div>` : '')
+          : `<div class="prop-deposit-inline" title="Security deposit">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2"/><circle cx="12" cy="12.5" r="2.5"/></svg>
           <span class="prop-deposit-val">${fmtRupee(deposit)}</span><span class="prop-deposit-lbl">Deposit</span>
         </div>`}
@@ -6609,7 +6627,7 @@ function renderCompareTable() {
     { label: 'Rent escalation', get: p => p.price?.rentIncrease ? `${p.price.rentIncrease}%` : '—' },
 
     section('Property Details'),
-    { label: 'Property type', get: p => dash(p.property?.type) },
+    { label: 'Property type', get: p => dash(p.property?.type ?? p.pg?.type ?? p.shortStay?.type) },
     { label: 'Configuration', get: p => dash(p.property?.bhk) },
     { label: 'Built-up area', get: p => p.property?.area ? `${String(p.property.area).replace(/\s*sqft\s*$/i, '').trim()} sqft` : '—' },
     { label: 'Age of property', get: p => dash(p.property?.age) },
@@ -6638,6 +6656,7 @@ function renderCompareTable() {
 
     ...(anyPG ? [
       section('PG Details'),
+      { label: 'Property type', get: p => dash(p.pg?.type) },
       { label: 'Gender', get: p => dash(p.pg?.gender) },
       { label: 'Room type', get: p => dash(p.pg?.room) },
       { label: 'Occupancy', get: p => dash(p.pg?.occupancy) },
@@ -6923,6 +6942,7 @@ const FILTER_FIELD_PATHS = {
   leaseType:    ['terms','leaseType'],
   lockIn:       ['terms','lockIn'],
   pgGender:     ['pg','gender'],
+  pgPropertyType: ['pg','type'],
   pgRoomType:   ['pg','room'],
   pgMeals:      ['pg','meals'],
   pgFoodType:   ['pg','food'],
@@ -6933,6 +6953,7 @@ const FILTER_FIELD_PATHS = {
   pgGateTime:   ['pg','gateTime'],
   pgVisitors:   ['pg','visitors'],
   ssRoomType:     ['shortStay','roomType'],
+  ssPropertyType: ['shortStay','type'],
   ssCancellation: ['shortStay','cancellation'],
   ssCouples:      ['shortStay','couplesAllowed'],
   ss24hrs:        ['shortStay','available24hrs'],
@@ -7016,8 +7037,10 @@ function buildFilterOptions() {
     });
   }
 
+  // Property type now shows on Rent/Lease, PG, and Short Stay tabs alike —
+  // merge options from all listing types into one shared dropdown.
   fdRenderOpts('fdo-type', 'propertyType',
-    fdSortValues('propertyType', fdCollectValues('propertyType')), 'type');
+    fdSortValues('propertyType', fdCollectMerged(['propertyType','pgPropertyType','ssPropertyType'])), 'type');
   restoreSel('fdo-type');
 
   fdRenderOpts('fdo-bhk', 'bhk',
@@ -7500,7 +7523,10 @@ function getFiltered() {
     }
     if (!hasFilters) return true;
 
-    if (fs.propertyType && !fs.propertyType.includes(p.property?.type)) return false;
+    if (fs.propertyType) {
+      const typeVal = p.property?.type ?? p.pg?.type ?? p.shortStay?.type;
+      if (!fs.propertyType.includes(typeVal)) return false;
+    }
     if (fs.bhk) {
       const bhkVal = (p.property?.bhk||'').trim();
       const match = fs.bhk.some(b => b==='4 BHK' ? parseInt(bhkVal)>=4 : bhkVal===b);
@@ -7840,6 +7866,7 @@ function buildDetailTable(p) {
   }
 
   if (isPG) {
+    row('Property type', pg.type);
     row('Gender preference', pg.gender);
     row('Room type', pg.room);
     row('Meals', pg.meals);
@@ -7854,6 +7881,7 @@ function buildDetailTable(p) {
   }
 
   if (isShortStay) {
+    row('Property type', shortStay.type);
     row('Room type', shortStay.roomType);
     row('Available 24 hours', shortStay.available24hrs);
     row('Free cancellation window', shortStay.cancellation);
@@ -8556,6 +8584,7 @@ function applyImportedProperty(p) {
 
   // PG-specific block
   if (isPG) {
+    sv('f-pgPropertyType', pg.type);
     sv('f-pgGender', pg.gender);
     sv('f-pgRoomType', pg.room);
     sv('f-pgMeals', pg.meals);
@@ -8570,6 +8599,7 @@ function applyImportedProperty(p) {
   // Short-Stay-specific block (was missing entirely — none of these ever
   // got restored when viewing a Short Stay listing).
   if (isShortStay) {
+    sv('f-ssPropertyType', shortStay.type);
     sv('f-ssRoomType', shortStay.roomType);
     sv('f-ss24hrs', shortStay.available24hrs);
     sv('f-ssCancellation', shortStay.cancellation);
@@ -10547,6 +10577,7 @@ function submitListing() {
     // every other listing type — is captured here only, so nothing about a PG
     // listing is duplicated into property/terms/rules.
     pg: isPG ? {
+      type:      document.getElementById('f-pgPropertyType').value,
       gender:    document.getElementById('f-pgGender').value,
       room:      document.getElementById('f-pgRoomType').value,
       meals:     document.getElementById('f-pgMeals').value,
@@ -10562,6 +10593,7 @@ function submitListing() {
       car:       String(parseInt(document.getElementById('f-pgCarPark').value, 10) || 0),
     } : {},
     shortStay: isShortStay ? {
+      type:          document.getElementById('f-ssPropertyType').value,
       roomType:      document.getElementById('f-ssRoomType').value,
       available24hrs: document.getElementById('f-ss24hrs').value,
       cancellation:  gv('f-ssCancellation') || null,

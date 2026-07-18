@@ -590,6 +590,7 @@ const MediaSchema = new mongoose.Schema({
 }, { _id: false });
 
 const PgSchema = new mongoose.Schema({
+  type:          { type: String, default: null }, // pgPropertyType (Apartment/Independent House/Villa/Studio) — lives here only, property.type is omitted for PG
   gender:        { type: String, default: null },
   room:          { type: String, default: null }, // pgRoomType
   meals:         { type: String, default: null }, // pgMeals
@@ -611,6 +612,7 @@ const PgSchema = new mongoose.Schema({
 }, { _id: false });
 
 const ShortStaySchema = new mongoose.Schema({
+  type:            { type: String, default: null }, // ssPropertyType (Apartment/Independent House/Villa/Studio) — lives here only, same reasoning as shortStay.furnish
   roomType:        { type: String, default: null }, // ssRoomType (Single/Double/Deluxe/Suite)
   available24hrs:  { type: String, default: null }, // ss24hrs (Yes/No)
   cancellation:    { type: String, default: null }, // ssCancellation
@@ -1033,6 +1035,7 @@ const TYPE_REQUIRED_FIELDS = {
   ],
   'PG': [
     ['price.deposit', 'Security deposit'],
+    ['pg.type',      'Property type'],
     ['pg.meals',     'Meals'],
     ['pg.occupancy', 'Occupancy available'],
     ['pg.bathroom',  'Attached bathroom'],
@@ -1042,6 +1045,7 @@ const TYPE_REQUIRED_FIELDS = {
     ['pg.food',      'Food type'],
   ],
   'Short Stay': [
+    ['shortStay.type',           'Property type'],
     ['shortStay.available24hrs', 'Available 24 hours'],
     ['shortStay.cancellation',   'Free cancellation window'],
     ['shortStay.couplesAllowed', 'Unmarried couples allowed'],
@@ -1848,6 +1852,7 @@ app.get('/api/admin/properties', requireAdmin, async (req, res) => {
         deposit:      price.deposit != null ? price.deposit : null,
 
         // PG Details
+        pgPropertyType: pg.type || '',
         pgGender:     pg.gender || '',
         pgRoomType:   pg.room || '',
         pgMeals:      pg.meals || '',
@@ -1856,6 +1861,7 @@ app.get('/api/admin/properties', requireAdmin, async (req, res) => {
         pgBathroom:   pg.bathroom || '',
 
         // Short Stay Details
+        ssPropertyType:  shortStay.type || '',
         ssRoomType:      shortStay.roomType || '',
         ssAvailable24hrs:shortStay.available24hrs || '',
         ssCancellation:  shortStay.cancellation || '',
