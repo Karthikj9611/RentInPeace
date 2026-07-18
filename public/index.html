@@ -3171,7 +3171,7 @@ ul{list-style:none}
 
 
   <!-- RENT + LEASE: Furnishing -->
-  <div class="fd-btn fd-rent fd-lease fd-pg" id="fdb-furnishing" onclick="toggleFd('furnishing',this)">
+  <div class="fd-btn fd-rent fd-lease fd-pg fd-shortstay" id="fdb-furnishing" onclick="toggleFd('furnishing',this)">
     <span class="fd-icon">🛋️</span>
     <span class="fd-label">Furnishing</span> <span class="fd-badge" id="fdbc-furnishing" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
@@ -4472,6 +4472,7 @@ ul{list-style:none}
         </div>
         <div class="form-group"><label class="form-label">Available 24 hours</label><select class="form-select" id="f-ss24hrs"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
         <div class="form-group"><label class="form-label">Free cancellation window</label><select class="form-select" id="f-ssCancellation"><option value="">Select</option><option>No Cancellation</option><option>Free Till Check-in</option><option>24 Hours Before</option><option>48 Hours Before</option></select></div>
+        <div class="form-group"><label class="form-label">Room furnishing</label><select class="form-select" id="f-ssFurnish"><option value="">Select</option><option>Fully Furnished</option><option>Semi-Furnished</option><option>Unfurnished</option></select></div>
         <div class="form-group">
           <label class="form-label">Bike Parking</label>
           <select class="form-select" id="f-ssBikePark">
@@ -6147,7 +6148,7 @@ function cardHTML(p, compact) {
       <div class="prop-chip-row prop-chip-row-scroll">
         <span class="prop-chip chip-furnish" title="Furnishing">
           <span class="prop-chip-icon icon-furnish">🛋️</span>
-          ${p.property?.furnish}
+          ${p.property?.furnish ?? p.pg?.furnish ?? p.shortStay?.furnish}
         </span>
         ${maintenance > 0 ? `<span class="prop-chip chip-maint" title="Monthly maintenance">
           <span class="chip-ico-wrap icon-maint"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
@@ -6274,7 +6275,7 @@ function shortlistCardHTML(p) {
         </span>
         <span class="prop-stat" title="Furnishing">
           <span class="prop-stat-icon icon-furnish">🛋️</span>
-          ${p.property?.furnish}
+          ${p.property?.furnish ?? p.pg?.furnish ?? p.shortStay?.furnish}
         </span>
         <span class="prop-stat${carpark?'':' is-off'}" title="${carCount>0?carCount+' car parking spot'+(carCount>1?'s':''):'No car parking'}">
           <span class="prop-stat-icon icon-car">🚗</span>
@@ -6566,7 +6567,7 @@ function renderCompareTable() {
     { label: 'Configuration', get: p => dash(p.property?.bhk) },
     { label: 'Built-up area', get: p => p.property?.area ? `${String(p.property.area).replace(/\s*sqft\s*$/i, '').trim()} sqft` : '—' },
     { label: 'Age of property', get: p => dash(p.property?.age) },
-    { label: 'Furnishing', get: p => dash(p.property?.furnish ?? p.pg?.furnish) },
+    { label: 'Furnishing', get: p => dash(p.property?.furnish ?? p.pg?.furnish ?? p.shortStay?.furnish) },
     { label: 'Floor', get: p => dash(p.property?.floor) },
     { label: 'Bathrooms', get: p => dash(p.property?.bathrooms ?? p.pg?.bathroom) },
     { label: 'Facing', get: p => dash(p.property?.facing) },
@@ -6889,6 +6890,7 @@ const FILTER_FIELD_PATHS = {
   ssCancellation: ['shortStay','cancellation'],
   ssCouples:      ['shortStay','couplesAllowed'],
   ss24hrs:        ['shortStay','available24hrs'],
+  ssFurnishing:   ['shortStay','furnish'],
 };
 function pFieldByPath(p, pathArr) {
   return pathArr.reduce((o, k) => (o == null ? o : o[k]), p);
@@ -6976,10 +6978,10 @@ function buildFilterOptions() {
     fdSortValues('bhk', fdCollectValues('bhk')), 'bhk');
   restoreSel('fdo-bhk');
 
-  // Furnishing now shows on Rent/Lease and PG tabs alike — merge options from
-  // both listing types into one shared dropdown.
+  // Furnishing now shows on Rent/Lease, PG, and Short Stay tabs alike — merge
+  // options from all listing types into one shared dropdown.
   fdRenderOpts('fdo-furnishing', 'furnishing',
-    fdSortValues('furnishing', fdCollectMerged(['furnishing','pgFurnishing'])), 'furnishing');
+    fdSortValues('furnishing', fdCollectMerged(['furnishing','pgFurnishing','ssFurnishing'])), 'furnishing');
   restoreSel('fdo-furnishing');
 
   fdRenderOpts('fdo-tenant', 'tenant',
@@ -7459,7 +7461,7 @@ function getFiltered() {
       if (!match) return false;
     }
     if (fs.furnishing) {
-      const furnishVal = p.property?.furnish ?? p.pg?.furnish;
+      const furnishVal = p.property?.furnish ?? p.pg?.furnish ?? p.shortStay?.furnish;
       if (furnishVal != null && furnishVal !== '' && !fs.furnishing.includes(furnishVal)) return false;
     }
     if (fs.tenant) {
@@ -7810,6 +7812,7 @@ function buildDetailTable(p) {
     row('Available 24 hours', shortStay.available24hrs);
     row('Free cancellation window', shortStay.cancellation);
     row('Unmarried couples allowed', shortStay.couplesAllowed);
+    row('Room furnishing', shortStay.furnish);
   }
 
   const selected = Array.isArray(amenities.selected) ? amenities.selected : [];
@@ -8525,6 +8528,7 @@ function applyImportedProperty(p) {
     sv('f-ss24hrs', shortStay.available24hrs);
     sv('f-ssCancellation', shortStay.cancellation);
     sv('f-ssCouples', shortStay.couplesAllowed);
+    sv('f-ssFurnish', shortStay.furnish);
   }
 
   onFTypeChange(typeVal);
@@ -10516,6 +10520,7 @@ function submitListing() {
       available24hrs: document.getElementById('f-ss24hrs').value,
       cancellation:  gv('f-ssCancellation') || null,
       couplesAllowed: gv('f-ssCouples') || null,
+      furnish:       gv('f-ssFurnish') || null,
     } : {},
   };
 

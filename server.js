@@ -615,6 +615,7 @@ const ShortStaySchema = new mongoose.Schema({
   available24hrs:  { type: String, default: null }, // ss24hrs (Yes/No)
   cancellation:    { type: String, default: null }, // ssCancellation
   couplesAllowed:  { type: String, default: null }, // ssCouples (Yes/No)
+  furnish:         { type: String, default: null }, // ssFurnish — lives here only, same reasoning as pg.furnish; property.furnish is omitted for Short Stay
 }, { _id: false });
 
 // ── Counter (atomic per-type sequence for human-readable property IDs) ──
@@ -1044,6 +1045,7 @@ const TYPE_REQUIRED_FIELDS = {
     ['shortStay.available24hrs', 'Available 24 hours'],
     ['shortStay.cancellation',   'Free cancellation window'],
     ['shortStay.couplesAllowed', 'Unmarried couples allowed'],
+    ['shortStay.furnish',        'Furnishing'],
   ],
 };
 
@@ -1837,7 +1839,9 @@ app.get('/api/admin/properties', requireAdmin, async (req, res) => {
         bhk:          property.bhk || '',
         area:         property.area || '',
         floor:        property.floor || '',
-        furnishing:   basic.status === 'PG' ? (pg.furnish || '') : (property.furnish || ''),
+        furnishing:   basic.status === 'PG' ? (pg.furnish || '')
+                    : basic.status === 'Short Stay' ? (shortStay.furnish || '')
+                    : (property.furnish || ''),
         carparking:   basic.status === 'PG' ? (pg.car || '') : (property.car || ''),
         bikeparking:  basic.status === 'PG' ? (pg.bike || '') : (property.bike || ''),
         toilet:       basic.status === 'PG' ? (pg.bathroom || '') : (property.bathrooms || ''),
@@ -1856,6 +1860,7 @@ app.get('/api/admin/properties', requireAdmin, async (req, res) => {
         ssAvailable24hrs:shortStay.available24hrs || '',
         ssCancellation:  shortStay.cancellation || '',
         ssCouplesAllowed:shortStay.couplesAllowed || '',
+        ssFurnish:       shortStay.furnish || '',
 
         // Owner Info
         ownerName:    owner.name || '',
