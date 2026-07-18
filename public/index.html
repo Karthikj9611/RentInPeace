@@ -725,6 +725,20 @@ ul{list-style:none}
 .chip-water{background:#faf1f2;border-color:#eed9dc;color:#8a6b7a}
 .icon-electric{background:linear-gradient(145deg,#f8f0f0,#efdfe0)}
 .chip-electric{background:#faf1f2;border-color:#eed9dc;color:#a85c6e}
+.icon-gender{background:linear-gradient(145deg,#f8f0f0,#efdfe0)}
+.chip-gender{background:#faf1f2;border-color:#eed9dc}
+.icon-room{background:linear-gradient(145deg,#f8f0f0,#efdfe0)}
+.chip-room{background:#faf1f2;border-color:#eed9dc}
+.icon-meals{background:linear-gradient(145deg,#f8f0f0,#efdfe0)}
+.chip-meals{background:#faf1f2;border-color:#eed9dc}
+.icon-occupancy{background:linear-gradient(145deg,#f8f0f0,#efdfe0)}
+.chip-occupancy{background:#faf1f2;border-color:#eed9dc}
+.icon-ss24hrs{background:linear-gradient(145deg,#f8f0f0,#efdfe0)}
+.chip-ss24hrs{background:#faf1f2;border-color:#eed9dc}
+.icon-sscancel{background:linear-gradient(145deg,#f8f0f0,#efdfe0)}
+.chip-sscancel{background:#faf1f2;border-color:#eed9dc}
+.icon-sscouples{background:linear-gradient(145deg,#f8f0f0,#efdfe0)}
+.chip-sscouples{background:#faf1f2;border-color:#eed9dc}
 .chip-video{background:#faf1f2;border-color:#eed9dc;color:#c9975c;font-weight:700}
 .prop-chip-lbl{color:var(--brand);font-weight:600}
 .prop-chip-val{color:var(--text);font-weight:600}
@@ -6058,7 +6072,9 @@ function cardHTML(p, compact) {
   const [bg, fg] = (colors[pType]||'#f0f0f0:#333').split(':');
   const listClass = isListView ? ' list-view' : '';
   const isPGCard = pType === 'PG';
+  const isSSCard = pType === 'ShortStay';
   const pg = p.pg || {};
+  const shortStay = p.shortStay || {};
   const bathrooms = isPGCard ? (parseInt(pg.bathroom) || 1) : (parseInt(p.property?.bathrooms) || 1);
   const carCount = isPGCard ? (parseInt(pg.car, 10) || 0) : (parseInt(p.property?.car, 10) || 0);
   const bikeCount = isPGCard ? (parseInt(pg.bike, 10) || 0) : (parseInt(p.property?.bike, 10) || 0);
@@ -6168,10 +6184,40 @@ function cardHTML(p, compact) {
         </span>` : ''}
       </div>
       ${isPGCard ? `<div class="prop-chip-row prop-chip-row-scroll">
-        ${chip('Gender', pg.gender)}
-        ${chip('Room type', pg.room)}
-        ${chip('Meals', pg.meals)}
-        ${chip('Occupancy', pg.occupancy)}
+        ${pg.gender ? `<span class="prop-chip chip-gender" title="Gender preference">
+          <span class="prop-chip-icon icon-gender">🚻</span>
+          ${esc(pg.gender)}
+        </span>` : ''}
+        ${pg.room ? `<span class="prop-chip chip-room" title="Room type">
+          <span class="prop-chip-icon icon-room">🛏️</span>
+          ${esc(pg.room)}
+        </span>` : ''}
+        ${pg.meals ? `<span class="prop-chip chip-meals" title="Meals">
+          <span class="prop-chip-icon icon-meals">🍽️</span>
+          ${esc(pg.meals)}
+        </span>` : ''}
+        ${pg.occupancy ? `<span class="prop-chip chip-occupancy" title="Occupancy available">
+          <span class="prop-chip-icon icon-occupancy">🧍</span>
+          ${esc(pg.occupancy)}
+        </span>` : ''}
+      </div>` : ''}
+      ${isSSCard ? `<div class="prop-chip-row prop-chip-row-scroll">
+        ${shortStay.roomType ? `<span class="prop-chip chip-room" title="Room type">
+          <span class="prop-chip-icon icon-room">🛏️</span>
+          ${esc(shortStay.roomType)}
+        </span>` : ''}
+        ${shortStay.available24hrs ? `<span class="prop-chip chip-ss24hrs" title="Available 24 hours">
+          <span class="prop-chip-icon icon-ss24hrs">🕐</span>
+          ${shortStay.available24hrs === 'Yes' ? '24-Hour Checkin' : 'No 24-Hour Checkin'}
+        </span>` : ''}
+        ${shortStay.cancellation ? `<span class="prop-chip chip-sscancel" title="Free cancellation window">
+          <span class="prop-chip-icon icon-sscancel">🔄</span>
+          ${esc(shortStay.cancellation)}
+        </span>` : ''}
+        ${shortStay.couplesAllowed ? `<span class="prop-chip chip-sscouples" title="Unmarried couples allowed">
+          <span class="prop-chip-icon icon-sscouples">💑</span>
+          ${shortStay.couplesAllowed === 'Yes' ? 'Couples Allowed' : 'Couples Not Allowed'}
+        </span>` : ''}
       </div>` : ''}
       <div class="prop-footer">
         <div class="prop-quick-actions">
