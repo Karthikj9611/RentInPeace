@@ -43,6 +43,18 @@
   --shadow-lg:0 16px 52px rgba(12,13,16,0.14);
   --radius:20px;
   --radius-sm:12px;
+  /* Aliases so CSS ported verbatim from index.html (which uses these token
+     names) resolves against admin's existing palette without rewriting it. */
+  --brand:#E03A52;
+  --brand-hover:#c72e43;
+  --brand-light:#fde3e8;
+  --bg-2:#f8f5f0;
+  --bg-3:#f0ede6;
+  --text:var(--ink);
+  --text-2:var(--ink2);
+  --text-3:var(--ink3);
+  --border-2:var(--border2);
+  --radius-xl:22px;
   --radius-xs:8px;
 }
 
@@ -799,11 +811,157 @@ footer i{color:var(--gold)}
   font-size:0.7rem;font-weight:700;letter-spacing:0.3px;
   margin-left:10px;vertical-align:middle;
 }
+/* ══════════════════════════════════════
+   PROPERTY DETAIL VIEW — ported directly from index.html's customer-facing
+   property view (buildDetailTable / openDetail / buildImgSlider / lightbox),
+   so admin renders the exact same markup+styles. Only the JS data source
+   differs (reads from _adminPropCache instead of PROPERTIES). ── */
+.add-modal-overlay{
+  position:fixed;inset:0;z-index:950;
+  background:rgba(0,0,0,.45);
+  display:none;align-items:center;justify-content:center;
+  padding:16px;
+}
+.add-modal-overlay.open{display:flex}
+.add-modal{
+  background:var(--bg);border-radius:var(--radius-xl);
+  width:100%;max-width:520px;max-height:92vh;
+  overflow-y:auto;padding:24px;
+  position:relative;
+}
+.add-modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-right:40px}
+.add-modal-title{font-size:17px;font-weight:700}
+.modal-close{
+  position:absolute;top:12px;right:12px;z-index:3;
+  width:32px;height:32px;border-radius:50%;
+  background:var(--brand);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;border:none;
+  box-shadow:0 3px 8px rgba(0,0,0,.25);
+  transition:background .15s,transform .15s;
+  flex-shrink:0;
+}
+.modal-close:hover{background:var(--brand-hover);transform:scale(1.06)}
+.modal-close svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.6;transition:stroke .15s}
+
+/* Video tour */
+.video-embed-wrap{
+  position:relative;width:100%;aspect-ratio:16/9;
+  border-radius:12px;overflow:hidden;background:#000;margin-bottom:10px;
+}
+.video-embed-wrap iframe,
+.video-embed-wrap video{
+  position:absolute;inset:0;width:100%;height:100%;border:0;display:block;
+}
+.video-view-row{display:none;align-items:center;gap:8px}
+.video-view-link{
+  display:flex;align-items:center;gap:8px;flex:1;min-width:0;
+  color:var(--brand);font-weight:600;font-size:13px;
+  padding:9px 12px;border:1.5px solid var(--border-2);border-radius:9px;
+  overflow:hidden;
+}
+.video-view-link svg{width:16px;height:16px;flex-shrink:0;stroke:var(--brand);fill:none;stroke-width:1.8}
+.video-view-link span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.video-view-link:hover{background:var(--brand-light)}
+.video-view-copy{
+  width:38px;height:38px;flex-shrink:0;border-radius:9px;
+  border:1.5px solid var(--border-2);display:flex;align-items:center;justify-content:center;
+  color:var(--text-2);transition:border-color .12s,color .12s;
+}
+.video-view-copy:hover{border-color:var(--brand);color:var(--brand)}
+.video-view-copy svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8}
+
+/* Photo gallery (same slider used on cards + the property view) */
+.detail-gallery .prop-img{
+  position:relative;overflow:hidden;
+  aspect-ratio:16/9;border-radius:14px;
+  border:1px solid var(--border);
+  background:var(--bg-3);
+}
+.detail-gallery .img-slide{object-fit:contain;background:var(--bg-3)}
+.prop-img-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.prop-img-placeholder svg{width:52px;height:52px;stroke:var(--border-2);fill:none;stroke-width:1.4}
+.img-slides{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;cursor:grab}
+.img-slides:active{cursor:grabbing}
+.img-slide{display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background-color:var(--bg-3);pointer-events:none;vertical-align:top}
+.img-slide.active{display:block;pointer-events:auto;opacity:1}
+.slide-dots{
+  position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+  display:flex;gap:5px;z-index:3;
+}
+.slide-dot{
+  width:6px;height:6px;border-radius:99px;border:none;
+  background:rgba(255,255,255,.5);cursor:pointer;padding:0;transition:all .22s;
+}
+.slide-dot.active{background:#fff;width:16px}
+
+/* Lightbox (full-image viewer) */
+.lightbox-overlay{
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(0,0,0,.92);
+  display:none;align-items:center;justify-content:center;
+  padding:24px;
+}
+.lightbox-overlay.open{display:flex}
+.lightbox-stage{
+  position:relative;
+  display:inline-flex;align-items:center;justify-content:center;
+  max-width:100%;max-height:100%;
+}
+.lightbox-img{
+  max-width:100%;max-height:90vh;
+  object-fit:contain;border-radius:6px;
+  animation:lightboxIn .18s ease;
+  user-select:none;display:block;
+}
+@keyframes lightboxIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
+.lightbox-close{
+  position:absolute;top:10px;right:10px;z-index:5;
+  width:38px;height:38px;border-radius:50%;
+  background:var(--brand);border:1.5px solid #fff;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:background .15s,transform .15s;
+  box-shadow:0 2px 8px rgba(0,0,0,.35);
+}
+.lightbox-close:hover{background:var(--brand-hover);transform:scale(1.06)}
+.lightbox-close svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.4}
+.lightbox-counter{
+  position:absolute;bottom:18px;left:50%;transform:translateX(-50%);z-index:5;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+  color:#fff;font-size:12.5px;font-weight:600;padding:6px 16px;border-radius:99px;
+}
+.lightbox-thumbs{
+  position:absolute;bottom:54px;left:50%;transform:translateX(-50%);z-index:5;
+  display:flex;gap:7px;max-width:90vw;overflow-x:auto;padding:2px;
+}
+.lightbox-thumb{
+  width:48px;height:36px;border-radius:5px;flex-shrink:0;
+  background-size:cover;background-position:center;cursor:pointer;
+  border:2px solid transparent;opacity:.55;transition:opacity .15s,border-color .15s;
+}
+.lightbox-thumb.active{opacity:1;border-color:#fff}
+@media(max-width:600px){.lightbox-thumbs{display:none}}
+
 .prop-modal-chip{
   display:inline-flex;align-items:center;gap:4px;
+
   background:var(--surface2);border:1px solid var(--border);
   border-radius:99px;font-size:0.75rem;
   padding:4px 11px;font-weight:600;color:var(--ink2);
+}
+
+/* ── Detail key/value table — same layout as index.html's customer-facing
+   property view (buildDetailTable), ported here so both views render
+   identically ── */
+.detail-kv-table{width:100%;font-size:13px;display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border);border-left:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:0.5rem}
+.detail-kv-table .kv-cell{padding:9px 10px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);min-width:0}
+.detail-kv-table .kv-cell.wide{grid-column:1 / -1}
+.detail-kv-table .kv-label{color:var(--ink3);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px}
+.detail-kv-table .kv-value{color:var(--gold);font-weight:600;word-break:break-word}
+@media(max-width:420px){
+  .detail-kv-table .kv-cell{padding:8px 6px}
+  .detail-kv-table .kv-label{font-size:9.5px}
+  .detail-kv-table .kv-value{font-size:12px}
 }
 
 /* ── APPOINTMENT STATUS BADGES ── */
@@ -1515,27 +1673,57 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
   </footer>
 </div>
 
-<!-- ══ PROPERTY DETAIL MODAL ══ -->
-<div class="prop-modal-wrap" id="adminPropModal" onclick="if(event.target===this)closeAdminPropModal()">
-  <div class="prop-modal">
-    <div class="prop-modal-close-row">
-      <button class="prop-modal-close-btn" onclick="closeAdminPropModal()">✕</button>
+<!-- ══ PROPERTY DETAIL MODAL — ported from index.html's customer-facing
+     property view (same add-modal shell, gallery, kv table, video row) ══ -->
+<div class="add-modal-overlay" id="adminPropModal" onclick="if(event.target===this)closeAdminPropModal()">
+  <div class="add-modal" style="max-width:620px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:92vh">
+    <div class="add-modal-header" style="background:linear-gradient(135deg,var(--brand) 0%,var(--brand-hover) 100%);padding:14px 28px;margin-bottom:0;position:relative;flex-shrink:0">
+      <div>
+        <div class="add-modal-title" style="color:#fff" id="adminModalTitleText">Property details</div>
+        <div style="color:rgba(255,255,255,.85);font-size:12px;font-weight:600;margin-top:2px;display:none" id="adminModalSubtitleText"></div>
+      </div>
+      <button class="modal-close" style="position:static;background:var(--brand);border:none;color:#fff;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(0,0,0,.25);transition:background .15s,transform .15s" onmouseover="this.style.background='var(--brand-hover)';this.style.transform='scale(1.06)'" onmouseout="this.style.background='var(--brand)';this.style.transform='scale(1)'" onclick="closeAdminPropModal()" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px;stroke-width:2.6;stroke:#fff"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
-    <div class="prop-modal-body">
-      <div id="adminModalImgSlot"></div>
-      <div class="prop-modal-price" id="adminModalPrice"></div>
-      <div class="prop-modal-title" id="adminModalTitle"></div>
-      <div class="prop-modal-loc" id="adminModalLoc"></div>
+
+    <div style="overflow-y:auto;padding:20px 28px 28px;flex:1;min-height:0">
+      <div class="detail-gallery" id="detailGallerySlot" style="display:block;margin-bottom:16px"></div>
+      <div class="detail-table-wrap" id="detailTableWrap" style="display:block;margin-bottom:16px"></div>
+      <div class="video-embed-wrap" id="videoEmbedWrap" style="display:none"></div>
+      <div class="video-view-row" id="videoViewRow" style="display:none">
+        <a href="#" id="videoViewLink" target="_blank" rel="noopener noreferrer" class="video-view-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+          <span id="videoViewLinkText"></span>
+        </a>
+        <button type="button" class="video-view-copy" onclick="copyVideoLink()" aria-label="Copy video link" title="Copy link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+
       <div id="adminModalSections"></div>
       <div id="adminModalNavSlot"></div>
     </div>
   </div>
 </div>
 
+<!-- ─── Lightbox (full-image viewer) — ported from index.html ─────── -->
+<div class="lightbox-overlay" id="adminLightboxOverlay" role="dialog" aria-modal="true" aria-label="Image viewer">
+  <div class="lightbox-stage">
+    <img class="lightbox-img" id="adminLightboxImg" src="" alt="Property photo" />
+    <button class="lightbox-close" onclick="closeAdminLightbox()" aria-label="Close image viewer">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="lightbox-counter" id="adminLightboxCounter"></div>
+    <div class="lightbox-thumbs" id="adminLightboxThumbs"></div>
+  </div>
+</div>
+
 <script>
+
 let dataTable, propTable, apptTable, honestReviewsTable;
 
-const BASE = 'https://rentinpeace.onrender.com';
+const BASE = 'http://localhost:5000';
 
 /* ── ADMIN KEY – set after login ── */
 let ADMIN_KEY = sessionStorage.getItem('kr_admin_key') || '';
@@ -1856,8 +2044,10 @@ async function loadDailyStat(type){
     const data = await res.json().catch(()=>({}));
     if(!res.ok) return;
     const n = typeof data.today === 'number' ? data.today : 0;
-    document.getElementById(meta.bigNumEl).innerText = n;
-    document.getElementById(meta.countEl).innerText = n;
+    const bigNumEl = document.getElementById(meta.bigNumEl);
+    if(bigNumEl) bigNumEl.innerText = n;
+    const countEl = document.getElementById(meta.countEl);
+    if(countEl) countEl.innerText = n;
   } catch(err){ console.error(`loadDailyStat(${type}) error:`, err); }
 }
 
@@ -3076,251 +3266,426 @@ const _adminPropCache = {};
 const _customerCache = {};
 const _selectedPropIds = new Set();
 
-/* Fields to show in the modal — ordered, with human labels */
-const MODAL_FIELD_GROUPS = [
-  {
-    label: 'Basic Info',
-    fields: [
-      ['title',      'Building / Project Name'],
-      ['status',     'Listing Type'],
-      ['price',      'Price (₹)'],
-      ['displayPrice','Display Price'],
-      ['city',       'City'],
-      ['loc',        'Area / Location'],
-      ['facing',     'Facing'],
-      ['age',        'Property Age'],
-    ]
-  },
-  {
-    label: 'Property Details',
-    fields: [
-      ['bhk',        'BHK'],
-      ['area',       'Area (sqft)'],
-      ['floor',      'Floor'],
-      ['floorLevel', 'Floor Level'],
-      ['furnishing', 'Furnishing'],
-      ['parking',    'Parking'],
-      ['carparking', 'Car Parking'],
-      ['bikeparking','Bike Parking'],
-      ['toilet',     'Bathrooms'],
-      ['toilet_type','Toilet Type'],
-      ['deposit',    'Security Deposit (₹)'],
-    ]
-  },
-  {
-    label: 'PG Details',
-    fields: [
-      ['pgGender',   'Gender Preference'],
-      ['pgRoomType', 'Room Type'],
-      ['pgMeals',    'Meals Included'],
-      ['pgOccupancy','Occupancy Available'],
-      ['pgNotice',   'Notice Period'],
-      ['pgBathroom', 'Attached Bathroom'],
-    ]
-  },
-  {
-    label: 'Short Stay Details',
-    fields: [
-      ['ssRoomType',      'Room Type'],
-      ['ssMaxGuests',     'Max Guests'],
-      ['ssMinDays',       'Minimum Days'],
-      ['ssCheckinTime',   'Check-in Time'],
-      ['ssCheckoutTime',  'Check-out Time'],
-      ['ssExtraDayRate',  'Extra Day Rate (₹)'],
-      ['ssCancellation',  'Cancellation Policy'],
-      ['ssIdProof',       'ID Proof Required'],
-      ['ssCouplesAllowed','Couples Allowed'],
-    ]
-  },
-  {
-    label: 'Owner Info',
-    fields: [
-      ['ownerName',  'Owner Name'],
-      ['ownerNumber','Owner Number'],
-    ]
-  },
-  {
-    label: 'Admin',
-    fields: [
-      ['remarks',    'Remarks'],
-      ['createdAt',  'Listed On'],
-    ]
-  }
-];
-
-const STATUS_COLOR_MAP = {
-  'For Sale' : 'background:#eef1fc;color:#5b7be8',
-  'For Rent' : 'background:#e8f7f3;color:#1a7a5e',
-  'New Launch': 'background:#faf3e0;color:#8a6820',
-  'Sold'     : 'background:#f5f5f5;color:#999',
-  'Lease'    : 'background:#fff3e0;color:#e67e22',
-  'PG'       : 'background:#fce4ec;color:#c2185b',
-  'Short Stay': 'background:#ede7f6;color:#6a3fb5',
-};
-
 function _adminModalEsc(str){
   if(str==null) return '—';
   return String(str).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
-/* ── Gallery ── */
-let _adminGalIdx = 0, _adminGalTotal = 0;
-
-function _adminStepGal(dir){
-  _adminGalIdx = (_adminGalIdx + dir + _adminGalTotal) % _adminGalTotal;
-  _adminSlideGal(_adminGalIdx);
+/* ── esc / fmtRupee / safeUrl / video-embed helpers — copied verbatim
+   from index.html so the detail view formats and escapes identically ── */
+function esc(v){
+  if (v === null || v === undefined) return '';
+  return String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
-function _adminSlideGal(idx){
-  _adminGalIdx = idx;
-  const track = document.getElementById('adminGalTrack');
-  const counter = document.getElementById('adminGalCounter');
-  if(track) track.style.transform = `translateX(-${idx*100}%)`;
-  if(counter) counter.textContent = `${idx+1} / ${_adminGalTotal}`;
-  document.querySelectorAll('#adminModalImgSlot .gallery-dot')
-    .forEach((d,i) => d.classList.toggle('active', i===idx));
+function fmtRupee(n){
+  n = Number(n) || 0;
+  const trim = x => x.toFixed(2).replace(/\.?0+$/, '');
+  if (n >= 10000000) return '₹' + trim(n/10000000) + 'Cr';
+  if (n >= 100000)   return '₹' + trim(n/100000) + 'L';
+  if (n >= 1000)     return '₹' + trim(n/1000) + 'k';
+  return '₹' + n;
+}
+function safeUrl(v){
+  if(!v) return '';
+  const s = String(v).trim();
+  try{
+    const u = new URL(s, window.location.origin);
+    if (u.protocol === 'http:' || u.protocol === 'https:') return u.href;
+  }catch{}
+  return '';
+}
+function getVideoEmbedInfo(url){
+  let u;
+  try{ u = new URL(url); }catch{ return null; }
+  const host = u.hostname.replace(/^www\./, '');
+  if (host === 'youtu.be'){
+    const id = u.pathname.slice(1).split('/')[0];
+    if (id) return { type:'youtube', id };
+  }
+  if (host === 'youtube.com' || host === 'm.youtube.com'){
+    if (u.pathname === '/watch' && u.searchParams.get('v')) return { type:'youtube', id:u.searchParams.get('v') };
+    const m = u.pathname.match(/^\/(embed|shorts)\/([^/?]+)/);
+    if (m) return { type:'youtube', id:m[2] };
+  }
+  if (host === 'vimeo.com' || host === 'player.vimeo.com'){
+    const m = u.pathname.match(/(\d+)/);
+    if (m) return { type:'vimeo', id:m[1] };
+  }
+  if (/\.(mp4|webm|ogg|mov)$/i.test(u.pathname)) return { type:'file', src:url };
+  return null;
+}
+function buildVideoEmbed(url){
+  const info = getVideoEmbedInfo(url);
+  if(!info) return '';
+  if(info.type === 'youtube') return `<iframe src="https://www.youtube.com/embed/${info.id}" title="Video tour" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+  if(info.type === 'vimeo') return `<iframe src="https://player.vimeo.com/video/${info.id}" title="Video tour" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+  if(info.type === 'file') return `<video controls preload="metadata" src="${safeUrl(info.src)}"></video>`;
+  return '';
+}
+function copyVideoLink(){
+  const url = document.getElementById('videoViewLink').dataset.url || '';
+  if (!url) return;
+  if (navigator.clipboard) navigator.clipboard.writeText(url).then(()=>_adminToast('Video link copied!'));
+  else _adminToast('Video link: ' + url);
+}
+/* Tiny toast, just for the copy-link confirmation above — admin.html has
+   no existing toast system to hook into. */
+function _adminToast(msg){
+  let el = document.getElementById('_adminToastEl');
+  if (!el){
+    el = document.createElement('div');
+    el.id = '_adminToastEl';
+    el.style.cssText = 'position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#222;color:#fff;padding:10px 18px;border-radius:99px;font-size:13px;font-weight:600;z-index:2000;opacity:0;transition:opacity .2s;pointer-events:none';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.opacity = '1';
+  clearTimeout(el._t);
+  el._t = setTimeout(()=>{ el.style.opacity = '0'; }, 1800);
 }
 
-/* ── Touch / swipe ── */
-let _galTouchX = null;
-function _galTouchStart(e){ _galTouchX = e.touches[0].clientX; }
-function _galTouchEnd(e){
-  if(_galTouchX === null) return;
-  const dx = e.changedTouches[0].clientX - _galTouchX;
-  _galTouchX = null;
-  if(Math.abs(dx) > 40) _adminStepGal(dx < 0 ? 1 : -1);
+/* ── Photo gallery + lightbox — ported from index.html's buildImgSlider /
+   openLightbox family. Reads p.images (flattened row) and keys off p._id
+   instead of index.html's p.id / PROPERTIES lookup. ── */
+function buildImgSlider(p, fg){
+  const imgs = Array.isArray(p.images) && p.images.length ? p.images : [];
+  if (imgs.length === 0){
+    return `<div class="prop-img-placeholder"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="${fg}" opacity=".3"/><polyline points="9 22 9 12 15 12 15 22" stroke="${fg}" opacity=".3"/></svg></div>`;
+  }
+  const uid = 'sl' + p._id;
+  const slides = imgs.map((url, i) =>
+    `<img class="img-slide${i===0?' active':''}" src="${safeUrl(url)}" loading="lazy" alt="" onclick="event.stopPropagation();openAdminLightbox('${p._id}',${i})" />`
+  ).join('');
+  const dots = imgs.length > 1 ? `<div class="slide-dots">${imgs.map((_,i)=>
+    `<button class="slide-dot${i===0?' active':''}" onclick="event.stopPropagation();slideGo('${uid}',${i})"></button>`
+  ).join('')}</div>` : '';
+  return `<div class="img-slides" id="${uid}">${slides}${dots}</div>`;
+}
+function slideGo(uid, idx){
+  const c = document.getElementById(uid);
+  if (!c) return;
+  c.querySelectorAll('.img-slide').forEach((s,i) => s.classList.toggle('active', i===idx));
+  c.querySelectorAll('.slide-dot').forEach((d,i) => d.classList.toggle('active', i===idx));
+}
+function slideStep(uid, dir){
+  const c = document.getElementById(uid);
+  if (!c) return;
+  const slides = c.querySelectorAll('.img-slide');
+  let cur = [...slides].findIndex(s => s.classList.contains('active'));
+  const next = (cur + dir + slides.length) % slides.length;
+  slideGo(uid, next);
+}
+/* Swipe-to-change-photo, same delegated touch/mouse handlers as index.html */
+(function(){
+  let sx = 0, sy = 0, active = null;
+  document.addEventListener('touchstart', function(e){
+    const el = e.target.closest('.img-slides');
+    if (!el || !el.id) { active = null; return; }
+    if (el.querySelectorAll('.img-slide').length < 2) { active = null; return; }
+    active = el; sx = e.touches[0].clientX; sy = e.touches[0].clientY;
+  }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    if (!active) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - sx, dy = t.clientY - sy;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) slideStep(active.id, dx < 0 ? 1 : -1);
+    active = null;
+  }, {passive:true});
+})();
+(function(){
+  let mx = 0, my = 0, active = null;
+  document.addEventListener('mousedown', function(e){
+    const el = e.target.closest('.img-slides');
+    if (!el || !el.id) { active = null; return; }
+    if (el.querySelectorAll('.img-slide').length < 2) { active = null; return; }
+    active = el; mx = e.clientX; my = e.clientY;
+  });
+  document.addEventListener('mouseup', function(e){
+    if (!active) return;
+    const dx = e.clientX - mx, dy = e.clientY - my;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) slideStep(active.id, dx < 0 ? 1 : -1);
+    active = null;
+  });
+})();
+
+let _adminLightboxImgs = [];
+let _adminLightboxIdx = 0;
+function openAdminLightbox(id, idx){
+  const p = _adminPropCache[id];
+  if (!p || !Array.isArray(p.images) || !p.images.length) return;
+  _adminLightboxImgs = p.images;
+  _adminLightboxIdx = idx || 0;
+  _renderAdminLightbox();
+  document.getElementById('adminLightboxOverlay').classList.add('open');
+}
+function closeAdminLightbox(){
+  document.getElementById('adminLightboxOverlay').classList.remove('open');
+}
+function _renderAdminLightbox(){
+  if (!_adminLightboxImgs.length) return;
+  document.getElementById('adminLightboxImg').src = _adminLightboxImgs[_adminLightboxIdx];
+  document.getElementById('adminLightboxCounter').textContent = (_adminLightboxIdx + 1) + ' / ' + _adminLightboxImgs.length;
+  const multi = _adminLightboxImgs.length > 1;
+  document.getElementById('adminLightboxThumbs').innerHTML = multi
+    ? _adminLightboxImgs.map((url, i) => `<div class="lightbox-thumb${i===_adminLightboxIdx?' active':''}" style="background-image:url('${safeUrl(url)}')" onclick="_adminLightboxGo(${i})"></div>`).join('')
+    : '';
+}
+function _adminLightboxGo(idx){ _adminLightboxIdx = idx; _renderAdminLightbox(); }
+function _adminLightboxStep(dir){
+  if (!_adminLightboxImgs.length) return;
+  _adminLightboxIdx = (_adminLightboxIdx + dir + _adminLightboxImgs.length) % _adminLightboxImgs.length;
+  _renderAdminLightbox();
+}
+(function(){
+  let lsx = 0, lsy = 0, lactive = false;
+  const stage = document.querySelector('#adminLightboxOverlay .lightbox-stage');
+  if (stage){
+    stage.addEventListener('touchstart', function(e){
+      if (_adminLightboxImgs.length < 2) { lactive = false; return; }
+      lactive = true; lsx = e.touches[0].clientX; lsy = e.touches[0].clientY;
+    }, {passive:true});
+    stage.addEventListener('touchend', function(e){
+      if (!lactive) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - lsx, dy = t.clientY - lsy;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) _adminLightboxStep(dx < 0 ? 1 : -1);
+      lactive = false;
+    }, {passive:true});
+  }
+})();
+
+/* Builds the exact same read-only key/value spec table used on the
+   customer-facing site (index.html's buildDetailTable). Reads from the
+   raw nested record (p.full — basic/location/price/property/amenities/
+   terms/rules/media/pg/shortStay), so both views always stay in sync.
+   Owner contact info is intentionally left out here too, same as
+   index.html — it's shown separately in the Owner Info section below,
+   since admins (unlike customers) are meant to see it directly. */
+function buildDetailTable(full){
+  const basic = full.basic || {}, location = full.location || {}, price = full.price || {},
+        property = full.property || {}, amenities = full.amenities || {}, terms = full.terms || {},
+        rules = full.rules || {}, media = full.media || {}, pg = full.pg || {}, shortStay = full.shortStay || {};
+
+  const status = basic.status || 'For Rent';
+  const isPG = status === 'PG', isLease = status === 'Lease', isShortStay = status === 'Short Stay';
+
+  const rows = [];
+  function row(label, value, wide){
+    if (value === null || value === undefined) return;
+    const text = String(value).trim();
+    if (!text) return;
+    rows.push('<div class="kv-cell' + (wide ? ' wide' : '') + '"><div class="kv-label">' + _adminModalEsc(label) + '</div><div class="kv-value">' + _adminModalEsc(text) + '</div></div>');
+  }
+
+  row('Status', status);
+  row('Listed by', basic.listedBy);
+  row('Area / Locality', location.area);
+  row('City', location.city);
+
+  if (isLease){
+    row('Lease amount', price.rent != null ? fmtRupee(price.rent) + '/month' : null);
+    row('Maintenance', price.maintenance != null ? fmtRupee(price.maintenance) : null);
+  } else {
+    row('Rent', price.rent != null ? fmtRupee(price.rent) + '/month' : null);
+    if (!isShortStay) row('Deposit', price.deposit != null ? fmtRupee(price.deposit) : null);
+    row('Maintenance', price.maintenance != null ? fmtRupee(price.maintenance) : null);
+    row('Rent increase', price.rentIncrease);
+    row('Electricity included', price.electricity);
+    row('Water charge', price.water);
+    row('Negotiable', price.negotiable);
+  }
+
+  if (!isPG && !isShortStay){
+    row('Property type', property.type);
+    row('BHK', property.bhk);
+    row('Built-up area', property.area);
+    row('Age of property', property.age);
+    row('Preferred tenants', property.tenant);
+    row('Facing', property.facing);
+  }
+  row('Bike parking', property.bike);
+  row('Car parking', property.car);
+  row('Floor', property.floor);
+  row('Bathrooms', property.bathrooms);
+  row('Furnishing', property.furnish);
+  if (!isPG) row('Available from', property.available);
+
+  if (isLease){
+    row('Notice period', terms.notice);
+    row('Lease duration', terms.lease);
+    row('Lease type', terms.leaseType);
+    row('Lock-in period', terms.lockIn);
+  } else if (!isPG && !isShortStay){
+    row('Notice period', terms.notice);
+    row('Lease duration', terms.lease);
+  }
+
+  if (!isShortStay){
+    row('Pets allowed', rules.pets);
+    row('Non-veg allowed', rules.nonVeg);
+    row('Piped gas', rules.gas);
+  }
+
+  if (isPG){
+    row('Property type', pg.type);
+    row('Gender preference', pg.gender);
+    row('Room type', pg.room);
+    row('Meals', pg.meals);
+    row('Occupancy', pg.occupancy);
+    row('Notice period', pg.notice);
+    row('Bathroom', pg.bathroom);
+    row('Room furnishing', pg.furnish);
+    row('Food type', pg.food);
+    row('Available from', pg.available);
+    row('Visitor policy', pg.visitors);
+    row('Gate closing time', pg.gateTime);
+  }
+
+  if (isShortStay){
+    row('Property type', shortStay.type);
+    row('Room type', shortStay.roomType);
+    row('Available 24 hours', shortStay.available24hrs);
+    row('Free cancellation window', shortStay.cancellation);
+    row('Unmarried couples allowed', shortStay.couplesAllowed);
+    row('Room furnishing', shortStay.furnish);
+  }
+
+  const selected = Array.isArray(amenities.selected) ? amenities.selected : [];
+  row('Amenities', selected.join(', '), true);
+  row('Additional amenities', amenities.extra, true);
+
+  row('Description', media.desc, true);
+
+  if (!rows.length) return '<div style="padding:14px 0;color:var(--ink3);font-size:0.85rem">No details added yet.</div>';
+  return '<div class="detail-kv-table">' + rows.join('') + '</div>';
 }
 
 function openAdminPropModal(id){
   const p = _adminPropCache[id];
   if(!p) return;
+  const full = p.full || {};
 
-  /* ── Gallery ── */
-  const imgs = Array.isArray(p.images) && p.images.length ? p.images : [];
-  const imgSlot = document.getElementById('adminModalImgSlot');
+  /* ── Header: property ID as title, area as subtitle — same as
+     openDetail() in index.html ── */
+  document.getElementById('adminModalTitleText').textContent = p.propertyId || p.title || 'Property details';
+  const subEl = document.getElementById('adminModalSubtitleText');
+  const subText = p.loc || p.city || '';
+  subEl.textContent = subText;
+  subEl.style.display = subText ? '' : 'none';
 
-  if(imgs.length > 1){
-    _adminGalIdx = 0; _adminGalTotal = imgs.length;
-    const slides = imgs.map(src =>
-      `<div class="gallery-slide"><img src="${src}" loading="lazy"/></div>`
-    ).join('');
-    const dots = imgs.map((_,i) =>
-      `<button class="gallery-dot${i===0?' active':''}" onclick="_adminSlideGal(${i})"></button>`
-    ).join('');
-    imgSlot.innerHTML = `
-      <div class="prop-modal-gallery"
-        ontouchstart="_galTouchStart(event)" ontouchend="_galTouchEnd(event)">
-        <div class="gallery-track" id="adminGalTrack">${slides}</div>
-        <span class="gallery-counter" id="adminGalCounter">1 / ${imgs.length}</span>
-        <button class="gallery-prev" onclick="_adminStepGal(-1)">&#8249;</button>
-        <button class="gallery-next" onclick="_adminStepGal(1)">&#8250;</button>
-        <div class="gallery-dots">${dots}</div>
-      </div>`;
-  } else if(imgs.length === 1){
-    imgSlot.innerHTML = `
-      <div class="prop-modal-gallery">
-        <div class="gallery-track" id="adminGalTrack">
-          <div class="gallery-slide"><img src="${imgs[0]}" loading="lazy"/></div>
-        </div>
-      </div>`;
-  } else {
-    imgSlot.innerHTML = `<div class="prop-modal-img-wrap">🏠</div>`;
+  /* ── Gallery — same photo slider used on the property cards/customer
+     view (buildImgSlider), colored by listing status like index.html ── */
+  const gallerySlot = document.getElementById('detailGallerySlot');
+  if (gallerySlot){
+    const colors = {'For Rent':'#e8f5ee:#1a6640','Lease':'#dde9fa:#1a4680','PG':'#eee8fa:#4a2a9a','Short Stay':'#e0f7fa:#00646e'};
+    const [gbg, gfg] = (colors[p.status] || '#f0f0f0:#333').split(':');
+    gallerySlot.innerHTML = `<div class="prop-img" style="background:${gbg}" data-idx="0">${buildImgSlider(p, gfg)}</div>`;
   }
 
-  /* ── Price + status badge ── */
-  const sStyle = STATUS_COLOR_MAP[p.status] || 'background:#eef1fc;color:#5b7be8';
-  document.getElementById('adminModalPrice').innerHTML =
-    `${_adminModalEsc(p.displayPrice || p.price || '—')}
-     <span class="prop-modal-status" style="${sStyle}">${_adminModalEsc(p.status||'')}</span>`;
+  /* ── Plain key/value spec table — identical to the customer-facing
+     property view (buildDetailTable), built straight from the raw
+     nested record the server sends alongside the flattened row. ── */
+  const tableWrap = document.getElementById('detailTableWrap');
+  if (tableWrap) tableWrap.innerHTML = buildDetailTable(full);
 
-  document.getElementById('adminModalTitle').textContent = p.title || 'Untitled';
-  document.getElementById('adminModalLoc').innerHTML =
-    `<i class="fas fa-location-dot" style="color:var(--gold)"></i>&nbsp;${_adminModalEsc(p.loc || p.city || '—')}`;
+  /* ── Video tour — real embedded player when recognized, plus a
+     clickable link + copy button, same as openDetail(). ── */
+  const videoUrl = full.media?.video || '';
+  const videoRow = document.getElementById('videoViewRow');
+  const videoEmbedWrap = document.getElementById('videoEmbedWrap');
+  const safeVideoUrl = safeUrl(videoUrl);
+  if (safeVideoUrl){
+    const link = document.getElementById('videoViewLink');
+    link.href = safeVideoUrl;
+    document.getElementById('videoViewLinkText').textContent = videoUrl;
+    link.dataset.url = videoUrl;
+    videoRow.style.display = 'flex';
+    if (videoEmbedWrap){
+      const embedHtml = buildVideoEmbed(safeVideoUrl);
+      videoEmbedWrap.innerHTML = embedHtml;
+      videoEmbedWrap.style.display = embedHtml ? 'block' : 'none';
+    }
+  } else {
+    videoRow.style.display = 'none';
+    if (videoEmbedWrap){ videoEmbedWrap.innerHTML = ''; videoEmbedWrap.style.display = 'none'; }
+  }
 
-  /* ── Sections ── */
+  /* ── Admin-only extras — everything buildDetailTable deliberately
+     leaves out of the customer-facing table: full owner contact, full
+     address/map link, legacy fields, remarks, listed-on date. Admins
+     (unlike customers) are meant to see all of it. ── */
   let sectionsHtml = '';
 
-  MODAL_FIELD_GROUPS.forEach(group => {
-    const rows = group.fields
-      .filter(([k]) => {
-        const v = p[k];
-        return v != null && v !== '' && !(Array.isArray(v) && !v.length);
-      })
-      .map(([k, label]) => {
-        let val = p[k];
-        if(k === 'bhk') val = val + ' BHK';
-        if(k === 'createdAt') val = new Date(val).toLocaleString('en-GB');
-        if(k === 'remarks'){
-          // Render remarks as numbered list inside the modal card.
-          // Each entry can be a plain string (current schema) or an
-          // object with a .remark property (older shape) — handle both.
-          let entries = [];
-          if(Array.isArray(val) && val.length)
-            entries = val
-              .map(r => (typeof r === 'string' ? r : (r && r.remark) || ''))
-              .map(s => s.trim())
-              .filter(Boolean);
-          else if(typeof val === 'string' && val.trim())
-            entries = [val.trim()];
-          if(!entries.length) return ''; // skip if empty
-          const listHtml = entries.map((t,i)=>`<div style="display:flex;gap:6px;align-items:baseline;margin-bottom:4px"><span style="min-width:18px;background:var(--gold-light);color:var(--gold-dark);border-radius:99px;font-size:0.62rem;font-weight:800;text-align:center;padding:1px 5px;">${i+1}</span><span style="font-size:0.84rem;word-break:break-word">${_adminModalEsc(t)}</span></div>`).join('');
-          return `<div class="prop-modal-detail" style="grid-column:1/-1">
-            <div class="prop-modal-detail-label">${_adminModalEsc(label)}</div>
-            <div style="margin-top:6px">${listHtml}</div>
-          </div>`;
-        }
-        if(Array.isArray(val)) val = val.join(', ');
-        return `<div class="prop-modal-detail">
-          <div class="prop-modal-detail-label">${_adminModalEsc(label)}</div>
-          <div class="prop-modal-detail-val">${_adminModalEsc(String(val))}</div>
-        </div>`;
-      }).join('');
-
-    if(!rows) return; // skip empty sections
-    sectionsHtml += `<div class="prop-modal-section-label">${group.label}</div>
-      <div class="prop-modal-grid">${rows}</div>`;
-  });
-
-  /* ── Description ── */
-  if(p.desc && p.desc.trim()){
-    sectionsHtml += `<div class="prop-modal-section-label">Description</div>
-      <div class="prop-modal-desc-box">${_adminModalEsc(p.desc)}</div>`;
+  function detailRow(label, value){
+    if (value === null || value === undefined) return '';
+    const text = String(value).trim();
+    if (!text) return '';
+    return `<div class="prop-modal-detail"><div class="prop-modal-detail-label">${_adminModalEsc(label)}</div><div class="prop-modal-detail-val">${_adminModalEsc(text)}</div></div>`;
   }
 
-  /* ── Amenities ── */
-  let amenArr = [];
-  if(Array.isArray(p.amenities) && p.amenities.length) amenArr = p.amenities;
-  else if(typeof p.amenities === 'string' && p.amenities.trim())
-    amenArr = p.amenities.split(',').map(s=>s.trim()).filter(Boolean);
-
-  if(amenArr.length){
-    sectionsHtml += `<div class="prop-modal-section-label">Amenities</div>
-      <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:0.5rem">
-        ${amenArr.map(a=>`<span class="prop-modal-chip">${_adminModalEsc(a)}</span>`).join('')}
-      </div>`;
+  const owner = full.owner || {};
+  const ownerRows = [
+    detailRow('Building / Project Name', owner.propertyName),
+    detailRow('Owner Name', owner.name || p.ownerName),
+    detailRow('Owner Number', owner.phone || p.ownerNumber),
+    detailRow('Alternate Number', owner.altPhone),
+    detailRow('Owner Email', owner.email),
+    detailRow('Best Time to Contact', owner.contactTime),
+    detailRow('Owner Address', owner.address),
+    detailRow('Agent Phone', owner.agentPhone),
+    detailRow('Agent Area', owner.agentArea),
+  ].filter(Boolean).join('');
+  if (ownerRows){
+    sectionsHtml += `<div class="prop-modal-section-label">Owner Info</div>
+      <div class="prop-modal-grid">${ownerRows}</div>`;
   }
 
-  /* ── Any extra fields not in our groups ── */
-  const coveredKeys = new Set([
-    '_id','__v','images','color','icon',
-    ...MODAL_FIELD_GROUPS.flatMap(g=>g.fields.map(f=>f[0])),
-    'amenities','desc','latitude','longitude'
-  ]);
-  const extraRows = Object.entries(p)
-    .filter(([k,v]) => !coveredKeys.has(k) && v!=null && v!=='' && !(Array.isArray(v)&&!v.length))
-    .map(([k,v]) => {
-      const label = k.charAt(0).toUpperCase() + k.slice(1).replace(/([A-Z])/g,' $1');
-      const val = Array.isArray(v) ? v.join(', ') : String(v);
-      return `<div class="prop-modal-detail">
-        <div class="prop-modal-detail-label">${_adminModalEsc(label)}</div>
-        <div class="prop-modal-detail-val">${_adminModalEsc(val)}</div>
-      </div>`;
-    }).join('');
-  if(extraRows){
-    sectionsHtml += `<div class="prop-modal-section-label">More Details</div>
-      <div class="prop-modal-grid">${extraRows}</div>`;
+  const location = full.location || {};
+  const locationRows = [
+    detailRow('Full Address', location.address),
+    detailRow('Map Link', location.mapLink),
+    detailRow('Latitude', location.lat),
+    detailRow('Longitude', location.lng),
+  ].filter(Boolean).join('');
+  if (locationRows){
+    sectionsHtml += `<div class="prop-modal-section-label">Location (Admin Only)</div>
+      <div class="prop-modal-grid">${locationRows}</div>`;
   }
 
-  document.getElementById('adminModalSections').innerHTML = sectionsHtml || '<p style="color:var(--ink3);font-size:0.85rem">No details available.</p>';
+  const legacyRows = [
+    detailRow('Monthly Rent (legacy)', full.price?.monthlyRent != null ? fmtRupee(full.price.monthlyRent) : null),
+  ].filter(Boolean).join('');
+  if (legacyRows){
+    sectionsHtml += `<div class="prop-modal-section-label">Other</div>
+      <div class="prop-modal-grid">${legacyRows}</div>`;
+  }
+
+  let remarkEntries = [];
+  if (Array.isArray(p.remarks) && p.remarks.length)
+    remarkEntries = p.remarks.map(r => (typeof r === 'string' ? r : (r && r.remark) || '')).map(s => s.trim()).filter(Boolean);
+  else if (typeof p.remarks === 'string' && p.remarks.trim())
+    remarkEntries = [p.remarks.trim()];
+
+  const adminRows = [];
+  if (p.createdAt){
+    adminRows.push(`<div class="prop-modal-detail"><div class="prop-modal-detail-label">Listed On</div><div class="prop-modal-detail-val">${_adminModalEsc(new Date(p.createdAt).toLocaleString('en-GB'))}</div></div>`);
+  }
+  if (p.propertyId){
+    adminRows.push(`<div class="prop-modal-detail"><div class="prop-modal-detail-label">Property ID</div><div class="prop-modal-detail-val">${_adminModalEsc(p.propertyId)}</div></div>`);
+  }
+  if (p.userId){
+    adminRows.push(`<div class="prop-modal-detail"><div class="prop-modal-detail-label">Posted By (User ID)</div><div class="prop-modal-detail-val">${_adminModalEsc(p.userId)}</div></div>`);
+  }
+  if (remarkEntries.length){
+    const listHtml = remarkEntries.map((t,i)=>`<div style="display:flex;gap:6px;align-items:baseline;margin-bottom:4px"><span style="min-width:18px;background:var(--gold-light);color:var(--gold-dark);border-radius:99px;font-size:0.62rem;font-weight:800;text-align:center;padding:1px 5px;">${i+1}</span><span style="font-size:0.84rem;word-break:break-word">${_adminModalEsc(t)}</span></div>`).join('');
+    adminRows.push(`<div class="prop-modal-detail" style="grid-column:1/-1"><div class="prop-modal-detail-label">Remarks</div><div style="margin-top:6px">${listHtml}</div></div>`);
+  }
+  if (adminRows.length){
+    sectionsHtml += `<div class="prop-modal-section-label">Admin</div>
+      <div class="prop-modal-grid">${adminRows.join('')}</div>`;
+  }
+
+  document.getElementById('adminModalSections').innerHTML = sectionsHtml;
 
   /* ── Navigate ── */
   const navSlot = document.getElementById('adminModalNavSlot');
