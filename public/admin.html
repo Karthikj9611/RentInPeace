@@ -225,6 +225,9 @@ table.dataTable thead tr.col-filter-row th{
 .tab-panel.active{display:block;animation:fadeIn 0.2s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
+.visits-subpanel{display:none}
+.visits-subpanel.active{display:block;animation:fadeIn 0.2s ease}
+
 /* ── MAIN CARD ── */
 .card{
   background:var(--surface);border-radius:var(--radius);
@@ -533,6 +536,24 @@ table.dataTable.no-footer{border-bottom:none!important}
 .hr-btn-save:hover{box-shadow:0 6px 20px rgba(12,13,16,0.25)}
 .hr-form-error{color:var(--red);font-size:0.78rem;margin-bottom:12px;display:none}
 .hr-form-error.show{display:block}
+
+/* ── TOTAL VISITS TAB ── */
+.stat-card-big{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;padding:60px 20px;text-align:center;
+}
+.stat-card-big-icon{
+  width:64px;height:64px;border-radius:50%;
+  background:linear-gradient(135deg,#6f9bff,#2f5fd1);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:1.6rem;box-shadow:var(--shadow-md);
+}
+.stat-card-big-num{
+  font-family:'Cormorant Garamond',serif;font-weight:700;
+  font-size:3.2rem;color:var(--ink);line-height:1;
+}
+.stat-card-big-label{font-size:0.85rem;color:var(--ink3);font-weight:600}
+.stat-card-big-actions{margin-top:8px}
 
 /* ── DATATABLES CONTROLS ── */
 .dataTables_wrapper .dataTables_filter{margin-bottom:16px}
@@ -1171,15 +1192,10 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
       <span class="tab-btn-label">Appointments</span>
       <span class="tab-count" id="tab-appointments-count">—</span>
     </button>
-    <button class="tab-btn" id="tab-daily-visits" onclick="switchTab('daily-visits')">
-      <i class="fas fa-chart-line"></i>
-      <span class="tab-btn-label">Daily Visits</span>
-      <span class="tab-count" id="tab-daily-visits-count">—</span>
-    </button>
-    <button class="tab-btn" id="tab-registered-users" onclick="switchTab('registered-users')">
-      <i class="fas fa-user-plus"></i>
-      <span class="tab-btn-label">Users Registered</span>
-      <span class="tab-count" id="tab-registered-users-count">—</span>
+    <button class="tab-btn" id="tab-visits" onclick="switchTab('visits')">
+      <i class="fas fa-globe"></i>
+      <span class="tab-btn-label">Visits</span>
+      <span class="tab-count" id="tab-visits-count">—</span>
     </button>
     <button class="tab-btn" id="tab-honest-reviews" onclick="switchTab('honest-reviews')">
       <i class="fas fa-video"></i>
@@ -1187,6 +1203,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
       <span class="tab-count" id="tab-honest-reviews-count">—</span>
     </button>
   </div>
+
 
   <!-- ══ CUSTOMERS PANEL ══ -->
   <div class="tab-panel" id="panel-customers">
@@ -1380,68 +1397,63 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
     </div>
   </div>
 
-  <!-- ══ DAILY VISITS PANEL ══ -->
-  <div class="tab-panel" id="panel-daily-visits">
-    <div class="card">
-      <div class="table-wrapper">
-        <div class="bulk-toolbar" id="dailyVisitsToolbar">
-          <div class="bulk-toolbar-left">
-            <span class="bulk-selected-count"><i class="fas fa-chart-line"></i> All-time: <span id="dailyVisitsTotal">0</span></span>
-          </div>
-          <div class="bulk-toolbar-right">
-            <button class="bulk-btn bulk-btn-clear" onclick="clearAllDailyStats('visit')">
-              <i class="fas fa-eraser"></i> Clear All Counts
-            </button>
-            <button class="bulk-btn bulk-btn-outline-danger" onclick="deleteAllDailyStats('visit')">
-              <i class="fas fa-trash-alt"></i> Delete All Records
+  <!-- ══ VISITS PANEL (Total Visit / Daily Visits / Users Registered sub-tabs) ══ -->
+  <div class="tab-panel" id="panel-visits">
+    <!-- Category sub-tabs: Total Visit / Daily Visits / Users Registered -->
+    <div class="cat-tab-bar" id="visitsCatTabs">
+      <button class="cat-tab-btn active" data-cat="total" onclick="switchVisitsCategory('total')">
+        <i class="fas fa-globe"></i><span>Total Visit</span><span class="cat-count" id="cat-count-visits-total">—</span>
+      </button>
+      <button class="cat-tab-btn" data-cat="daily" onclick="switchVisitsCategory('daily')">
+        <i class="fas fa-chart-line"></i><span>Daily Visits</span><span class="cat-count" id="cat-count-visits-daily">—</span>
+      </button>
+      <button class="cat-tab-btn" data-cat="users" onclick="switchVisitsCategory('users')">
+        <i class="fas fa-user-plus"></i><span>Users Registered</span><span class="cat-count" id="cat-count-visits-users">—</span>
+      </button>
+    </div>
+
+    <div class="visits-subpanel active" id="visits-sub-total">
+      <div class="card">
+        <div class="stat-card-big">
+          <div class="stat-card-big-icon"><i class="fas fa-globe"></i></div>
+          <div class="stat-card-big-num" id="totalVisitsBigNum">—</div>
+          <div class="stat-card-big-label">All-time website visits</div>
+          <div class="stat-card-big-actions">
+            <button class="bulk-btn bulk-btn-outline-danger" onclick="resetTotalVisits()">
+              <i class="fas fa-eraser"></i> Reset Count
             </button>
           </div>
         </div>
-        <table id="dailyVisitsTable" class="display nowrap" style="width:100%">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Visits</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td colspan="3" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
-          </tbody>
-        </table>
       </div>
     </div>
-  </div>
 
-  <!-- ══ USERS REGISTERED PANEL ══ -->
-  <div class="tab-panel" id="panel-registered-users">
-    <div class="card">
-      <div class="table-wrapper">
-        <div class="bulk-toolbar" id="registeredUsersToolbar">
-          <div class="bulk-toolbar-left">
-            <span class="bulk-selected-count"><i class="fas fa-user-plus"></i> All-time: <span id="registeredUsersTotal">0</span></span>
-          </div>
-          <div class="bulk-toolbar-right">
-            <button class="bulk-btn bulk-btn-clear" onclick="clearAllDailyStats('registration')">
-              <i class="fas fa-eraser"></i> Clear All Counts
-            </button>
-            <button class="bulk-btn bulk-btn-outline-danger" onclick="deleteAllDailyStats('registration')">
-              <i class="fas fa-trash-alt"></i> Delete All Records
+    <div class="visits-subpanel" id="visits-sub-daily">
+      <div class="card">
+        <div class="stat-card-big">
+          <div class="stat-card-big-icon"><i class="fas fa-chart-line"></i></div>
+          <div class="stat-card-big-num" id="dailyVisitsBigNum">—</div>
+          <div class="stat-card-big-label">Today's site visits</div>
+          <div class="stat-card-big-actions">
+            <button class="bulk-btn bulk-btn-outline-danger" onclick="resetDailyStat('visit')">
+              <i class="fas fa-eraser"></i> Reset Count
             </button>
           </div>
         </div>
-        <table id="registeredUsersTable" class="display nowrap" style="width:100%">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Registrations</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td colspan="3" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
-          </tbody>
-        </table>
+      </div>
+    </div>
+
+    <div class="visits-subpanel" id="visits-sub-users">
+      <div class="card">
+        <div class="stat-card-big">
+          <div class="stat-card-big-icon"><i class="fas fa-user-plus"></i></div>
+          <div class="stat-card-big-num" id="registeredUsersBigNum">—</div>
+          <div class="stat-card-big-label">Today's registrations</div>
+          <div class="stat-card-big-actions">
+            <button class="bulk-btn bulk-btn-outline-danger" onclick="resetDailyStat('registration')">
+              <i class="fas fa-eraser"></i> Reset Count
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1515,7 +1527,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
 </div>
 
 <script>
-let dataTable, propTable, apptTable, dailyVisitsTable, registeredUsersTable, honestReviewsTable;
+let dataTable, propTable, apptTable, honestReviewsTable;
 
 const BASE = 'https://rentinpeace.onrender.com';
 
@@ -1651,16 +1663,34 @@ function switchTab(tab){
   if(tab === 'appointments' && apptTable){
     setTimeout(()=>{ apptTable.columns.adjust().draw(false); }, 50);
   }
-  if(tab === 'daily-visits' && dailyVisitsTable){
-    setTimeout(()=>{ dailyVisitsTable.columns.adjust().draw(false); }, 50);
-  }
-  if(tab === 'registered-users' && registeredUsersTable){
-    setTimeout(()=>{ registeredUsersTable.columns.adjust().draw(false); }, 50);
+  if(tab === 'visits'){
+    refreshActiveVisitsCategory();
   }
   if(tab === 'honest-reviews' && honestReviewsTable){
     setTimeout(()=>{ honestReviewsTable.columns.adjust().draw(false); }, 50);
   }
 }
+
+/* ── VISITS: sub-tab switching (Total Visit / Daily Visits / Users Registered) ── */
+let _activeVisitsCategory = 'total';
+
+function refreshActiveVisitsCategory(){
+  if(_activeVisitsCategory === 'total') loadTotalVisits();
+  else if(_activeVisitsCategory === 'daily') loadDailyStat('visit');
+  else if(_activeVisitsCategory === 'users') loadDailyStat('registration');
+}
+
+window.switchVisitsCategory = function(cat){
+  _activeVisitsCategory = cat;
+
+  document.querySelectorAll('#visitsCatTabs .cat-tab-btn').forEach(btn=>{
+    btn.classList.toggle('active', btn.getAttribute('data-cat') === cat);
+  });
+  document.querySelectorAll('.visits-subpanel').forEach(panel=> panel.classList.remove('active'));
+  document.getElementById('visits-sub-'+cat).classList.add('active');
+
+  refreshActiveVisitsCategory();
+};
 
 function escapeHtml(str){
   if(!str) return '—';
@@ -1775,103 +1805,56 @@ window.deleteProperty = async function(id){
   }
 };
 
-/* ── DAILY VISITS / USERS REGISTERED ── */
-const DAILY_STAT_LABELS = { visit:{ tab:'daily-visits', countEl:'tab-daily-visits-count', totalEl:'dailyVisitsTotal', unit:'Visits', noun:'day' },
-                             registration:{ tab:'registered-users', countEl:'tab-registered-users-count', totalEl:'registeredUsersTotal', unit:'Registrations', noun:'day' } };
-
-function formatDailyStatDate(d){
-  if(!d) return '—';
-  return new Date(d+'T00:00:00').toLocaleDateString('en-GB', {weekday:'short', day:'2-digit', month:'short', year:'numeric'});
+/* ── TOTAL VISITS (all-time counter tab) ── */
+async function loadTotalVisits(){
+  try{
+    const res = await fetch(`${BASE}/api/admin/total-visits`, { headers: authHeaders() });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok) return;
+    const n = typeof data.totalVisits === 'number' ? data.totalVisits : 0;
+    document.getElementById('totalVisitsBigNum').innerText = n;
+    document.getElementById('cat-count-visits-total').innerText = n;
+    document.getElementById('tab-visits-count').innerText = n;
+  } catch(err){ console.error('loadTotalVisits error:', err); }
 }
 
-function buildDailyStatDtConfig(type){
+window.resetTotalVisits = async function(){
+  const ok = await showConfirmModal({ title:'Reset total visits?', message:'The all-time visit counter will be set back to 0. This cannot be undone.', okText:'Reset' });
+  if(!ok) return;
+  try{
+    const res = await fetch(`${BASE}/api/admin/total-visits/reset`, { method:'POST', headers: authHeaders() });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok){ alert(data.message || 'Failed to reset total visits'); return; }
+    loadTotalVisits();
+  } catch(err){ alert('Failed to reset total visits. Please try again.'); }
+};
+
+/* ── DAILY VISITS / USERS REGISTERED (today's count, big-stat-card style) ── */
+const DAILY_STAT_LABELS = { visit:{ countEl:'cat-count-visits-daily', bigNumEl:'dailyVisitsBigNum', label:'Daily Visits' },
+                             registration:{ countEl:'cat-count-visits-users', bigNumEl:'registeredUsersBigNum', label:'Users Registered' } };
+
+async function loadDailyStat(type){
   const meta = DAILY_STAT_LABELS[type];
-  return {
-    ajax:{
-      url: BASE+'/api/admin/daily-stats/'+type,
-      beforeSend: function(xhr){ xhr.setRequestHeader('x-admin-key', ADMIN_KEY); },
-      error: function(){ },
-      dataSrc: function(res){
-        const days = (res && Array.isArray(res.days)) ? res.days : [];
-        document.getElementById(meta.countEl).innerText = days.length;
-        document.getElementById(meta.totalEl).innerText = res && typeof res.total === 'number' ? res.total : 0;
-        return days;
-      }
-    },
-    columns:[
-      { data:'date', render:(d,t)=> t==='display' ? formatDailyStatDate(d) : (d||'') },
-      { data:'count', className:'dt-body-center', render:(d)=> Number(d||0) },
-      { data:null, orderable:false, className:'dt-body-center', render:(d,t,row)=>{
-          if(t!=='display') return '';
-          return `<div style="display:inline-flex;gap:6px;flex-wrap:wrap;justify-content:center">
-            <button class="btn-view" onclick="clearOneDailyStat('${type}','${row.date}')"><i class="fas fa-eraser"></i> Clear</button>
-            <button class="btn-delete" onclick="deleteOneDailyStat('${type}','${row.date}')"><i class="fas fa-trash-alt"></i> Delete</button>
-          </div>`;
-      }}
-    ],
-    order:[[0,'desc']],
-    pageLength:10,
-    scrollX:true,
-    language:{
-      emptyTable:`<div class="empty-state"><i class="fas fa-chart-line"></i>No ${meta.unit.toLowerCase()} recorded yet</div>`,
-      zeroRecords:'<div class="empty-state"><i class="fas fa-magnifying-glass"></i>No matching rows</div>',
-      lengthMenu:'Show _MENU_ entries',
-      info:`Showing _START_–_END_ of _TOTAL_ days`,
-      paginate:{previous:'‹ Prev',next:'Next ›'}
-    },
-    drawCallback:function(){}
-  };
+  try{
+    const res = await fetch(`${BASE}/api/admin/daily-stats/${type}`, { headers: authHeaders() });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok) return;
+    const n = typeof data.today === 'number' ? data.today : 0;
+    document.getElementById(meta.bigNumEl).innerText = n;
+    document.getElementById(meta.countEl).innerText = n;
+  } catch(err){ console.error(`loadDailyStat(${type}) error:`, err); }
 }
 
-window.clearOneDailyStat = async function(type, date){
+window.resetDailyStat = async function(type){
   const meta = DAILY_STAT_LABELS[type];
-  const ok = await showConfirmModal({ title:'Clear this day\'s count?', message:`The ${date} row will be reset to 0. The row itself stays.`, okText:'Clear', variant:'info' });
+  const ok = await showConfirmModal({ title:`Reset ${meta.label}?`, message:'Today\'s count will be set back to 0. This cannot be undone.', okText:'Reset' });
   if(!ok) return;
   try{
-    const res = await fetch(`${BASE}/api/admin/daily-stats/${type}/${date}/clear`, { method:'PATCH', headers: authHeaders() });
+    const res = await fetch(`${BASE}/api/admin/daily-stats/${type}/today/clear`, { method:'PATCH', headers: authHeaders() });
     const data = await res.json().catch(()=>({}));
-    if(!res.ok){ alert(data.message || 'Failed to clear count'); return; }
-    const table = type==='visit' ? dailyVisitsTable : registeredUsersTable;
-    if(table) table.ajax.reload(null, false);
-  } catch(err){ alert('Failed to clear count. Please try again.'); }
-};
-
-window.deleteOneDailyStat = async function(type, date){
-  const ok = await showConfirmModal({ title:'Delete this record?', message:`The ${date} row will be permanently removed.` });
-  if(!ok) return;
-  try{
-    const res = await fetch(`${BASE}/api/admin/daily-stats/${type}/${date}`, { method:'DELETE', headers: authHeaders() });
-    const data = await res.json().catch(()=>({}));
-    if(!res.ok){ alert(data.message || 'Failed to delete record'); return; }
-    const table = type==='visit' ? dailyVisitsTable : registeredUsersTable;
-    if(table) table.ajax.reload(null, false);
-  } catch(err){ alert('Failed to delete record. Please try again.'); }
-};
-
-window.clearAllDailyStats = async function(type){
-  const label = type==='visit' ? 'Daily Visits' : 'Users Registered';
-  const ok = await showConfirmModal({ title:`Clear all ${label} counts?`, message:'Every day\'s count will be reset to 0. The rows themselves stay.', okText:'Clear All', variant:'info' });
-  if(!ok) return;
-  try{
-    const res = await fetch(`${BASE}/api/admin/daily-stats/${type}/clear-all`, { method:'POST', headers: authHeaders() });
-    const data = await res.json().catch(()=>({}));
-    if(!res.ok){ alert(data.message || 'Failed to clear counts'); return; }
-    const table = type==='visit' ? dailyVisitsTable : registeredUsersTable;
-    if(table) table.ajax.reload(null, false);
-  } catch(err){ alert('Failed to clear counts. Please try again.'); }
-};
-
-window.deleteAllDailyStats = async function(type){
-  const label = type==='visit' ? 'Daily Visits' : 'Users Registered';
-  const ok = await showConfirmModal({ title:`Delete all ${label} records?`, message:'Every tracked day for this tab will be permanently removed. This cannot be undone.', okText:'Delete All' });
-  if(!ok) return;
-  try{
-    const res = await fetch(`${BASE}/api/admin/daily-stats/${type}/delete-all`, { method:'POST', headers: authHeaders() });
-    const data = await res.json().catch(()=>({}));
-    if(!res.ok){ alert(data.message || 'Failed to delete records'); return; }
-    const table = type==='visit' ? dailyVisitsTable : registeredUsersTable;
-    if(table) table.ajax.reload(null, false);
-  } catch(err){ alert('Failed to delete records. Please try again.'); }
+    if(!res.ok){ alert(data.message || `Failed to reset ${meta.label.toLowerCase()}`); return; }
+    loadDailyStat(type);
+  } catch(err){ alert(`Failed to reset ${meta.label.toLowerCase()}. Please try again.`); }
 };
 
 /* ── HONEST REVIEWS: SELECTION & BULK DELETE ── */
@@ -2499,6 +2482,8 @@ $.fn.dataTable.ext.errMode = 'none';
 
 $(document).ready(function(){
 
+  loadTotalVisits();
+
   /* ════════════════════════════════════
      CUSTOMERS TABLE
   ════════════════════════════════════ */
@@ -2977,18 +2962,10 @@ $(document).ready(function(){
   } catch(e){ console.error('Appointments table failed to initialize:', e); }
 
   /* ════════════════════════════════════
-     DAILY VISITS TABLE
+     DAILY VISITS / USERS REGISTERED (big-number cards)
   ════════════════════════════════════ */
-  try{
-  dailyVisitsTable = $('#dailyVisitsTable').DataTable(buildDailyStatDtConfig('visit'));
-  } catch(e){ console.error('Daily Visits table failed to initialize:', e); }
-
-  /* ════════════════════════════════════
-     USERS REGISTERED TABLE
-  ════════════════════════════════════ */
-  try{
-  registeredUsersTable = $('#registeredUsersTable').DataTable(buildDailyStatDtConfig('registration'));
-  } catch(e){ console.error('Users Registered table failed to initialize:', e); }
+  loadDailyStat('visit');
+  loadDailyStat('registration');
 
   /* ════════════════════════════════════
      HONEST REVIEWS TABLE

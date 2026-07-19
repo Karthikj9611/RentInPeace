@@ -2603,6 +2603,32 @@ app.get('/api/stats', async (req, res) => {
   }
 });
 
+// GET /api/admin/total-visits — admin-only, all-time visit counter for its own tab.
+app.get('/api/admin/total-visits', requireAdmin, async (req, res) => {
+  try {
+    const doc = await SiteStat.findOne({ key: 'totalVisits' }).lean();
+    res.json({ totalVisits: doc ? doc.value : 0 });
+  } catch (err) {
+    console.error('GET /api/admin/total-visits error:', err.message);
+    res.status(500).json({ message: 'Error fetching total visits' });
+  }
+});
+
+// POST /api/admin/total-visits/reset — reset the all-time counter to 0.
+app.post('/api/admin/total-visits/reset', requireAdmin, async (req, res) => {
+  try {
+    const doc = await SiteStat.findOneAndUpdate(
+      { key: 'totalVisits' },
+      { $set: { value: 0 } },
+      { upsert: true, new: true }
+    );
+    res.json({ message: 'Total visits reset', totalVisits: doc.value });
+  } catch (err) {
+    console.error('POST /api/admin/total-visits/reset error:', err.message);
+    res.status(500).json({ message: 'Error resetting total visits' });
+  }
+});
+
 // ── ADMIN: Daily Visits / Users Registered tabs ──
 // :type is 'visit' (Daily Visits tab) or 'registration' (Users Registered tab).
 const DAILY_STAT_TYPES = ['visit', 'registration'];
@@ -2620,7 +2646,9 @@ app.get('/api/admin/daily-stats/:type', requireAdmin, async (req, res) => {
     if (!checkDailyStatType(req, res)) return;
     const days = await DailyStat.find({ type: req.params.type }).sort({ date: -1 }).lean();
     const total = days.reduce((sum, d) => sum + (d.count || 0), 0);
-    res.json({ days, total });
+    const todayDate = todayStr();
+    const todayDoc = days.find(d => d.date === todayDate);
+    res.json({ days, total, today: todayDoc ? todayDoc.count : 0, todayDate });
   } catch (err) {
     console.error('GET /api/admin/daily-stats error:', err.message);
     res.status(500).json({ message: 'Error fetching daily stats' });
@@ -2631,12 +2659,12 @@ app.get('/api/admin/daily-stats/:type', requireAdmin, async (req, res) => {
 app.patch('/api/admin/daily-stats/:type/:date/clear', requireAdmin, async (req, res) => {
   try {
     if (!checkDailyStatType(req, res)) return;
+    const date = req.params.date === 'today' ? todayStr() : req.params.date;
     const doc = await DailyStat.findOneAndUpdate(
-      { type: req.params.type, date: req.params.date },
+      { type: req.params.type, date },
       { $set: { count: 0 } },
-      { new: true }
+      { new: true, upsert: true }
     );
-    if (!doc) return res.status(404).json({ message: 'Record not found' });
     res.json({ message: 'Count cleared', day: doc });
   } catch (err) {
     console.error('PATCH /api/admin/daily-stats/:type/:date/clear error:', err.message);
@@ -2677,6 +2705,35 @@ app.post('/api/admin/daily-stats/:type/delete-all', requireAdmin, async (req, re
   } catch (err) {
     console.error('POST /api/admin/daily-stats/:type/delete-all error:', err.message);
     res.status(500).json({ message: 'Error deleting records' });
+  }
+});
+
+// ── ADMIN: Total Visits tab ──
+// The all-time SiteStat counter, shown as its own tab (distinct from the
+// Daily Visits breakdown, which only started tracking once DailyStat was
+// introduced and won't necessarily match this older running total).
+app.get('/api/admin/total-visits', requireAdmin, async (req, res) => {
+  try {
+    const doc = await SiteStat.findOne({ key: 'totalVisits' }).lean();
+    res.json({ totalVisits: doc ? doc.value : 0 });
+  } catch (err) {
+    console.error('GET /api/admin/total-visits error:', err.message);
+    res.status(500).json({ message: 'Error fetching total visits' });
+  }
+});
+
+// POST /api/admin/total-visits/reset — reset the all-time counter to 0.
+app.post('/api/admin/total-visits/reset', requireAdmin, async (req, res) => {
+  try {
+    const doc = await SiteStat.findOneAndUpdate(
+      { key: 'totalVisits' },
+      { $set: { value: 0 } },
+      { upsert: true, new: true }
+    );
+    res.json({ message: 'Total visits reset', totalVisits: doc.value });
+  } catch (err) {
+    console.error('POST /api/admin/total-visits/reset error:', err.message);
+    res.status(500).json({ message: 'Error resetting total visits' });
   }
 });
 
