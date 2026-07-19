@@ -648,6 +648,17 @@ footer i{color:var(--gold)}
 .btn-view:hover{background:var(--green);color:#fff;box-shadow:0 4px 12px rgba(26,122,94,0.3)}
 .btn-view i{font-size:0.72rem}
 
+/* ── EDIT BUTTON ── */
+.btn-edit{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--gold-light);color:var(--gold-dark);
+  border:1px solid rgba(184,144,60,0.3);padding:6px 14px;
+  border-radius:99px;cursor:pointer;font-size:0.76rem;
+  font-weight:600;transition:all 0.18s;font-family:inherit;margin:0 2px;
+}
+.btn-edit:hover{background:var(--gold);color:#fff;box-shadow:0 4px 12px rgba(184,144,60,0.3)}
+.btn-edit i{font-size:0.72rem}
+
 /* ── FILTER DROPDOWNS ── */
 .prop-filters{
   display:flex;flex-wrap:wrap;gap:8px;align-items:center;
@@ -843,6 +854,173 @@ footer i{color:var(--gold)}
 }
 .modal-close:hover{background:var(--brand-hover);transform:scale(1.06)}
 .modal-close svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.6;transition:stroke .15s}
+
+/* ── Property EDIT form styles (ported from index.html's list-your-property form) ── */
+.form-group{margin-bottom:14px}
+.form-label{font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:5px;display:block}
+.form-input{
+  width:100%;border:1.5px solid var(--border-2);border-radius:9px;
+  padding:9px 12px;font-size:13px;color:var(--brand);background:var(--bg);
+  outline:none;transition:border-color .12s;
+}
+.form-input:focus{border-color:var(--brand)}
+.form-input::placeholder{color:var(--text-3)}
+
+.form-select{
+  width:100%;border:1.5px solid var(--border-2);border-radius:9px;
+  padding:9px 12px;font-size:13px;color:var(--brand);background:var(--bg);
+  outline:none;transition:border-color .12s;appearance:none;
+  cursor:pointer;
+}
+.form-select:focus{border-color:var(--brand)}
+.form-select:disabled{background:var(--bg-2);color:var(--text-2);cursor:not-allowed;opacity:1}
+.form-group.has-error .form-input,
+.form-group.has-error .form-select{border-color:var(--brand);background:var(--brand-light)}
+.field-error-text{display:block;color:var(--brand);font-size:11px;font-weight:600;margin-top:4px}
+.input-icon-wrap{position:relative}
+.input-icon-wrap .form-input{padding-right:44px}
+.contact-pick-btn{
+  position:absolute;top:50%;right:6px;transform:translateY(-50%);
+  width:30px;height:30px;border-radius:50%;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(150deg,#ff8a9a 0%,var(--brand) 55%,var(--brand-hover) 100%);
+  box-shadow:0 2px 5px rgba(224,58,82,.45),inset 0 1px 1px rgba(255,255,255,.55),inset 0 -2px 2px rgba(0,0,0,.18);
+  color:#fff;transition:transform .12s,box-shadow .12s;
+}
+.contact-pick-btn:hover{transform:translateY(-50%) scale(1.08)}
+.contact-pick-btn:active{
+  transform:translateY(-50%) scale(.94);
+  box-shadow:0 1px 2px rgba(224,58,82,.4),inset 0 1px 2px rgba(0,0,0,.25);
+}
+.contact-pick-btn svg{width:15px;height:15px;filter:drop-shadow(0 1px 0.5px rgba(0,0,0,.15))}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:640px){
+  /* Post Property and View Property share this form — keep every row to
+     exactly 2 fields per line on mobile, even where a row is set to 3+
+     columns inline for desktop. */
+  .form-row{grid-template-columns:1fr 1fr!important;gap:10px}
+  .form-row [style*="grid-column"]{grid-column:1/-1!important}
+}
+.lm-section{font-size:10px;font-weight:800;color:var(--text-2);text-transform:uppercase;letter-spacing:.8px;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border-2)}
+.form-submit{
+  width:100%;padding:12px;border-radius:10px;
+  background:var(--brand);color:#fff;font-size:14px;font-weight:700;
+  border:none;cursor:pointer;margin-top:8px;transition:background .12s;
+}
+
+.form-submit:hover{background:var(--brand-hover)}
+
+/* ─── Amenities multi-select dropdown ──────────── */
+.am-dd{position:relative}
+.am-dd-trigger{
+  width:100%;border:1.5px solid var(--border-2);border-radius:9px;
+  padding:9px 12px;font-size:13px;color:var(--text-2);background:var(--bg);
+  outline:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  transition:border-color .12s;
+}
+.am-dd-trigger:hover,.am-dd.open .am-dd-trigger{border-color:var(--brand)}
+.am-dd-trigger svg{width:15px;height:15px;stroke:var(--text-3);fill:none;stroke-width:2;flex-shrink:0;transition:transform .15s}
+.am-dd.open .am-dd-trigger svg{transform:rotate(180deg)}
+.am-dd-count{
+  background:var(--brand);color:#fff;font-size:11px;font-weight:700;
+  border-radius:99px;padding:1px 7px;min-width:18px;text-align:center;margin-right:4px;
+}
+.am-dd-panel{
+  display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:20;
+  background:var(--bg);border:1.5px solid var(--border-2);border-radius:var(--radius);
+  box-shadow:var(--shadow-md);padding:10px;max-height:280px;overflow-y:auto;
+}
+.am-dd.open .am-dd-panel{display:block}
+.am-dd-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0}
+.am-dd-actions{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 2px 8px;margin-bottom:6px;
+  border-bottom:1px solid var(--border);
+}
+.am-dd-action-btn{
+  font-size:11.5px;font-weight:600;color:var(--brand);
+  background:none;border:none;cursor:pointer;padding:2px 4px;border-radius:5px;
+  transition:background .1s;
+}
+.am-dd-action-btn:hover{background:var(--brand-light)}
+.am-dd-action-clear{color:var(--text-3)}
+.am-dd-action-clear:hover{background:var(--bg-3);color:var(--text-2)}
+.am-dd-item{
+  display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:0;
+  font-size:12.5px;font-weight:500;color:var(--text);cursor:pointer;transition:background .1s;
+  border-bottom:1px solid var(--border);
+}
+.am-dd-item:last-child{border-bottom:none}
+.am-dd-item:hover{background:var(--bg-2)}
+.am-dd-item input{width:15px;height:15px;flex-shrink:0;cursor:pointer;accent-color:var(--brand)}
+.am-dd-item input[type="number"]{width:72px;flex:0 0 72px;padding:5px 8px;font-size:12.5px;border-radius:7px;border:1px solid var(--border-2);accent-color:initial;text-align:center;margin-left:auto}
+.form-label-hint{
+  display:inline-block;font-size:11px;color:var(--text-3);cursor:help;
+  vertical-align:middle;margin-left:3px;line-height:1;
+  position:relative;
+}
+.form-label-hint:hover::after{
+  content:attr(title);
+  position:fixed;transform:translateX(-50%);margin-top:4px;
+  background:var(--text);color:#fff;
+  font-size:11px;font-weight:400;line-height:1.45;
+  padding:6px 10px;border-radius:7px;
+  max-width:220px;white-space:normal;text-align:left;
+  z-index:500;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.18);
+}
+.am-selected-box{
+  border:1.5px dashed var(--border-2);border-radius:var(--radius);
+  padding:10px 12px;margin-top:8px;min-height:42px;
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;align-items:start;
+}
+.am-tag{
+  display:flex;align-items:center;justify-content:space-between;gap:6px;
+  background:var(--brand-light);color:var(--brand);
+  border:1px solid #f5c0c8;border-radius:99px;
+  padding:5px 6px 5px 12px;font-size:12px;font-weight:600;white-space:nowrap;
+  overflow:hidden;
+}
+.am-tag-remove{
+  width:17px;height:17px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(224,58,82,.14);color:var(--brand);cursor:pointer;
+  font-size:11px;line-height:1;border:none;
+}
+.am-tag-remove:hover{background:var(--brand);color:#fff}
+.am-selected-empty{font-size:12px;color:var(--text-3);grid-column:1/-1}
+
+/* ─── Image upload row & thumbnails ────────────── */
+.img-row{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.img-url-input{
+  width:100%;padding:9px 12px;border:1.5px solid var(--border-2);border-radius:9px;
+  font-size:12.5px;font-family:inherit;color:var(--text);background:var(--bg);
+  outline:none;resize:vertical;transition:border-color .12s;
+}
+.img-url-input:focus{border-color:var(--brand)}
+.img-btns{display:flex;gap:8px;flex-wrap:wrap}
+.img-btn-add{
+  padding:9px 16px;border-radius:9px;border:none;
+  background:var(--brand);color:#fff;font-size:12px;font-weight:700;
+  font-family:inherit;cursor:pointer;transition:background .15s;
+}
+.img-btn-add:hover{background:var(--brand-hover)}
+.img-btn-sec{
+  padding:9px 14px;border-radius:9px;border:1.5px solid var(--border-2);
+  background:var(--bg);color:var(--text-2);font-size:12px;font-weight:600;
+  font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:6px;
+  transition:border-color .12s;
+}
+.img-btn-sec:hover{border-color:var(--text)}
+.img-thumb-grid{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px}
+.img-thumb{position:relative;width:72px;height:72px;border-radius:9px;overflow:hidden;border:1.5px solid var(--border-2);flex-shrink:0}
+.img-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.img-thumb-del{
+  position:absolute;top:3px;right:3px;width:18px;height:18px;
+  background:rgba(0,0,0,.65);color:#fff;border:none;border-radius:50%;
+  font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;
+}
+.img-hint{font-size:11px;color:var(--text-3);margin-bottom:6px}
+
 
 /* Video tour */
 .video-embed-wrap{
@@ -1707,6 +1885,482 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
   </div>
 </div>
 
+<!-- ─── Property EDIT modal — ported from index.html's "List your property"
+     form (openEditListingFull/applyImportedProperty/submitListing), so
+     admin edits every field exactly the way the property owner would.
+     Reads from _adminPropCache instead of MY_LISTINGS_CACHE, PUTs to
+     /api/admin/properties/:id instead of /api/user/listings/:id. ─── -->
+<div class="add-modal-overlay" id="addModal" role="dialog" aria-modal="true" aria-label="Edit property listing">
+  <div class="add-modal" id="addModalBox" style="max-width:860px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:92vh">
+    <div class="add-modal-header" style="background:linear-gradient(135deg,var(--brand) 0%,var(--brand-hover) 100%);padding:14px 28px;margin-bottom:0;position:relative;flex-shrink:0">
+      <div>
+        <div class="add-modal-title" style="color:#fff" id="addModalTitleText">Edit property</div>
+        <div style="color:rgba(255,255,255,.85);font-size:12px;font-weight:600;margin-top:2px;display:none" id="addModalSubtitleText"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+      <button class="modal-close" style="position:static;background:var(--brand);border:none;color:#fff;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(0,0,0,.25);transition:background .15s,transform .15s" onmouseover="this.style.background='var(--brand-hover)';this.style.transform='scale(1.06)'" onmouseout="this.style.background='var(--brand)';this.style.transform='scale(1)'" onclick="closeAdminEditModal()" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true" stroke="#fff" style="width:16px;height:16px;stroke-width:2.6;stroke:#fff !important"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      </div>
+    </div>
+
+    <div style="overflow-y:auto;padding:20px 28px 28px;flex:1" id="addModalScrollBody">
+
+    <!-- View-mode only: photo gallery, a plain key/value spec table, and the
+         video display — all built directly from the property object in
+         openDetail(), and living outside #listingFormSections below so
+         they're never affected by hiding the actual form. See
+         buildDetailTable()/openDetail()/closeDetail(). -->
+    <div class="video-embed-wrap" id="aeVideoEmbedWrap" style="display:none"></div>
+    <div class="video-view-row" id="aeVideoViewRow" style="display:none">
+      <a href="#" id="aeVideoViewLink" target="_blank" rel="noopener noreferrer" class="video-view-link">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        <span id="aeVideoViewLinkText"></span>
+      </a>
+      <button type="button" class="video-view-copy" onclick="copyEditVideoLink()" aria-label="Copy video link" title="Copy link">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      </button>
+    </div>
+
+    <!-- Everything below is the actual "list your property" form (create +
+         edit modes). It's hidden as a single block in view mode — see
+         .add-modal.view-mode #listingFormSections in the CSS — so nothing
+         inside it can ever be visible or interactive while just viewing a
+         listing. -->
+    <div id="listingFormSections">
+
+    <!-- ===== 1. BASIC INFORMATION ===== -->
+    <div class="lm-section">📋 Basic Information</div>
+    <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="form-group" id="f-typeWrap">
+        <label class="form-label">Status <span style="color:var(--brand)">*</span></label>
+        <select class="form-select" id="f-type" onchange="onFTypeChange(this.value)">
+          <option value="Rent">Rent</option><option value="Lease">Lease</option><option value="PG">PG / Co-living</option><option value="ShortStay">Short Stay (Per Day)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Listed by</label>
+        <select class="form-select" id="f-listedBy">
+          <option>Owner</option><option>Agent</option><option>Builder</option>
+        </select>
+      </div>
+    </div>
+    
+
+    <input type="hidden" id="f-latitude"/><input type="hidden" id="f-longitude"/>
+
+    <!-- ===== 2/3. OWNER DETAILS (incl. Location) ===== -->
+    <div id="ownerDetailsSection">
+    <div class="lm-section">👤 Owner Details</div>
+    <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+	<div class="form-group">
+      <label class="form-label">Property name</label>
+      <input class="form-input" type="text" id="f-title" />
+    </div>
+	  <div class="form-group">
+        <label class="form-label">Area <span style="color:var(--brand)">*</span></label>
+        <input class="form-input" type="text" id="f-location" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">City</label>
+        <input class="form-input" type="text" id="f-city" value="Bangalore" />
+      </div>
+      <div class="form-group" id="fullAddressGroup" style="grid-column:span 3">
+        <label class="form-label">Building Live Address</label>
+        <div style="display:flex;gap:7px;align-items:flex-start">
+          <textarea class="form-input" id="f-fullAddress" rows="2" style="flex:1;min-width:0;resize:vertical;background:var(--bg-2,#f5f5f5);cursor:not-allowed" readonly></textarea>
+          <button type="button" onclick="fCaptureLocation()"
+            style="flex-shrink:0;padding:9px 12px;border-radius:9px;border:1.5px solid var(--text);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;height:40px;margin-top:1px">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg>
+            <span id="f-locBtnTxt">Live</span>
+          </button>
+        </div>
+        <div id="f-locStatus" style="font-size:11px;color:var(--text-2);min-height:14px;margin-top:2px">Auto-filled from your current location · Tap Live to update</div>
+      </div>
+      <div class="form-group" id="latLngGroup">
+        <label class="form-label">Latitude / Longitude (auto)</label>
+        <input class="form-input" type="text" id="f-latLngDisplay" readonly />
+      </div>
+      <div class="form-group" id="mapsLinkGroup">
+        <label class="form-label">Google Maps link (optional)</label>
+        <input class="form-input" type="url" id="f-googleMapsLink" />
+      </div>
+      <div class="form-group"><label class="form-label">Owner name <span style="color:var(--brand)">*</span></label><input class="form-input" type="text" id="f-ownerName"/></div>
+      <div class="form-group">
+        <label class="form-label">Phone number <span style="color:var(--brand)">*</span></label>
+        <div class="input-icon-wrap">
+          <input class="form-input" type="tel" id="f-ownerPhone" inputmode="numeric" maxlength="10" oninput="sanitizeMobileInput(this)"/>
+          <button type="button" class="contact-pick-btn" onclick="pickContactFromDevice('f-ownerPhone','f-ownerName')" title="Pick from contacts">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Email (optional)</label><input class="form-input" type="email" id="f-ownerEmail"/></div>
+      <div class="form-group">
+        <label class="form-label">Alternate number</label>
+        <div class="input-icon-wrap">
+          <input class="form-input" type="tel" id="f-ownerAltPhone" inputmode="numeric" maxlength="10" oninput="sanitizeMobileInput(this)"/>
+          <button type="button" class="contact-pick-btn" onclick="pickContactFromDevice('f-ownerAltPhone')" title="Pick from contacts">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Preferred contact time</label>
+        <select class="form-select" id="f-contactTime"><option>Any</option><option>Morning (10am - 1pm)</option><option>Afternoon (1pm - 5pm)</option><option>Evening (6pm - 9pm)</option></select>
+      </div>
+      <div class="form-group" style="grid-column:span 3">
+        <label class="form-label">Owner address (optional)</label>
+        <textarea class="form-input" id="f-ownerAddress" rows="2" style="resize:vertical"></textarea>
+      </div>
+      <!-- Agent-only fields — shown when Listed by = Agent -->
+      <div id="f-agentFields" style="grid-column:span 3">
+        <div class="form-row" style="grid-template-columns:1fr 1fr;margin-top:4px">
+          <div class="form-group">
+            <label class="form-label">Agent phone number</label>
+            <div class="input-icon-wrap">
+              <input class="form-input" type="tel" id="f-agentPhone" inputmode="numeric" maxlength="10" oninput="sanitizeMobileInput(this)" />
+              <button type="button" class="contact-pick-btn" onclick="pickContactFromDevice('f-agentPhone','f-agentArea')" title="Pick from contacts">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Agent service area</label>
+            <input class="form-input" type="text" id="f-agentArea" />
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <!-- ===== 4. PRICING ===== -->
+    <div id="addPricingSection">
+    <div class="lm-section">💰 Pricing</div>
+    <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="form-group"><label class="form-label" id="f-rentLabel">Monthly rent (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-rent" min="0" max="9999999" /></div>
+      <div class="form-group" id="f-depositWrap"><label class="form-label">Security deposit (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-deposit" min="0" max="9999999" /></div>
+      <div class="form-group" id="f-maintenanceWrap"><label class="form-label">Maintenance (₹/ Month)</label><input class="form-input" type="number" id="f-maintenance" oninput="onMaintenanceChange()" /></div>
+      <div class="form-group" id="f-escalationWrap"><label class="form-label">Annual rent escalation (%)</label><input class="form-input" type="number" step="0.5" id="f-escalation" /></div>
+      <div class="form-group" id="f-electricityWrap">
+        <label class="form-label">Electricity included?</label>
+        <select class="form-select" id="f-electricityIncluded"><option>Included</option><option>Separate</option><option>Shared meter</option></select>
+      </div>
+      <div class="form-group" id="f-waterWrap">
+        <label class="form-label">Water / borewell charges</label>
+        <select class="form-select" id="f-waterCharge"><option>Included</option><option>Separate</option><option>Tanker</option></select>
+      </div>
+	  <div class="form-group" id="f-negotiableWrap">
+        <label class="form-label">Price negotiable</label>
+        <select class="form-select" id="f-negotiable"><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select>
+      </div>
+    </div>
+    </div>
+
+    <!-- ===== 5. PROPERTY DETAILS ===== -->
+    <div id="addPropDetailsSection">
+    <div class="lm-section">🏢 Property Details</div>
+    <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="form-group">
+        <label class="form-label">Property type</label>
+        <select class="form-select" id="f-propertyType">
+          <option>Apartment</option><option>Independent House</option><option>Villa</option><option>Studio</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">BHK</label>
+        <select class="form-select" id="f-bhk">
+          <option>1 RK</option><option>1 BHK</option><option>2 BHK</option><option>3 BHK</option><option>4 BHK</option>
+        </select>
+      </div>
+	  
+	  <div class="form-group">
+        <label class="form-label">Bike Parking</label>
+        <select class="form-select" id="f-bikepark">
+          <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
+        </select>
+      </div>
+	  
+	  <div class="form-group">
+        <label class="form-label">Car Parking</label>
+        <select class="form-select" id="f-carpark">
+          <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
+        </select>
+      </div>
+	  
+      <div class="form-group">
+        <label class="form-label">Floor (out of total)</label>
+        <input class="form-input" type="text" id="f-floor" onblur="formatFloorOrdinal(this)" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Area (sqft)</label>
+        <input class="form-input" type="text" inputmode="numeric" id="f-area" onfocus="stripAreaSqft(this)" onblur="formatAreaSqft(this)" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Bathrooms</label>
+        <select class="form-select" id="f-baths"><option>1</option><option>2</option><option>3</option><option>4+</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Furnishing</label>
+        <select class="form-select" id="f-furnishing">
+          <option>Furnished</option><option>Semi-Furnished</option><option>Unfurnished</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Facing</label>
+        <select class="form-select" id="f-facing">
+          <option>North</option><option>South</option><option>East</option><option>West</option><option>North-East</option><option>North-West</option><option>South-East</option><option>South-West</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Age of property</label>
+        <select class="form-select" id="f-age">
+          <option value="">Select</option><option>New (0–2 yrs)</option><option>3–5 yrs</option><option>6–10 yrs</option><option>10+ yrs</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tenant preference</label>
+        <select class="form-select" id="f-tenant"><option>Any</option><option>Family</option><option>Bachelor</option><option>Female only</option></select>
+      </div>
+      <div class="form-group" id="f-availWrap">
+        <label class="form-label">Available from</label>
+        <input class="form-input" type="date" id="f-avail" />
+      </div>
+    </div>
+    </div>
+
+
+    <!-- ===== 6. STATUS-SPECIFIC SECTIONS ===== -->
+
+    <!-- FOR RENT extras -->
+    <div id="addRentSection">
+      <div class="lm-section">📅 Availability &amp; Terms</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-noticePeriod"><option value="">Select</option><option>15 Days</option><option>1 Month</option><option>2 Months</option><option selected>3 Months</option></select></div>
+        <div class="form-group"><label class="form-label">Lease duration</label><select class="form-select" id="f-leaseDuration"><option value="">Any</option><option>6 Months</option><option selected>12 Months</option><option>24 Months</option><option>36 Months</option><option>48 Months</option><option>48+ Months</option></select></div>
+      </div>
+      <div class="lm-section">⚖️ Tenant Rules</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Pets allowed</label><select class="form-select" id="f-petsAllowed"><option value="">Select</option><option>Yes</option><option>No</option><option>Restricted</option></select></div>
+        <div class="form-group"><label class="form-label">Non-veg allowed</label><select class="form-select" id="f-nonVegAllowed"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
+      </div>
+    </div>
+
+    <!-- LEASE extras -->
+    <div id="addLeaseSection" style="display:none">
+      <div class="lm-section">💼 Lease Pricing</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Lease amount (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-leaseAmount" /></div>
+        <div class="form-group"><label class="form-label">Maintenance (₹/ Month)</label><input class="form-input" type="number" id="f-leaseMaintenance" /></div>
+      </div>
+      <div class="lm-section">📋 Lease Terms</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Lease duration</label><select class="form-select" id="f-leaseDurationVal"><option value="">Select</option><option>1 Year</option><option selected>2 Years</option><option>3 Years</option><option>5 Years</option><option>9 Years</option><option>15 Years</option><option>30 Years</option></select></div>
+        <div class="form-group"><label class="form-label">Lease type</label><select class="form-select" id="f-leaseType"><option value="">Select</option><option>Residential</option><option>Commercial</option><option>Industrial</option><option>Mixed Use</option></select></div>
+        <div class="form-group"><label class="form-label">Lock-in period</label><select class="form-select" id="f-lockInPeriod"><option value="">None</option><option>1 Year</option><option>2 Years</option><option>3 Years</option></select></div>
+        <div class="form-group"><label class="form-label">Available from</label><input class="form-input" type="date" id="f-leaseAvailableFrom" /></div>
+        <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-leaseNoticePeriod"><option value="">Select</option><option>1 Month</option><option>2 Months</option><option selected>3 Months</option></select></div>
+      </div>
+      <div class="lm-section">⚖️ House Rules</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Pets allowed</label><select class="form-select" id="f-leasePets"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
+        <div class="form-group"><label class="form-label">Non-veg allowed</label><select class="form-select" id="f-leaseNonVeg"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
+      </div>
+    </div>
+
+    <!-- ===== 6b. PG-ONLY FIELDS ===== -->
+    <div id="addPgSection" style="display:none">
+      <div class="lm-section">🛏 Room Details</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group">
+          <label class="form-label">Property type</label>
+          <select class="form-select" id="f-pgPropertyType"><option>Apartment</option><option>Independent House</option><option>Villa</option><option>Studio</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Gender preference</label>
+          <select class="form-select" id="f-pgGender"><option>Any</option><option>Boys</option><option>Girls</option><option>Co-ed</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Room type</label>
+          <select class="form-select" id="f-pgRoomType"><option>Single</option><option>Double Sharing</option><option>Triple Sharing</option><option>Dormitory</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Attached bathroom</label><select class="form-select" id="f-pgBathroom"><option>Yes</option><option>Shared</option></select></div>
+        <div class="form-group"><label class="form-label">Occupancy available</label><input class="form-input" type="number" id="f-pgOccupancy" /></div>
+        <div class="form-group"><label class="form-label">Room furnishing</label><select class="form-select" id="f-pgRoomFurnishing"><option value="">Select</option><option>Fully Furnished</option><option>Semi-Furnished</option><option>Unfurnished</option></select></div>
+        <div class="form-group">
+          <label class="form-label">Bike Parking</label>
+          <select class="form-select" id="f-pgBikePark">
+            <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Car Parking</label>
+          <select class="form-select" id="f-pgCarPark">
+            <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
+          </select>
+        </div>
+      </div>
+      <div class="lm-section">📅 Availability &amp; Terms</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Available from</label><input class="form-input" type="date" id="f-pgAvailableFrom" /></div>
+        <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-pgNotice"><option value="">Select</option><option selected>15 Days</option><option>1 Month</option><option>2 Months</option><option>3 Months</option></select></div>
+        <div class="form-group"><label class="form-label">Security deposit (₹)</label><input class="form-input" type="number" id="f-pgDeposit" min="0" /></div>
+      </div>
+      <div class="lm-section">🍽 Meals &amp; Policies</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group">
+          <label class="form-label">Meals included</label>
+          <select class="form-select" id="f-pgMeals"><option value="">Select</option><option>No Meals</option><option>Breakfast Only</option><option>Dinner Only</option><option>Lunch + Dinner</option><option selected>All 3 Meals</option><option>On Request</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Food type</label><select class="form-select" id="f-pgFoodType"><option value="">Select</option><option>Veg Only</option><option>Veg + Non-veg</option></select></div>
+        <div class="form-group"><label class="form-label">Gate closing time</label><select class="form-select" id="f-pgGateTime"><option value="">No Curfew</option><option>9 PM</option><option>10 PM</option><option>11 PM</option></select></div>
+        <div class="form-group"><label class="form-label">Visitor policy</label><select class="form-select" id="f-pgVisitorPolicy"><option value="">Select</option><option>Allowed</option><option>Lobby Only</option><option>Not Allowed</option></select></div>
+      </div>
+    </div>
+
+    <!-- ===== 6c. SHORT STAY (PER DAY / OYO-STYLE) FIELDS ===== -->
+    <div id="addShortStaySection" style="display:none">
+      <div class="lm-section">🛎 Room &amp; Booking</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group">
+          <label class="form-label">Property type</label>
+          <select class="form-select" id="f-ssPropertyType"><option>Apartment</option><option>Independent House</option><option>Villa</option><option>Studio</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Room type</label>
+          <select class="form-select" id="f-ssRoomType"><option>Single</option><option>Double</option><option>Deluxe</option><option>Suite</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Available 24 hours</label><select class="form-select" id="f-ss24hrs"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
+        <div class="form-group"><label class="form-label">Free cancellation window</label><select class="form-select" id="f-ssCancellation"><option value="">Select</option><option>No Cancellation</option><option>Free Till Check-in</option><option>24 Hours Before</option><option>48 Hours Before</option></select></div>
+        <div class="form-group"><label class="form-label">Room furnishing</label><select class="form-select" id="f-ssFurnish"><option value="">Select</option><option>Fully Furnished</option><option>Semi-Furnished</option><option>Unfurnished</option></select></div>
+        <div class="form-group">
+          <label class="form-label">Bike Parking</label>
+          <select class="form-select" id="f-ssBikePark">
+            <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Car Parking</label>
+          <select class="form-select" id="f-ssCarPark">
+            <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option>
+          </select>
+        </div>
+      </div>
+      <div class="lm-section">🪪 Guest Policy</div>
+      <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="form-group"><label class="form-label">Unmarried couples allowed</label><select class="form-select" id="f-ssCouples"><option value="">Select</option><option>Yes</option><option>No</option></select></div>
+      </div>
+    </div>
+
+    <!-- ===== 7. AMENITIES ===== -->
+    <div id="addAmenitiesSection">
+    <div class="lm-section">✨ Amenities</div>
+    <div class="form-group" id="amSelectFormGroup">
+      <label class="form-label">Select amenities</label>
+      <div class="am-dd" id="amDropdown">
+        <button type="button" class="am-dd-trigger" onclick="toggleAmDropdown(event)">
+          <span><span class="am-dd-count" id="amDdCount" style="display:none">0</span><span id="amDdLabel">Choose amenities…</span></span>
+          <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="am-dd-panel" id="amDdPanel">
+          <div class="am-dd-actions">
+            <button type="button" class="am-dd-action-btn" onclick="amSelectAll()">Select all</button>
+            <button type="button" class="am-dd-action-btn am-dd-action-clear" onclick="amClearAll()">Clear all</button>
+          </div>
+          <div class="am-dd-grid">
+            <label class="am-dd-item"><input type="checkbox" id="am-wifi" onchange="onAmCheck()"/> Wi-Fi <input type="number" id="f-wifiUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-ac" onchange="onAmCheck()"/> AC <input type="number" id="f-acUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-washing" onchange="onAmCheck()"/> Washing machine <input type="number" id="f-washingUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-fridge" onchange="onAmCheck()"/> Refrigerator <input type="number" id="f-fridgeUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-microwave" onchange="onAmCheck()"/> Microwave <input type="number" id="f-microwaveUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-geyser" onchange="onAmCheck()"/> Geyser <input type="number" id="f-geyserUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-wardrobe" onchange="onAmCheck()"/> Cupboards <input type="number" id="f-wardrobeUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-bed" onchange="onAmCheck()"/> Bed &amp; mattress <input type="number" id="f-bedUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-sofa" onchange="onAmCheck()"/> Sofa <input type="number" id="f-sofaUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-lift" onchange="onAmCheck()"/> Elevator <input type="number" id="f-liftUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-balcony" onchange="onAmCheck()"/> Balcony <input type="number" id="f-balconyUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-gym" onchange="onAmCheck()"/> Gym <input type="number" id="f-gymUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-security" onchange="onAmCheck()"/> CCTV <input type="number" id="f-securityUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-power" onchange="onAmCheck()"/> Power backup <input type="number" id="f-powerUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-garden" onchange="onAmCheck()"/> Garden <input type="number" id="f-gardenUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-laundry" onchange="onAmCheck()"/> Laundry <input type="number" id="f-laundryUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-meals" onchange="onAmCheck()"/> Meals included <input type="number" id="f-mealsUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-pipedgas" onchange="onAmCheck()"/> Piped gas connection <input type="number" id="f-pipedgasUnits" min="1" onclick="event.stopPropagation()"></label>
+            <label class="am-dd-item"><input type="checkbox" id="am-ro" onchange="onAmCheck()"/> RO water filter <input type="number" id="f-roUnits" min="1" onclick="event.stopPropagation()"></label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Selected amenities</label>
+      <div class="am-selected-box" id="amSelectedBox">
+        <span class="am-selected-empty" id="amSelectedEmpty">No amenities selected yet</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Additional amenities (comma-separated)</label>
+      <input class="form-input" type="text" id="f-amenities-extra"/>
+    </div>
+    </div>
+
+
+    <!-- ===== 8. MEDIA & DESCRIPTION ===== -->
+    <div id="mediaSection">
+    <div class="lm-section" id="mediaSectionHeader">📸 Media &amp; Description</div>
+    <div class="form-group" id="videoUrlGroup">
+      <label class="form-label">Video tour URL (optional)</label>
+      <input class="form-input" type="url" id="f-videoUrl" />
+    </div>
+    <div class="form-group" id="imgFormGroup">
+      <label class="form-label">Property images (optional)</label>
+      <div class="img-row" id="imgAddControls">
+        <div class="img-btns">
+          <button type="button" class="img-btn-sec" onclick="document.getElementById('f-imgFileInput').click()">📁 Upload</button>
+          <button type="button" class="img-btn-sec" onclick="document.getElementById('f-imgCameraInput').click()">📷 Camera</button>
+        </div>
+        <input type="file" id="f-imgFileInput" accept="image/*" multiple style="display:none" onchange="addImagesFromFiles(this)"/>
+        <input type="file" id="f-imgCameraInput" accept="image/*" capture="environment" style="display:none" onchange="addImagesFromFiles(this)"/>
+      </div>
+      <div class="img-thumb-grid" id="fImgGrid"></div>
+      <div class="img-hint" id="fImgHint">No images added yet.</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description (optional)</label>
+      <textarea class="form-input" id="f-desc" rows="3" style="resize:vertical"></textarea>
+    </div>
+    </div>
+
+    </div>
+    <!-- /listingFormSections -->
+
+    <button class="form-submit" id="listingSubmitBtn" onclick="adminSubmitListing()">Save changes</button>
+
+    <!-- View-mode only: quick actions carried over from the old detail view (save,
+         contact, schedule a visit, WhatsApp). Sits inline at the end of the
+         scrolling body — not pinned — so it scrolls up with the rest of the
+         content instead of staying stuck to the bottom. Hidden while actually
+         listing a property. -->
+    <div class="view-actions-footer" id="viewActionsFooter" style="display:none">
+      <div class="modal-actions" id="viewActionsRow">
+        <button class="modal-btn-secondary" id="modal-save-btn">♡ Save</button>
+        <button class="modal-btn-primary" id="viewCallBtn">Call</button>
+      </div>
+      <div class="modal-actions-row" id="viewActionsRow2" style="margin-top:10px">
+        <button class="modal-btn-outline" id="viewScheduleBtn">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Schedule visit
+          <span class="modal-visit-count-badge" id="modal-visit-count" style="display:none">0</span>
+        </button>
+        <button class="modal-btn-whatsapp" id="viewWhatsappBtn">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg>
+          WhatsApp
+        </button>
+      </div>
+    </div>
+    </div>
+  </div>
+</div>
+
 <!-- ─── Lightbox (full-image viewer) — ported from index.html ─────── -->
 <div class="lightbox-overlay" id="adminLightboxOverlay" role="dialog" aria-modal="true" aria-label="Image viewer">
   <div class="lightbox-stage">
@@ -1723,7 +2377,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
 
 let dataTable, propTable, apptTable, honestReviewsTable;
 
-const BASE = 'http://localhost:5000';
+const BASE = 'https://rentinpeace.onrender.com';
 
 /* ── ADMIN KEY – set after login ── */
 let ADMIN_KEY = sessionStorage.getItem('kr_admin_key') || '';
@@ -2902,6 +3556,7 @@ $(document).ready(function(){
           _adminPropCache[row._id] = row;
           return `<div style="display:inline-flex;gap:6px;flex-wrap:wrap;justify-content:center">
             <button class="btn-view" onclick="openAdminPropModal('${row._id}')"><i class="fas fa-eye"></i> View</button>
+            <button class="btn-edit" onclick="openAdminEditListing('${row._id}')"><i class="fas fa-pen"></i> Edit</button>
             <button class="btn-delete" onclick="deleteProperty('${row._id}')"><i class="fas fa-trash-alt"></i> Delete</button>
           </div>`;
       }}
@@ -4100,6 +4755,801 @@ function closeApptModal(){
   document.getElementById('apptModal').classList.remove('open');
   document.body.style.overflow = '';
 }
+
+
+/* ══════════════════════════════════════════════════════════════════
+   PROPERTY EDIT FORM — ported from index.html's "List your property"
+   form (resetListingForm / applyImportedProperty / onFTypeChange /
+   submitListing), so admin edits every field of a listing exactly the
+   way the property owner would themselves. Reads from _adminPropCache
+   (already populated by the Properties DataTable render) instead of
+   MY_LISTINGS_CACHE, and saves via PUT /api/admin/properties/:id
+   (requireAdmin) instead of PUT /api/user/listings/:id (requireUser).
+   The bulk-import-JSON panel and the customer-facing Save/Call/
+   Schedule/WhatsApp quick actions aren't relevant to admin editing an
+   existing DB record, so both were left out of the ported form.
+   ══════════════════════════════════════════════════════════════════ */
+
+let editingPropertyId = null;
+let fImages = [];
+let _scrollLockCount = 0;
+let _scrollLockY = 0;
+
+function lockBodyScroll() {
+  if (_scrollLockCount === 0) {
+    _scrollLockY = window.scrollY || window.pageYOffset || 0;
+    document.body.style.position = 'fixed';
+    document.body.style.top = (-_scrollLockY) + 'px';
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+    document.body.style.overflow = 'hidden';
+  }
+  _scrollLockCount++;
+}
+function unlockBodyScroll() {
+  _scrollLockCount = Math.max(0, _scrollLockCount - 1);
+  if (_scrollLockCount === 0) {
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
+    document.body.style.overflow = '';
+    window.scrollTo(0, _scrollLockY);
+  }
+}
+
+/* ── Amenities list (checkbox id, label, optional qty-input id) — same
+   list index.html's form uses, needed so applyImportedProperty/
+   adminSubmitListing read/write the exact same amenity fields. ── */
+const AM_LIST = [
+  ['am-wifi',     'Wi-Fi',                  'f-wifiUnits'],
+  ['am-ac',       'AC',                     'f-acUnits'],
+  ['am-washing',  'Washing machine',        'f-washingUnits'],
+  ['am-fridge',   'Refrigerator',           'f-fridgeUnits'],
+  ['am-microwave','Microwave',       'f-microwaveUnits'],
+  ['am-geyser',   'Geyser',  'f-geyserUnits'],
+  ['am-wardrobe', 'Cupboards',   'f-wardrobeUnits'],
+  ['am-bed',      'Bed',         'f-bedUnits'],
+  ['am-sofa',     'Sofa',         'f-sofaUnits'],
+  ['am-lift',     'Elevator',        'f-liftUnits'],
+  ['am-balcony',  'Balcony',      'f-balconyUnits'],
+  ['am-gym',      'Gym',             'f-gymUnits'],
+  ['am-security', 'CCTV',        'f-securityUnits'],
+  ['am-power',    'Power backup',           'f-powerUnits'],
+  ['am-garden',   'Garden',                 'f-gardenUnits'],
+  ['am-laundry',  'Laundry',                'f-laundryUnits'],
+  ['am-meals',    'Meals included',         'f-mealsUnits'],
+  ['am-pipedgas', 'Piped gas connection',   'f-pipedgasUnits'],
+  ['am-ro',       'RO water filter',        'f-roUnits'],
+];
+
+function resetListingForm() {
+  document.querySelectorAll('#addModal input:not([type="checkbox"]), #addModal select, #addModal textarea').forEach(el => { el.value = ''; });
+  const noticeRent = document.getElementById('f-noticePeriod');
+  const noticeLease = document.getElementById('f-leaseNoticePeriod');
+  const noticePg = document.getElementById('f-pgNotice');
+  if (noticeRent) noticeRent.value = '3 Months';
+  if (noticeLease) noticeLease.value = '3 Months';
+  if (noticePg) noticePg.value = '15 Days';
+  const leaseDurRent = document.getElementById('f-leaseDuration');
+  const leaseDurLease = document.getElementById('f-leaseDurationVal');
+  if (leaseDurRent) leaseDurRent.value = '12 Months';
+  if (leaseDurLease) leaseDurLease.value = '2 Years';
+  const cityField = document.getElementById('f-city');
+  if (cityField) cityField.value = 'Bangalore';
+  const elecReset = document.getElementById('f-electricityIncluded');
+  const waterReset = document.getElementById('f-waterCharge');
+  if (elecReset) elecReset.disabled = false;
+  if (waterReset) waterReset.disabled = false;
+  document.querySelectorAll('#addModal input[type="checkbox"]').forEach(el => { el.checked = false; });
+  amClearAll();
+  fImages = [];
+  renderFImages();
+  resetFieldVisibility();
+}
+function resetFieldVisibility() {
+  document.querySelectorAll('#addModalScrollBody .form-group').forEach(group => { group.style.display = ''; });
+  document.querySelectorAll('#addModalScrollBody .lm-section').forEach(header => { header.classList.remove('view-hidden'); });
+}
+
+/* ── Open/close: admin equivalent of index.html's openEditListingFull /
+   closeEditListingFull, minus the draft-save/restore dance (that's a
+   per-owner "resume my in-progress listing" feature that doesn't apply
+   when admin is editing someone else's property record). ── */
+function openAdminEditListing(id) {
+  const p = _adminPropCache[id];
+  if (!p) { alert('Could not find that listing'); return; }
+  const full = p.full || {};
+
+  editingPropertyId = id;
+  resetListingForm();
+  applyImportedProperty(full);
+  onFTypeChange(document.getElementById('f-type').value);
+
+  document.getElementById('addModalTitleText').textContent = 'Edit property';
+  const sub = document.getElementById('addModalSubtitleText');
+  if (sub) {
+    sub.textContent = p.propertyId || '';
+    sub.style.display = p.propertyId ? '' : 'none';
+  }
+
+  const submitBtn = document.getElementById('listingSubmitBtn');
+  if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Save changes'; }
+
+  document.getElementById('addModal').classList.add('open');
+  lockBodyScroll();
+}
+function closeAdminEditModal() {
+  document.getElementById('addModal').classList.remove('open');
+  unlockBodyScroll();
+  editingPropertyId = null;
+  resetListingForm();
+}
+
+function applyImportedProperty(p) {
+  function sv(id, val) { const el = document.getElementById(id); if (el && val !== undefined && val !== null) el.value = val; }
+  const basic = p.basic || {}, location = p.location || {}, owner = p.owner || {}, price = p.price || {},
+        property = p.property || {}, amenities = p.amenities || {}, terms = p.terms || {}, rules = p.rules || {},
+        media = p.media || {}, pg = p.pg || {}, shortStay = p.shortStay || {};
+
+  const reverseStatusMap = { 'For Rent': 'Rent', 'Lease': 'Lease', 'PG': 'PG', 'Short Stay': 'ShortStay' };
+  const typeVal = reverseStatusMap[basic.status] || (basic.status || 'Rent');
+  sv('f-type', typeVal);
+  sv('f-listedBy', basic.listedBy);
+  const isPG = typeVal === 'PG', isLease = typeVal === 'Lease', isShortStay = typeVal === 'ShortStay';
+
+  sv('f-location', location.area);
+  sv('f-city', location.city || 'Bangalore');
+  sv('f-fullAddress', location.address);
+  if (location.lat != null) sv('f-latitude', location.lat);
+  if (location.lng != null) sv('f-longitude', location.lng);
+  if (location.lat != null && location.lng != null) {
+    sv('f-latLngDisplay', Number(location.lat).toFixed(6) + '° N, ' + Number(location.lng).toFixed(6) + '° E');
+  }
+  sv('f-googleMapsLink', location.mapLink);
+
+  sv('f-title', owner.propertyName);
+  sv('f-ownerName', owner.name);
+  sv('f-ownerPhone', owner.phone);
+  sv('f-ownerEmail', owner.email);
+  sv('f-ownerAltPhone', owner.altPhone);
+  sv('f-contactTime', owner.contactTime);
+  sv('f-ownerAddress', owner.address);
+  sv('f-agentPhone', owner.agentPhone);
+  sv('f-agentArea', owner.agentArea);
+
+  if (isLease) {
+    sv('f-leaseAmount', price.rent);
+    sv('f-leaseMaintenance', price.maintenance);
+  } else {
+    sv('f-rent', price.rent);
+    if (isPG) sv('f-pgDeposit', price.deposit);
+    else if (!isShortStay) sv('f-deposit', price.deposit);
+    sv('f-maintenance', price.maintenance);
+    if (price.rentIncrease) sv('f-escalation', parseFloat(price.rentIncrease));
+    sv('f-electricityIncluded', price.electricity);
+    sv('f-waterCharge', price.water);
+    sv('f-negotiable', (price.negotiable || '').toLowerCase() === 'yes' ? 'yes' : (price.negotiable || '').toLowerCase() === 'no' ? 'no' : '');
+    onMaintenanceChange();
+  }
+
+  if (!isPG && !isShortStay) {
+    sv('f-propertyType', property.type);
+    sv('f-bhk', property.bhk);
+    sv('f-area', property.area);
+    formatAreaSqft(document.getElementById('f-area'));
+    sv('f-age', property.age);
+    sv('f-tenant', property.tenant);
+    sv('f-facing', property.facing);
+  }
+  sv('f-bikepark', (isPG || isShortStay) ? '0' : property.bike);
+  sv('f-carpark', (isPG || isShortStay) ? '0' : property.car);
+  if (isPG) { sv('f-pgBikePark', pg.bike); sv('f-pgCarPark', pg.car); }
+  if (isShortStay) { sv('f-ssBikePark', property.bike); sv('f-ssCarPark', property.car); }
+  sv('f-floor', property.floor);
+  sv('f-baths', isPG ? '1' : property.bathrooms);
+  sv('f-furnishing', property.furnish);
+  if (isPG) sv('f-pgAvailableFrom', pg.available);
+  else if (isLease) sv('f-leaseAvailableFrom', property.available);
+  else if (!isShortStay) sv('f-avail', property.available);
+
+  const selected = Array.isArray(amenities.selected) ? amenities.selected : [];
+  AM_LIST.forEach(([checkId, label, unitId]) => {
+    const match = selected.find(s => s === label || s.indexOf(label + ' ×') === 0 || s.indexOf(label + ' x') === 0);
+    const cb = document.getElementById(checkId);
+    if (cb) cb.checked = !!match;
+    if (match && unitId) {
+      const qtyMatch = match.match(/[×x]\s*(\d+)/i);
+      if (qtyMatch) sv(unitId, qtyMatch[1]);
+    }
+  });
+  sv('f-amenities-extra', amenities.extra);
+  if (typeof onAmCheck === 'function') onAmCheck();
+  if (typeof renderAmSelected === 'function') renderAmSelected();
+
+  if (isPG) {
+    sv('f-pgNotice', pg.notice);
+  } else if (isLease) {
+    sv('f-leaseNoticePeriod', terms.notice);
+    sv('f-leaseDurationVal', terms.lease);
+    sv('f-leaseType', terms.leaseType);
+    sv('f-lockInPeriod', terms.lockIn);
+  } else {
+    sv('f-noticePeriod', terms.notice);
+    sv('f-leaseDuration', terms.lease);
+  }
+
+  if (isLease) {
+    sv('f-leasePets', rules.pets);
+    sv('f-leaseNonVeg', rules.nonVeg);
+  } else {
+    sv('f-petsAllowed', rules.pets);
+    sv('f-nonVegAllowed', rules.nonVeg);
+  }
+
+  sv('f-videoUrl', media.video);
+  sv('f-desc', media.desc);
+  if (Array.isArray(media.images) && media.images.length) {
+    fImages = media.images.slice();
+    renderFImages();
+  }
+
+  if (isPG) {
+    sv('f-pgPropertyType', pg.type);
+    sv('f-pgGender', pg.gender);
+    sv('f-pgRoomType', pg.room);
+    sv('f-pgMeals', pg.meals);
+    sv('f-pgOccupancy', pg.occupancy);
+    sv('f-pgBathroom', pg.bathroom);
+    sv('f-pgRoomFurnishing', pg.furnish);
+    sv('f-pgFoodType', pg.food);
+    sv('f-pgVisitorPolicy', pg.visitors);
+    sv('f-pgGateTime', pg.gateTime);
+  }
+
+  if (isShortStay) {
+    sv('f-ssPropertyType', shortStay.type);
+    sv('f-ssRoomType', shortStay.roomType);
+    sv('f-ss24hrs', shortStay.available24hrs);
+    sv('f-ssCancellation', shortStay.cancellation);
+    sv('f-ssCouples', shortStay.couplesAllowed);
+    sv('f-ssFurnish', shortStay.furnish);
+  }
+
+  onFTypeChange(typeVal);
+}
+
+function onFTypeChange(val) {
+  const isPG = val === 'PG';
+  const isLease = val === 'Lease';
+  const isShortStay = val === 'ShortStay';
+  document.getElementById('addPgSection').style.display = isPG ? '' : 'none';
+  document.getElementById('addShortStaySection').style.display = isShortStay ? '' : 'none';
+  document.getElementById('addRentSection').style.display = (!isPG && !isLease && !isShortStay) ? '' : 'none';
+  document.getElementById('addLeaseSection').style.display = isLease ? '' : 'none';
+  document.getElementById('addPropDetailsSection').style.display = (isPG || isShortStay) ? 'none' : '';
+  document.getElementById('addAmenitiesSection').style.display = '';
+  document.getElementById('addPricingSection').style.display = isLease ? 'none' : '';
+  ['f-maintenanceWrap', 'f-escalationWrap', 'f-electricityWrap', 'f-waterWrap'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = (isPG || isShortStay) ? 'none' : '';
+  });
+  document.getElementById('f-depositWrap').style.display = (isPG || isShortStay) ? 'none' : '';
+  document.getElementById('f-negotiableWrap').style.display = (isPG || isShortStay) ? 'none' : '';
+  document.getElementById('f-availWrap').style.display = (isLease || isShortStay) ? 'none' : '';
+  const lbl = document.getElementById('f-rentLabel');
+  if (lbl) lbl.innerHTML = (val === 'For Rent' || val === 'Rent') ? 'Monthly rent (₹) <span style="color:var(--brand)">*</span>'
+    : isLease ? 'Token rent (₹) <span style="color:var(--brand)">*</span>'
+    : isShortStay ? 'Per day rate (₹) <span style="color:var(--brand)">*</span>'
+    : 'Monthly charge (₹) <span style="color:var(--brand)">*</span>';
+}
+
+function stripAreaSqft(el) {
+  el.value = el.value.replace(/\s*Sqft\s*$/i, '').trim();
+}
+function formatAreaSqft(el) {
+  const num = el.value.replace(/[^\d.]/g, '').trim();
+  el.value = num ? num + 'Sqft' : '';
+}
+function formatFloorOrdinal(el) {
+  const raw = el.value.trim();
+  if (!/^\d+$/.test(raw)) return;
+  const n = parseInt(raw, 10);
+  const mod100 = n % 100;
+  const mod10 = n % 10;
+  let suffix = 'th';
+  if (mod100 < 11 || mod100 > 13) {
+    if (mod10 === 1) suffix = 'st';
+    else if (mod10 === 2) suffix = 'nd';
+    else if (mod10 === 3) suffix = 'rd';
+  }
+  el.value = n + suffix;
+}
+function onMaintenanceChange() {
+  const maint = parseFloat(document.getElementById('f-maintenance').value) || 0;
+  const elec = document.getElementById('f-electricityIncluded');
+  const water = document.getElementById('f-waterCharge');
+  if (maint > 0) {
+    elec.value = 'Included'; elec.disabled = true;
+    water.value = 'Included'; water.disabled = true;
+  } else {
+    elec.disabled = false;
+    water.disabled = false;
+  }
+}
+function fCaptureLocation() {
+  const btnTxt = document.getElementById('f-locBtnTxt');
+  const status = document.getElementById('f-locStatus');
+  if (!navigator.geolocation) { status.textContent = 'Not supported on this device/browser'; return; }
+  btnTxt.textContent = '...'; status.textContent = 'Getting location...';
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    const lat = pos.coords.latitude, lon = pos.coords.longitude;
+    document.getElementById('f-latitude').value = lat;
+    document.getElementById('f-longitude').value = lon;
+    document.getElementById('f-latLngDisplay').value = lat.toFixed(6) + '° N, ' + lon.toFixed(6) + '° E';
+    btnTxt.textContent = 'OK';
+    fetch('https://nominatim.openstreetmap.org/reverse?lat=' + lat + '&lon=' + lon + '&format=json&accept-language=en')
+      .then(r => r.json())
+      .then(d => {
+        document.getElementById('f-fullAddress').value = d.display_name || '';
+        status.textContent = 'Address captured · Enter Location / Area manually';
+      }).catch(() => { status.textContent = 'Coordinates saved.'; });
+  }, function() { btnTxt.textContent = 'Live'; status.textContent = 'Permission denied.'; });
+}
+
+/* ── Amenities multi-select dropdown ── */
+function toggleAmDropdown(e) {
+  e.stopPropagation();
+  document.getElementById('amDropdown').classList.toggle('open');
+}
+function amSelectAll() {
+  AM_LIST.forEach(([id]) => { const cb = document.getElementById(id); if (cb) cb.checked = true; });
+  renderAmSelected();
+}
+function amClearAll() {
+  AM_LIST.forEach(([id, , unitId]) => {
+    const cb = document.getElementById(id); if (cb) cb.checked = false;
+    if (unitId) { const u = document.getElementById(unitId); if (u) u.value = ''; }
+  });
+  renderAmSelected();
+}
+function onAmCheck() {
+  renderAmSelected();
+}
+function amRemove(id) {
+  const cb = document.getElementById(id);
+  if (cb) cb.checked = false;
+  const entry = AM_LIST.find(([eid]) => eid === id);
+  if (entry && entry[2]) { const u = document.getElementById(entry[2]); if (u) u.value = ''; }
+  renderAmSelected();
+}
+function renderAmSelected() {
+  const box = document.getElementById('amSelectedBox');
+  const empty = document.getElementById('amSelectedEmpty');
+  const ddLabel = document.getElementById('amDdLabel');
+  const ddCount = document.getElementById('amDdCount');
+
+  const selected = AM_LIST.filter(([id]) => document.getElementById(id).checked);
+
+  box.querySelectorAll('.am-tag').forEach(t => t.remove());
+  if (!selected.length) {
+    empty.style.display = '';
+  } else {
+    empty.style.display = 'none';
+    selected.forEach(([id, label, unitId]) => {
+      let text = label;
+      if (unitId) {
+        const u = document.getElementById(unitId);
+        const qty = u ? u.value.trim() : '';
+        text += ' ×' + (qty && parseInt(qty) > 0 ? qty : '1');
+      }
+      const tag = document.createElement('span');
+      tag.className = 'am-tag';
+      tag.innerHTML = '<span>' + text + '</span><button type="button" class="am-tag-remove" aria-label="Remove">✕</button>';
+      tag.querySelector('.am-tag-remove').onclick = function() { amRemove(id); };
+      box.appendChild(tag);
+    });
+  }
+
+  ddLabel.textContent = selected.length ? selected.length + ' selected' : 'Choose amenities…';
+  ddCount.style.display = selected.length ? '' : 'none';
+  ddCount.textContent = selected.length;
+}
+document.addEventListener('click', function(e) {
+  const dd = document.getElementById('amDropdown');
+  if (dd && dd.classList.contains('open') && !dd.contains(e.target)) {
+    dd.classList.remove('open');
+  }
+});
+
+/* ── Property images (paste-upload / file / camera) ── */
+function renderFImages() {
+  const grid = document.getElementById('fImgGrid');
+  const hint = document.getElementById('fImgHint');
+  grid.innerHTML = fImages.map((src, i) =>
+    '<div class="img-thumb"><img src="' + src + '" alt="img"/><button type="button" class="img-thumb-del" onclick="removeFImage(' + i + ')">✕</button></div>'
+  ).join('');
+  hint.style.display = fImages.length ? 'none' : 'block';
+}
+function removeFImage(i) {
+  fImages.splice(i, 1);
+  renderFImages();
+}
+async function addImagesFromFiles(input) {
+  const files = Array.from(input.files || []);
+  input.value = '';
+  if (!files.length) return;
+
+  const hint = document.getElementById('fImgHint');
+  if (hint) hint.textContent = 'Uploading…';
+
+  const form = new FormData();
+  files.forEach(file => form.append('images', file));
+
+  try {
+    const res = await fetch('/api/upload-images', { method: 'POST', body: form, headers: authHeaders() });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Upload failed');
+    (data.urls || []).forEach(u => { if (fImages.indexOf(u) < 0) fImages.push(u); });
+  } catch (err) {
+    alert(err.message || 'Could not upload images. Please try again.');
+  } finally {
+    renderFImages();
+  }
+}
+
+/* ── Required-field validation (mirrors index.html's list-your-property
+   form validation, so the same fields are mandatory here too) ── */
+const OPTIONAL_FIELD_IDS = new Set([
+  'f-latitude', 'f-longitude', 'f-latLngDisplay',
+  'f-imgFileInput', 'f-imgCameraInput',
+  'f-amenities-extra',
+]);
+function isUnitField(id) { return /Units$/.test(id); }
+function getAllListingFields() {
+  return Array.from(document.querySelectorAll(
+    '#addModal input[id^="f-"], #addModal select[id^="f-"], #addModal textarea[id^="f-"]'
+  )).filter(el =>
+    el.type !== 'hidden' && el.type !== 'file' && !el.readOnly &&
+    !OPTIONAL_FIELD_IDS.has(el.id) && !isUnitField(el.id)
+  );
+}
+function isFieldVisible(el) {
+  return !!el && !!el.offsetParent && window.getComputedStyle(el).display !== 'none';
+}
+function markRequiredLabels() {
+  getAllListingFields().forEach(el => {
+    const group = el.closest('.form-group');
+    const label = group ? group.querySelector('.form-label') : null;
+    if (!label) return;
+    label.innerHTML = label.innerHTML
+      .replace(/\s*\(₹,\s*optional\)/i, ' (₹)')
+      .replace(/\s*\(optional\)/i, '');
+    const hasStar = Array.from(label.querySelectorAll('span')).some(s => s.textContent.trim() === '*');
+    if (!hasStar) {
+      label.insertAdjacentHTML('beforeend', ' <span style="color:var(--brand)">*</span>');
+    }
+  });
+}
+function setGroupError(group, message) {
+  if (!group) return;
+  group.classList.add('has-error');
+  let msg = group.querySelector('.field-error-text');
+  if (!msg) {
+    msg = document.createElement('div');
+    msg.className = 'field-error-text';
+    group.appendChild(msg);
+  }
+  msg.textContent = message;
+}
+function clearAllFieldErrors() {
+  document.querySelectorAll('#addModal .form-group.has-error').forEach(g => {
+    g.classList.remove('has-error');
+    const msg = g.querySelector('.field-error-text');
+    if (msg) msg.remove();
+  });
+}
+function fieldLabelText(el) {
+  const group = el.closest('.form-group');
+  const label = group ? group.querySelector('.form-label') : null;
+  if (!label) return 'This field';
+  return label.textContent.replace(/\*\s*$/, '').trim();
+}
+function validateListingForm() {
+  clearAllFieldErrors();
+  let firstErrorEl = null;
+  getAllListingFields().forEach(el => {
+    if (!isFieldVisible(el)) return;
+    const val = (el.value || '').trim();
+    const missing = el.tagName === 'SELECT' ? (val === '' || val === 'Select') : (val === '');
+    if (missing) {
+      setGroupError(el.closest('.form-group'), fieldLabelText(el) + ' is required');
+      if (!firstErrorEl) firstErrorEl = el;
+    }
+  });
+  const imgGroup = document.getElementById('imgFormGroup');
+  if (imgGroup && isFieldVisible(imgGroup) && (!Array.isArray(fImages) || fImages.length === 0)) {
+    setGroupError(imgGroup, 'Please add at least one property image');
+    if (!firstErrorEl) firstErrorEl = imgGroup;
+  }
+  return firstErrorEl;
+}
+
+function isValidIndianMobile(v) {
+  return /^[6-9]\d{9}$/.test((v || '').trim());
+}
+function sanitizeMobileInput(el) {
+  let digits = el.value.replace(/\D/g, '');
+  while (digits.length && !/[6-9]/.test(digits[0])) {
+    digits = digits.slice(1);
+  }
+  el.value = digits.slice(0, 10);
+}
+async function pickContactFromDevice(fieldId, nameFieldId) {
+  if (!('contacts' in navigator && 'ContactsManager' in window)) {
+    alert("Contact picker isn't supported on this device/browser — please type the number in.");
+    return;
+  }
+  try {
+    const contacts = await navigator.contacts.select(['tel', 'name'], { multiple: false });
+    if (!contacts || !contacts.length) return;
+    const picked = contacts[0];
+    const rawTel = (picked.tel && picked.tel[0]) || '';
+    let digits = rawTel.replace(/\D/g, '').slice(-10);
+    while (digits.length && !/[6-9]/.test(digits[0])) digits = digits.slice(1);
+    if (!digits) {
+      alert('That contact has no usable mobile number.');
+      return;
+    }
+    const field = document.getElementById(fieldId);
+    if (field) {
+      field.value = digits;
+      field.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    if (nameFieldId && picked.name && picked.name[0]) {
+      const nameField = document.getElementById(nameFieldId);
+      if (nameField) {
+        nameField.value = picked.name[0];
+        nameField.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    }
+  } catch (err) {
+    if (err && err.name !== 'AbortError') {
+      alert('Could not read that contact — please type the number in.');
+    }
+  }
+}
+
+function copyEditVideoLink() {
+  const url = document.getElementById('aeVideoViewLink').dataset.url || '';
+  if (!url) return;
+  if (navigator.clipboard) navigator.clipboard.writeText(url).then(() => _adminToast('Video link copied!'));
+  else _adminToast('Video link: ' + url);
+}
+
+/* ── Save (PUT /api/admin/properties/:id) — admin equivalent of
+   index.html's submitListing(), minus the create/POST branch (admin
+   only ever edits an existing DB record here, never creates one from
+   scratch), and refreshing the DataTable in place afterwards. ── */
+function adminSubmitListing() {
+  const firstError = validateListingForm();
+  if (firstError) {
+    alert('Please fill in all required fields');
+    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (typeof firstError.focus === 'function') firstError.focus();
+    return;
+  }
+  if (!editingPropertyId) return;
+
+  const title = document.getElementById('f-title').value.trim();
+  const rent = document.getElementById('f-rent').value;
+  const loc = document.getElementById('f-location').value.trim();
+  const ownerName = document.getElementById('f-ownerName').value.trim();
+  const ownerPhone = document.getElementById('f-ownerPhone').value.trim();
+
+  function gv(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+  function gb(id) { const el = document.getElementById(id); return el ? el.checked : false; }
+
+  if (ownerPhone && !isValidIndianMobile(ownerPhone)) {
+    alert('Enter a valid 10-digit owner phone number starting with 6, 7, 8 or 9');
+    return;
+  }
+  const ownerAltPhone = gv('f-ownerAltPhone');
+  if (ownerAltPhone && !isValidIndianMobile(ownerAltPhone)) {
+    alert('Enter a valid 10-digit alternate number starting with 6, 7, 8 or 9');
+    return;
+  }
+  const agentPhone = gv('f-agentPhone');
+  if (agentPhone && !isValidIndianMobile(agentPhone)) {
+    alert('Enter a valid 10-digit agent phone number starting with 6, 7, 8 or 9');
+    return;
+  }
+
+  const amenitiesSelected = AM_LIST.filter(([id]) => gb(id)).map(([id, label, unitId]) => {
+    if (unitId) {
+      const qty = parseInt(gv(unitId)) || 1;
+      return qty > 1 ? label + ' ×' + qty : label;
+    }
+    return label;
+  });
+  const amenitiesExtra = gv('f-amenities-extra');
+  const images = fImages.slice();
+
+  const typeRaw = document.getElementById('f-type').value;
+  const statusMap = { 'Rent': 'For Rent', 'For Rent': 'For Rent', 'Lease': 'Lease', 'PG': 'PG', 'ShortStay': 'Short Stay' };
+  const status = statusMap[typeRaw] || 'For Rent';
+  const isPG = status === 'PG';
+  const isLease = status === 'Lease';
+  const isShortStay = status === 'Short Stay';
+
+  const newProp = {
+    basic: {
+      status:   status,
+      listedBy: document.getElementById('f-listedBy').value,
+    },
+    location: {
+      area:    loc,
+      city:    document.getElementById('f-city').value.trim() || 'Bangalore',
+      address: document.getElementById('f-fullAddress').value.trim(),
+      lat:     parseFloat(document.getElementById('f-latitude').value) || null,
+      lng:     parseFloat(document.getElementById('f-longitude').value) || null,
+      mapLink: gv('f-googleMapsLink') || null,
+    },
+    owner: {
+      propertyName: title,
+      name:         ownerName,
+      phone:        ownerPhone,
+      email:        document.getElementById('f-ownerEmail').value.trim(),
+      altPhone:     gv('f-ownerAltPhone') || null,
+      contactTime:  gv('f-contactTime') || null,
+      address:      gv('f-ownerAddress') || null,
+      agentPhone:   gv('f-agentPhone') || null,
+      agentArea:    gv('f-agentArea') || null,
+    },
+    price: isLease ? {
+      rent:         parseFloat(gv('f-leaseAmount')) || 0,
+      maintenance:  parseFloat(gv('f-leaseMaintenance')) || null,
+    } : {
+      rent:         parseInt(rent) || 0,
+      ...(isShortStay ? {} : {
+        deposit: isPG ? (parseInt(gv('f-pgDeposit')) || 0)
+                      : (parseInt(document.getElementById('f-deposit').value) || 0),
+      }),
+      ...((isPG || isShortStay) ? {} : {
+        maintenance:  parseFloat(gv('f-maintenance')) || null,
+        rentIncrease: parseFloat(gv('f-escalation')) ? gv('f-escalation') + '%' : null,
+        electricity:  gv('f-electricityIncluded') || null,
+        water:        gv('f-waterCharge') || null,
+        negotiable:   gv('f-negotiable').toLowerCase() === 'yes' ? 'Yes'
+                    : gv('f-negotiable').toLowerCase() === 'no'  ? 'No'
+                    : null,
+      }),
+    },
+    ...(isPG ? {} : {
+      property: {
+        ...(isShortStay ? {} : { type: gv('f-propertyType'), bhk: gv('f-bhk'), area: gv('f-area'), age: gv('f-age') }),
+        bike:      isShortStay ? String(parseInt(document.getElementById('f-ssBikePark').value, 10) || 0)
+                 : String(parseInt(document.getElementById('f-bikepark').value, 10) || 0),
+        car:       isShortStay ? String(parseInt(document.getElementById('f-ssCarPark').value, 10) || 0)
+                 : String(parseInt(document.getElementById('f-carpark').value, 10) || 0),
+        ...(isShortStay ? {} : {
+          floor:     document.getElementById('f-floor').value || 'G',
+          bathrooms: document.getElementById('f-baths').value || '1',
+          furnish:   document.getElementById('f-furnishing').value,
+          facing:    document.getElementById('f-facing').value,
+          tenant:    document.getElementById('f-tenant').value,
+          available: isLease ? gv('f-leaseAvailableFrom') : (document.getElementById('f-avail').value || null),
+        }),
+      },
+    }),
+    amenities: {
+      selected: amenitiesSelected,
+      extra:    amenitiesExtra,
+    },
+    ...((isPG || isShortStay) ? {} : {
+      terms: {
+        notice: isLease ? (gv('f-leaseNoticePeriod') || null)
+              : (gv('f-noticePeriod') || null),
+        ...(isLease ? { lease: gv('f-leaseDurationVal') || null }
+          : { lease: gv('f-leaseDuration') || null }),
+        ...(isLease ? { leaseType: gv('f-leaseType') || null, lockIn: gv('f-lockInPeriod') || null } : {}),
+      },
+    }),
+    ...((isPG || isShortStay) ? {} : {
+      rules: {
+        pets:   isLease ? (gv('f-leasePets') || null) : (gv('f-petsAllowed') || null),
+        nonVeg: isLease ? (gv('f-leaseNonVeg') || null) : (gv('f-nonVegAllowed') || null),
+      },
+    }),
+    media: {
+      video: gv('f-videoUrl') || null,
+      desc:  document.getElementById('f-desc').value.trim(),
+      images: images,
+    },
+    pg: isPG ? {
+      type:      document.getElementById('f-pgPropertyType').value,
+      gender:    document.getElementById('f-pgGender').value,
+      room:      document.getElementById('f-pgRoomType').value,
+      meals:     document.getElementById('f-pgMeals').value,
+      occupancy: gv('f-pgOccupancy') || null,
+      notice:    gv('f-pgNotice') || null,
+      bathroom:  gv('f-pgBathroom') || null,
+      furnish:   gv('f-pgRoomFurnishing') || null,
+      food:      gv('f-pgFoodType') || null,
+      available: gv('f-pgAvailableFrom') || null,
+      visitors:  gv('f-pgVisitorPolicy') || null,
+      gateTime:  gv('f-pgGateTime') || null,
+      bike:      String(parseInt(document.getElementById('f-pgBikePark').value, 10) || 0),
+      car:       String(parseInt(document.getElementById('f-pgCarPark').value, 10) || 0),
+    } : {},
+    shortStay: isShortStay ? {
+      type:          document.getElementById('f-ssPropertyType').value,
+      roomType:      document.getElementById('f-ssRoomType').value,
+      available24hrs: document.getElementById('f-ss24hrs').value,
+      cancellation:  gv('f-ssCancellation') || null,
+      couplesAllowed: gv('f-ssCouples') || null,
+      furnish:       gv('f-ssFurnish') || null,
+    } : {},
+  };
+
+  const submitBtn = document.getElementById('listingSubmitBtn');
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Saving…'; }
+
+  fetch('/api/admin/properties/' + editingPropertyId, {
+    method: 'PUT',
+    headers: authHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify(newProp)
+  })
+  .then(async res => {
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Server error');
+    alert('Listing updated');
+    closeAdminEditModal();
+    if (typeof propTable !== 'undefined' && propTable) propTable.ajax.reload(null, false);
+  })
+  .catch(err => {
+    console.error('Admin save listing error:', err);
+    alert('Failed to save changes: ' + err.message);
+  })
+  .finally(() => {
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Save changes'; }
+  });
+}
+
+document.getElementById('addModal').addEventListener('input', function(e){
+  const group = e.target.closest && e.target.closest('.form-group');
+  if (group && group.classList.contains('has-error')) {
+    const val = (e.target.value || '').trim();
+    if (val !== '' && val !== 'Select') {
+      group.classList.remove('has-error');
+      const msg = group.querySelector('.field-error-text');
+      if (msg) msg.remove();
+    }
+  }
+});
+document.getElementById('addModal').addEventListener('change', function(e){
+  const group = e.target.closest && e.target.closest('.form-group');
+  if (group && group.classList.contains('has-error')) {
+    const val = (e.target.value || '').trim();
+    if (val !== '' && val !== 'Select') {
+      group.classList.remove('has-error');
+      const msg = group.querySelector('.field-error-text');
+      if (msg) msg.remove();
+    }
+  }
+  const imgGroup = document.getElementById('imgFormGroup');
+  if (imgGroup && imgGroup.classList.contains('has-error') && Array.isArray(fImages) && fImages.length > 0) {
+    imgGroup.classList.remove('has-error');
+    const msg = imgGroup.querySelector('.field-error-text');
+    if (msg) msg.remove();
+  }
+});
+document.getElementById('addModal').addEventListener('click', function(e) {
+  if (e.target === this) closeAdminEditModal();
+});
+markRequiredLabels();
 
 </script>
 

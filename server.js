@@ -2096,7 +2096,56 @@ app.put('/api/user/listings/:id', requireUser, async (req, res) => {
   }
 });
 
-// ── DELETE /api/user/listings/:id (delete a listing the user owns) ──
+// ── PUT /api/admin/properties/:id (admin edits any listing, regardless of
+// owner) — same field-handling logic as PUT /api/user/listings/:id above,
+// just scoped by requireAdmin + findListingById instead of requireUser +
+// findUserListingById(id, userId), since admin isn't the listing's owner. ──
+app.put('/api/admin/properties/:id', requireAdmin, async (req, res) => {
+  try {
+    const { doc: prop, model: currentModel } = await findListingById(req.params.id);
+    if (!prop) return res.status(404).json({ message: 'Listing not found' });
+
+    const body = req.body || {};
+    const fields = NESTED_SECTIONS.reduce((acc, k) => {
+      acc[k] = (body[k] && typeof body[k] === 'object') ? body[k] : {};
+      return acc;
+    }, {});
+
+    const sentSections = NESTED_SECTIONS.filter(k => body[k] && typeof body[k] === 'object');
+    const fieldsForValidation = {};
+    for (const k of sentSections) fieldsForValidation[k] = fields[k];
+    const validationError = validatePropertyFields(fieldsForValidation);
+    if (validationError) return res.status(400).json({ message: validationError });
+
+    const FULL_REPLACE_SECTIONS = new Set(['pg', 'shortStay']);
+    for (const section of sentSections) {
+      prop[section] = FULL_REPLACE_SECTIONS.has(section)
+        ? fields[section]
+        : Object.assign({}, prop[section]?.toObject ? prop[section].toObject() : prop[section], fields[section]);
+    }
+
+    const effectiveStatus = (fields.basic && fields.basic.status) || (prop.basic || {}).status;
+    if (effectiveStatus === 'PG') {
+      prop.property = undefined;
+      prop.terms = undefined;
+      prop.rules = undefined;
+    } else if (effectiveStatus === 'Short Stay') {
+      prop.terms = undefined;
+      prop.rules = undefined;
+    }
+
+    const savedDoc = await moveListingIfNeeded(prop, currentModel);
+    const saved = savedDoc.toObject();
+    saved.displayPrice = formatPrice((saved.price || {}).rent, (saved.basic || {}).status);
+
+    res.json({ message: 'Listing updated successfully', property: saved });
+  } catch (err) {
+    console.error('PUT /api/admin/properties/:id error:', err);
+    res.status(500).json({ message: 'Error updating listing: ' + err.message });
+  }
+});
+
+
 app.delete('/api/user/listings/:id', requireUser, async (req, res) => {
   try {
     let deleted = null;
