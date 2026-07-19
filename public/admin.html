@@ -542,6 +542,7 @@ table.dataTable.no-footer{border-bottom:none!important}
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:10px;padding:60px 20px;text-align:center;
 }
+.stat-card-big.compact{padding:28px 20px}
 .stat-card-big-icon{
   width:64px;height:64px;border-radius:50%;
   background:linear-gradient(135deg,#6f9bff,#2f5fd1);
@@ -1177,6 +1178,11 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
 
   <!-- TAB BAR -->
   <div class="tab-bar">
+    <button class="tab-btn" id="tab-visits" onclick="switchTab('visits')">
+      <i class="fas fa-globe"></i>
+      <span class="tab-btn-label">Visits</span>
+      <span class="tab-count" id="tab-visits-count">—</span>
+    </button>
     <button class="tab-btn" id="tab-customers" onclick="switchTab('customers')">
       <i class="fas fa-users"></i>
       <span class="tab-btn-label">Customers</span>
@@ -1191,11 +1197,6 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
       <i class="fas fa-calendar-days"></i>
       <span class="tab-btn-label">Appointments</span>
       <span class="tab-count" id="tab-appointments-count">—</span>
-    </button>
-    <button class="tab-btn" id="tab-visits" onclick="switchTab('visits')">
-      <i class="fas fa-globe"></i>
-      <span class="tab-btn-label">Visits</span>
-      <span class="tab-count" id="tab-visits-count">—</span>
     </button>
     <button class="tab-btn" id="tab-honest-reviews" onclick="switchTab('honest-reviews')">
       <i class="fas fa-video"></i>
@@ -1397,61 +1398,66 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
     </div>
   </div>
 
-  <!-- ══ VISITS PANEL (Total Visit / Daily Visits / Users Registered sub-tabs) ══ -->
+  <!-- ══ VISITS PANEL (Visits / Users Registered sub-tabs) ══ -->
   <div class="tab-panel" id="panel-visits">
-    <!-- Category sub-tabs: Total Visit / Daily Visits / Users Registered -->
+    <!-- Category sub-tabs: Visits (Total + Daily combined) / Users Registered -->
     <div class="cat-tab-bar" id="visitsCatTabs">
-      <button class="cat-tab-btn active" data-cat="total" onclick="switchVisitsCategory('total')">
-        <i class="fas fa-globe"></i><span>Total Visit</span><span class="cat-count" id="cat-count-visits-total">—</span>
-      </button>
-      <button class="cat-tab-btn" data-cat="daily" onclick="switchVisitsCategory('daily')">
-        <i class="fas fa-chart-line"></i><span>Daily Visits</span><span class="cat-count" id="cat-count-visits-daily">—</span>
+      <button class="cat-tab-btn active" data-cat="visits" onclick="switchVisitsCategory('visits')">
+        <i class="fas fa-globe"></i><span>Visits</span><span class="cat-count" id="cat-count-visits-total">—</span>
       </button>
       <button class="cat-tab-btn" data-cat="users" onclick="switchVisitsCategory('users')">
         <i class="fas fa-user-plus"></i><span>Users Registered</span><span class="cat-count" id="cat-count-visits-users">—</span>
       </button>
     </div>
 
-    <div class="visits-subpanel active" id="visits-sub-total">
-      <div class="card">
-        <div class="stat-card-big">
-          <div class="stat-card-big-icon"><i class="fas fa-globe"></i></div>
-          <div class="stat-card-big-num" id="totalVisitsBigNum">—</div>
-          <div class="stat-card-big-label">All-time website visits</div>
-          <div class="stat-card-big-actions">
-            <button class="bulk-btn bulk-btn-outline-danger" onclick="resetTotalVisits()">
-              <i class="fas fa-eraser"></i> Reset Count
-            </button>
+    <div class="visits-subpanel active" id="visits-sub-visits">
+      <div style="display:flex;flex-wrap:wrap;gap:16px">
+        <div class="card" style="flex:1;min-width:260px">
+          <div class="stat-card-big compact">
+            <div class="stat-card-big-icon"><i class="fas fa-globe"></i></div>
+            <div class="stat-card-big-num" id="totalVisitsBigNum">—</div>
+            <div class="stat-card-big-label">All-time website visits</div>
+            <div class="stat-card-big-actions">
+              <button class="bulk-btn bulk-btn-outline-danger" onclick="resetTotalVisits()">
+                <i class="fas fa-eraser"></i> Reset Count
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-
-    <div class="visits-subpanel" id="visits-sub-daily">
-      <div class="card">
-        <div class="stat-card-big">
-          <div class="stat-card-big-icon"><i class="fas fa-chart-line"></i></div>
-          <div class="stat-card-big-num" id="dailyVisitsBigNum">—</div>
-          <div class="stat-card-big-label">Today's site visits</div>
-          <div class="stat-card-big-actions">
-            <button class="bulk-btn bulk-btn-outline-danger" onclick="resetDailyStat('visit')">
-              <i class="fas fa-eraser"></i> Reset Count
-            </button>
+        <div class="card" style="flex:1;min-width:260px">
+          <div class="stat-card-big compact">
+            <div class="stat-card-big-icon"><i class="fas fa-chart-line"></i></div>
+            <div class="stat-card-big-num" id="dailyVisitsBigNum">—</div>
+            <div class="stat-card-big-label">Today's site visits</div>
+            <div class="stat-card-big-actions">
+              <button class="bulk-btn bulk-btn-outline-danger" onclick="resetDailyStat('visit')">
+                <i class="fas fa-eraser"></i> Reset Count
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
     <div class="visits-subpanel" id="visits-sub-users">
-      <div class="card">
-        <div class="stat-card-big">
-          <div class="stat-card-big-icon"><i class="fas fa-user-plus"></i></div>
-          <div class="stat-card-big-num" id="registeredUsersBigNum">—</div>
-          <div class="stat-card-big-label">Today's registrations</div>
-          <div class="stat-card-big-actions">
-            <button class="bulk-btn bulk-btn-outline-danger" onclick="resetDailyStat('registration')">
-              <i class="fas fa-eraser"></i> Reset Count
-            </button>
+      <div style="display:flex;flex-wrap:wrap;gap:16px">
+        <div class="card" style="flex:1;min-width:260px">
+          <div class="stat-card-big compact">
+            <div class="stat-card-big-icon"><i class="fas fa-users"></i></div>
+            <div class="stat-card-big-num" id="totalUsersBigNum">—</div>
+            <div class="stat-card-big-label">Total registered users</div>
+          </div>
+        </div>
+        <div class="card" style="flex:1;min-width:260px">
+          <div class="stat-card-big compact">
+            <div class="stat-card-big-icon"><i class="fas fa-user-plus"></i></div>
+            <div class="stat-card-big-num" id="registeredUsersBigNum">—</div>
+            <div class="stat-card-big-label">Today's registrations</div>
+            <div class="stat-card-big-actions">
+              <button class="bulk-btn bulk-btn-outline-danger" onclick="resetDailyStat('registration')">
+                <i class="fas fa-eraser"></i> Reset Count
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -1671,13 +1677,12 @@ function switchTab(tab){
   }
 }
 
-/* ── VISITS: sub-tab switching (Total Visit / Daily Visits / Users Registered) ── */
-let _activeVisitsCategory = 'total';
+/* ── VISITS: sub-tab switching (Visits [Total+Daily] / Users Registered) ── */
+let _activeVisitsCategory = 'visits';
 
 function refreshActiveVisitsCategory(){
-  if(_activeVisitsCategory === 'total') loadTotalVisits();
-  else if(_activeVisitsCategory === 'daily') loadDailyStat('visit');
-  else if(_activeVisitsCategory === 'users') loadDailyStat('registration');
+  if(_activeVisitsCategory === 'visits'){ loadTotalVisits(); loadDailyStat('visit'); }
+  else if(_activeVisitsCategory === 'users'){ loadDailyStat('registration'); loadTotalUsers(); }
 }
 
 window.switchVisitsCategory = function(cat){
@@ -1828,6 +1833,17 @@ window.resetTotalVisits = async function(){
     loadTotalVisits();
   } catch(err){ alert('Failed to reset total visits. Please try again.'); }
 };
+
+/* ── TOTAL USERS (all-time count, shown alongside Today's registrations) ── */
+async function loadTotalUsers(){
+  try{
+    const res = await fetch(`${BASE}/api/admin/total-users`, { headers: authHeaders() });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok) return;
+    const n = typeof data.totalUsers === 'number' ? data.totalUsers : 0;
+    document.getElementById('totalUsersBigNum').innerText = n;
+  } catch(err){ console.error('loadTotalUsers error:', err); }
+}
 
 /* ── DAILY VISITS / USERS REGISTERED (today's count, big-stat-card style) ── */
 const DAILY_STAT_LABELS = { visit:{ countEl:'cat-count-visits-daily', bigNumEl:'dailyVisitsBigNum', label:'Daily Visits' },
@@ -2966,6 +2982,7 @@ $(document).ready(function(){
   ════════════════════════════════════ */
   loadDailyStat('visit');
   loadDailyStat('registration');
+  loadTotalUsers();
 
   /* ════════════════════════════════════
      HONEST REVIEWS TABLE

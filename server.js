@@ -2629,6 +2629,18 @@ app.post('/api/admin/total-visits/reset', requireAdmin, async (req, res) => {
   }
 });
 
+// GET /api/admin/total-users — admin-only, all-time count of registered user accounts
+// (actual User collection count, distinct from the daily-registration log below).
+app.get('/api/admin/total-users', requireAdmin, async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments();
+    res.json({ totalUsers });
+  } catch (err) {
+    console.error('GET /api/admin/total-users error:', err.message);
+    res.status(500).json({ message: 'Error fetching total users' });
+  }
+});
+
 // ── ADMIN: Daily Visits / Users Registered tabs ──
 // :type is 'visit' (Daily Visits tab) or 'registration' (Users Registered tab).
 const DAILY_STAT_TYPES = ['visit', 'registration'];
