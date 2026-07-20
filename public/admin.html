@@ -284,6 +284,77 @@ table.dataTable tbody tr:last-child td{border-bottom:none!important}
 table.dataTable tbody tr:hover td{background:#fdfaf6}
 table.dataTable.no-footer{border-bottom:none!important}
 
+/* ── STICKY FIRST COLUMNS (Properties table: checkbox + Property name) ──
+   Keeps the row-select checkbox and property identity visible while the
+   admin scrolls horizontally through the many detail columns. */
+#propertyTable thead th:nth-child(1),
+#propertyTable tbody td:nth-child(1){
+  position:sticky!important;left:0;z-index:3;
+  width:46px!important;min-width:46px!important;max-width:46px!important;
+}
+#propertyTable thead th:nth-child(2),
+#propertyTable tbody td:nth-child(2){
+  position:sticky!important;left:46px;z-index:2;
+  width:210px!important;min-width:210px!important;max-width:210px!important;
+  text-align:left!important;
+}
+#propertyTable thead th:nth-child(1),
+#propertyTable thead th:nth-child(2){
+  z-index:4;background:var(--surface2);
+}
+#propertyTable tbody td:nth-child(1),
+#propertyTable tbody td:nth-child(2){
+  background:var(--surface);
+}
+#propertyTable tbody tr:hover td:nth-child(1),
+#propertyTable tbody tr:hover td:nth-child(2){
+  background:#fdfaf6;
+}
+#propertyTable thead th:nth-child(2),
+#propertyTable tbody td:nth-child(2){
+  box-shadow:4px 0 6px -3px rgba(12,13,16,0.12);
+}
+
+/* ── COLUMN VISIBILITY TOGGLE (Properties table) ── */
+.col-toggle-wrap{position:relative;display:inline-block}
+.col-toggle-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:8px 16px;border-radius:99px;border:1.5px solid var(--border);
+  background:var(--surface);color:var(--ink2);
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:0.78rem;font-weight:700;
+  cursor:pointer;transition:all 0.18s;white-space:nowrap;
+}
+.col-toggle-btn:hover{background:var(--surface2);border-color:var(--border2)}
+.col-toggle-btn.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.col-toggle-menu{
+  display:none;position:absolute;top:calc(100% + 8px);left:0;z-index:50;
+  width:300px;max-height:420px;overflow-y:auto;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-sm);box-shadow:var(--shadow-lg);padding:10px;
+}
+.col-toggle-menu.open{display:block}
+.col-toggle-group-label{
+  font-size:0.68rem;font-weight:700;color:var(--gold-dark);
+  text-transform:uppercase;letter-spacing:0.6px;
+  padding:8px 8px 4px;
+}
+.col-toggle-item{
+  display:flex;align-items:center;gap:9px;padding:6px 8px;border-radius:8px;
+  cursor:pointer;font-size:0.82rem;color:var(--ink2);font-weight:500;
+}
+.col-toggle-item:hover{background:var(--surface2)}
+.col-toggle-item input{width:14px;height:14px;cursor:pointer;accent-color:var(--ink)}
+.col-toggle-footer{
+  display:flex;justify-content:space-between;gap:8px;
+  padding:8px 8px 2px;margin-top:4px;border-top:1px solid var(--border);
+}
+.col-toggle-footer button{
+  flex:1;padding:7px 10px;border-radius:8px;border:1px solid var(--border);
+  background:var(--surface2);color:var(--ink2);font-size:0.74rem;font-weight:700;
+  cursor:pointer;transition:all 0.15s;
+}
+.col-toggle-footer button:hover{background:var(--border);color:var(--ink)}
+
 /* ── CUSTOMER NAME ── */
 .customer-name{display:flex;align-items:center;justify-content:center;gap:9px}
 .customer-text-name{font-weight:600;font-size:0.88rem;color:var(--ink)}
@@ -482,8 +553,8 @@ table.dataTable.no-footer{border-bottom:none!important}
 .remark-saving{opacity:0.5;pointer-events:none}
 
 /* ── PROPERTY TABLE ── */
-.prop-title{font-weight:600;font-size:0.88rem;color:var(--ink)}
-.prop-sub{font-size:0.72rem;color:var(--ink3);margin-top:2px}
+.prop-title{font-weight:600;font-size:0.88rem;color:var(--ink);max-width:182px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prop-sub{font-size:0.72rem;color:var(--ink3);margin-top:2px;max-width:182px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .status-badge{
   display:inline-block;padding:4px 11px;border-radius:99px;
   font-size:0.72rem;font-weight:700;letter-spacing:0.3px;
@@ -1679,6 +1750,14 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
     </div>
     <div class="card">
       <div class="table-wrapper">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+          <div class="col-toggle-wrap" id="propColToggleWrap">
+            <button type="button" class="col-toggle-btn" id="propColToggleBtn" onclick="togglePropColMenu()">
+              <i class="fas fa-table-columns"></i> Columns
+            </button>
+            <div class="col-toggle-menu" id="propColToggleMenu"></div>
+          </div>
+        </div>
 
         <table id="propertyTable" class="display nowrap" style="width:100%">
           <thead>
@@ -3821,6 +3900,10 @@ $(document).ready(function(){
   // "top-controls" button row immediately above the <table>, so we move
   // the toolbar to sit right after that generated row).
   $('#bulkToolbar').insertAfter($('#propertyTable_wrapper .top-controls'));
+  buildPropColumnToggle();
+  propTable.on('column-visibility.dt', function(e, settings, column, state){
+    syncPropColToggleCheckbox(column, state);
+  });
   } catch(e){ console.error('Properties table failed to initialize:', e); }
 
   /* ════════════════════════════════════
@@ -4323,6 +4406,94 @@ let _propCategoryState = 'all';
 // numbered comments in the propTable columns:[...] definition above).
 const PG_ONLY_COLS = [18, 19, 20, 21, 22]; // PG Gender, Room Type, Meals, Occupancy, Notice
 const SS_ONLY_COLS = [23, 24, 25, 26];     // SS Room Type, Available 24hrs, Cancellation, Couples Allowed
+
+/* ── COLUMN VISIBILITY TOGGLE ──
+   Groups mirror the columns:[...] layout in propTable's init. idx 0 (select)
+   and the last column (Action) are always visible and not offered here. */
+const PROP_COL_GROUPS = [
+  { label:'Basic', cols:[
+    {idx:1, label:'Property'}, {idx:2, label:'Status'}, {idx:3, label:'Price'},
+    {idx:4, label:'Deposit'}, {idx:5, label:'Owner Name'}, {idx:6, label:'Owner Number'},
+    {idx:7, label:'Location'}, {idx:8, label:'City'}
+  ]},
+  { label:'Property Details', cols:[
+    {idx:9, label:'Type'}, {idx:10, label:'Area (sqft)'}, {idx:11, label:'Floor'},
+    {idx:12, label:'Furnishing'}, {idx:13, label:'Bathroom'}, {idx:14, label:'Car Parking'},
+    {idx:15, label:'Bike Parking'}, {idx:16, label:'Facing'}, {idx:17, label:'Age'}
+  ]},
+  { label:'PG Details', cols:[
+    {idx:18, label:'PG Gender'}, {idx:19, label:'PG Room Type'}, {idx:20, label:'PG Meals'},
+    {idx:21, label:'PG Occupancy'}, {idx:22, label:'PG Notice'}
+  ]},
+  { label:'Short Stay Details', cols:[
+    {idx:23, label:'SS Room Type'}, {idx:24, label:'SS Available 24hrs'},
+    {idx:25, label:'SS Cancellation'}, {idx:26, label:'SS Couples Allowed'}
+  ]},
+  { label:'Meta', cols:[
+    {idx:27, label:'Visits'}, {idx:28, label:'Photos'}, {idx:29, label:'Amenities'},
+    {idx:30, label:'Property ID'}, {idx:31, label:'User ID'}, {idx:32, label:'Listed On'},
+    {idx:33, label:'Promoted'}, {idx:34, label:'Verified'}, {idx:35, label:'Remarks'}
+  ]}
+];
+
+function buildPropColumnToggle(){
+  const menu = document.getElementById('propColToggleMenu');
+  if(!menu || !propTable) return;
+  let html = '';
+  PROP_COL_GROUPS.forEach(group=>{
+    html += `<div class="col-toggle-group-label">${group.label}</div>`;
+    group.cols.forEach(c=>{
+      const visible = propTable.column(c.idx).visible();
+      html += `<label class="col-toggle-item">
+        <input type="checkbox" data-col-idx="${c.idx}" ${visible?'checked':''} onchange="onPropColToggleChange(this)">
+        <span>${c.label}</span>
+      </label>`;
+    });
+  });
+  html += `<div class="col-toggle-footer">
+    <button type="button" onclick="setAllPropColumns(true)">Show all</button>
+    <button type="button" onclick="setAllPropColumns(false)">Hide all</button>
+  </div>`;
+  menu.innerHTML = html;
+}
+
+window.onPropColToggleChange = function(inputEl){
+  const idx = parseInt(inputEl.getAttribute('data-col-idx'), 10);
+  if(propTable) propTable.column(idx).visible(inputEl.checked);
+};
+
+window.setAllPropColumns = function(show){
+  if(!propTable) return;
+  PROP_COL_GROUPS.forEach(group=>{
+    group.cols.forEach(c=>{ propTable.column(c.idx).visible(show, false); });
+  });
+  propTable.columns.adjust();
+  buildPropColumnToggle();
+};
+
+function syncPropColToggleCheckbox(colIdx, visible){
+  const cb = document.querySelector('#propColToggleMenu input[data-col-idx="'+colIdx+'"]');
+  if(cb) cb.checked = visible;
+}
+
+window.togglePropColMenu = function(){
+  const menu = document.getElementById('propColToggleMenu');
+  const btn = document.getElementById('propColToggleBtn');
+  if(!menu) return;
+  const opening = !menu.classList.contains('open');
+  menu.classList.toggle('open', opening);
+  if(btn) btn.classList.toggle('active', opening);
+};
+document.addEventListener('click', function(e){
+  const wrap = document.getElementById('propColToggleWrap');
+  const menu = document.getElementById('propColToggleMenu');
+  const btn = document.getElementById('propColToggleBtn');
+  if(!wrap || !menu || !menu.classList.contains('open')) return;
+  if(!wrap.contains(e.target)){
+    menu.classList.remove('open');
+    if(btn) btn.classList.remove('active');
+  }
+});
 
 function applyPropCategoryColumnVisibility(cat){
   if(!propTable) return;
