@@ -160,6 +160,10 @@ body{
   background:rgba(12,13,16,0.08);color:var(--ink3);
 }
 
+/* Visits panel sub-tabs: only 2 items — split evenly across full width */
+#visitsCatTabs{width:100%}
+#visitsCatTabs .cat-tab-btn{flex:1;justify-content:center}
+
 /* ── BULK DELETE TOOLBAR ── */
 .bulk-toolbar{
   display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:20px;
@@ -183,6 +187,8 @@ body{
 .bulk-btn-danger:hover{background:#c73a3a;box-shadow:0 4px 14px rgba(224,68,68,0.3)}
 .bulk-btn-outline-danger{background:#fff;color:var(--red);border-color:rgba(224,68,68,0.35)}
 .bulk-btn-outline-danger:hover{background:var(--red);color:#fff;box-shadow:0 4px 14px rgba(224,68,68,0.3)}
+.bulk-btn:disabled{opacity:0.45;cursor:not-allowed;pointer-events:none}
+.bulk-btn:disabled:hover{background:#fff;color:var(--red);box-shadow:none}
 #propSelectAllCheckbox,.prop-select-all-checkbox,.prop-row-check{
   width:16px;height:16px;cursor:pointer;accent-color:var(--ink);
 }
@@ -1227,15 +1233,20 @@ footer i{color:var(--gold)}
   .header-title h1{font-size:1.2rem}
   .header-title p{font-size:0.72rem}
 
-  /* Tab bar */
+  /* Tab bar — single horizontal row, swipeable */
   .tab-bar{
     width:100%;border-radius:var(--radius-sm);
     padding:5px;gap:4px;margin-bottom:18px;
+    flex-wrap:nowrap;overflow-x:auto;
+    -webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;
+    scrollbar-width:none;-ms-overflow-style:none;
   }
+  .tab-bar::-webkit-scrollbar{display:none}
   .tab-btn{
-    flex:1;justify-content:center;
-    padding:9px 6px;font-size:0.75rem;gap:5px;
+    flex:0 0 auto;justify-content:center;
+    padding:9px 12px;font-size:0.75rem;gap:5px;
     border-radius:calc(var(--radius-sm) - 2px);
+    scroll-snap-align:start;
   }
   .tab-btn i{font-size:0.78rem}
   .tab-count{min-width:18px;height:17px;font-size:0.62rem;padding:0 4px}
@@ -1277,6 +1288,34 @@ footer i{color:var(--gold)}
 
   /* Login card */
   .login-card{padding:32px 24px 28px;border-radius:20px}
+
+  /* Visits/Users stat cards: shrink so two fit side by side */
+  .stat-card-big.compact{padding:18px 10px;gap:6px}
+  .stat-card-big-icon{width:44px;height:44px;font-size:1.15rem}
+  .stat-card-big-num{font-size:2.1rem}
+  .stat-card-big-label{font-size:0.7rem}
+  .stat-card-big-actions .bulk-btn{padding:6px 10px;font-size:0.68rem}
+
+  /* Bulk toolbar: single horizontal line, icons only, scroll if tight */
+  .bulk-toolbar{
+    justify-content:flex-start;flex-wrap:nowrap;gap:10px;
+    padding:10px 12px;overflow-x:auto;-webkit-overflow-scrolling:touch;
+    scrollbar-width:none;-ms-overflow-style:none;
+  }
+  .bulk-toolbar::-webkit-scrollbar{display:none}
+  .bulk-toolbar-left,.bulk-toolbar-right{flex-wrap:nowrap;flex-shrink:0;gap:6px}
+  .bulk-btn,.btn-add-review,.bulk-selected-count{flex-shrink:0}
+  .bulk-btn-label{display:none}
+  .bulk-btn,.btn-add-review{padding:8px 11px}
+
+  /* Category sub-tab bar — single horizontal row, swipeable */
+  .cat-tab-bar{
+    width:100%;flex-wrap:nowrap;overflow-x:auto;
+    -webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;
+    scrollbar-width:none;-ms-overflow-style:none;
+  }
+  .cat-tab-bar::-webkit-scrollbar{display:none}
+  .cat-tab-btn{flex:0 0 auto;scroll-snap-align:start}
 }
 
 /* ── 600 px and below ── */
@@ -1316,7 +1355,7 @@ footer i{color:var(--gold)}
 
   /* Tab label: icons only on very small screens */
   .tab-btn .tab-btn-label{display:none}
-  .tab-btn{padding:10px 8px;gap:4px;flex-direction:column;font-size:0.62rem}
+  .tab-btn{padding:10px 8px;gap:4px;flex-direction:column;font-size:0.62rem;min-width:56px}
   .tab-btn i{font-size:1rem;margin-bottom:1px}
 
   /* Remark input full width */
@@ -1640,18 +1679,18 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
         <div class="bulk-toolbar" id="bulkToolbar">
           <div class="bulk-toolbar-left">
             <span class="bulk-selected-count" id="bulkSelectedCount" style="display:none">
-              <i class="fas fa-check-circle"></i> <span id="bulkSelectedNum">0</span> selected
+              <i class="fas fa-check-circle"></i> <span id="bulkSelectedNum">0</span><span class="bulk-btn-label"> selected</span>
             </span>
-            <button class="bulk-btn bulk-btn-clear" id="bulkClearBtn" style="display:none" onclick="clearPropSelection()">
-              <i class="fas fa-xmark"></i> Clear selection
+            <button class="bulk-btn bulk-btn-clear" id="bulkClearBtn" style="display:none" onclick="clearPropSelection()" title="Clear selection">
+              <i class="fas fa-xmark"></i> <span class="bulk-btn-label">Clear selection</span>
             </button>
           </div>
           <div class="bulk-toolbar-right">
-            <button class="bulk-btn bulk-btn-danger" id="bulkDeleteSelectedBtn" style="display:none" onclick="deleteSelectedProperties()">
-              <i class="fas fa-trash-alt"></i> Delete Selected (<span id="bulkDeleteCount">0</span>)
+            <button class="bulk-btn bulk-btn-danger" id="bulkDeleteSelectedBtn" style="display:none" onclick="deleteSelectedProperties()" title="Delete selected">
+              <i class="fas fa-trash-alt"></i> <span class="bulk-btn-label">Delete Selected&nbsp;</span>(<span id="bulkDeleteCount">0</span>)
             </button>
-            <button class="bulk-btn bulk-btn-outline-danger" onclick="deleteAllProperties()">
-              <i class="fas fa-triangle-exclamation"></i> Delete All Properties
+            <button class="bulk-btn bulk-btn-outline-danger" disabled title="Temporarily disabled">
+              <i class="fas fa-triangle-exclamation"></i> <span class="bulk-btn-label">Delete All Properties</span>
             </button>
           </div>
         </div>
@@ -1777,7 +1816,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
 
     <div class="visits-subpanel active" id="visits-sub-visits">
       <div style="display:flex;flex-wrap:wrap;gap:16px">
-        <div class="card" style="flex:1;min-width:260px">
+        <div class="card" style="flex:1;min-width:0">
           <div class="stat-card-big compact">
             <div class="stat-card-big-icon"><i class="fas fa-globe"></i></div>
             <div class="stat-card-big-num" id="totalVisitsBigNum">—</div>
@@ -1789,7 +1828,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
             </div>
           </div>
         </div>
-        <div class="card" style="flex:1;min-width:260px">
+        <div class="card" style="flex:1;min-width:0">
           <div class="stat-card-big compact">
             <div class="stat-card-big-icon"><i class="fas fa-chart-line"></i></div>
             <div class="stat-card-big-num" id="dailyVisitsBigNum">—</div>
@@ -1806,14 +1845,14 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
 
     <div class="visits-subpanel" id="visits-sub-users">
       <div style="display:flex;flex-wrap:wrap;gap:16px">
-        <div class="card" style="flex:1;min-width:260px">
+        <div class="card" style="flex:1;min-width:0">
           <div class="stat-card-big compact">
             <div class="stat-card-big-icon"><i class="fas fa-users"></i></div>
             <div class="stat-card-big-num" id="totalUsersBigNum">—</div>
             <div class="stat-card-big-label">Total registered users</div>
           </div>
         </div>
-        <div class="card" style="flex:1;min-width:260px">
+        <div class="card" style="flex:1;min-width:0">
           <div class="stat-card-big compact">
             <div class="stat-card-big-icon"><i class="fas fa-user-plus"></i></div>
             <div class="stat-card-big-num" id="registeredUsersBigNum">—</div>
@@ -1836,21 +1875,21 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
         <div class="bulk-toolbar" id="reviewBulkToolbar">
           <div class="bulk-toolbar-left">
             <span class="bulk-selected-count" id="reviewSelectedCount" style="display:none">
-              <i class="fas fa-check-circle"></i> <span id="reviewSelectedNum">0</span> selected
+              <i class="fas fa-check-circle"></i> <span id="reviewSelectedNum">0</span><span class="bulk-btn-label"> selected</span>
             </span>
-            <button class="bulk-btn bulk-btn-clear" id="reviewClearBtn" style="display:none" onclick="clearReviewSelection()">
-              <i class="fas fa-xmark"></i> Clear selection
+            <button class="bulk-btn bulk-btn-clear" id="reviewClearBtn" style="display:none" onclick="clearReviewSelection()" title="Clear selection">
+              <i class="fas fa-xmark"></i> <span class="bulk-btn-label">Clear selection</span>
             </button>
           </div>
           <div class="bulk-toolbar-right">
-            <button class="btn-add-review" onclick="openHonestReviewModal()">
-              <i class="fas fa-plus"></i> Add Review
+            <button class="btn-add-review" onclick="openHonestReviewModal()" title="Add review">
+              <i class="fas fa-plus"></i> <span class="bulk-btn-label">Add Review</span>
             </button>
-            <button class="bulk-btn bulk-btn-danger" id="reviewDeleteSelectedBtn" style="display:none" onclick="deleteSelectedReviews()">
-              <i class="fas fa-trash-alt"></i> Delete Selected (<span id="reviewDeleteCount">0</span>)
+            <button class="bulk-btn bulk-btn-danger" id="reviewDeleteSelectedBtn" style="display:none" onclick="deleteSelectedReviews()" title="Delete selected">
+              <i class="fas fa-trash-alt"></i> <span class="bulk-btn-label">Delete Selected&nbsp;</span>(<span id="reviewDeleteCount">0</span>)
             </button>
-            <button class="bulk-btn bulk-btn-outline-danger" onclick="deleteAllReviews()">
-              <i class="fas fa-triangle-exclamation"></i> Delete All Reviews
+            <button class="bulk-btn bulk-btn-outline-danger" disabled title="Temporarily disabled">
+              <i class="fas fa-triangle-exclamation"></i> <span class="bulk-btn-label">Delete All Reviews</span>
             </button>
           </div>
         </div>
