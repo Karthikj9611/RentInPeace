@@ -812,6 +812,11 @@ footer i{color:var(--gold)}
   font-size:0.88rem;font-weight:600;color:var(--ink);margin-top:3px;
   word-break:break-word;
 }
+/* Admin-meta block inside the unified View/Edit modal only — match the
+   crimson value-text color the Edit form uses for its inputs, so View
+   visually mirrors Edit. (Scoped to #aeAdminMetaSlot, not the base class,
+   since Appointments/Honest Reviews modals share these same classes.) */
+#aeAdminMetaSlot .prop-modal-detail-val{color:var(--brand)}
 .prop-modal-desc-box{
   background:var(--surface2);border-radius:10px;
   padding:12px 14px;font-size:0.83rem;color:var(--ink2);
@@ -877,6 +882,30 @@ footer i{color:var(--gold)}
 .form-group.has-error .form-input,
 .form-group.has-error .form-select{border-color:var(--brand);background:var(--brand-light)}
 .field-error-text{display:block;color:var(--brand);font-size:11px;font-weight:600;margin-top:4px}
+
+/* ── View mode: the SAME edit form, every field disabled in place instead
+   of hidden, so View is pixel-identical to Edit — just read-only. Image/
+   video upload controls don't make sense read-only, so those swap for a
+   real gallery + video preview (below). Ported from index.html's own
+   .add-modal.view-mode rules. ── */
+.add-modal.view-mode input:disabled,
+.add-modal.view-mode select:disabled,
+.add-modal.view-mode textarea:disabled{
+  opacity:1;background:var(--bg-2);color:var(--brand);cursor:default;-webkit-text-fill-color:var(--brand);font-weight:600;
+}
+.add-modal.view-mode input:disabled::placeholder,
+.add-modal.view-mode textarea:disabled::placeholder{
+  color:var(--text-3);-webkit-text-fill-color:var(--text-3);font-weight:400;
+}
+.add-modal.view-mode .lm-section{cursor:default}
+.add-modal.view-mode .form-submit{display:none}
+.add-modal.view-mode #imgAddControls,
+.add-modal.view-mode #fImgGrid,
+.add-modal.view-mode #fImgHint{display:none}
+.add-modal.view-mode #amSelectFormGroup{display:none}
+.add-modal.view-mode .am-tag-remove{display:none}
+.add-modal.view-mode #videoUrlGroup input{display:none}
+.add-modal.view-mode #aeGallerySlot{display:block;margin-bottom:16px}
 .input-icon-wrap{position:relative}
 .input-icon-wrap .form-input{padding-right:44px}
 .contact-pick-btn{
@@ -1135,7 +1164,7 @@ footer i{color:var(--gold)}
 .detail-kv-table .kv-cell{padding:9px 10px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);min-width:0}
 .detail-kv-table .kv-cell.wide{grid-column:1 / -1}
 .detail-kv-table .kv-label{color:var(--ink3);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px}
-.detail-kv-table .kv-value{color:var(--gold);font-weight:600;word-break:break-word}
+.detail-kv-table .kv-value{color:var(--brand);font-weight:600;word-break:break-word}
 @media(max-width:420px){
   .detail-kv-table .kv-cell{padding:8px 6px}
   .detail-kv-table .kv-label{font-size:9.5px}
@@ -1851,40 +1880,6 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
   </footer>
 </div>
 
-<!-- ══ PROPERTY DETAIL MODAL — ported from index.html's customer-facing
-     property view (same add-modal shell, gallery, kv table, video row) ══ -->
-<div class="add-modal-overlay" id="adminPropModal" onclick="if(event.target===this)closeAdminPropModal()">
-  <div class="add-modal" style="max-width:620px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:92vh">
-    <div class="add-modal-header" style="background:linear-gradient(135deg,var(--brand) 0%,var(--brand-hover) 100%);padding:14px 28px;margin-bottom:0;position:relative;flex-shrink:0">
-      <div>
-        <div class="add-modal-title" style="color:#fff" id="adminModalTitleText">Property details</div>
-        <div style="color:rgba(255,255,255,.85);font-size:12px;font-weight:600;margin-top:2px;display:none" id="adminModalSubtitleText"></div>
-      </div>
-      <button class="modal-close" style="position:static;background:var(--brand);border:none;color:#fff;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(0,0,0,.25);transition:background .15s,transform .15s" onmouseover="this.style.background='var(--brand-hover)';this.style.transform='scale(1.06)'" onmouseout="this.style.background='var(--brand)';this.style.transform='scale(1)'" onclick="closeAdminPropModal()" aria-label="Close">
-        <svg viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px;stroke-width:2.6;stroke:#fff"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-
-    <div style="overflow-y:auto;padding:20px 28px 28px;flex:1;min-height:0">
-      <div class="detail-gallery" id="detailGallerySlot" style="display:block;margin-bottom:16px"></div>
-      <div class="detail-table-wrap" id="detailTableWrap" style="display:block;margin-bottom:16px"></div>
-      <div class="video-embed-wrap" id="videoEmbedWrap" style="display:none"></div>
-      <div class="video-view-row" id="videoViewRow" style="display:none">
-        <a href="#" id="videoViewLink" target="_blank" rel="noopener noreferrer" class="video-view-link">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-          <span id="videoViewLinkText"></span>
-        </a>
-        <button type="button" class="video-view-copy" onclick="copyVideoLink()" aria-label="Copy video link" title="Copy link">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        </button>
-      </div>
-
-      <div id="adminModalSections"></div>
-      <div id="adminModalNavSlot"></div>
-    </div>
-  </div>
-</div>
-
 <!-- ─── Property EDIT modal — ported from index.html's "List your property"
      form (openEditListingFull/applyImportedProperty/submitListing), so
      admin edits every field exactly the way the property owner would.
@@ -1898,6 +1893,11 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
         <div style="color:rgba(255,255,255,.85);font-size:12px;font-weight:600;margin-top:2px;display:none" id="addModalSubtitleText"></div>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
+      <button type="button" id="addModalModeToggleBtn" onclick="toggleAdminListingMode()" aria-label="Toggle edit mode"
+        style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:99px;padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;transition:background .15s"
+        onmouseover="this.style.background='rgba(255,255,255,.28)'" onmouseout="this.style.background='rgba(255,255,255,.16)'">
+        <i class="fas fa-pen" style="font-size:11px"></i> Edit
+      </button>
       <button class="modal-close" style="position:static;background:var(--brand);border:none;color:#fff;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(0,0,0,.25);transition:background .15s,transform .15s" onmouseover="this.style.background='var(--brand-hover)';this.style.transform='scale(1.06)'" onmouseout="this.style.background='var(--brand)';this.style.transform='scale(1)'" onclick="closeAdminEditModal()" aria-label="Close">
         <svg viewBox="0 0 24 24" aria-hidden="true" stroke="#fff" style="width:16px;height:16px;stroke-width:2.6;stroke:#fff !important"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
@@ -1906,11 +1906,11 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
 
     <div style="overflow-y:auto;padding:20px 28px 28px;flex:1" id="addModalScrollBody">
 
-    <!-- View-mode only: photo gallery, a plain key/value spec table, and the
-         video display — all built directly from the property object in
-         openDetail(), and living outside #listingFormSections below so
-         they're never affected by hiding the actual form. See
-         buildDetailTable()/openDetail()/closeDetail(). -->
+    <!-- View-mode only: real photo gallery, embedded video player + copy-link
+         row — swapped in for the raw upload/URL controls in view mode by
+         _setAdminListingMode(), living outside #listingFormSections below
+         so they're never affected by hiding the actual form. -->
+    <div class="detail-gallery" id="aeGallerySlot" style="display:none"></div>
     <div class="video-embed-wrap" id="aeVideoEmbedWrap" style="display:none"></div>
     <div class="video-view-row" id="aeVideoViewRow" style="display:none">
       <a href="#" id="aeVideoViewLink" target="_blank" rel="noopener noreferrer" class="video-view-link">
@@ -1922,11 +1922,12 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
       </button>
     </div>
 
-    <!-- Everything below is the actual "list your property" form (create +
-         edit modes). It's hidden as a single block in view mode — see
-         .add-modal.view-mode #listingFormSections in the CSS — so nothing
-         inside it can ever be visible or interactive while just viewing a
-         listing. -->
+    <!-- The same form is used for both View and Edit now — in view-mode
+         (see .add-modal.view-mode in the CSS) every field is disabled
+         in place rather than hiding the form, so View is pixel-identical
+         to Edit, just read-only. A real photo gallery + video preview
+         swap in for the image/video-upload controls, which don't make
+         sense to show read-only. -->
     <div id="listingFormSections">
 
     <!-- ===== 1. BASIC INFORMATION ===== -->
@@ -2334,6 +2335,11 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
     <!-- /listingFormSections -->
 
     <button class="form-submit" id="listingSubmitBtn" onclick="adminSubmitListing()">Save changes</button>
+
+    <!-- View-mode only: admin/meta info that isn't part of the actual
+         editable form (listed-on date, property ID, posted-by user,
+         remarks, legacy fields) plus a Navigate-on-maps shortcut. -->
+    <div id="aeAdminMetaSlot" style="display:none"></div>
 
     <!-- View-mode only: quick actions carried over from the old detail view (save,
          contact, schedule a visit, WhatsApp). Sits inline at the end of the
@@ -3556,7 +3562,7 @@ $(document).ready(function(){
           _adminPropCache[row._id] = row;
           return `<div style="display:inline-flex;gap:6px;flex-wrap:wrap;justify-content:center">
             <button class="btn-view" onclick="openAdminPropModal('${row._id}')"><i class="fas fa-eye"></i> View</button>
-            <button class="btn-edit" onclick="openAdminEditListing('${row._id}')"><i class="fas fa-pen"></i> Edit</button>
+            <button class="btn-edit" onclick="openAdminListingModal('${row._id}', 'edit')"><i class="fas fa-pen"></i> Edit</button>
             <button class="btn-delete" onclick="deleteProperty('${row._id}')"><i class="fas fa-trash-alt"></i> Delete</button>
           </div>`;
       }}
@@ -3977,12 +3983,6 @@ function buildVideoEmbed(url){
   if(info.type === 'file') return `<video controls preload="metadata" src="${safeUrl(info.src)}"></video>`;
   return '';
 }
-function copyVideoLink(){
-  const url = document.getElementById('videoViewLink').dataset.url || '';
-  if (!url) return;
-  if (navigator.clipboard) navigator.clipboard.writeText(url).then(()=>_adminToast('Video link copied!'));
-  else _adminToast('Video link: ' + url);
-}
 /* Tiny toast, just for the copy-link confirmation above — admin.html has
    no existing toast system to hook into. */
 function _adminToast(msg){
@@ -4109,268 +4109,15 @@ function _adminLightboxStep(dir){
   }
 })();
 
-/* Builds the exact same read-only key/value spec table used on the
-   customer-facing site (index.html's buildDetailTable). Reads from the
-   raw nested record (p.full — basic/location/price/property/amenities/
-   terms/rules/media/pg/shortStay), so both views always stay in sync.
-   Owner contact info is intentionally left out here too, same as
-   index.html — it's shown separately in the Owner Info section below,
-   since admins (unlike customers) are meant to see it directly. */
-function buildDetailTable(full){
-  const basic = full.basic || {}, location = full.location || {}, price = full.price || {},
-        property = full.property || {}, amenities = full.amenities || {}, terms = full.terms || {},
-        rules = full.rules || {}, media = full.media || {}, pg = full.pg || {}, shortStay = full.shortStay || {};
-
-  const status = basic.status || 'For Rent';
-  const isPG = status === 'PG', isLease = status === 'Lease', isShortStay = status === 'Short Stay';
-
-  const rows = [];
-  function row(label, value, wide){
-    if (value === null || value === undefined) return;
-    const text = String(value).trim();
-    if (!text) return;
-    rows.push('<div class="kv-cell' + (wide ? ' wide' : '') + '"><div class="kv-label">' + _adminModalEsc(label) + '</div><div class="kv-value">' + _adminModalEsc(text) + '</div></div>');
-  }
-
-  row('Status', status);
-  row('Listed by', basic.listedBy);
-  row('Area / Locality', location.area);
-  row('City', location.city);
-
-  if (isLease){
-    row('Lease amount', price.rent != null ? fmtRupee(price.rent) + '/month' : null);
-    row('Maintenance', price.maintenance != null ? fmtRupee(price.maintenance) : null);
-  } else {
-    row('Rent', price.rent != null ? fmtRupee(price.rent) + '/month' : null);
-    if (!isShortStay) row('Deposit', price.deposit != null ? fmtRupee(price.deposit) : null);
-    row('Maintenance', price.maintenance != null ? fmtRupee(price.maintenance) : null);
-    row('Rent increase', price.rentIncrease);
-    row('Electricity included', price.electricity);
-    row('Water charge', price.water);
-    row('Negotiable', price.negotiable);
-  }
-
-  if (!isPG && !isShortStay){
-    row('Property type', property.type);
-    row('BHK', property.bhk);
-    row('Built-up area', property.area);
-    row('Age of property', property.age);
-    row('Preferred tenants', property.tenant);
-    row('Facing', property.facing);
-  }
-  row('Bike parking', property.bike);
-  row('Car parking', property.car);
-  row('Floor', property.floor);
-  row('Bathrooms', property.bathrooms);
-  row('Furnishing', property.furnish);
-  if (!isPG) row('Available from', property.available);
-
-  if (isLease){
-    row('Notice period', terms.notice);
-    row('Lease duration', terms.lease);
-    row('Lease type', terms.leaseType);
-    row('Lock-in period', terms.lockIn);
-  } else if (!isPG && !isShortStay){
-    row('Notice period', terms.notice);
-    row('Lease duration', terms.lease);
-  }
-
-  if (!isShortStay){
-    row('Pets allowed', rules.pets);
-    row('Non-veg allowed', rules.nonVeg);
-    row('Piped gas', rules.gas);
-  }
-
-  if (isPG){
-    row('Property type', pg.type);
-    row('Gender preference', pg.gender);
-    row('Room type', pg.room);
-    row('Meals', pg.meals);
-    row('Occupancy', pg.occupancy);
-    row('Notice period', pg.notice);
-    row('Bathroom', pg.bathroom);
-    row('Room furnishing', pg.furnish);
-    row('Food type', pg.food);
-    row('Available from', pg.available);
-    row('Visitor policy', pg.visitors);
-    row('Gate closing time', pg.gateTime);
-  }
-
-  if (isShortStay){
-    row('Property type', shortStay.type);
-    row('Room type', shortStay.roomType);
-    row('Available 24 hours', shortStay.available24hrs);
-    row('Free cancellation window', shortStay.cancellation);
-    row('Unmarried couples allowed', shortStay.couplesAllowed);
-    row('Room furnishing', shortStay.furnish);
-  }
-
-  const selected = Array.isArray(amenities.selected) ? amenities.selected : [];
-  row('Amenities', selected.join(', '), true);
-  row('Additional amenities', amenities.extra, true);
-
-  row('Description', media.desc, true);
-
-  if (!rows.length) return '<div style="padding:14px 0;color:var(--ink3);font-size:0.85rem">No details added yet.</div>';
-  return '<div class="detail-kv-table">' + rows.join('') + '</div>';
-}
-
+/* View and Edit now share the exact same form (#addModal) — see
+   openAdminListingModal()/_setAdminListingMode() below — so View is
+   pixel-identical to Edit, just with every field disabled in place. */
 function openAdminPropModal(id){
-  const p = _adminPropCache[id];
-  if(!p) return;
-  const full = p.full || {};
-
-  /* ── Header: property ID as title, area as subtitle — same as
-     openDetail() in index.html ── */
-  document.getElementById('adminModalTitleText').textContent = p.propertyId || p.title || 'Property details';
-  const subEl = document.getElementById('adminModalSubtitleText');
-  const subText = p.loc || p.city || '';
-  subEl.textContent = subText;
-  subEl.style.display = subText ? '' : 'none';
-
-  /* ── Gallery — same photo slider used on the property cards/customer
-     view (buildImgSlider), colored by listing status like index.html ── */
-  const gallerySlot = document.getElementById('detailGallerySlot');
-  if (gallerySlot){
-    const colors = {'For Rent':'#e8f5ee:#1a6640','Lease':'#dde9fa:#1a4680','PG':'#eee8fa:#4a2a9a','Short Stay':'#e0f7fa:#00646e'};
-    const [gbg, gfg] = (colors[p.status] || '#f0f0f0:#333').split(':');
-    gallerySlot.innerHTML = `<div class="prop-img" style="background:${gbg}" data-idx="0">${buildImgSlider(p, gfg)}</div>`;
-  }
-
-  /* ── Plain key/value spec table — identical to the customer-facing
-     property view (buildDetailTable), built straight from the raw
-     nested record the server sends alongside the flattened row. ── */
-  const tableWrap = document.getElementById('detailTableWrap');
-  if (tableWrap) tableWrap.innerHTML = buildDetailTable(full);
-
-  /* ── Video tour — real embedded player when recognized, plus a
-     clickable link + copy button, same as openDetail(). ── */
-  const videoUrl = full.media?.video || '';
-  const videoRow = document.getElementById('videoViewRow');
-  const videoEmbedWrap = document.getElementById('videoEmbedWrap');
-  const safeVideoUrl = safeUrl(videoUrl);
-  if (safeVideoUrl){
-    const link = document.getElementById('videoViewLink');
-    link.href = safeVideoUrl;
-    document.getElementById('videoViewLinkText').textContent = videoUrl;
-    link.dataset.url = videoUrl;
-    videoRow.style.display = 'flex';
-    if (videoEmbedWrap){
-      const embedHtml = buildVideoEmbed(safeVideoUrl);
-      videoEmbedWrap.innerHTML = embedHtml;
-      videoEmbedWrap.style.display = embedHtml ? 'block' : 'none';
-    }
-  } else {
-    videoRow.style.display = 'none';
-    if (videoEmbedWrap){ videoEmbedWrap.innerHTML = ''; videoEmbedWrap.style.display = 'none'; }
-  }
-
-  /* ── Admin-only extras — everything buildDetailTable deliberately
-     leaves out of the customer-facing table: full owner contact, full
-     address/map link, legacy fields, remarks, listed-on date. Admins
-     (unlike customers) are meant to see all of it. ── */
-  let sectionsHtml = '';
-
-  function detailRow(label, value){
-    if (value === null || value === undefined) return '';
-    const text = String(value).trim();
-    if (!text) return '';
-    return `<div class="prop-modal-detail"><div class="prop-modal-detail-label">${_adminModalEsc(label)}</div><div class="prop-modal-detail-val">${_adminModalEsc(text)}</div></div>`;
-  }
-
-  const owner = full.owner || {};
-  const ownerRows = [
-    detailRow('Building / Project Name', owner.propertyName),
-    detailRow('Owner Name', owner.name || p.ownerName),
-    detailRow('Owner Number', owner.phone || p.ownerNumber),
-    detailRow('Alternate Number', owner.altPhone),
-    detailRow('Owner Email', owner.email),
-    detailRow('Best Time to Contact', owner.contactTime),
-    detailRow('Owner Address', owner.address),
-    detailRow('Agent Phone', owner.agentPhone),
-    detailRow('Agent Area', owner.agentArea),
-  ].filter(Boolean).join('');
-  if (ownerRows){
-    sectionsHtml += `<div class="prop-modal-section-label">Owner Info</div>
-      <div class="prop-modal-grid">${ownerRows}</div>`;
-  }
-
-  const location = full.location || {};
-  const locationRows = [
-    detailRow('Full Address', location.address),
-    detailRow('Map Link', location.mapLink),
-    detailRow('Latitude', location.lat),
-    detailRow('Longitude', location.lng),
-  ].filter(Boolean).join('');
-  if (locationRows){
-    sectionsHtml += `<div class="prop-modal-section-label">Location (Admin Only)</div>
-      <div class="prop-modal-grid">${locationRows}</div>`;
-  }
-
-  const legacyRows = [
-    detailRow('Monthly Rent (legacy)', full.price?.monthlyRent != null ? fmtRupee(full.price.monthlyRent) : null),
-  ].filter(Boolean).join('');
-  if (legacyRows){
-    sectionsHtml += `<div class="prop-modal-section-label">Other</div>
-      <div class="prop-modal-grid">${legacyRows}</div>`;
-  }
-
-  let remarkEntries = [];
-  if (Array.isArray(p.remarks) && p.remarks.length)
-    remarkEntries = p.remarks.map(r => (typeof r === 'string' ? r : (r && r.remark) || '')).map(s => s.trim()).filter(Boolean);
-  else if (typeof p.remarks === 'string' && p.remarks.trim())
-    remarkEntries = [p.remarks.trim()];
-
-  const adminRows = [];
-  if (p.createdAt){
-    adminRows.push(`<div class="prop-modal-detail"><div class="prop-modal-detail-label">Listed On</div><div class="prop-modal-detail-val">${_adminModalEsc(new Date(p.createdAt).toLocaleString('en-GB'))}</div></div>`);
-  }
-  if (p.propertyId){
-    adminRows.push(`<div class="prop-modal-detail"><div class="prop-modal-detail-label">Property ID</div><div class="prop-modal-detail-val">${_adminModalEsc(p.propertyId)}</div></div>`);
-  }
-  if (p.userId){
-    adminRows.push(`<div class="prop-modal-detail"><div class="prop-modal-detail-label">Posted By (User ID)</div><div class="prop-modal-detail-val">${_adminModalEsc(p.userId)}</div></div>`);
-  }
-  if (remarkEntries.length){
-    const listHtml = remarkEntries.map((t,i)=>`<div style="display:flex;gap:6px;align-items:baseline;margin-bottom:4px"><span style="min-width:18px;background:var(--gold-light);color:var(--gold-dark);border-radius:99px;font-size:0.62rem;font-weight:800;text-align:center;padding:1px 5px;">${i+1}</span><span style="font-size:0.84rem;word-break:break-word">${_adminModalEsc(t)}</span></div>`).join('');
-    adminRows.push(`<div class="prop-modal-detail" style="grid-column:1/-1"><div class="prop-modal-detail-label">Remarks</div><div style="margin-top:6px">${listHtml}</div></div>`);
-  }
-  if (adminRows.length){
-    sectionsHtml += `<div class="prop-modal-section-label">Admin</div>
-      <div class="prop-modal-grid">${adminRows.join('')}</div>`;
-  }
-
-  document.getElementById('adminModalSections').innerHTML = sectionsHtml;
-
-  /* ── Navigate ── */
-  const navSlot = document.getElementById('adminModalNavSlot');
-  if(p.latitude && p.longitude){
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${p.latitude},${p.longitude}`;
-    navSlot.innerHTML = `
-      <a href="${url}" target="_blank" rel="noopener"
-        style="display:flex;align-items:center;justify-content:center;gap:8px;
-          width:100%;padding:12px;border-radius:10px;background:#1a73e8;color:#fff;
-          font-size:0.86rem;font-weight:700;text-decoration:none;margin-top:14px;
-          transition:background 0.18s;font-family:inherit;"
-        onmouseover="this.style.background='#1558c0'" onmouseout="this.style.background='#1a73e8'">
-        <i class="fas fa-location-arrow"></i> Navigate on Google Maps
-      </a>`;
-  } else {
-    navSlot.innerHTML = `
-      <div style="margin-top:12px;padding:9px 12px;border-radius:10px;
-        background:var(--surface2);border:1px dashed var(--border2);
-        font-size:0.75rem;color:var(--ink3);text-align:center;">
-        📍 No coordinates saved for this property
-      </div>`;
-  }
-
-  document.getElementById('adminPropModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  openAdminListingModal(id, 'view');
 }
 
 function closeAdminPropModal(){
-  document.getElementById('adminPropModal').classList.remove('open');
-  document.body.style.overflow = '';
+  closeAdminEditModal();
 }
 
 /* ════════════════════════════════════
@@ -4857,8 +4604,10 @@ function resetFieldVisibility() {
 /* ── Open/close: admin equivalent of index.html's openEditListingFull /
    closeEditListingFull, minus the draft-save/restore dance (that's a
    per-owner "resume my in-progress listing" feature that doesn't apply
-   when admin is editing someone else's property record). ── */
-function openAdminEditListing(id) {
+   when admin is editing someone else's property record). Shared by both
+   the table's View and Edit buttons — mode ('view' | 'edit') decides
+   whether fields start disabled or editable; see _setAdminListingMode(). ── */
+function openAdminListingModal(id, mode) {
   const p = _adminPropCache[id];
   if (!p) { alert('Could not find that listing'); return; }
   const full = p.full || {};
@@ -4868,24 +4617,154 @@ function openAdminEditListing(id) {
   applyImportedProperty(full);
   onFTypeChange(document.getElementById('f-type').value);
 
-  document.getElementById('addModalTitleText').textContent = 'Edit property';
-  const sub = document.getElementById('addModalSubtitleText');
-  if (sub) {
-    sub.textContent = p.propertyId || '';
-    sub.style.display = p.propertyId ? '' : 'none';
-  }
-
-  const submitBtn = document.getElementById('listingSubmitBtn');
-  if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Save changes'; }
-
   document.getElementById('addModal').classList.add('open');
   lockBodyScroll();
+
+  _setAdminListingMode(mode);
 }
 function closeAdminEditModal() {
   document.getElementById('addModal').classList.remove('open');
   unlockBodyScroll();
   editingPropertyId = null;
   resetListingForm();
+}
+
+/* View and Edit are the SAME form now — this just flips which mode it's
+   in without closing/reopening the modal. Called by the header's toggle
+   button (id="addModalModeToggleBtn"). */
+function toggleAdminListingMode(){
+  const isCurrentlyView = document.getElementById('addModalBox').classList.contains('view-mode');
+  _setAdminListingMode(isCurrentlyView ? 'edit' : 'view');
+}
+
+/* Disables/enables every form field in place (view-mode CSS handles the
+   read-only look), swaps the image/video upload controls for a real
+   gallery + video preview in view mode, and shows/hides the admin-only
+   meta block (listed-on, property ID, posted-by, remarks, navigate) that
+   isn't part of the actual editable form. */
+function _setAdminListingMode(mode){
+  const p = _adminPropCache[editingPropertyId] || {};
+  const full = p.full || {};
+  const isView = mode === 'view';
+
+  document.getElementById('addModalBox').classList.toggle('view-mode', isView);
+  document.getElementById('addModal').classList.toggle('view-mode', isView);
+
+  document.querySelectorAll('#listingFormSections input, #listingFormSections select, #listingFormSections textarea')
+    .forEach(el => { el.disabled = isView; });
+
+  const submitBtn = document.getElementById('listingSubmitBtn');
+  if (submitBtn) { submitBtn.disabled = isView; submitBtn.textContent = 'Save changes'; }
+
+  const toggleBtn = document.getElementById('addModalModeToggleBtn');
+  if (toggleBtn){
+    toggleBtn.innerHTML = isView
+      ? '<i class="fas fa-pen" style="font-size:11px"></i> Edit'
+      : '<i class="fas fa-eye" style="font-size:11px"></i> View';
+  }
+
+  document.getElementById('addModalTitleText').textContent = isView
+    ? (p.propertyId || p.title || 'Property details')
+    : 'Edit property';
+  const sub = document.getElementById('addModalSubtitleText');
+  if (sub){
+    const subText = isView ? (p.loc || p.city || '') : (p.propertyId || '');
+    sub.textContent = subText;
+    sub.style.display = subText ? '' : 'none';
+  }
+
+  /* Gallery — real photo slider (same one used everywhere else), only
+     meaningful in view mode; the raw image-upload controls take over
+     again in edit mode (already visible via the view-mode CSS toggle). */
+  const gallerySlot = document.getElementById('aeGallerySlot');
+  if (gallerySlot){
+    if (isView){
+      const colors = {'For Rent':'#e8f5ee:#1a6640','Lease':'#dde9fa:#1a4680','PG':'#eee8fa:#4a2a9a','Short Stay':'#e0f7fa:#00646e'};
+      const [gbg, gfg] = (colors[p.status] || '#f0f0f0:#333').split(':');
+      gallerySlot.innerHTML = `<div class="prop-img" style="background:${gbg}" data-idx="0">${buildImgSlider(p, gfg)}</div>`;
+      gallerySlot.style.display = 'block';
+    } else {
+      gallerySlot.innerHTML = '';
+      gallerySlot.style.display = 'none';
+    }
+  }
+
+  /* Video — a real embedded player + copy-link row in view mode, in
+     place of the raw URL input (hidden via view-mode CSS). */
+  const videoUrl = full.media?.video || '';
+  const videoRow = document.getElementById('aeVideoViewRow');
+  const videoEmbedWrap = document.getElementById('aeVideoEmbedWrap');
+  const safeVideoUrl = safeUrl(videoUrl);
+  if (isView && safeVideoUrl){
+    const link = document.getElementById('aeVideoViewLink');
+    link.href = safeVideoUrl;
+    document.getElementById('aeVideoViewLinkText').textContent = videoUrl;
+    link.dataset.url = videoUrl;
+    if (videoRow) videoRow.style.display = 'flex';
+    if (videoEmbedWrap){
+      const embedHtml = buildVideoEmbed(safeVideoUrl);
+      videoEmbedWrap.innerHTML = embedHtml;
+      videoEmbedWrap.style.display = embedHtml ? 'block' : 'none';
+    }
+  } else {
+    if (videoRow) videoRow.style.display = 'none';
+    if (videoEmbedWrap){ videoEmbedWrap.innerHTML = ''; videoEmbedWrap.style.display = 'none'; }
+  }
+
+  /* Admin-only meta — not part of the actual editable form, so it lives
+     in its own slot below the (hidden-in-view-mode) Save button, shown
+     only in view mode. */
+  const metaSlot = document.getElementById('aeAdminMetaSlot');
+  if (metaSlot){
+    if (!isView){
+      metaSlot.style.display = 'none';
+      metaSlot.innerHTML = '';
+    } else {
+      function detailRow(label, value){
+        if (value === null || value === undefined) return '';
+        const text = String(value).trim();
+        if (!text) return '';
+        return `<div class="prop-modal-detail"><div class="prop-modal-detail-label">${_adminModalEsc(label)}</div><div class="prop-modal-detail-val">${_adminModalEsc(text)}</div></div>`;
+      }
+
+      let html = '';
+      const legacyRows = [
+        detailRow('Monthly Rent (legacy)', full.price?.monthlyRent != null ? fmtRupee(full.price.monthlyRent) : null),
+      ].filter(Boolean).join('');
+      if (legacyRows) html += `<div class="prop-modal-section-label">💰 Other</div><div class="prop-modal-grid">${legacyRows}</div>`;
+
+      let remarkEntries = [];
+      if (Array.isArray(p.remarks) && p.remarks.length)
+        remarkEntries = p.remarks.map(r => (typeof r === 'string' ? r : (r && r.remark) || '')).map(s => s.trim()).filter(Boolean);
+      else if (typeof p.remarks === 'string' && p.remarks.trim())
+        remarkEntries = [p.remarks.trim()];
+
+      const adminRows = [];
+      if (p.createdAt) adminRows.push(detailRow('Listed On', new Date(p.createdAt).toLocaleString('en-GB')));
+      if (p.propertyId) adminRows.push(detailRow('Property ID', p.propertyId));
+      if (p.userId) adminRows.push(detailRow('Posted By (User ID)', p.userId));
+      if (remarkEntries.length){
+        const listHtml = remarkEntries.map((t,i)=>`<div style="display:flex;gap:6px;align-items:baseline;margin-bottom:4px"><span style="min-width:18px;background:var(--gold-light);color:var(--gold-dark);border-radius:99px;font-size:0.62rem;font-weight:800;text-align:center;padding:1px 5px;">${i+1}</span><span style="font-size:0.84rem;word-break:break-word">${_adminModalEsc(t)}</span></div>`).join('');
+        adminRows.push(`<div class="prop-modal-detail" style="grid-column:1/-1"><div class="prop-modal-detail-label">Remarks</div><div style="margin-top:6px">${listHtml}</div></div>`);
+      }
+      if (adminRows.length) html += `<div class="prop-modal-section-label">🗂️ Admin</div><div class="prop-modal-grid">${adminRows.join('')}</div>`;
+
+      if (p.latitude && p.longitude){
+        const url = `https://www.google.com/maps/dir/?api=1&destination=${p.latitude},${p.longitude}`;
+        html += `<a href="${url}" target="_blank" rel="noopener"
+            style="display:flex;align-items:center;justify-content:center;gap:8px;
+              width:100%;padding:12px;border-radius:10px;background:#1a73e8;color:#fff;
+              font-size:0.86rem;font-weight:700;text-decoration:none;margin-top:14px;
+              transition:background 0.18s;font-family:inherit;"
+            onmouseover="this.style.background='#1558c0'" onmouseout="this.style.background='#1a73e8'">
+            <i class="fas fa-location-arrow"></i> Navigate on Google Maps
+          </a>`;
+      }
+
+      metaSlot.innerHTML = html;
+      metaSlot.style.display = html ? 'block' : 'none';
+    }
+  }
 }
 
 function applyImportedProperty(p) {
