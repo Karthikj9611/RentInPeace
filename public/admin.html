@@ -1687,9 +1687,34 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
               <th>Property</th>
               <th>Status</th>
               <th>Price</th>
+              <th>Deposit</th>
               <th>Owner Name</th>
               <th>Owner Number</th>
               <th>Location</th>
+              <th>City</th>
+              <th>Type</th>
+              <th>Area (sqft)</th>
+              <th>Floor</th>
+              <th>Furnishing</th>
+              <th>Bathroom</th>
+              <th>Car Parking</th>
+              <th>Bike Parking</th>
+              <th>Facing</th>
+              <th>Age</th>
+              <th>PG Gender</th>
+              <th>PG Room Type</th>
+              <th>PG Meals</th>
+              <th>PG Occupancy</th>
+              <th>PG Notice</th>
+              <th>SS Room Type</th>
+              <th>SS Available 24hrs</th>
+              <th>SS Cancellation</th>
+              <th>SS Couples Allowed</th>
+              <th>Visits</th>
+              <th>Photos</th>
+              <th>Amenities</th>
+              <th>Property ID</th>
+              <th>User ID</th>
               <th>Listed On</th>
               <th>Promoted</th>
               <th>Verified</th>
@@ -1701,9 +1726,34 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('title', this.value, this)"></th>
               <th><select class="col-filter-select" id="colFilterStatus" onchange="onPropColumnFilter('status', this.value, this)"><option value="">All</option></select></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('displayPrice', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('deposit', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('ownerName', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('ownerNumber', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('loc', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('city', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('typeCol', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('area', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('floor', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('furnishing', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('bathroom', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('carparking', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('bikeparking', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('facing', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('age', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('pgGender', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('pgRoomType', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('pgMeals', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('pgOccupancy', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('pgNotice', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('ssRoomType', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('ssAvailable24hrs', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('ssCancellation', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('ssCouplesAllowed', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('visitCount', this.value, this)"></th>
+              <th></th>
+              <th></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('propertyId', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('userId', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="dd/mm/yyyy" oninput="onPropColumnFilter('listedOn', this.value, this)"></th>
               <th><select class="col-filter-select" onchange="onPropColumnFilter('promoted', this.value, this)"><option value="">All</option><option value="yes">Yes</option><option value="no">No</option></select></th>
               <th><select class="col-filter-select" onchange="onPropColumnFilter('verified', this.value, this)"><option value="">All</option><option value="yes">Yes</option><option value="no">No</option></select></th>
@@ -1712,7 +1762,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
             </tr>
           </thead>
           <tbody>
-            <tr><td colspan="12" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
+            <tr><td colspan="37" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
           </tbody>
         </table>
 
@@ -3570,18 +3620,75 @@ $(document).ready(function(){
       { data:'status', render:(d,t)=> t==='display' ? statusBadge(d) : (d||'—') },
       /* 3 – Price */
       { data:'displayPrice', render:(d)=> escapeHtml(d||'—') },
-      /* 4 – Owner Name */
+      /* 4 – Deposit */
+      { data:'deposit', render:(d)=> escapeHtml(d==null?'':String(d)) },
+      /* 5 – Owner Name */
       { data:'ownerName', render:(d)=> escapeHtml(d||'—') },
-      /* 5 – Owner Number (clickable) */
+      /* 6 – Owner Number (clickable) */
       { data:null, render:(d,t,row)=>{
           if(t==='display') return renderOwnerPhone(row);
           return row.ownerNumber||'—';
       }},
-      /* 6 – Location */
+      /* 7 – Location */
       { data:'loc', render:(d)=> escapeHtml(d||'—') },
-      /* 7 – Listed On */
+      /* 8 – City */
+      { data:'city', render:(d)=> escapeHtml(d||'—') },
+      /* 9 – Type (BHK for Rent/Lease, PG type, or Short Stay type) */
+      { data:null, render:(d,t,row)=>{
+          const v = row.bhk || row.pgPropertyType || row.ssPropertyType || '';
+          return escapeHtml(v||'—');
+      }},
+      /* 10 – Area (sqft) */
+      { data:'area', render:(d)=> escapeHtml(d||'—') },
+      /* 11 – Floor */
+      { data:'floor', render:(d)=> escapeHtml(d||'—') },
+      /* 12 – Furnishing */
+      { data:'furnishing', render:(d)=> escapeHtml(d||'—') },
+      /* 13 – Bathroom */
+      { data:'toilet', render:(d)=> escapeHtml(d||'—') },
+      /* 14 – Car Parking */
+      { data:'carparking', render:(d)=> escapeHtml(d||'—') },
+      /* 15 – Bike Parking */
+      { data:'bikeparking', render:(d)=> escapeHtml(d||'—') },
+      /* 16 – Facing */
+      { data:'facing', render:(d)=> escapeHtml(d||'—') },
+      /* 17 – Age */
+      { data:'age', render:(d)=> escapeHtml(d||'—') },
+      /* 18 – PG Gender */
+      { data:'pgGender', render:(d)=> escapeHtml(d||'—') },
+      /* 19 – PG Room Type */
+      { data:'pgRoomType', render:(d)=> escapeHtml(d||'—') },
+      /* 20 – PG Meals */
+      { data:'pgMeals', render:(d)=> escapeHtml(d||'—') },
+      /* 21 – PG Occupancy */
+      { data:'pgOccupancy', render:(d)=> escapeHtml(d||'—') },
+      /* 22 – PG Notice */
+      { data:'pgNotice', render:(d)=> escapeHtml(d||'—') },
+      /* 23 – SS Room Type */
+      { data:'ssRoomType', render:(d)=> escapeHtml(d||'—') },
+      /* 24 – SS Available 24hrs */
+      { data:'ssAvailable24hrs', render:(d)=> escapeHtml(d||'—') },
+      /* 25 – SS Cancellation */
+      { data:'ssCancellation', render:(d)=> escapeHtml(d||'—') },
+      /* 26 – SS Couples Allowed */
+      { data:'ssCouplesAllowed', render:(d)=> escapeHtml(d||'—') },
+      /* 27 – Visits */
+      { data:'visitCount', render:(d)=> (d==null?'0':escapeHtml(String(d))) },
+      /* 28 – Photos (count) */
+      { data:null, orderable:false, className:'dt-body-center', render:(d,t,row)=>{
+          return Array.isArray(row.images) ? row.images.length : 0;
+      }},
+      /* 29 – Amenities (count) */
+      { data:null, orderable:false, className:'dt-body-center', render:(d,t,row)=>{
+          return Array.isArray(row.amenities) ? row.amenities.length : 0;
+      }},
+      /* 30 – Property ID */
+      { data:'propertyId', render:(d)=> escapeHtml(d||'—') },
+      /* 31 – User ID */
+      { data:'userId', render:(d)=> escapeHtml(d||'—') },
+      /* 32 – Listed On */
       { data:'createdAt', render:(d,t)=> t==='display' ? formatDateTime(d) : (d||'—') },
-      /* 8 – Promoted (toggle) */
+      /* 33 – Promoted (toggle) */
       { data:'promoted', orderable:false, className:'dt-body-center', render:(d,t,row)=>{
           if(t!=='display') return d ? 'Yes' : 'No';
           return `<label class="mini-toggle-wrap"><span class="mini-toggle promoted-toggle">
@@ -3589,7 +3696,7 @@ $(document).ready(function(){
             <span class="slider"></span>
           </span></label>`;
       }},
-      /* 9 – Verified (toggle) */
+      /* 34 – Verified (toggle) */
       { data:'verified', orderable:false, className:'dt-body-center', render:(d,t,row)=>{
           if(t!=='display') return d ? 'Yes' : 'No';
           return `<label class="mini-toggle-wrap"><span class="mini-toggle verified-toggle">
@@ -3597,12 +3704,12 @@ $(document).ready(function(){
             <span class="slider"></span>
           </span></label>`;
       }},
-      /* 10 – Remarks */
+      /* 35 – Remarks */
       { data:'remarks', orderable:false, render:(d,t,row)=>{
           if(t==='display') return remarkCellHtml(row._id, d, 'property');
           return d||'';
       }},
-      /* 11 – Action */
+      /* 36 – Action */
       { data:null, orderable:false, render:(d,t,row)=>{
           _adminPropCache[row._id] = row;
           return `<div style="display:inline-flex;gap:6px;flex-wrap:nowrap;justify-content:center">
@@ -3612,7 +3719,7 @@ $(document).ready(function(){
           </div>`;
       }}
     ],
-    order:[[7,'desc']],
+    order:[[32,'desc']],
     orderCellsTop:true,
     pageLength:10,
     scrollX:true,
@@ -3665,11 +3772,11 @@ $(document).ready(function(){
       },*/
       {
         extend:'print', text:'<i class="fas fa-print"></i> Print', title:'KR Properties',
-        exportOptions:{columns:[1,2,3,4,5,6,7,8,9,10],
+        exportOptions:{columns:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35],
           format:{ body:function(data,row,col){
             var rd=propTable.row(row).data(); if(!rd) return data;
-            if(col===8) return rd.promoted ? 'Yes' : 'No';
-            if(col===9) return rd.verified ? 'Yes' : 'No';
+            if(col===33) return rd.promoted ? 'Yes' : 'No';
+            if(col===34) return rd.verified ? 'Yes' : 'No';
             return data;
           }}
         },
@@ -3677,19 +3784,19 @@ $(document).ready(function(){
           $(win.document.head).append('<style>table td a{color:#1a7a5e;text-decoration:underline}</style>');
           $(win.document.body).find('table tbody tr').each(function(){
             var cells=$(this).find('td');
-            var phText=cells.eq(4).text().trim();
-            if(phText&&phText!=='—') cells.eq(4).html('<a href="tel:'+phText+'">'+phText+'</a>');
+            var phText=cells.eq(5).text().trim();
+            if(phText&&phText!=='—') cells.eq(5).html('<a href="tel:'+phText+'">'+phText+'</a>');
           });
         }
       },
 	  {
         extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
         orientation:'landscape', pageSize:'A4', title:'KR Real-Estate — Properties',
-        exportOptions:{columns:[1,2,3,4,5,6,7,8,9,10],
+        exportOptions:{columns:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35],
           format:{ body:function(data,row,col){
             var rd=propTable.row(row).data(); if(!rd) return data;
-            if(col===8) return rd.promoted ? 'Yes' : 'No';
-            if(col===9) return rd.verified ? 'Yes' : 'No';
+            if(col===33) return rd.promoted ? 'Yes' : 'No';
+            if(col===34) return rd.verified ? 'Yes' : 'No';
             return data;
           }}
         },
@@ -3702,7 +3809,7 @@ $(document).ready(function(){
           rows.forEach(function(rd,i){
             var pdfRow=tableBody[i+1]; if(!pdfRow) return;
             var ph=rd.ownerNumber||'';
-            if(ph&&pdfRow[4]) pdfRow[4]={text:ph,link:'tel:'+ph,color:'#1a7a5e',decoration:'underline',fontSize:8};
+            if(ph&&pdfRow[5]) pdfRow[5]={text:ph,link:'tel:'+ph,color:'#1a7a5e',decoration:'underline',fontSize:8};
           });
         }
       }
@@ -4185,8 +4292,13 @@ function buildPropFilters(data){
 // Per-column header search filters (Property, Status, Price, Owner Name,
 // Owner Number, Location, Listed On, Promoted, Verified, Remarks).
 const _propColumnFilters = {
-  title:'', status:'', displayPrice:'', ownerName:'', ownerNumber:'',
-  loc:'', listedOn:'', promoted:'', verified:'', remarks:''
+  title:'', status:'', displayPrice:'', deposit:'', ownerName:'', ownerNumber:'',
+  loc:'', city:'', typeCol:'', area:'', floor:'', furnishing:'', bathroom:'',
+  carparking:'', bikeparking:'', facing:'', age:'',
+  pgGender:'', pgRoomType:'', pgMeals:'', pgOccupancy:'', pgNotice:'',
+  ssRoomType:'', ssAvailable24hrs:'', ssCancellation:'', ssCouplesAllowed:'',
+  visitCount:'', propertyId:'', userId:'',
+  listedOn:'', promoted:'', verified:'', remarks:''
 };
 
 window.onPropColumnFilter = function(field, value, inputEl){
@@ -4247,6 +4359,29 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex){
   if(cf.ownerName && !contains(row.ownerName, cf.ownerName)) return false;
   if(cf.ownerNumber && !contains(row.ownerNumber, cf.ownerNumber)) return false;
   if(cf.loc && !contains((row.loc||'')+' '+(row.city||''), cf.loc)) return false;
+  if(cf.city && !contains(row.city, cf.city)) return false;
+  if(cf.typeCol && !contains(row.bhk || row.pgPropertyType || row.ssPropertyType || '', cf.typeCol)) return false;
+  if(cf.area && !contains(row.area, cf.area)) return false;
+  if(cf.floor && !contains(row.floor, cf.floor)) return false;
+  if(cf.furnishing && !contains(row.furnishing, cf.furnishing)) return false;
+  if(cf.bathroom && !contains(row.toilet, cf.bathroom)) return false;
+  if(cf.deposit && !contains(row.deposit, cf.deposit)) return false;
+  if(cf.carparking && !contains(row.carparking, cf.carparking)) return false;
+  if(cf.bikeparking && !contains(row.bikeparking, cf.bikeparking)) return false;
+  if(cf.facing && !contains(row.facing, cf.facing)) return false;
+  if(cf.age && !contains(row.age, cf.age)) return false;
+  if(cf.pgGender && !contains(row.pgGender, cf.pgGender)) return false;
+  if(cf.pgRoomType && !contains(row.pgRoomType, cf.pgRoomType)) return false;
+  if(cf.pgMeals && !contains(row.pgMeals, cf.pgMeals)) return false;
+  if(cf.pgOccupancy && !contains(row.pgOccupancy, cf.pgOccupancy)) return false;
+  if(cf.pgNotice && !contains(row.pgNotice, cf.pgNotice)) return false;
+  if(cf.ssRoomType && !contains(row.ssRoomType, cf.ssRoomType)) return false;
+  if(cf.ssAvailable24hrs && !contains(row.ssAvailable24hrs, cf.ssAvailable24hrs)) return false;
+  if(cf.ssCancellation && !contains(row.ssCancellation, cf.ssCancellation)) return false;
+  if(cf.ssCouplesAllowed && !contains(row.ssCouplesAllowed, cf.ssCouplesAllowed)) return false;
+  if(cf.visitCount && !contains(row.visitCount, cf.visitCount)) return false;
+  if(cf.propertyId && !contains(row.propertyId, cf.propertyId)) return false;
+  if(cf.userId && !contains(row.userId, cf.userId)) return false;
   if(cf.listedOn){
     const formatted = row.createdAt ? new Date(row.createdAt).toLocaleDateString('en-GB') : '';
     if(!formatted.includes(cf.listedOn)) return false;
