@@ -189,6 +189,9 @@ body{
 .bulk-btn-outline-danger:hover{background:var(--red);color:#fff;box-shadow:0 4px 14px rgba(224,68,68,0.3)}
 .bulk-btn:disabled{opacity:0.45;cursor:not-allowed;pointer-events:none}
 .bulk-btn:disabled:hover{background:#fff;color:var(--red);box-shadow:none}
+.bulk-toolbar-below{
+  justify-content:center;border-bottom:none;border-top:1px solid var(--border);
+}
 #propSelectAllCheckbox,.prop-select-all-checkbox,.prop-row-check{
   width:16px;height:16px;cursor:pointer;accent-color:var(--ink);
 }
@@ -317,7 +320,7 @@ table.dataTable.no-footer{border-bottom:none!important}
 
 /* ── BUTTONS ── */
 .btn-delete{
-  display:inline-flex;align-items:center;gap:6px;
+  display:inline-flex;align-items:center;gap:6px;white-space:nowrap;
   background:var(--red-light);color:var(--red);
   border:1px solid rgba(224,68,68,0.2);padding:6px 14px;
   border-radius:99px;cursor:pointer;font-size:0.76rem;
@@ -1305,6 +1308,7 @@ footer i{color:var(--gold)}
   .bulk-toolbar::-webkit-scrollbar{display:none}
   .bulk-toolbar-left,.bulk-toolbar-right{flex-wrap:nowrap;flex-shrink:0;gap:6px}
   .bulk-btn,.btn-add-review,.bulk-selected-count{flex-shrink:0}
+  .bulk-toolbar-below{justify-content:center}
   .bulk-btn-label{display:none}
   .bulk-btn,.btn-add-review{padding:8px 11px}
 
@@ -1675,25 +1679,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
     </div>
     <div class="card">
       <div class="table-wrapper">
-        <!-- Bulk delete toolbar -->
-        <div class="bulk-toolbar" id="bulkToolbar">
-          <div class="bulk-toolbar-left">
-            <span class="bulk-selected-count" id="bulkSelectedCount" style="display:none">
-              <i class="fas fa-check-circle"></i> <span id="bulkSelectedNum">0</span><span class="bulk-btn-label"> selected</span>
-            </span>
-            <button class="bulk-btn bulk-btn-clear" id="bulkClearBtn" style="display:none" onclick="clearPropSelection()" title="Clear selection">
-              <i class="fas fa-xmark"></i> <span class="bulk-btn-label">Clear selection</span>
-            </button>
-          </div>
-          <div class="bulk-toolbar-right">
-            <button class="bulk-btn bulk-btn-danger" id="bulkDeleteSelectedBtn" style="display:none" onclick="deleteSelectedProperties()" title="Delete selected">
-              <i class="fas fa-trash-alt"></i> <span class="bulk-btn-label">Delete Selected&nbsp;</span>(<span id="bulkDeleteCount">0</span>)
-            </button>
-            <button class="bulk-btn bulk-btn-outline-danger" disabled title="Temporarily disabled">
-              <i class="fas fa-triangle-exclamation"></i> <span class="bulk-btn-label">Delete All Properties</span>
-            </button>
-          </div>
-        </div>
+
         <table id="propertyTable" class="display nowrap" style="width:100%">
           <thead>
             <tr>
@@ -1729,6 +1715,26 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
             <tr><td colspan="12" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
           </tbody>
         </table>
+
+        <!-- Bulk delete toolbar -->
+        <div class="bulk-toolbar bulk-toolbar-below" id="bulkToolbar">
+          <div class="bulk-toolbar-left">
+            <span class="bulk-selected-count" id="bulkSelectedCount" style="display:none">
+              <i class="fas fa-check-circle"></i> <span id="bulkSelectedNum">0</span><span class="bulk-btn-label"> selected</span>
+            </span>
+            <button class="bulk-btn bulk-btn-clear" id="bulkClearBtn" style="display:none" onclick="clearPropSelection()" title="Clear selection">
+              <i class="fas fa-xmark"></i> <span class="bulk-btn-label">Clear selection</span>
+            </button>
+          </div>
+          <div class="bulk-toolbar-right">
+            <button class="bulk-btn bulk-btn-danger" id="bulkDeleteSelectedBtn" style="display:none" onclick="deleteSelectedProperties()" title="Delete selected">
+              <i class="fas fa-trash-alt"></i> <span class="bulk-btn-label">Delete Selected&nbsp;</span>(<span id="bulkDeleteCount">0</span>)
+            </button>
+            <button class="bulk-btn bulk-btn-outline-danger" disabled title="Temporarily disabled">
+              <i class="fas fa-triangle-exclamation"></i> <span class="bulk-btn-label">Delete All Properties</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -3433,7 +3439,7 @@ $(document).ready(function(){
 			_customerCache[row.mobile || row._id] = row;
 
 			return `
-			  <div style="display:inline-flex;gap:6px;flex-wrap:wrap;justify-content:center">
+			  <div style="display:inline-flex;gap:6px;flex-wrap:nowrap;justify-content:center">
 
 				<button class="btn-view" onclick="openCustomerModal('${row.mobile || row._id}')">
 				  <i class="fas fa-eye"></i> View
@@ -3599,7 +3605,7 @@ $(document).ready(function(){
       /* 11 – Action */
       { data:null, orderable:false, render:(d,t,row)=>{
           _adminPropCache[row._id] = row;
-          return `<div style="display:inline-flex;gap:6px;flex-wrap:wrap;justify-content:center">
+          return `<div style="display:inline-flex;gap:6px;flex-wrap:nowrap;justify-content:center">
             <button class="btn-view" onclick="openAdminPropModal('${row._id}')"><i class="fas fa-eye"></i> View</button>
             <button class="btn-edit" onclick="openAdminListingModal('${row._id}', 'edit')"><i class="fas fa-pen"></i> Edit</button>
             <button class="btn-delete" onclick="deleteProperty('${row._id}')"><i class="fas fa-trash-alt"></i> Delete</button>
@@ -3788,7 +3794,7 @@ $(document).ready(function(){
       /* 12 – Action */
       { data:null, orderable:false, render:(d,t,row)=>{
           _apptCache[row._id] = row;
-          return `<div style="display:inline-flex;gap:6px;flex-wrap:wrap;justify-content:center">
+          return `<div style="display:inline-flex;gap:6px;flex-wrap:nowrap;justify-content:center">
             <button class="btn-view" onclick="openApptModal('${row._id}')"><i class="fas fa-eye"></i> View</button>
             <button class="btn-delete" onclick="deleteAppointment('${row._id}')"><i class="fas fa-trash-alt"></i> Delete</button>
           </div>`;
@@ -3937,7 +3943,7 @@ $(document).ready(function(){
       /* 6 – Action */
       { data:null, orderable:false, render:(d,t,row)=>{
           if(t!=='display') return '';
-          return `<div style="display:inline-flex;gap:6px;flex-wrap:wrap;justify-content:center">
+          return `<div style="display:inline-flex;gap:6px;flex-wrap:nowrap;justify-content:center">
             <button class="btn-view" onclick="openHonestReviewModal('${row._id}')"><i class="fas fa-pen"></i> Edit</button>
             <button class="btn-delete" onclick="deleteHonestReview('${row._id}')"><i class="fas fa-trash-alt"></i> Delete</button>
           </div>`;
