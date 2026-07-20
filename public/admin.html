@@ -4319,11 +4319,30 @@ function propCategoryOf(status){
 
 let _propCategoryState = 'all';
 
+// PG-only and Short-Stay-only column indices in #propertyTable (see the
+// numbered comments in the propTable columns:[...] definition above).
+const PG_ONLY_COLS = [18, 19, 20, 21, 22]; // PG Gender, Room Type, Meals, Occupancy, Notice
+const SS_ONLY_COLS = [23, 24, 25, 26];     // SS Room Type, Available 24hrs, Cancellation, Couples Allowed
+
+function applyPropCategoryColumnVisibility(cat){
+  if(!propTable) return;
+  // Rent/Lease: neither PG nor Short Stay fields apply.
+  // PG: hide Short-Stay-only fields, show PG fields.
+  // Short Stay: hide PG-only fields, show Short-Stay fields.
+  // all/Promoted/Verified: mixed listing types, so show everything.
+  const showPG = (cat === 'all' || cat === 'Promoted' || cat === 'Verified' || cat === 'PG');
+  const showSS = (cat === 'all' || cat === 'Promoted' || cat === 'Verified' || cat === 'Short Stay');
+  PG_ONLY_COLS.forEach(i => propTable.column(i).visible(showPG, false));
+  SS_ONLY_COLS.forEach(i => propTable.column(i).visible(showSS, false));
+  propTable.columns.adjust();
+}
+
 function switchPropCategory(cat){
   _propCategoryState = cat;
   document.querySelectorAll('#propCatTabs .cat-tab-btn').forEach(btn=>{
     btn.classList.toggle('active', btn.getAttribute('data-cat') === cat);
   });
+  applyPropCategoryColumnVisibility(cat);
   if(propTable) propTable.draw();
 }
 
