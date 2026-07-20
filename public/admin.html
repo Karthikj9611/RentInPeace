@@ -1674,7 +1674,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
         <i class="fas fa-bed"></i><span>PG</span><span class="cat-count" id="cat-count-PG">—</span>
       </button>
       <button class="cat-tab-btn" data-cat="Short Stay" onclick="switchPropCategory('Short Stay')">
-        <i class="fas fa-suitcase-rolling"></i><span>Short Stay</span><span class="cat-count" id="cat-count-Short Stay">—</span>
+        <i class="fas fa-suitcase-rolling"></i><span>Short Stay</span><span class="cat-count" id="cat-count-Short-Stay">—</span>
       </button>
     </div>
     <div class="card">
@@ -4223,7 +4223,7 @@ function updatePropCategoryCounts(data){
     if(r.verified) counts.Verified++;
   });
   ['all','Promoted','Verified','Rent','Lease','PG','Short Stay'].forEach(cat=>{
-    const el = document.getElementById('cat-count-'+cat);
+    const el = document.getElementById('cat-count-'+cat.replace(/\s+/g,'-'));
     if(el) el.innerText = counts[cat];
   });
 }
