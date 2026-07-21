@@ -1801,9 +1801,6 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
       <button class="cat-tab-btn" data-cat="Promoted" onclick="switchPropCategory('Promoted')">
         <i class="fas fa-star"></i><span>Promoted</span><span class="cat-count" id="cat-count-Promoted">—</span>
       </button>
-      <button class="cat-tab-btn" data-cat="Verified" onclick="switchPropCategory('Verified')">
-        <i class="fas fa-circle-check"></i><span>Verified</span><span class="cat-count" id="cat-count-Verified">—</span>
-      </button>
       <button class="cat-tab-btn" data-cat="Booked" onclick="switchPropCategory('Booked')">
         <i class="fas fa-lock"></i><span>Booked</span><span class="cat-count" id="cat-count-Booked">—</span>
       </button>
@@ -1890,7 +1887,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('userId', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="dd/mm/yyyy" oninput="onPropColumnFilter('listedOn', this.value, this)"></th>
               <th><select class="col-filter-select" onchange="onPropColumnFilter('promoted', this.value, this)"><option value="">All</option><option value="yes">Yes</option><option value="no">No</option></select></th>
-              <th><select class="col-filter-select" onchange="onPropColumnFilter('verified', this.value, this)"><option value="">All</option><option value="yes">Yes</option><option value="no">No</option></select></th>
+              <th></th>
               <th><select class="col-filter-select" onchange="onPropColumnFilter('booked', this.value, this)"><option value="">All</option><option value="yes">Yes</option><option value="no">No</option></select></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('remarks', this.value, this)"></th>
               <th></th>
@@ -3397,11 +3394,9 @@ window.togglePropFlag = async function(id, field, checkboxEl){
       if(rd && rd._id === id){ rd[field] = confirmedVal; }
     });
     updatePropCategoryCounts(propTable.rows().data().toArray());
-    // If the currently active sub-tab is Promoted/Verified and this row no
-    // longer belongs there, redraw so it disappears from the filtered view.
-    if(_propCategoryState === 'Promoted' || _propCategoryState === 'Verified' || _propCategoryState === 'Booked'){
-      propTable.draw(false);
-    }
+    // Booked now affects visibility in every tab (All, Promoted, Rent/Lease/PG/
+    // Short Stay), not just Promoted/Booked, so always redraw to reflect it.
+    propTable.draw(false);
   } catch(err){
     checkboxEl.checked = !desired; // revert on network error
     alert(`Failed to update ${field} status`);
@@ -4661,7 +4656,7 @@ const _propColumnFilters = {
   pgGender:'', pgRoomType:'', pgMeals:'', pgOccupancy:'', pgNotice:'',
   ssRoomType:'', ssAvailable24hrs:'', ssCancellation:'', ssCouplesAllowed:'',
   visitCount:'', propertyId:'', userId:'',
-  listedOn:'', promoted:'', verified:'', booked:'', remarks:''
+  listedOn:'', promoted:'', booked:'', remarks:''
 };
 
 window.onPropColumnFilter = function(field, value, inputEl){
@@ -4795,9 +4790,9 @@ function applyPropCategoryColumnVisibility(cat){
   // Rent/Lease: neither PG nor Short Stay fields apply.
   // PG: hide Short-Stay-only fields, show PG fields.
   // Short Stay: hide PG-only fields, show Short-Stay fields.
-  // all/Promoted/Verified/Booked: mixed listing types, so show everything.
-  const showPG = (cat === 'all' || cat === 'Promoted' || cat === 'Verified' || cat === 'Booked' || cat === 'PG');
-  const showSS = (cat === 'all' || cat === 'Promoted' || cat === 'Verified' || cat === 'Booked' || cat === 'Short Stay');
+  // all/Promoted/Booked: mixed listing types, so show everything.
+  const showPG = (cat === 'all' || cat === 'Promoted' || cat === 'Booked' || cat === 'PG');
+  const showSS = (cat === 'all' || cat === 'Promoted' || cat === 'Booked' || cat === 'Short Stay');
   PG_ONLY_COLS.forEach(i => propTable.column(i).visible(showPG, false));
   SS_ONLY_COLS.forEach(i => propTable.column(i).visible(showSS, false));
   propTable.columns.adjust();
@@ -4814,14 +4809,16 @@ function switchPropCategory(cat){
 }
 
 function updatePropCategoryCounts(data){
-  const counts = {all:data.length, Promoted:0, Verified:0, Booked:0, Rent:0, Lease:0, PG:0, 'Short Stay':0};
+  const counts = {all:0, Promoted:0, Booked:0, Rent:0, Lease:0, PG:0, 'Short Stay':0};
   data.forEach(r=>{
-    if(!r.booked) counts[propCategoryOf(r.status)]++; // once booked, no longer counted under its Rent/Lease/PG/Short Stay tab
-    if(r.promoted) counts.Promoted++;
-    if(r.verified) counts.Verified++;
+    if(!r.booked){
+      counts.all++;
+      counts[propCategoryOf(r.status)]++; // once booked, no longer counted under All or its Rent/Lease/PG/Short Stay tab
+      if(r.promoted) counts.Promoted++; // once booked, no longer counted under Promoted either
+    }
     if(r.booked) counts.Booked++;
   });
-  ['all','Promoted','Verified','Booked','Rent','Lease','PG','Short Stay'].forEach(cat=>{
+  ['all','Promoted','Booked','Rent','Lease','PG','Short Stay'].forEach(cat=>{
     const el = document.getElementById('cat-count-'+cat.replace(/\s+/g,'-'));
     if(el) el.innerText = counts[cat];
   });
@@ -4831,15 +4828,14 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex){
   if(settings.nTable.id !== 'propertyTable') return true;
   const row = propTable ? propTable.row(dataIndex).data() : null;
   if(!row) return true;
-  if(_propCategoryState === 'Promoted'){
-    if(!row.promoted) return false;
-  } else if(_propCategoryState === 'Verified'){
-    if(!row.verified) return false;
-  } else if(_propCategoryState === 'Booked'){
+  if(_propCategoryState === 'Booked'){
     if(!row.booked) return false;
+  } else if(row.booked){
+    return false; // once booked, hidden from every other tab (All, Promoted, Rent/Lease/PG/Short Stay) — only the Booked tab shows it
+  } else if(_propCategoryState === 'Promoted'){
+    if(!row.promoted) return false;
   } else if(_propCategoryState !== 'all'){
     if(propCategoryOf(row.status) !== _propCategoryState) return false;
-    if(row.booked) return false; // once booked, no longer shown under its Rent/Lease/PG/Short Stay tab
   }
   const cf = _propColumnFilters;
   const contains = (val, needle) => String(val||'').toLowerCase().includes(needle.toLowerCase());
@@ -4872,8 +4868,6 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex){
   }
   if(cf.promoted === 'yes' && !row.promoted) return false;
   if(cf.promoted === 'no'  && row.promoted)  return false;
-  if(cf.verified === 'yes' && !row.verified) return false;
-  if(cf.verified === 'no'  && row.verified)  return false;
   if(cf.booked === 'yes' && !row.booked) return false;
   if(cf.booked === 'no'  && row.booked)  return false;
   if(cf.remarks && !contains(flattenRemarks(row.remarks||[]), cf.remarks)) return false;
