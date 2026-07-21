@@ -286,32 +286,35 @@ table.dataTable.no-footer{border-bottom:none!important}
 
 /* ── STICKY FIRST COLUMNS (Properties table: checkbox + Property name) ──
    Keeps the row-select checkbox and property identity visible while the
-   admin scrolls horizontally through the many detail columns. */
-#propertyTable thead th:nth-child(1),
-#propertyTable tbody td:nth-child(1){
+   admin scrolls horizontally through the many detail columns. The "left"
+   offset of the 2nd sticky column is NOT a hard-coded guess — it's read
+   from the --sticky-col1-w custom property, which updatePropStickyOffset()
+   sets by measuring the actual rendered width of the 1st sticky column on
+   every draw/resize. This avoids any mismatch between the header clone and
+   body table that DataTables' scrollX mode creates internally. */
+#propertyTable_wrapper{ --sticky-col1-w:46px; }
+#propertyTable .col-sticky-1{
   position:sticky!important;left:0;z-index:3;
-  width:46px!important;min-width:46px!important;max-width:46px!important;
+  min-width:40px;
 }
-#propertyTable thead th:nth-child(2),
-#propertyTable tbody td:nth-child(2){
-  position:sticky!important;left:46px;z-index:2;
-  width:210px!important;min-width:210px!important;max-width:210px!important;
-  text-align:left!important;
+#propertyTable .col-sticky-2{
+  position:sticky!important;left:var(--sticky-col1-w);z-index:2;
+  max-width:230px;text-align:left!important;
 }
-#propertyTable thead th:nth-child(1),
-#propertyTable thead th:nth-child(2){
-  z-index:4;background:var(--surface2);
+#propertyTable thead th.col-sticky-1,
+#propertyTable thead th.col-sticky-2{
+  z-index:4;background:var(--surface2)!important;
 }
-#propertyTable tbody td:nth-child(1),
-#propertyTable tbody td:nth-child(2){
+#propertyTable tbody td.col-sticky-1,
+#propertyTable tbody td.col-sticky-2{
   background:var(--surface);
 }
-#propertyTable tbody tr:hover td:nth-child(1),
-#propertyTable tbody tr:hover td:nth-child(2){
+#propertyTable tbody tr:hover td.col-sticky-1,
+#propertyTable tbody tr:hover td.col-sticky-2{
   background:#fdfaf6;
 }
-#propertyTable thead th:nth-child(2),
-#propertyTable tbody td:nth-child(2){
+#propertyTable thead th.col-sticky-2,
+#propertyTable tbody td.col-sticky-2{
   box-shadow:4px 0 6px -3px rgba(12,13,16,0.12);
 }
 
@@ -361,6 +364,8 @@ table.dataTable.no-footer{border-bottom:none!important}
 
 /* ── PHONE / EMAIL LINKS ── */
 .contact-col{display:flex;flex-direction:column;align-items:center;gap:6px}
+.owner-combined-cell{display:flex;flex-direction:column;align-items:center;gap:5px;padding:4px 0}
+.owner-combined-cell .prop-sub{display:flex;align-items:center;gap:5px;max-width:none;white-space:nowrap}
 .phone-link{
   display:inline-flex;align-items:center;gap:6px;
   background:var(--green-light);color:var(--green);
@@ -378,6 +383,13 @@ table.dataTable.no-footer{border-bottom:none!important}
   transition:all 0.18s;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 .email-link:hover{background:var(--gold);color:var(--ink);box-shadow:0 4px 12px rgba(184,144,60,0.3)}
+.amenities-more-link{color:var(--gold-dark);font-weight:600;text-decoration:underline;white-space:nowrap}
+.amenities-more-link:hover{color:var(--gold)}
+.amenity-chip{
+  display:inline-block;background:var(--gold-light);color:var(--gold-dark);
+  font-size:0.82rem;font-weight:500;padding:6px 12px;border-radius:99px;
+  border:1px solid rgba(184,144,60,0.2);
+}
 .email-link i{font-size:0.68rem;flex-shrink:0}
 .no-contact{font-size:0.78rem;color:var(--ink3);font-style:italic}
 
@@ -553,8 +565,10 @@ table.dataTable.no-footer{border-bottom:none!important}
 .remark-saving{opacity:0.5;pointer-events:none}
 
 /* ── PROPERTY TABLE ── */
-.prop-title{font-weight:600;font-size:0.88rem;color:var(--ink);max-width:182px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.prop-sub{font-size:0.72rem;color:var(--ink3);margin-top:2px;max-width:182px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prop-title{font-weight:600;font-size:0.88rem;color:var(--ink);max-width:202px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prop-title + .prop-title{margin-top:2px}
+.prop-name{color:var(--gold-dark)!important}
+.prop-sub{font-size:0.72rem;color:var(--ink3);margin-top:2px;max-width:202px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .status-badge{
   display:inline-block;padding:4px 11px;border-radius:99px;
   font-size:0.72rem;font-weight:700;letter-spacing:0.3px;
@@ -1726,7 +1740,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
   <div class="tab-panel active" id="panel-properties">
     <!-- Category sub-tabs: All / Rent / Lease / PG -->
     <div class="cat-tab-bar" id="propCatTabs">
-      <button class="cat-tab-btn active" data-cat="all" onclick="switchPropCategory('all')">
+      <button class="cat-tab-btn" data-cat="all" onclick="switchPropCategory('all')">
         <i class="fas fa-layer-group"></i><span>All</span><span class="cat-count" id="cat-count-all">—</span>
       </button>
       <button class="cat-tab-btn" data-cat="Promoted" onclick="switchPropCategory('Promoted')">
@@ -1735,7 +1749,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
       <button class="cat-tab-btn" data-cat="Verified" onclick="switchPropCategory('Verified')">
         <i class="fas fa-circle-check"></i><span>Verified</span><span class="cat-count" id="cat-count-Verified">—</span>
       </button>
-      <button class="cat-tab-btn" data-cat="Rent" onclick="switchPropCategory('Rent')">
+      <button class="cat-tab-btn active" data-cat="Rent" onclick="switchPropCategory('Rent')">
         <i class="fas fa-key"></i><span>Rent</span><span class="cat-count" id="cat-count-Rent">—</span>
       </button>
       <button class="cat-tab-btn" data-cat="Lease" onclick="switchPropCategory('Lease')">
@@ -1762,24 +1776,15 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
         <table id="propertyTable" class="display nowrap" style="width:100%">
           <thead>
             <tr>
-              <th><input type="checkbox" class="prop-select-all-checkbox" id="propSelectAllCheckbox" onchange="onPropSelectAllChange(this)"></th>
-              <th>Property</th>
+              <th class="col-sticky-1"><input type="checkbox" class="prop-select-all-checkbox" id="propSelectAllCheckbox" onchange="onPropSelectAllChange(this)"></th>
+              <th class="col-sticky-2">Property</th>
+              <th>Owner Name</th>
               <th>Status</th>
               <th>Price</th>
-              <th>Deposit</th>
-              <th>Owner Name</th>
               <th>Owner Number</th>
               <th>Location</th>
               <th>City</th>
-              <th>Type</th>
-              <th>Area (sqft)</th>
-              <th>Floor</th>
-              <th>Furnishing</th>
-              <th>Bathroom</th>
-              <th>Car Parking</th>
-              <th>Bike Parking</th>
-              <th>Facing</th>
-              <th>Age</th>
+              <th>Details</th>
               <th>PG Gender</th>
               <th>PG Room Type</th>
               <th>PG Meals</th>
@@ -1801,24 +1806,15 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
               <th>Action</th>
             </tr>
             <tr class="col-filter-row">
-              <th></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('title', this.value, this)"></th>
+              <th class="col-sticky-1"></th>
+              <th class="col-sticky-2"><input type="text" class="col-filter-input" placeholder="Name, ID, or location…" oninput="onPropColumnFilter('title', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Name, email, alt#, time…" oninput="onPropColumnFilter('ownerName', this.value, this)"></th>
               <th><select class="col-filter-select" id="colFilterStatus" onchange="onPropColumnFilter('status', this.value, this)"><option value="">All</option></select></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('displayPrice', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('deposit', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('ownerName', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('ownerNumber', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('loc', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('city', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('typeCol', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('area', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('floor', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('furnishing', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('bathroom', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('carparking', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('bikeparking', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('facing', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('age', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('pgGender', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('pgRoomType', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('pgMeals', this.value, this)"></th>
@@ -3683,91 +3679,121 @@ $(document).ready(function(){
     },
     columns:[
       /* 0 – Select checkbox */
-      { data:null, orderable:false, className:'dt-body-center', render:(d,t,row)=>{
+      { data:null, orderable:false, className:'dt-body-center col-sticky-1', render:(d,t,row)=>{
           if(t!=='display') return '';
           const checked = _selectedPropIds.has(row._id) ? 'checked' : '';
           return `<input type="checkbox" class="prop-row-check" data-id="${row._id}" onchange="onPropRowCheck(this,'${row._id}')" ${checked}>`;
       }},
-      /* 1 – Property title + city */
-      { data:null, render:(d,t,row)=>{
+      /* 1 – Property title + ID + location */
+      { data:null, className:'col-sticky-2', render:(d,t,row)=>{
           const title = escapeHtml(row.title||'Untitled');
-          const city  = escapeHtml(row.city||'');
-          if(t==='display') return `<div><div class="prop-title">${title}</div><div class="prop-sub">${city}</div></div>`;
+          const pid   = escapeHtml(row.propertyId||'—');
+          const loc   = escapeHtml(row.loc||'—');
+          if(t==='display') return `<div><div class="prop-title prop-name">${title}</div><div class="prop-title">${pid}</div><div class="prop-title">${loc}</div></div>`;
           return (row.title||'').trim();
       }},
-      /* 2 – Status */
-      { data:'status', render:(d,t)=> t==='display' ? statusBadge(d) : (d||'—') },
-      /* 3 – Price */
-      { data:'displayPrice', render:(d)=> escapeHtml(d||'—') },
-      /* 4 – Deposit */
-      { data:'deposit', render:(d)=> escapeHtml(d==null?'':String(d)) },
-      /* 5 – Owner Name */
-      { data:'ownerName', render:(d)=> escapeHtml(d||'—') },
-      /* 6 – Owner Number (clickable) */
+      /* 2 – Owner Name (combined: name, phone, alt phone, email, preferred contact time) */
       { data:null, render:(d,t,row)=>{
+          if(t!=='display'){
+            return [row.ownerName, row.ownerNumber, row.ownerAltPhone, row.ownerEmail, row.ownerContactTime]
+              .filter(Boolean).join(' ');
+          }
+          const name  = escapeHtml(row.ownerName||'—');
+          const phone = row.ownerNumber ? `<a href="tel:${row.ownerNumber}" class="phone-link"><i class="fas fa-phone-flip"></i>${escapeHtml(row.ownerNumber)}</a>` : '';
+          const alt   = row.ownerAltPhone ? `<a href="tel:${row.ownerAltPhone}" class="phone-link"><i class="fas fa-phone"></i>${escapeHtml(row.ownerAltPhone)} (Alt)</a>` : '';
+          const email = row.ownerEmail ? `<a href="mailto:${row.ownerEmail}" class="email-link"><i class="fas fa-envelope"></i>${escapeHtml(row.ownerEmail)}</a>` : '';
+          const time  = row.ownerContactTime ? `<div class="prop-sub"><i class="fas fa-clock"></i> ${escapeHtml(row.ownerContactTime)}</div>` : '';
+          return `<div class="owner-combined-cell">
+            <div class="prop-title">${name}</div>
+            ${phone}${alt}${email}${time}
+          </div>`;
+      }},
+      /* 3 – Status */
+      { data:'status', render:(d,t)=> t==='display' ? statusBadge(d) : (d||'—') },
+      /* 4 – Price (combined: rent, deposit, maintenance, negotiable) */
+      { data:null, render:(d,t,row)=>{
+          const maintVal = row.maintenance ?? (row.price && row.price.maintenance);
+          const negVal   = row.negotiable ?? (row.price && row.price.negotiable);
+          if(t!=='display'){
+            return [row.displayPrice, row.deposit, maintVal, negVal].filter(v=>v!=null && v!=='').join(' ');
+          }
+          const price = escapeHtml(row.displayPrice||'—');
+          const deposit = (row.deposit!=null && row.deposit!=='') ? `<div class="prop-sub">Deposit: ${escapeHtml(String(row.deposit))}</div>` : '';
+          const maint   = (maintVal!=null && maintVal!=='') ? `<div class="prop-sub">Maintenance: ₹${escapeHtml(String(maintVal))}</div>` : '';
+          const neg     = (negVal!=null && negVal!=='') ? `<div class="prop-sub">Negotiable: ${escapeHtml(String(negVal))}</div>` : '';
+          return `<div><div class="prop-title">${price}</div>${deposit}${maint}${neg}</div>`;
+      }},
+      /* 5 – Owner Number (merged into Owner Name column above) */
+      { data:null, visible:false, render:(d,t,row)=>{
           if(t==='display') return renderOwnerPhone(row);
           return row.ownerNumber||'—';
       }},
-      /* 7 – Location */
-      { data:'loc', render:(d)=> escapeHtml(d||'—') },
-      /* 8 – City */
-      { data:'city', render:(d)=> escapeHtml(d||'—') },
-      /* 9 – Type (BHK for Rent/Lease, PG type, or Short Stay type) */
+      /* 6 – Location */
+      { data:'loc', visible:false, render:(d)=> escapeHtml(d||'—') },
+      /* 7 – City */
+      { data:'city', visible:false, render:(d)=> escapeHtml(d||'—') },
+      /* 8 – Details (combined: type, area, floor, furnishing, bathroom, car parking, bike parking, facing, age) */
       { data:null, render:(d,t,row)=>{
-          const v = row.bhk || row.pgPropertyType || row.ssPropertyType || '';
-          return escapeHtml(v||'—');
+          const type = row.bhk || row.pgPropertyType || row.ssPropertyType || '';
+          if(t!=='display'){
+            return [type, row.area, row.floor, row.furnishing, row.toilet, row.carparking, row.bikeparking, row.facing, row.age]
+              .filter(v=>v!=null && v!=='').join(' ');
+          }
+          const line = (label, v) => (v!=null && v!=='') ? `<div class="prop-sub">${label}: ${escapeHtml(String(v))}</div>` : '';
+          return `<div>
+            <div class="prop-title">${escapeHtml(type||'—')}</div>
+            ${line('Area', row.area ? row.area+' sqft' : '')}
+            ${line('Floor', row.floor)}
+            ${line('Furnishing', row.furnishing)}
+            ${line('Bathroom', row.toilet)}
+            ${line('Car Parking', row.carparking)}
+            ${line('Bike Parking', row.bikeparking)}
+            ${line('Facing', row.facing)}
+            ${line('Age', row.age)}
+          </div>`;
       }},
-      /* 10 – Area (sqft) */
-      { data:'area', render:(d)=> escapeHtml(d||'—') },
-      /* 11 – Floor */
-      { data:'floor', render:(d)=> escapeHtml(d||'—') },
-      /* 12 – Furnishing */
-      { data:'furnishing', render:(d)=> escapeHtml(d||'—') },
-      /* 13 – Bathroom */
-      { data:'toilet', render:(d)=> escapeHtml(d||'—') },
-      /* 14 – Car Parking */
-      { data:'carparking', render:(d)=> escapeHtml(d||'—') },
-      /* 15 – Bike Parking */
-      { data:'bikeparking', render:(d)=> escapeHtml(d||'—') },
-      /* 16 – Facing */
-      { data:'facing', render:(d)=> escapeHtml(d||'—') },
-      /* 17 – Age */
-      { data:'age', render:(d)=> escapeHtml(d||'—') },
-      /* 18 – PG Gender */
+      /* 9 – PG Gender */
       { data:'pgGender', render:(d)=> escapeHtml(d||'—') },
-      /* 19 – PG Room Type */
+      /* 10 – PG Room Type */
       { data:'pgRoomType', render:(d)=> escapeHtml(d||'—') },
-      /* 20 – PG Meals */
+      /* 11 – PG Meals */
       { data:'pgMeals', render:(d)=> escapeHtml(d||'—') },
-      /* 21 – PG Occupancy */
+      /* 12 – PG Occupancy */
       { data:'pgOccupancy', render:(d)=> escapeHtml(d||'—') },
-      /* 22 – PG Notice */
+      /* 13 – PG Notice */
       { data:'pgNotice', render:(d)=> escapeHtml(d||'—') },
-      /* 23 – SS Room Type */
+      /* 14 – SS Room Type */
       { data:'ssRoomType', render:(d)=> escapeHtml(d||'—') },
-      /* 24 – SS Available 24hrs */
+      /* 15 – SS Available 24hrs */
       { data:'ssAvailable24hrs', render:(d)=> escapeHtml(d||'—') },
-      /* 25 – SS Cancellation */
+      /* 16 – SS Cancellation */
       { data:'ssCancellation', render:(d)=> escapeHtml(d||'—') },
-      /* 26 – SS Couples Allowed */
+      /* 17 – SS Couples Allowed */
       { data:'ssCouplesAllowed', render:(d)=> escapeHtml(d||'—') },
-      /* 27 – Visits */
+      /* 18 – Visits */
       { data:'visitCount', render:(d)=> (d==null?'0':escapeHtml(String(d))) },
-      /* 28 – Photos (count) */
-      { data:null, orderable:false, className:'dt-body-center', render:(d,t,row)=>{
+      /* 19 – Photos (count) */
+      { data:null, orderable:false, visible:false, className:'dt-body-center', render:(d,t,row)=>{
           return Array.isArray(row.images) ? row.images.length : 0;
       }},
-      /* 29 – Amenities (count) */
-      { data:null, orderable:false, className:'dt-body-center', render:(d,t,row)=>{
-          return Array.isArray(row.amenities) ? row.amenities.length : 0;
+      /* 20 – Amenities (list, +N more opens modal) */
+      { data:null, orderable:false, render:(d,t,row)=>{
+          const list = Array.isArray(row.amenities) ? row.amenities : [];
+          if(t!=='display') return list.join(' ');
+          if(!list.length) return '—';
+          const shown = list.slice(0,4).map(a=>escapeHtml(a)).join(', ');
+          if(list.length<=4) return `<div style="white-space:normal;max-width:260px">${shown}</div>`;
+          const more = list.length-4;
+          const encoded = escapeHtml(JSON.stringify(list));
+          return `<div style="white-space:normal;max-width:260px">${shown}, <a href="javascript:void(0)" class="amenities-more-link" data-list="${encoded}" onclick="openAmenitiesModal(this)">+${more} more</a></div>`;
       }},
-      /* 30 – Property ID */
-      { data:'propertyId', render:(d)=> escapeHtml(d||'—') },
-      /* 31 – User ID */
-      { data:'userId', render:(d)=> escapeHtml(d||'—') },
-      /* 32 – Listed On */
+      /* 21 – Property ID */
+      { data:'propertyId', visible:false, render:(d)=> escapeHtml(d||'—') },
+      /* 22 – User ID */
+      { data:'userId', visible:false, render:(d)=> escapeHtml(d||'—') },
+      /* 23 – Listed On */
       { data:'createdAt', render:(d,t)=> t==='display' ? formatDateTime(d) : (d||'—') },
-      /* 33 – Promoted (toggle) */
+      /* 24 – Promoted (toggle) */
       { data:'promoted', orderable:false, className:'dt-body-center', render:(d,t,row)=>{
           if(t!=='display') return d ? 'Yes' : 'No';
           return `<label class="mini-toggle-wrap"><span class="mini-toggle promoted-toggle">
@@ -3775,7 +3801,7 @@ $(document).ready(function(){
             <span class="slider"></span>
           </span></label>`;
       }},
-      /* 34 – Verified (toggle) */
+      /* 25 – Verified (toggle) */
       { data:'verified', orderable:false, className:'dt-body-center', render:(d,t,row)=>{
           if(t!=='display') return d ? 'Yes' : 'No';
           return `<label class="mini-toggle-wrap"><span class="mini-toggle verified-toggle">
@@ -3783,12 +3809,12 @@ $(document).ready(function(){
             <span class="slider"></span>
           </span></label>`;
       }},
-      /* 35 – Remarks */
+      /* 26 – Remarks */
       { data:'remarks', orderable:false, render:(d,t,row)=>{
           if(t==='display') return remarkCellHtml(row._id, d, 'property');
           return d||'';
       }},
-      /* 36 – Action */
+      /* 27 – Action */
       { data:null, orderable:false, render:(d,t,row)=>{
           _adminPropCache[row._id] = row;
           return `<div style="display:inline-flex;gap:6px;flex-wrap:nowrap;justify-content:center">
@@ -3798,7 +3824,7 @@ $(document).ready(function(){
           </div>`;
       }}
     ],
-    order:[[32,'desc']],
+    order:[[23,'desc']],
     orderCellsTop:true,
     pageLength:10,
     scrollX:true,
@@ -3851,11 +3877,11 @@ $(document).ready(function(){
       },*/
       {
         extend:'print', text:'<i class="fas fa-print"></i> Print', title:'KR Properties',
-        exportOptions:{columns:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35],
+        exportOptions:{columns:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27],
           format:{ body:function(data,row,col){
             var rd=propTable.row(row).data(); if(!rd) return data;
-            if(col===33) return rd.promoted ? 'Yes' : 'No';
-            if(col===34) return rd.verified ? 'Yes' : 'No';
+            if(col===24) return rd.promoted ? 'Yes' : 'No';
+            if(col===25) return rd.verified ? 'Yes' : 'No';
             return data;
           }}
         },
@@ -3863,19 +3889,19 @@ $(document).ready(function(){
           $(win.document.head).append('<style>table td a{color:#1a7a5e;text-decoration:underline}</style>');
           $(win.document.body).find('table tbody tr').each(function(){
             var cells=$(this).find('td');
-            var phText=cells.eq(5).text().trim();
-            if(phText&&phText!=='—') cells.eq(5).html('<a href="tel:'+phText+'">'+phText+'</a>');
+            var phText=cells.eq(4).text().trim();
+            if(phText&&phText!=='—') cells.eq(4).html('<a href="tel:'+phText+'">'+phText+'</a>');
           });
         }
       },
 	  {
         extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
         orientation:'landscape', pageSize:'A4', title:'KR Real-Estate — Properties',
-        exportOptions:{columns:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35],
+        exportOptions:{columns:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27],
           format:{ body:function(data,row,col){
             var rd=propTable.row(row).data(); if(!rd) return data;
-            if(col===33) return rd.promoted ? 'Yes' : 'No';
-            if(col===34) return rd.verified ? 'Yes' : 'No';
+            if(col===24) return rd.promoted ? 'Yes' : 'No';
+            if(col===25) return rd.verified ? 'Yes' : 'No';
             return data;
           }}
         },
@@ -3888,12 +3914,15 @@ $(document).ready(function(){
           rows.forEach(function(rd,i){
             var pdfRow=tableBody[i+1]; if(!pdfRow) return;
             var ph=rd.ownerNumber||'';
-            if(ph&&pdfRow[5]) pdfRow[5]={text:ph,link:'tel:'+ph,color:'#1a7a5e',decoration:'underline',fontSize:8};
+            if(ph&&pdfRow[4]) pdfRow[4]={text:ph,link:'tel:'+ph,color:'#1a7a5e',decoration:'underline',fontSize:8};
           });
         }
       }
     ],
-    drawCallback:function(){ try{ syncPropSelectionUI(); }catch(e){ /* table not fully initialized yet */ } }
+    drawCallback:function(){
+      updatePropStickyOffset();
+      try{ syncPropSelectionUI(); }catch(e){ /* table not fully initialized yet */ }
+    }
   });
   // Physically reposition the bulk-delete toolbar so it renders below the
   // CSV/Excel/PDF/Print export buttons (DataTables always inserts its
@@ -3901,6 +3930,7 @@ $(document).ready(function(){
   // the toolbar to sit right after that generated row).
   $('#bulkToolbar').insertAfter($('#propertyTable_wrapper .top-controls'));
   buildPropColumnToggle();
+  applyPropCategoryColumnVisibility(_propCategoryState);
   propTable.on('column-visibility.dt', function(e, settings, column, state){
     syncPropColToggleCheckbox(column, state);
   });
@@ -4375,9 +4405,8 @@ function buildPropFilters(data){
 // Per-column header search filters (Property, Status, Price, Owner Name,
 // Owner Number, Location, Listed On, Promoted, Verified, Remarks).
 const _propColumnFilters = {
-  title:'', status:'', displayPrice:'', deposit:'', ownerName:'', ownerNumber:'',
-  loc:'', city:'', typeCol:'', area:'', floor:'', furnishing:'', bathroom:'',
-  carparking:'', bikeparking:'', facing:'', age:'',
+  title:'', status:'', displayPrice:'', ownerName:'', ownerNumber:'',
+  loc:'', city:'', typeCol:'',
   pgGender:'', pgRoomType:'', pgMeals:'', pgOccupancy:'', pgNotice:'',
   ssRoomType:'', ssAvailable24hrs:'', ssCancellation:'', ssCouplesAllowed:'',
   visitCount:'', propertyId:'', userId:'',
@@ -4400,39 +4429,53 @@ function propCategoryOf(status){
   return 'Rent';
 }
 
-let _propCategoryState = 'all';
+let _propCategoryState = 'Rent';
 
 // PG-only and Short-Stay-only column indices in #propertyTable (see the
 // numbered comments in the propTable columns:[...] definition above).
-const PG_ONLY_COLS = [18, 19, 20, 21, 22]; // PG Gender, Room Type, Meals, Occupancy, Notice
-const SS_ONLY_COLS = [23, 24, 25, 26];     // SS Room Type, Available 24hrs, Cancellation, Couples Allowed
+const PG_ONLY_COLS = [9, 10, 11, 12, 13]; // PG Gender, Room Type, Meals, Occupancy, Notice
+const SS_ONLY_COLS = [14, 15, 16, 17];     // SS Room Type, Available 24hrs, Cancellation, Couples Allowed
+
+// Measures the real rendered width of the properties table's 1st sticky
+// column (the row-select checkbox) and stores it as a CSS custom property
+// so the 2nd sticky column (Property) can position itself at the exact
+// right offset — no guessing, so it can't drift out of alignment.
+function updatePropStickyOffset(){
+  const wrapper = document.getElementById('propertyTable_wrapper');
+  if(!wrapper) return;
+  const cell = wrapper.querySelector('tbody td.col-sticky-1') || wrapper.querySelector('thead th.col-sticky-1');
+  if(cell){
+    const w = cell.getBoundingClientRect().width;
+    if(w > 0) wrapper.style.setProperty('--sticky-col1-w', w + 'px');
+  }
+}
+let _propStickyResizeTimer = null;
+window.addEventListener('resize', function(){
+  clearTimeout(_propStickyResizeTimer);
+  _propStickyResizeTimer = setTimeout(updatePropStickyOffset, 150);
+});
 
 /* ── COLUMN VISIBILITY TOGGLE ──
    Groups mirror the columns:[...] layout in propTable's init. idx 0 (select)
    and the last column (Action) are always visible and not offered here. */
 const PROP_COL_GROUPS = [
   { label:'Basic', cols:[
-    {idx:1, label:'Property'}, {idx:2, label:'Status'}, {idx:3, label:'Price'},
-    {idx:4, label:'Deposit'}, {idx:5, label:'Owner Name'}, {idx:6, label:'Owner Number'},
-    {idx:7, label:'Location'}, {idx:8, label:'City'}
-  ]},
-  { label:'Property Details', cols:[
-    {idx:9, label:'Type'}, {idx:10, label:'Area (sqft)'}, {idx:11, label:'Floor'},
-    {idx:12, label:'Furnishing'}, {idx:13, label:'Bathroom'}, {idx:14, label:'Car Parking'},
-    {idx:15, label:'Bike Parking'}, {idx:16, label:'Facing'}, {idx:17, label:'Age'}
+    {idx:1, label:'Property'}, {idx:2, label:'Owner Name'}, {idx:3, label:'Status'},
+    {idx:4, label:'Price'}, {idx:5, label:'Owner Number'},
+    {idx:6, label:'Location'}, {idx:7, label:'City'}, {idx:8, label:'Details'}
   ]},
   { label:'PG Details', cols:[
-    {idx:18, label:'PG Gender'}, {idx:19, label:'PG Room Type'}, {idx:20, label:'PG Meals'},
-    {idx:21, label:'PG Occupancy'}, {idx:22, label:'PG Notice'}
+    {idx:9, label:'PG Gender'}, {idx:10, label:'PG Room Type'}, {idx:11, label:'PG Meals'},
+    {idx:12, label:'PG Occupancy'}, {idx:13, label:'PG Notice'}
   ]},
   { label:'Short Stay Details', cols:[
-    {idx:23, label:'SS Room Type'}, {idx:24, label:'SS Available 24hrs'},
-    {idx:25, label:'SS Cancellation'}, {idx:26, label:'SS Couples Allowed'}
+    {idx:14, label:'SS Room Type'}, {idx:15, label:'SS Available 24hrs'},
+    {idx:16, label:'SS Cancellation'}, {idx:17, label:'SS Couples Allowed'}
   ]},
   { label:'Meta', cols:[
-    {idx:27, label:'Visits'}, {idx:28, label:'Photos'}, {idx:29, label:'Amenities'},
-    {idx:30, label:'Property ID'}, {idx:31, label:'User ID'}, {idx:32, label:'Listed On'},
-    {idx:33, label:'Promoted'}, {idx:34, label:'Verified'}, {idx:35, label:'Remarks'}
+    {idx:18, label:'Visits'}, {idx:19, label:'Photos'}, {idx:20, label:'Amenities'},
+    {idx:21, label:'Property ID'}, {idx:22, label:'User ID'}, {idx:23, label:'Listed On'},
+    {idx:24, label:'Promoted'}, {idx:25, label:'Verified'}, {idx:26, label:'Remarks'}
   ]}
 ];
 
@@ -4468,6 +4511,7 @@ window.setAllPropColumns = function(show){
     group.cols.forEach(c=>{ propTable.column(c.idx).visible(show, false); });
   });
   propTable.columns.adjust();
+  updatePropStickyOffset();
   buildPropColumnToggle();
 };
 
@@ -4506,6 +4550,7 @@ function applyPropCategoryColumnVisibility(cat){
   PG_ONLY_COLS.forEach(i => propTable.column(i).visible(showPG, false));
   SS_ONLY_COLS.forEach(i => propTable.column(i).visible(showSS, false));
   propTable.columns.adjust();
+  updatePropStickyOffset();
 }
 
 function switchPropCategory(cat){
@@ -4543,23 +4588,17 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex){
   }
   const cf = _propColumnFilters;
   const contains = (val, needle) => String(val||'').toLowerCase().includes(needle.toLowerCase());
-  if(cf.title && !contains(row.title, cf.title)) return false;
+  if(cf.title && !(contains(row.title, cf.title) || contains(row.propertyId, cf.title) || contains(row.loc, cf.title))) return false;
   if(cf.status && (row.status||'') !== cf.status) return false;
   if(cf.displayPrice && !contains(row.displayPrice, cf.displayPrice)) return false;
-  if(cf.ownerName && !contains(row.ownerName, cf.ownerName)) return false;
+  if(cf.ownerName && !(contains(row.ownerName, cf.ownerName) || contains(row.ownerAltPhone, cf.ownerName) || contains(row.ownerEmail, cf.ownerName) || contains(row.ownerContactTime, cf.ownerName))) return false;
   if(cf.ownerNumber && !contains(row.ownerNumber, cf.ownerNumber)) return false;
   if(cf.loc && !contains((row.loc||'')+' '+(row.city||''), cf.loc)) return false;
   if(cf.city && !contains(row.city, cf.city)) return false;
-  if(cf.typeCol && !contains(row.bhk || row.pgPropertyType || row.ssPropertyType || '', cf.typeCol)) return false;
-  if(cf.area && !contains(row.area, cf.area)) return false;
-  if(cf.floor && !contains(row.floor, cf.floor)) return false;
-  if(cf.furnishing && !contains(row.furnishing, cf.furnishing)) return false;
-  if(cf.bathroom && !contains(row.toilet, cf.bathroom)) return false;
-  if(cf.deposit && !contains(row.deposit, cf.deposit)) return false;
-  if(cf.carparking && !contains(row.carparking, cf.carparking)) return false;
-  if(cf.bikeparking && !contains(row.bikeparking, cf.bikeparking)) return false;
-  if(cf.facing && !contains(row.facing, cf.facing)) return false;
-  if(cf.age && !contains(row.age, cf.age)) return false;
+  if(cf.typeCol && !(contains(row.bhk || row.pgPropertyType || row.ssPropertyType || '', cf.typeCol)
+    || contains(row.area, cf.typeCol) || contains(row.floor, cf.typeCol) || contains(row.furnishing, cf.typeCol)
+    || contains(row.toilet, cf.typeCol) || contains(row.carparking, cf.typeCol) || contains(row.bikeparking, cf.typeCol)
+    || contains(row.facing, cf.typeCol) || contains(row.age, cf.typeCol))) return false;
   if(cf.pgGender && !contains(row.pgGender, cf.pgGender)) return false;
   if(cf.pgRoomType && !contains(row.pgRoomType, cf.pgRoomType)) return false;
   if(cf.pgMeals && !contains(row.pgMeals, cf.pgMeals)) return false;
@@ -4812,6 +4851,20 @@ function closeCustomerModal(){
   document.getElementById('customerModal').classList.remove('open');
   document.body.style.overflow = '';
 }
+
+window.openAmenitiesModal = function(linkEl){
+  let list = [];
+  try{ list = JSON.parse(linkEl.getAttribute('data-list')||'[]'); }catch(e){ list = []; }
+  document.getElementById('amenitiesModalList').innerHTML =
+    list.map(a => `<span class="amenity-chip">${_adminModalEsc(a)}</span>`).join('');
+  document.getElementById('amenitiesModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+
+window.closeAmenitiesModal = function(){
+  document.getElementById('amenitiesModal').classList.remove('open');
+  document.body.style.overflow = '';
+};
 
 function openApptModal(id){
   const a = _apptCache[id];
@@ -5843,6 +5896,29 @@ markRequiredLabels();
 
       <!-- Details -->
       <div class="prop-modal-grid" id="customerModalDetails"></div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ═════════ AMENITIES DETAIL MODAL ═════════ -->
+<div class="prop-modal-wrap" id="amenitiesModal" onclick="if(event.target===this)closeAmenitiesModal()">
+
+  <div class="prop-modal">
+
+    <div class="prop-modal-close-row">
+      <button class="prop-modal-close-btn" onclick="closeAmenitiesModal()">✕</button>
+    </div>
+
+    <div class="prop-modal-body">
+
+      <div style="text-align:center;font-size:1.2rem;font-weight:700;margin-bottom:16px;color:var(--ink)">
+        Amenities
+      </div>
+
+      <div id="amenitiesModalList" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center"></div>
 
     </div>
 

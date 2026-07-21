@@ -1851,6 +1851,8 @@ app.get('/api/admin/properties', requireAdmin, async (req, res) => {
         bikeparking:  basic.status === 'PG' ? (pg.bike || '') : (property.bike || ''),
         toilet:       basic.status === 'PG' ? (pg.bathroom || '') : (property.bathrooms || ''),
         deposit:      price.deposit != null ? price.deposit : null,
+        maintenance:  price.maintenance != null ? price.maintenance : null,
+        negotiable:   price.negotiable || null,
 
         // PG Details
         pgPropertyType: pg.type || '',
@@ -1872,6 +1874,9 @@ app.get('/api/admin/properties', requireAdmin, async (req, res) => {
         // Owner Info
         ownerName:    owner.name || '',
         ownerNumber:  owner.phone || '',
+        ownerEmail:   owner.email || '',
+        ownerAltPhone:owner.altPhone || '',
+        ownerContactTime: owner.contactTime || '',
 
         // Admin
         remarks:      doc.remarks || [],
