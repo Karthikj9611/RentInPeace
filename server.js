@@ -702,6 +702,24 @@ function buildListingSchema() {
     verified:         { type: Boolean, default: false },
     promoted:         { type: Boolean, default: false },
     promotedPriority: { type: Number,  default: 3 },
+    booked:           { type: Boolean, default: false }, // once true, listing is hidden from the public site regardless of verified status
+    // Captured from the admin Booked-tab "Booking Details" modal — who the
+    // deal was between and when. ownerId / tenantId reference registered
+    // Users (picked from the two dropdowns in that modal); the *Name/Phone/
+    // Email fields are a snapshot at save-time so the record still reads
+    // fine even if that User doc later changes or is deleted.
+    bookingDetails: {
+      ownerId:     { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+      ownerName:   { type: String, default: '' },
+      ownerPhone:  { type: String, default: '' },
+      ownerEmail:  { type: String, default: '' },
+      tenantId:    { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+      tenantName:  { type: String, default: '' },
+      tenantPhone: { type: String, default: '' },
+      tenantEmail: { type: String, default: '' },
+      bookedOn:    { type: String, default: '' }, // 'YYYY-MM-DD'
+      description: { type: String, default: '', trim: true, maxlength: 1000 }, // free-text notes captured with the booking (terms agreed, move-in details, etc.)
+    },
     views:            { type: Number,  default: 0 },
     visitCount:       { type: Number,  default: 0 }, // # of "Schedule a Visit" requests made for this listing
     bookingCount:     { type: Number,  default: 0 }, // # of direct "Book Now" requests made for this listing (Short Stay only)
@@ -1164,7 +1182,7 @@ app.post('/api/properties', listingLimiter, requireUser, async (req, res) => {
 app.get('/api/properties', async (req, res) => {
   try {
     const { status, q, limit = 100, skip = 0 } = req.query;
-    const filter = { verified: true }; // a listing only appears to the public once admin has verified it
+    const filter = { verified: true, booked: { $ne: true } }; // a listing only appears to the public once admin has verified it, and disappears again once marked booked
     if (status && typeof status === 'string') filter['basic.status'] = status;
     if (q && typeof q === 'string') {
       const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
@@ -1173,7 +1191,7 @@ app.get('/api/properties', async (req, res) => {
 
     // Internal/admin-only fields — never read by the public frontend
     const PUBLIC_SELECT =
-      '-remarks -userId -userReadableId -promotedPriority -__v ' +
+      '-remarks -userId -userReadableId -promotedPriority -__v -bookingDetails ' +
       // Owner PII that only ever populated hidden form inputs in the read-only
       // detail view (VIEW_ALWAYS_HIDDEN_GROUPS on the frontend). owner.phone is
       // excluded too — Call/WhatsApp now read owner.agentPhone only (dynamically),
@@ -1218,6 +1236,7 @@ app.get('/api/properties', async (req, res) => {
                       ? formatPostedDateTime(doc.createdAt)
                       : 'Recently',
       verified:     !!doc.verified,
+      booked:       !!doc.booked,
     }));
 
     res.json({ properties: mapped, total: mapped.length });
@@ -1823,6 +1842,7 @@ app.get('/api/admin/properties', requireAdmin, async (req, res) => {
           verified:         !!doc.verified,
           promoted:         !!doc.promoted,
           promotedPriority: doc.promotedPriority != null ? doc.promotedPriority : null,
+          booked:           !!doc.booked,
           views:            doc.views != null ? doc.views : 0,
           visitCount:       doc.visitCount != null ? doc.visitCount : 0,
         },
@@ -1839,8 +1859,8 @@ app.get('/api/admin/properties', requireAdmin, async (req, res) => {
         visitCount:   doc.visitCount != null ? doc.visitCount : 0,
         verified:     !!doc.verified,
         promoted:     !!doc.promoted,
-
-        // Property Details
+        booked:       !!doc.booked,
+        bookingDetails: doc.bookingDetails || null,
         bhk:          property.bhk || '',
         area:         property.area || '',
         floor:        property.floor || '',
@@ -1982,6 +2002,25 @@ app.patch('/api/properties/:id/promoted', requireAdmin, async (req, res) => {
   }
 });
 
+// ── PATCH /api/properties/:id/booked (admin: toggle booked flag) ──
+// Once true, the listing is excluded from GET /api/properties (see the
+// `booked: { $ne: true }` filter there) and disappears from the public site,
+// regardless of its verified status.
+app.patch('/api/properties/:id/booked', requireAdmin, async (req, res) => {
+  try {
+    const { booked } = req.body || {};
+    if (typeof booked !== 'boolean') {
+      return res.status(400).json({ message: 'booked must be a boolean' });
+    }
+    const prop = await updateListingById(req.params.id, { booked }, { new: true });
+    if (!prop) return res.status(404).json({ message: 'Property not found' });
+    res.json({ message: 'Booked status updated', booked: prop.booked });
+  } catch (err) {
+    console.error('PATCH /api/properties/:id/booked error:', err);
+    res.status(500).json({ message: 'Error updating booked status: ' + err.message });
+  }
+});
+
 // ── DELETE /api/properties/:id (example admin-protected route) ──
 app.delete('/api/properties/:id', requireAdmin, async (req, res) => {
   try {
@@ -1991,6 +2030,51 @@ app.delete('/api/properties/:id', requireAdmin, async (req, res) => {
   } catch (err) {
     console.error('DELETE /api/properties/:id error:', err);
     res.status(500).json({ message: 'Error deleting property: ' + err.message });
+  }
+});
+
+// ── PATCH /api/properties/:id/booking-details (admin: save owner/tenant/booked-on info) ──
+// Populated from the "Booking Details" modal that opens off the extra action
+// button shown only on rows in the admin Booked tab. ownerId/tenantId are
+// optional — the admin may free-type details for someone not in the Users
+// list — but when present they should be valid User _ids.
+app.patch('/api/properties/:id/booking-details', requireAdmin, async (req, res) => {
+  try {
+    const body = req.body || {};
+    const asId = (v) => (v && mongoose.Types.ObjectId.isValid(v)) ? v : null;
+    const ownerId  = asId(body.ownerId);
+    const tenantId = asId(body.tenantId);
+    const bookingDetails = {
+      ownerId,
+      ownerName:   (body.ownerName   || '').toString().trim(),
+      ownerPhone:  (body.ownerPhone  || '').toString().trim(),
+      ownerEmail:  (body.ownerEmail  || '').toString().trim(),
+      tenantId,
+      tenantName:  (body.tenantName  || '').toString().trim(),
+      tenantPhone: (body.tenantPhone || '').toString().trim(),
+      tenantEmail: (body.tenantEmail || '').toString().trim(),
+      bookedOn:    (body.bookedOn    || '').toString().trim(), // 'YYYY-MM-DD'
+      description: (body.description || '').toString().trim(),
+    };
+
+    // All fields are required — mirrors the admin.html modal's own validation,
+    // enforced again here since the API can be called directly.
+    const phoneOk = (v) => /^\d{10}$/.test(v);
+    const emailOk = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+    if (
+      !bookingDetails.bookedOn || !ownerId || !tenantId || !bookingDetails.description ||
+      !bookingDetails.ownerName  || !phoneOk(bookingDetails.ownerPhone)  || !emailOk(bookingDetails.ownerEmail) ||
+      !bookingDetails.tenantName || !phoneOk(bookingDetails.tenantPhone) || !emailOk(bookingDetails.tenantEmail)
+    ) {
+      return res.status(400).json({ message: 'All booking detail fields are required — please fill in owner, tenant, and booked-on date.' });
+    }
+
+    const prop = await updateListingById(req.params.id, { bookingDetails }, { new: true });
+    if (!prop) return res.status(404).json({ message: 'Property not found' });
+    res.json({ message: 'Booking details saved', bookingDetails: prop.bookingDetails });
+  } catch (err) {
+    console.error('PATCH /api/properties/:id/booking-details error:', err);
+    res.status(500).json({ message: 'Error saving booking details: ' + err.message });
   }
 });
 
@@ -2028,11 +2112,14 @@ app.get('/api/user/my-listings', requireUser, async (req, res) => {
     const docArrays = await Promise.all(LISTING_MODEL_LIST.map(M => M.find({ userId: req.userId }).lean()));
     const docs = docArrays.flat().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-    const mapped = docs.map(doc => ({
-      ...doc,
-      id:           String(doc._id),
-      displayPrice: formatPrice((doc.price || {}).rent, (doc.basic || {}).status),
-    }));
+    const mapped = docs.map(doc => {
+      const { bookingDetails, ...rest } = doc; // admin-only booking record — never shown in user-facing UI
+      return {
+        ...rest,
+        id:           String(doc._id),
+        displayPrice: formatPrice((doc.price || {}).rent, (doc.basic || {}).status),
+      };
+    });
 
     res.json({ properties: mapped, total: mapped.length });
   } catch (err) {

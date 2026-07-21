@@ -238,6 +238,7 @@ table.dataTable thead tr.col-filter-row th{
 .mini-toggle input:checked + .slider{background:var(--gold, #c9a227)}
 .mini-toggle input:checked + .slider::before{transform:translateX(16px)}
 .mini-toggle.verified-toggle input:checked + .slider{background:var(--green, #1a7a5e)}
+.mini-toggle.booked-toggle input:checked + .slider{background:var(--red, #e04444)}
 .mini-toggle input:disabled + .slider{opacity:0.55;cursor:wait}
 .mini-toggle input:focus-visible + .slider{outline:2px solid var(--ink3);outline-offset:2px}
 
@@ -284,26 +285,18 @@ table.dataTable tbody tr:last-child td{border-bottom:none!important}
 table.dataTable tbody tr:hover td{background:#fdfaf6}
 table.dataTable.no-footer{border-bottom:none!important}
 
-/* ── STICKY FIRST COLUMNS (Properties table: checkbox + Property name) ──
-   Keeps the row-select checkbox and property identity visible while the
-   admin scrolls horizontally through the many detail columns. The "left"
-   offset of the 2nd sticky column is NOT a hard-coded guess — it's read
-   from the --sticky-col1-w custom property, which updatePropStickyOffset()
-   sets by measuring the actual rendered width of the 1st sticky column on
-   every draw/resize. This avoids any mismatch between the header clone and
-   body table that DataTables' scrollX mode creates internally. */
-#propertyTable_wrapper{ --sticky-col1-w:46px; }
+/* ── FIRST COLUMNS (Properties table: checkbox + Property name) ──
+   Previously sticky while scrolling horizontally; sticky positioning
+   removed per request — columns now scroll normally with the table. */
 #propertyTable .col-sticky-1{
-  position:sticky!important;left:0;z-index:3;
   min-width:40px;
 }
 #propertyTable .col-sticky-2{
-  position:sticky!important;left:var(--sticky-col1-w);z-index:2;
   max-width:230px;text-align:left!important;
 }
 #propertyTable thead th.col-sticky-1,
 #propertyTable thead th.col-sticky-2{
-  z-index:4;background:var(--surface2)!important;
+  background:var(--surface2)!important;
 }
 #propertyTable tbody td.col-sticky-1,
 #propertyTable tbody td.col-sticky-2{
@@ -313,10 +306,7 @@ table.dataTable.no-footer{border-bottom:none!important}
 #propertyTable tbody tr:hover td.col-sticky-2{
   background:#fdfaf6;
 }
-#propertyTable thead th.col-sticky-2,
-#propertyTable tbody td.col-sticky-2{
-  box-shadow:4px 0 6px -3px rgba(12,13,16,0.12);
-}
+
 
 /* ── COLUMN VISIBILITY TOGGLE (Properties table) ── */
 .col-toggle-wrap{position:relative;display:inline-block}
@@ -752,6 +742,71 @@ footer i{color:var(--gold)}
 }
 .btn-edit:hover{background:var(--gold);color:#fff;box-shadow:0 4px 12px rgba(184,144,60,0.3)}
 .btn-edit i{font-size:0.72rem}
+
+/* ── BOOKING DETAILS BUTTON (Booked tab only) ── */
+.btn-booking-details{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--brand-light);color:var(--brand);
+  border:1px solid rgba(224,58,82,0.25);padding:6px 14px;
+  border-radius:99px;cursor:pointer;font-size:0.76rem;
+  font-weight:600;transition:all 0.18s;font-family:inherit;margin:0 2px;
+  white-space:nowrap;
+}
+.btn-booking-details:hover{background:var(--brand);color:#fff;box-shadow:0 4px 12px rgba(224,58,82,0.3)}
+.btn-booking-details i{font-size:0.72rem}
+
+/* ── BOOKING DETAILS MODAL ── */
+.bd-modal-header{text-align:center;margin-bottom:22px}
+.bd-modal-icon{
+  width:56px;height:56px;border-radius:50%;
+  background:var(--brand-light);color:var(--brand);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.4rem;margin:0 auto 12px;
+}
+.bd-modal-title{font-size:1.3rem;font-weight:700;color:var(--ink)}
+.bd-modal-sub{font-size:0.82rem;color:var(--ink3);margin-top:4px}
+.bd-section{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:14px;padding:16px 16px 4px;margin-bottom:18px;
+}
+.bd-section-title{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;color:var(--ink);font-size:0.88rem;
+  margin-bottom:14px;
+}
+.bd-section-title i{color:var(--brand);font-size:0.9rem}
+.bd-section .hr-form-row input,.bd-section .hr-form-row select{background:#fff}
+.bd-req{color:var(--red);margin-left:2px}
+.hr-form-row input.bd-invalid,.hr-form-row select.bd-invalid{
+  border-color:var(--red)!important;
+  background:var(--red-light)!important;
+}
+.bd-field-msg{color:var(--red);font-size:0.72rem;margin-top:4px;display:none}
+.bd-field-msg.show{display:block}
+
+/* ── MODERN DATE FIELD (Booked On) ── */
+.bd-date-wrap{position:relative}
+.bd-date-wrap i{
+  position:absolute;left:15px;top:50%;transform:translateY(-50%);
+  color:var(--brand);font-size:0.9rem;pointer-events:none;
+}
+.bd-date-input{
+  width:100%;box-sizing:border-box;padding:12px 14px 12px 42px;
+  border:1.5px solid var(--border);border-radius:12px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;font-weight:600;
+  color:var(--ink);outline:none;background:var(--surface2);
+  transition:border-color 0.15s,box-shadow 0.15s,background 0.15s;
+  letter-spacing:0.02em;
+}
+.bd-date-input:hover{background:#fff}
+.bd-date-input:focus{
+  border-color:var(--brand);background:#fff;
+  box-shadow:0 0 0 3px rgba(224,58,82,0.12);
+}
+.bd-date-input::-webkit-calendar-picker-indicator{
+  cursor:pointer;padding:4px;border-radius:6px;transition:background 0.15s;
+}
+.bd-date-input::-webkit-calendar-picker-indicator:hover{background:var(--brand-light)}
 
 /* ── FILTER DROPDOWNS ── */
 .prop-filters{
@@ -1749,6 +1804,9 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
       <button class="cat-tab-btn" data-cat="Verified" onclick="switchPropCategory('Verified')">
         <i class="fas fa-circle-check"></i><span>Verified</span><span class="cat-count" id="cat-count-Verified">—</span>
       </button>
+      <button class="cat-tab-btn" data-cat="Booked" onclick="switchPropCategory('Booked')">
+        <i class="fas fa-lock"></i><span>Booked</span><span class="cat-count" id="cat-count-Booked">—</span>
+      </button>
       <button class="cat-tab-btn active" data-cat="Rent" onclick="switchPropCategory('Rent')">
         <i class="fas fa-key"></i><span>Rent</span><span class="cat-count" id="cat-count-Rent">—</span>
       </button>
@@ -1802,6 +1860,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
               <th>Listed On</th>
               <th>Promoted</th>
               <th>Verified</th>
+              <th>Booked</th>
               <th>Remarks</th>
               <th>Action</th>
             </tr>
@@ -1832,6 +1891,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
               <th><input type="text" class="col-filter-input" placeholder="dd/mm/yyyy" oninput="onPropColumnFilter('listedOn', this.value, this)"></th>
               <th><select class="col-filter-select" onchange="onPropColumnFilter('promoted', this.value, this)"><option value="">All</option><option value="yes">Yes</option><option value="no">No</option></select></th>
               <th><select class="col-filter-select" onchange="onPropColumnFilter('verified', this.value, this)"><option value="">All</option><option value="yes">Yes</option><option value="no">No</option></select></th>
+              <th><select class="col-filter-select" onchange="onPropColumnFilter('booked', this.value, this)"><option value="">All</option><option value="yes">Yes</option><option value="no">No</option></select></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('remarks', this.value, this)"></th>
               <th></th>
             </tr>
@@ -3133,6 +3193,183 @@ window.saveHonestReview = async function(){
   }
 };
 
+/* ════════════════════════════════════
+   BOOKING DETAILS MODAL (Booked tab only)
+   Lets admin record which registered User was the owner and which was the
+   tenant for a booked listing, plus the date it was booked on. Entirely an
+   admin-side record — never surfaced anywhere in the public/user-facing app.
+════════════════════════════════════ */
+let _bdUsersCache = null; // lazy-loaded, reused across modal opens in this session
+
+async function _bdGetUsers(){
+  if(_bdUsersCache) return _bdUsersCache;
+  try{
+    const res = await fetch(BASE + '/api/users', { headers: authHeaders() });
+    const data = await res.json().catch(()=>[]);
+    _bdUsersCache = Array.isArray(data) ? data : [];
+  } catch(e){
+    _bdUsersCache = [];
+  }
+  return _bdUsersCache;
+}
+
+function _bdPopulateSelect(selectEl, users, selectedId){
+  const opts = users.map(u => {
+    const label = [u.name || '(no name)', u.mobile].filter(Boolean).join(' — ');
+    return `<option value="${u._id}" ${String(u._id)===String(selectedId||'')?'selected':''}>${_adminModalEsc(label)}</option>`;
+  }).join('');
+  selectEl.innerHTML = selectEl.options[0].outerHTML + opts;
+}
+
+// Fired when either dropdown changes — copies that user's details into the
+// Name/Phone/Email fields below it (still editable afterwards).
+window._bdFillFromUser = function(which, userId){
+  const user = (_bdUsersCache || []).find(u => String(u._id) === String(userId));
+  const prefix = which === 'owner' ? 'bdFormOwner' : 'bdFormTenant';
+  document.getElementById(prefix+'Name').value  = user ? (user.name   || '') : '';
+  document.getElementById(prefix+'Phone').value = user ? (user.mobile || '') : '';
+  document.getElementById(prefix+'Email').value = user ? (user.email  || '') : '';
+};
+
+window.openBookingDetailsModal = async function(id){
+  const errEl = document.getElementById('bdFormError');
+  errEl.classList.remove('show'); errEl.textContent = '';
+  document.getElementById('bdFormPropId').value = id;
+  _bdClearErrors();
+
+  const row = _adminPropCache[id] || {};
+  const bd = row.bookingDetails || {};
+
+  document.getElementById('bdFormBookedOn').value   = bd.bookedOn || '';
+  document.getElementById('bdFormDescription').value = bd.description || '';
+  document.getElementById('bdFormOwnerName').value  = bd.ownerName  || row.ownerName   || '';
+  document.getElementById('bdFormOwnerPhone').value = bd.ownerPhone || row.ownerNumber || '';
+  document.getElementById('bdFormOwnerEmail').value = bd.ownerEmail || row.ownerEmail  || '';
+  document.getElementById('bdFormTenantName').value  = bd.tenantName  || '';
+  document.getElementById('bdFormTenantPhone').value = bd.tenantPhone || '';
+  document.getElementById('bdFormTenantEmail').value = bd.tenantEmail || '';
+
+  const users = await _bdGetUsers();
+  _bdPopulateSelect(document.getElementById('bdFormOwnerSelect'),  users, bd.ownerId);
+  _bdPopulateSelect(document.getElementById('bdFormTenantSelect'), users, bd.tenantId);
+
+  document.getElementById('bookingDetailsModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+
+function closeBookingDetailsModal(){
+  document.getElementById('bookingDetailsModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+window.closeBookingDetailsModal = closeBookingDetailsModal;
+
+// All fields in the modal, keyed to their error-message element and the
+// validator that decides whether the current value passes.
+const _BD_FIELDS = [
+  { input:'bdFormBookedOn',    err:'bdErrBookedOn',    test:v => !!v },
+  { input:'bdFormDescription', err:'bdErrDescription', test:v => v.trim().length > 0 },
+  { input:'bdFormOwnerSelect', err:'bdErrOwnerSelect', test:v => !!v },
+  { input:'bdFormOwnerName',   err:'bdErrOwnerName',   test:v => v.trim().length > 0 },
+  { input:'bdFormOwnerPhone',  err:'bdErrOwnerPhone',  test:v => /^\d{10}$/.test(v.trim()) },
+  { input:'bdFormOwnerEmail',  err:'bdErrOwnerEmail',  test:v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()) },
+  { input:'bdFormTenantSelect',err:'bdErrTenantSelect',test:v => !!v },
+  { input:'bdFormTenantName',  err:'bdErrTenantName',  test:v => v.trim().length > 0 },
+  { input:'bdFormTenantPhone', err:'bdErrTenantPhone', test:v => /^\d{10}$/.test(v.trim()) },
+  { input:'bdFormTenantEmail', err:'bdErrTenantEmail', test:v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()) },
+];
+
+function _bdClearErrors(){
+  _BD_FIELDS.forEach(f => {
+    document.getElementById(f.input).classList.remove('bd-invalid');
+    document.getElementById(f.err).classList.remove('show');
+  });
+}
+
+// Validates every field, marking each invalid one (red border + inline
+// message) rather than stopping at the first failure, so the admin sees
+// everything that needs fixing in one pass. Returns true only if all pass.
+function _bdValidate(){
+  let firstInvalid = null;
+  let allValid = true;
+  _BD_FIELDS.forEach(f => {
+    const el = document.getElementById(f.input);
+    const errMsgEl = document.getElementById(f.err);
+    const ok = f.test(el.value || '');
+    el.classList.toggle('bd-invalid', !ok);
+    errMsgEl.classList.toggle('show', !ok);
+    if(!ok){
+      allValid = false;
+      if(!firstInvalid) firstInvalid = el;
+    }
+  });
+  if(firstInvalid) firstInvalid.scrollIntoView({behavior:'smooth', block:'center'});
+  return allValid;
+}
+
+// Clear a field's error state as soon as the admin edits it, so the red
+// state doesn't linger after they've fixed it (checked again on Save).
+document.addEventListener('input', (e) => {
+  const f = _BD_FIELDS.find(x => x.input === e.target.id);
+  if(!f) return;
+  e.target.classList.remove('bd-invalid');
+  document.getElementById(f.err).classList.remove('show');
+});
+document.addEventListener('change', (e) => {
+  const f = _BD_FIELDS.find(x => x.input === e.target.id);
+  if(!f) return;
+  e.target.classList.remove('bd-invalid');
+  document.getElementById(f.err).classList.remove('show');
+});
+
+window.saveBookingDetails = async function(){
+  const errEl = document.getElementById('bdFormError');
+  errEl.classList.remove('show'); errEl.textContent = '';
+
+  if(!_bdValidate()){
+    errEl.textContent = 'Please fill in all required fields correctly.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  const id = document.getElementById('bdFormPropId').value.trim();
+  const payload = {
+    bookedOn:    document.getElementById('bdFormBookedOn').value.trim(),
+    description: document.getElementById('bdFormDescription').value.trim(),
+    ownerId:     document.getElementById('bdFormOwnerSelect').value || null,
+    ownerName:   document.getElementById('bdFormOwnerName').value.trim(),
+    ownerPhone:  document.getElementById('bdFormOwnerPhone').value.trim(),
+    ownerEmail:  document.getElementById('bdFormOwnerEmail').value.trim(),
+    tenantId:    document.getElementById('bdFormTenantSelect').value || null,
+    tenantName:  document.getElementById('bdFormTenantName').value.trim(),
+    tenantPhone: document.getElementById('bdFormTenantPhone').value.trim(),
+    tenantEmail: document.getElementById('bdFormTenantEmail').value.trim(),
+  };
+
+  const saveBtn = document.getElementById('bdFormSaveBtn');
+  saveBtn.disabled = true;
+  try{
+    const res = await fetch(`${BASE}/api/properties/${id}/booking-details`, {
+      method: 'PATCH',
+      headers: authHeaders({'Content-Type':'application/json'}),
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok){
+      errEl.textContent = data.message || 'Save failed';
+      errEl.classList.add('show');
+      return;
+    }
+    closeBookingDetailsModal();
+    if(propTable) propTable.ajax.reload(null, false);
+  } catch(err){
+    errEl.textContent = 'Save failed. Please try again.';
+    errEl.classList.add('show');
+  } finally {
+    saveBtn.disabled = false;
+  }
+};
+
+
 /* ── PROMOTED / VERIFIED TOGGLES ── */
 window.togglePropFlag = async function(id, field, checkboxEl){
   const desired = checkboxEl.checked;
@@ -3162,7 +3399,7 @@ window.togglePropFlag = async function(id, field, checkboxEl){
     updatePropCategoryCounts(propTable.rows().data().toArray());
     // If the currently active sub-tab is Promoted/Verified and this row no
     // longer belongs there, redraw so it disappears from the filtered view.
-    if(_propCategoryState === 'Promoted' || _propCategoryState === 'Verified'){
+    if(_propCategoryState === 'Promoted' || _propCategoryState === 'Verified' || _propCategoryState === 'Booked'){
       propTable.draw(false);
     }
   } catch(err){
@@ -3809,17 +4046,29 @@ $(document).ready(function(){
             <span class="slider"></span>
           </span></label>`;
       }},
-      /* 26 – Remarks */
+      /* 26 – Booked (toggle) */
+      { data:'booked', orderable:false, className:'dt-body-center', render:(d,t,row)=>{
+          if(t!=='display') return d ? 'Yes' : 'No';
+          return `<label class="mini-toggle-wrap"><span class="mini-toggle booked-toggle">
+            <input type="checkbox" ${d?'checked':''} onchange="togglePropFlag('${row._id}','booked',this)">
+            <span class="slider"></span>
+          </span></label>`;
+      }},
+      /* 27 – Remarks */
       { data:'remarks', orderable:false, render:(d,t,row)=>{
           if(t==='display') return remarkCellHtml(row._id, d, 'property');
           return d||'';
       }},
-      /* 27 – Action */
+      /* 28 – Action */
       { data:null, orderable:false, render:(d,t,row)=>{
           _adminPropCache[row._id] = row;
+          const bookingBtn = row.booked
+            ? `<button class="btn-booking-details" title="Booking details" onclick="openBookingDetailsModal('${row._id}')"><i class="fas fa-file-signature"></i> Booking</button>`
+            : '';
           return `<div style="display:inline-flex;gap:6px;flex-wrap:nowrap;justify-content:center">
             <button class="btn-view" onclick="openAdminPropModal('${row._id}')"><i class="fas fa-eye"></i> View</button>
             <button class="btn-edit" onclick="openAdminListingModal('${row._id}', 'edit')"><i class="fas fa-pen"></i> Edit</button>
+            ${bookingBtn}
             <button class="btn-delete" onclick="deleteProperty('${row._id}')"><i class="fas fa-trash-alt"></i> Delete</button>
           </div>`;
       }}
@@ -3877,11 +4126,12 @@ $(document).ready(function(){
       },*/
       {
         extend:'print', text:'<i class="fas fa-print"></i> Print', title:'KR Properties',
-        exportOptions:{columns:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27],
+        exportOptions:{columns:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28],
           format:{ body:function(data,row,col){
             var rd=propTable.row(row).data(); if(!rd) return data;
             if(col===24) return rd.promoted ? 'Yes' : 'No';
             if(col===25) return rd.verified ? 'Yes' : 'No';
+            if(col===26) return rd.booked ? 'Yes' : 'No';
             return data;
           }}
         },
@@ -3897,11 +4147,12 @@ $(document).ready(function(){
 	  {
         extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
         orientation:'landscape', pageSize:'A4', title:'KR Real-Estate — Properties',
-        exportOptions:{columns:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27],
+        exportOptions:{columns:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28],
           format:{ body:function(data,row,col){
             var rd=propTable.row(row).data(); if(!rd) return data;
             if(col===24) return rd.promoted ? 'Yes' : 'No';
             if(col===25) return rd.verified ? 'Yes' : 'No';
+            if(col===26) return rd.booked ? 'Yes' : 'No';
             return data;
           }}
         },
@@ -4403,14 +4654,14 @@ function buildPropFilters(data){
 }
 
 // Per-column header search filters (Property, Status, Price, Owner Name,
-// Owner Number, Location, Listed On, Promoted, Verified, Remarks).
+// Owner Number, Location, Listed On, Promoted, Verified, Booked, Remarks).
 const _propColumnFilters = {
   title:'', status:'', displayPrice:'', ownerName:'', ownerNumber:'',
   loc:'', city:'', typeCol:'',
   pgGender:'', pgRoomType:'', pgMeals:'', pgOccupancy:'', pgNotice:'',
   ssRoomType:'', ssAvailable24hrs:'', ssCancellation:'', ssCouplesAllowed:'',
   visitCount:'', propertyId:'', userId:'',
-  listedOn:'', promoted:'', verified:'', remarks:''
+  listedOn:'', promoted:'', verified:'', booked:'', remarks:''
 };
 
 window.onPropColumnFilter = function(field, value, inputEl){
@@ -4475,7 +4726,7 @@ const PROP_COL_GROUPS = [
   { label:'Meta', cols:[
     {idx:18, label:'Visits'}, {idx:19, label:'Photos'}, {idx:20, label:'Amenities'},
     {idx:21, label:'Property ID'}, {idx:22, label:'User ID'}, {idx:23, label:'Listed On'},
-    {idx:24, label:'Promoted'}, {idx:25, label:'Verified'}, {idx:26, label:'Remarks'}
+    {idx:24, label:'Promoted'}, {idx:25, label:'Verified'}, {idx:26, label:'Booked'}, {idx:27, label:'Remarks'}
   ]}
 ];
 
@@ -4544,9 +4795,9 @@ function applyPropCategoryColumnVisibility(cat){
   // Rent/Lease: neither PG nor Short Stay fields apply.
   // PG: hide Short-Stay-only fields, show PG fields.
   // Short Stay: hide PG-only fields, show Short-Stay fields.
-  // all/Promoted/Verified: mixed listing types, so show everything.
-  const showPG = (cat === 'all' || cat === 'Promoted' || cat === 'Verified' || cat === 'PG');
-  const showSS = (cat === 'all' || cat === 'Promoted' || cat === 'Verified' || cat === 'Short Stay');
+  // all/Promoted/Verified/Booked: mixed listing types, so show everything.
+  const showPG = (cat === 'all' || cat === 'Promoted' || cat === 'Verified' || cat === 'Booked' || cat === 'PG');
+  const showSS = (cat === 'all' || cat === 'Promoted' || cat === 'Verified' || cat === 'Booked' || cat === 'Short Stay');
   PG_ONLY_COLS.forEach(i => propTable.column(i).visible(showPG, false));
   SS_ONLY_COLS.forEach(i => propTable.column(i).visible(showSS, false));
   propTable.columns.adjust();
@@ -4563,13 +4814,14 @@ function switchPropCategory(cat){
 }
 
 function updatePropCategoryCounts(data){
-  const counts = {all:data.length, Promoted:0, Verified:0, Rent:0, Lease:0, PG:0, 'Short Stay':0};
+  const counts = {all:data.length, Promoted:0, Verified:0, Booked:0, Rent:0, Lease:0, PG:0, 'Short Stay':0};
   data.forEach(r=>{
-    counts[propCategoryOf(r.status)]++;
+    if(!r.booked) counts[propCategoryOf(r.status)]++; // once booked, no longer counted under its Rent/Lease/PG/Short Stay tab
     if(r.promoted) counts.Promoted++;
     if(r.verified) counts.Verified++;
+    if(r.booked) counts.Booked++;
   });
-  ['all','Promoted','Verified','Rent','Lease','PG','Short Stay'].forEach(cat=>{
+  ['all','Promoted','Verified','Booked','Rent','Lease','PG','Short Stay'].forEach(cat=>{
     const el = document.getElementById('cat-count-'+cat.replace(/\s+/g,'-'));
     if(el) el.innerText = counts[cat];
   });
@@ -4583,8 +4835,11 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex){
     if(!row.promoted) return false;
   } else if(_propCategoryState === 'Verified'){
     if(!row.verified) return false;
-  } else if(_propCategoryState !== 'all' && propCategoryOf(row.status) !== _propCategoryState){
-    return false;
+  } else if(_propCategoryState === 'Booked'){
+    if(!row.booked) return false;
+  } else if(_propCategoryState !== 'all'){
+    if(propCategoryOf(row.status) !== _propCategoryState) return false;
+    if(row.booked) return false; // once booked, no longer shown under its Rent/Lease/PG/Short Stay tab
   }
   const cf = _propColumnFilters;
   const contains = (val, needle) => String(val||'').toLowerCase().includes(needle.toLowerCase());
@@ -4619,6 +4874,8 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex){
   if(cf.promoted === 'no'  && row.promoted)  return false;
   if(cf.verified === 'yes' && !row.verified) return false;
   if(cf.verified === 'no'  && row.verified)  return false;
+  if(cf.booked === 'yes' && !row.booked) return false;
+  if(cf.booked === 'no'  && row.booked)  return false;
   if(cf.remarks && !contains(flattenRemarks(row.remarks||[]), cf.remarks)) return false;
 
   return true;
@@ -6046,6 +6303,111 @@ markRequiredLabels();
       <div class="hr-modal-actions">
         <button class="hr-btn-cancel" onclick="closeHonestReviewModal()">Cancel</button>
         <button class="hr-btn-save" id="hrFormSaveBtn" onclick="saveHonestReview()">Save</button>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ═════════ BOOKING DETAILS MODAL (Booked tab only) ═════════ -->
+<div class="prop-modal-wrap" id="bookingDetailsModal" onclick="if(event.target===this)closeBookingDetailsModal()">
+
+  <div class="prop-modal">
+
+    <div class="prop-modal-close-row">
+      <button class="prop-modal-close-btn" onclick="closeBookingDetailsModal()">✕</button>
+    </div>
+
+    <div class="prop-modal-body">
+
+      <div class="bd-modal-header">
+        <div class="bd-modal-icon"><i class="fas fa-file-signature"></i></div>
+        <div class="bd-modal-title">Booking Details</div>
+        <div class="bd-modal-sub">All fields are required</div>
+      </div>
+
+      <div class="hr-form-error" id="bdFormError"></div>
+
+      <input type="hidden" id="bdFormPropId">
+
+      <div class="hr-form-row">
+        <label>Booked On<span class="bd-req">*</span></label>
+        <div class="bd-date-wrap">
+          <i class="fas fa-calendar-alt"></i>
+          <input type="date" id="bdFormBookedOn" class="bd-date-input">
+        </div>
+        <div class="bd-field-msg" id="bdErrBookedOn">Booked on date is required.</div>
+      </div>
+
+      <div class="hr-form-row">
+        <label>Booking Description<span class="bd-req">*</span></label>
+        <textarea id="bdFormDescription" rows="3" placeholder="Notes about this booking — terms agreed, move-in details, etc."></textarea>
+        <div class="bd-field-msg" id="bdErrDescription">Booking description is required.</div>
+      </div>
+
+      <div class="bd-section">
+        <div class="bd-section-title"><i class="fas fa-user-tie"></i> Owner</div>
+
+        <div class="hr-form-row">
+          <label>Select from Users<span class="bd-req">*</span></label>
+          <select id="bdFormOwnerSelect" onchange="_bdFillFromUser('owner', this.value)">
+            <option value="">— Select owner —</option>
+          </select>
+          <div class="bd-field-msg" id="bdErrOwnerSelect">Please select the owner.</div>
+        </div>
+        <div class="hr-form-grid">
+          <div class="hr-form-row">
+            <label>Name<span class="bd-req">*</span></label>
+            <input type="text" id="bdFormOwnerName" placeholder="Owner name">
+            <div class="bd-field-msg" id="bdErrOwnerName">Owner name is required.</div>
+          </div>
+          <div class="hr-form-row">
+            <label>Phone<span class="bd-req">*</span></label>
+            <input type="text" id="bdFormOwnerPhone" placeholder="Owner phone">
+            <div class="bd-field-msg" id="bdErrOwnerPhone">Enter a valid 10-digit phone number.</div>
+          </div>
+        </div>
+        <div class="hr-form-row">
+          <label>Email<span class="bd-req">*</span></label>
+          <input type="text" id="bdFormOwnerEmail" placeholder="Owner email">
+          <div class="bd-field-msg" id="bdErrOwnerEmail">Enter a valid email address.</div>
+        </div>
+      </div>
+
+      <div class="bd-section">
+        <div class="bd-section-title"><i class="fas fa-user"></i> Tenant / User</div>
+
+        <div class="hr-form-row">
+          <label>Select from Users<span class="bd-req">*</span></label>
+          <select id="bdFormTenantSelect" onchange="_bdFillFromUser('tenant', this.value)">
+            <option value="">— Select tenant —</option>
+          </select>
+          <div class="bd-field-msg" id="bdErrTenantSelect">Please select the tenant.</div>
+        </div>
+        <div class="hr-form-grid">
+          <div class="hr-form-row">
+            <label>Name<span class="bd-req">*</span></label>
+            <input type="text" id="bdFormTenantName" placeholder="Tenant name">
+            <div class="bd-field-msg" id="bdErrTenantName">Tenant name is required.</div>
+          </div>
+          <div class="hr-form-row">
+            <label>Phone<span class="bd-req">*</span></label>
+            <input type="text" id="bdFormTenantPhone" placeholder="Tenant phone">
+            <div class="bd-field-msg" id="bdErrTenantPhone">Enter a valid 10-digit phone number.</div>
+          </div>
+        </div>
+        <div class="hr-form-row">
+          <label>Email<span class="bd-req">*</span></label>
+          <input type="text" id="bdFormTenantEmail" placeholder="Tenant email">
+          <div class="bd-field-msg" id="bdErrTenantEmail">Enter a valid email address.</div>
+        </div>
+      </div>
+
+      <div class="hr-modal-actions">
+        <button class="hr-btn-cancel" onclick="closeBookingDetailsModal()">Cancel</button>
+        <button class="hr-btn-save" id="bdFormSaveBtn" onclick="saveBookingDetails()">Save</button>
       </div>
 
     </div>
