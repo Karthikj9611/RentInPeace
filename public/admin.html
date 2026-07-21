@@ -3931,8 +3931,8 @@ $(document).ready(function(){
               .filter(Boolean).join(' ');
           }
           const name  = escapeHtml(row.ownerName||'—');
-          const phone = row.ownerNumber ? `<a href="tel:${row.ownerNumber}" class="phone-link"><i class="fas fa-phone-flip"></i>${escapeHtml(row.ownerNumber)}</a>` : '';
-          const alt   = row.ownerAltPhone ? `<a href="tel:${row.ownerAltPhone}" class="phone-link"><i class="fas fa-phone"></i>${escapeHtml(row.ownerAltPhone)} (Alt)</a>` : '';
+          const phone = row.ownerNumber ? `<a href="tel:${row.ownerNumber}" class="phone-link"><i class="fas fa-phone"></i>${escapeHtml(row.ownerNumber)}</a>` : '';
+          const alt   = row.ownerAltPhone ? `<a href="tel:${row.ownerAltPhone}" class="phone-link"><i class="fas fa-phone"></i>${escapeHtml(row.ownerAltPhone)}</a>` : '';
           const email = row.ownerEmail ? `<a href="mailto:${row.ownerEmail}" class="email-link"><i class="fas fa-envelope"></i>${escapeHtml(row.ownerEmail)}</a>` : '';
           const time  = row.ownerContactTime ? `<div class="prop-sub"><i class="fas fa-clock"></i> ${escapeHtml(row.ownerContactTime)}</div>` : '';
           return `<div class="owner-combined-cell">
