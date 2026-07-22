@@ -6066,11 +6066,51 @@ function pHasLift(p) {
 
 /* Full amenities list (selected + comma-separated "extra" ones) as pill tags,
    shown on every card type right after the Furnished/Maint/Water chip row. */
+/* Icon per amenity, keyed by its base label (unit suffix like " ×3" stripped
+   before lookup). Falls back to a generic check icon for custom/"extra"
+   amenities not in this list. */
+const AMENITY_ICONS = {
+  'wi-fi': '📶',
+  'ac': '❄️',
+  'washing machine': '🧺',
+  'refrigerator': '🧊',
+  'microwave': '🥘',
+  'geyser': '🚿',
+  'cupboards': '🗄️',
+  'bed': '🛏️',
+  'sofa': '🛋️',
+  'elevator': '🛗',
+  'balcony': '🌇',
+  'gym': '🏋️',
+  'cctv': '📹',
+  'power backup': '🔌',
+  'garden': '🌳',
+  'laundry': '👕',
+  'meals included': '🍽️',
+  'piped gas connection': '🔥',
+  'ro water filter': '💧',
+};
+function amenityIcon(label) {
+  const base = label.replace(/\s*×\d+\s*$/, '').trim().toLowerCase();
+  if (AMENITY_ICONS[base]) return AMENITY_ICONS[base];
+  // Fallback: keyword match for custom/free-text amenities hosts type in
+  // themselves, so they still get a sensible icon instead of the generic ✅.
+  const KEYWORD_ICONS = [
+    [/park/, '🅿️'], [/water/, '💧'], [/\btv\b|television/, '📺'],
+    [/internet|broadband|wifi|wi-fi/, '📶'], [/security guard|watchman|guard/, '💂'],
+    [/pool|swim/, '🏊'], [/play area|kids/, '🧒'], [/club\s?house/, '🏛️'],
+    [/intercom/, '☎️'], [/fire/, '🧯'], [/solar/, '☀️'], [/pet/, '🐾'],
+    [/store|storage/, '📦'], [/curtain/, '🪟'], [/dining/, '🍽️'],
+    [/kitchen|modular/, '🍳'], [/dish\s?washer/, '🧽'], [/chimney/, '💨'],
+  ];
+  for (const [re, icon] of KEYWORD_ICONS) if (re.test(base)) return icon;
+  return '🏠';
+}
 function amenityTagsHTML(p) {
   const list = (p.amenities?.selected || []).slice();
   if (p.amenities?.extra) list.push(...p.amenities.extra.split(',').map(s => s.trim()).filter(Boolean));
   if (!list.length) return '';
-  return `<div class="prop-chip-row prop-chip-row-scroll prop-amenity-row">${list.map(a => `<span class="prop-chip chip-amenity">${esc(a)}</span>`).join('')}</div>`;
+  return `<div class="prop-chip-row prop-chip-row-scroll prop-amenity-row">${list.map(a => `<span class="prop-chip chip-amenity"><span class="prop-chip-icon">${amenityIcon(a)}</span>${esc(a)}</span>`).join('')}</div>`;
 }
 
 function cardHTML(p, compact) {
