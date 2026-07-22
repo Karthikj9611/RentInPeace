@@ -4566,6 +4566,13 @@ ul{list-style:none}
     </div>
 
     <div id="authFormStep">
+      <div id="authSignupTypeField" style="display:none">
+        <label class="form-label">I am a</label>
+        <div class="auth-tabs" id="authTypeTabsRow" style="margin-bottom:16px">
+          <div class="auth-tab active" id="authTypeCustomer" onclick="selectAccountType('customer')">Looking for a home</div>
+          <div class="auth-tab" id="authTypeOwner" onclick="selectAccountType('owner')">Property owner</div>
+        </div>
+      </div>
       <div id="authSignupNameField" style="display:none">
         <div class="form-row">
           <div class="form-group">
@@ -8604,6 +8611,7 @@ function switchAuthTab(tab) {
   const isLogin = tab === 'login';
   document.getElementById('authTabLogin').classList.toggle('active', isLogin);
   document.getElementById('authTabSignup').classList.toggle('active', !isLogin);
+  document.getElementById('authSignupTypeField').style.display = isLogin ? 'none' : '';
   document.getElementById('authSignupNameField').style.display = isLogin ? 'none' : '';
   document.getElementById('authLoginContactField').style.display = isLogin ? '' : 'none';
   document.getElementById('authSignupContactFields').style.display = isLogin ? 'none' : '';
@@ -8615,6 +8623,15 @@ function switchAuthTab(tab) {
     ? 'New to Quatar? <a onclick="switchAuthTab(\'signup\')">Sign up</a>'
     : 'Already have an account? <a onclick="switchAuthTab(\'login\')">Log in</a>';
 }
+// Which of the two signup account types is currently selected — defaults to
+// 'customer' (the "Looking for a home" tab is active by default in the HTML).
+let selectedAccountType = 'customer';
+function selectAccountType(type) {
+  selectedAccountType = type;
+  document.getElementById('authTypeCustomer').classList.toggle('active', type === 'customer');
+  document.getElementById('authTypeOwner').classList.toggle('active', type === 'owner');
+}
+
 // Holds the collected signup form data between "send OTP" and "verify OTP",
 // since the account isn't actually created until the code is confirmed.
 let pendingSignupBody = null;
@@ -8645,7 +8662,7 @@ async function submitAuth() {
     if (!isValidIndianMobile(mobile)) { showToast('Enter a valid 10-digit mobile number starting with 6, 7, 8 or 9'); return; }
     if (!password) { showToast('Please enter a password'); return; }
     if (password !== confirmPassword) { showToast('Passwords do not match'); return; }
-    body = { firstName, lastName, email, mobile, password, confirmPassword };
+    body = { firstName, lastName, email, mobile, password, confirmPassword, accountType: selectedAccountType };
   }
 
   btn.disabled = true;
@@ -8698,7 +8715,7 @@ function finishAuthSuccess(data) {
   localStorage.setItem('quatar_user', JSON.stringify({
     id: data._id, userId: data.userId,
     firstName: data.firstName, lastName: data.lastName, name: data.name,
-    email: data.email, mobile: data.mobile,
+    email: data.email, mobile: data.mobile, accountType: data.accountType,
     userKey: data.userKey
   }));
   closeAuthModal();

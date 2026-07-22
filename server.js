@@ -114,6 +114,10 @@ const UserSchema = new mongoose.Schema({
   email:     { type: String, trim: true, lowercase: true, sparse: true, unique: true },
   mobile:    { type: String, trim: true, sparse: true, unique: true },
   password:  { type: String, required: true },
+  // Which of the two signup paths the person picked — drives what admin sees
+  // and can later drive customer- vs owner-specific UI. Defaults to
+  // 'customer' for any pre-existing accounts created before this field existed.
+  accountType: { type: String, enum: ['customer', 'owner'], default: 'customer' },
   remarks:   { type: [RemarkEntrySchema], default: [] },
   // Human-readable unique id, same pattern as Property.propertyId (e.g. USER-000001).
   // This is a *display* identifier, distinct from the Mongo _id. Session docs
@@ -324,7 +328,7 @@ app.post('/api/user/signup/verify-otp', otpLimiter, async (req, res) => {
 // ── User Signup ──
 app.post('/api/user/signup', userAuthLimiter, async (req, res) => {
   try {
-    const { firstName, lastName, email, mobile, password, confirmPassword } = req.body || {};
+    const { firstName, lastName, email, mobile, password, confirmPassword, accountType } = req.body || {};
 
     if (!firstName || !String(firstName).trim()) return res.status(400).json({ message: 'First name is required' });
     if (!lastName  || !String(lastName).trim())  return res.status(400).json({ message: 'Last name is required' });
@@ -334,6 +338,8 @@ app.post('/api/user/signup', userAuthLimiter, async (req, res) => {
     if (!/^[\d+\-\s]{7,15}$/.test(String(mobile).trim())) return res.status(400).json({ message: 'Please enter a valid mobile number' });
     if (!password || password.length < 6) return res.status(400).json({ message: 'Password must be at least 6 characters' });
     if (password !== confirmPassword) return res.status(400).json({ message: 'Passwords do not match' });
+
+    const cleanAccountType = accountType === 'owner' ? 'owner' : 'customer';
 
     const cleanEmail  = String(email).toLowerCase().trim();
     const cleanMobile = String(mobile).trim();
@@ -362,6 +368,7 @@ app.post('/api/user/signup', userAuthLimiter, async (req, res) => {
       email:     cleanEmail,
       mobile:    cleanMobile,
       password:  hashed,
+      accountType: cleanAccountType,
       userId,
     });
     const userKey = await issueUserSession(user);
@@ -371,7 +378,7 @@ app.post('/api/user/signup', userAuthLimiter, async (req, res) => {
       message: 'Account created successfully',
       _id: user._id, userId: user.userId,
       firstName: user.firstName, lastName: user.lastName, name: user.name,
-      email: user.email, mobile: user.mobile,
+      email: user.email, mobile: user.mobile, accountType: user.accountType,
       userKey,
     });
   } catch (err) {
@@ -401,7 +408,7 @@ app.post('/api/user/login', userAuthLimiter, async (req, res) => {
       message: 'Logged in successfully',
       _id: user._id, userId: user.userId,
       firstName: user.firstName, lastName: user.lastName, name: user.name,
-      email: user.email, mobile: user.mobile,
+      email: user.email, mobile: user.mobile, accountType: user.accountType,
       userKey,
     });
   } catch (err) {
