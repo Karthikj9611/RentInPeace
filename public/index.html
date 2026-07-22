@@ -10083,7 +10083,12 @@ function _autoSlidePropRows(){
   document.querySelectorAll('.prop-stats, .prop-chip-row-scroll').forEach(row => {
     if (row.scrollWidth <= row.clientWidth + 4) return;
     const target = _propRowPhase ? row.scrollWidth - row.clientWidth : 0;
-    _slowScrollTo(row, target, 5000);
+    // Readable, constant speed (~28px/sec) rather than a fixed total
+    // duration — longer rows (more chips) now take proportionally longer
+    // instead of racing through at the same 5s regardless of length.
+    const distance = Math.abs(target - row.scrollLeft);
+    const duration = Math.min(Math.max(distance / 28 * 1000, 4000), 16000);
+    _slowScrollTo(row, target, duration);
   });
 }
 /* ─── Manual drag-to-scroll for the stat/chip rows on desktop ───────────
