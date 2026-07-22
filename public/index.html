@@ -700,11 +700,18 @@ ul{list-style:none}
 .prop-chip-row-scroll.is-dragging{cursor:grabbing;scroll-behavior:auto;user-select:none}
 .prop-chip-row-scroll::-webkit-scrollbar{display:none}
 .prop-chip-row-scroll .prop-chip{flex-shrink:0}
-/* List view: no room to scroll sideways card-by-card, so let the spec/
-   amenity chips wrap onto additional lines instead of hiding behind a
-   horizontal scroll. */
+/* List view: no room to scroll sideways card-by-card, so arrange the spec/
+   amenity chips as an equal 4-column grid instead of hiding behind a
+   horizontal scroll or wrapping unevenly. */
 .prop-card.list-view .prop-chip-row-scroll{
-  flex-wrap:wrap;overflow-x:visible;cursor:default;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
+  overflow-x:visible;cursor:default;
+}
+.prop-card.list-view .prop-chip-row-scroll .prop-chip{
+  width:100%;justify-content:center;
+}
+@media(max-width:768px){
+  .prop-card.list-view .prop-chip-row-scroll{grid-template-columns:repeat(2,1fr)}
 }
 .prop-id{font-size:12px;font-family:monospace;color:var(--text-3);margin-top:2px;letter-spacing:.02em}
 .prop-desc-preview{margin-top:8px;font-size:12px;line-height:1.4;color:var(--text-3);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -814,13 +821,24 @@ ul{list-style:none}
    compact icon plus its name side by side, all equal width — instead of
    the big 56px circular icon with a label stacked underneath (which had
    no room and spilled past the card's bottom edge). */
-.prop-card.list-view .prop-quick-actions{gap:6px}
+/* List view: 5 labeled buttons (Contact/WhatsApp/Visit/Compare/Views) rarely
+   fit the narrower content column (esp. in the 2-up list layout). Instead of
+   letting flex:1 squeeze each one down to an unreadable sliver — which also
+   forced the row wider than the card and let it spill past the edge — give
+   each button a guaranteed minimum width and let the row itself scroll
+   horizontally within the card so nothing overflows the layout. */
+.prop-card.list-view .prop-quick-actions{
+  gap:6px;overflow-x:auto;overflow-y:hidden;
+  scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;
+}
+.prop-card.list-view .prop-quick-actions::-webkit-scrollbar{display:none}
 .prop-card.list-view .prop-quick-actions .prop-qa-btn.prop-qa-3d,
 .prop-card.list-view .prop-quick-actions .prop-qa-icon.prop-qa-3d,
 .prop-card.list-view .prop-quick-actions .prop-views{
   flex-direction:row;align-items:center;justify-content:center;gap:5px;
   height:38px;border-radius:9px;
   border:1.5px solid var(--border-2);background:var(--bg);
+  flex:0 0 auto;min-width:76px;padding:0 10px;
 }
 .prop-card.list-view .prop-quick-actions .qa-3d-icon,
 .prop-card.list-view .prop-quick-actions .prop-views-icon{
