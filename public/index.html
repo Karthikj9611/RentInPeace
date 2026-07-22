@@ -749,6 +749,8 @@ ul{list-style:none}
 .chip-sscancel{background:#faf1f2;border-color:#eed9dc}
 .icon-sscouples{background:linear-gradient(145deg,#f8f0f0,#efdfe0)}
 .chip-sscouples{background:#faf1f2;border-color:#eed9dc}
+.chip-amenity{background:#faf1f2;border-color:#eed9dc;color:#a85c6e}
+.prop-amenity-row{margin-top:5px}
 .chip-video{background:#faf1f2;border-color:#eed9dc;color:#c9975c;font-weight:700}
 .prop-chip-lbl{color:var(--brand);font-weight:600}
 .prop-chip-val{color:var(--text);font-weight:600}
@@ -6062,6 +6064,15 @@ function pHasLift(p) {
   return (p.amenities?.selected || []).some(a => /lift/i.test(a));
 }
 
+/* Full amenities list (selected + comma-separated "extra" ones) as pill tags,
+   shown on every card type right after the Furnished/Maint/Water chip row. */
+function amenityTagsHTML(p) {
+  const list = (p.amenities?.selected || []).slice();
+  if (p.amenities?.extra) list.push(...p.amenities.extra.split(',').map(s => s.trim()).filter(Boolean));
+  if (!list.length) return '';
+  return `<div class="prop-chip-row prop-chip-row-scroll prop-amenity-row">${list.map(a => `<span class="prop-chip chip-amenity">${esc(a)}</span>`).join('')}</div>`;
+}
+
 function cardHTML(p, compact) {
   const liked = shortlisted.has(String(p.id));
   const compared = compareSet.has(p.id);
@@ -6171,6 +6182,10 @@ function cardHTML(p, compact) {
           <span class="prop-chip-icon icon-furnish">🛋️</span>
           ${p.property?.furnish ?? p.pg?.furnish ?? p.shortStay?.furnish}
         </span>
+        ${isPGCard && pg.room ? `<span class="prop-chip chip-room" title="Room type">
+          <span class="prop-chip-icon icon-room">🛏️</span>
+          ${esc(pg.room)}
+        </span>` : ''}
         ${maintenance > 0 ? `<span class="prop-chip chip-maint" title="Monthly maintenance">
           <span class="chip-ico-wrap icon-maint"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
           ${fmtRupee(maintenance)} Maint.
@@ -6187,43 +6202,36 @@ function cardHTML(p, compact) {
           <span class="chip-ico-wrap icon-avail"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
           Available From ${availableFmt}
         </span>` : ''}
-      </div>
-      ${isPGCard ? `<div class="prop-chip-row prop-chip-row-scroll">
-        ${pg.gender ? `<span class="prop-chip chip-gender" title="Gender preference">
+        ${isPGCard && pg.gender ? `<span class="prop-chip chip-gender" title="Gender preference">
           <span class="prop-chip-icon icon-gender">🚻</span>
           ${esc(pg.gender)}
         </span>` : ''}
-        ${pg.room ? `<span class="prop-chip chip-room" title="Room type">
-          <span class="prop-chip-icon icon-room">🛏️</span>
-          ${esc(pg.room)}
-        </span>` : ''}
-        ${pg.meals ? `<span class="prop-chip chip-meals" title="Meals">
+        ${isPGCard && pg.meals ? `<span class="prop-chip chip-meals" title="Meals">
           <span class="prop-chip-icon icon-meals">🍽️</span>
           ${esc(pg.meals)}
         </span>` : ''}
-        ${pg.occupancy ? `<span class="prop-chip chip-occupancy" title="Occupancy available">
+        ${isPGCard && pg.occupancy ? `<span class="prop-chip chip-occupancy" title="Occupancy available">
           <span class="prop-chip-icon icon-occupancy">🧍</span>
           ${esc(pg.occupancy)}
         </span>` : ''}
-      </div>` : ''}
-      ${isSSCard ? `<div class="prop-chip-row prop-chip-row-scroll">
-        ${shortStay.roomType ? `<span class="prop-chip chip-room" title="Room type">
+        ${isSSCard && shortStay.roomType ? `<span class="prop-chip chip-room" title="Room type">
           <span class="prop-chip-icon icon-room">🛏️</span>
           ${esc(shortStay.roomType)}
         </span>` : ''}
-        ${shortStay.available24hrs ? `<span class="prop-chip chip-ss24hrs" title="Available 24 hours">
+        ${isSSCard && shortStay.available24hrs ? `<span class="prop-chip chip-ss24hrs" title="Available 24 hours">
           <span class="prop-chip-icon icon-ss24hrs">🕐</span>
           ${shortStay.available24hrs === 'Yes' ? '24-Hour Checkin' : 'No 24-Hour Checkin'}
         </span>` : ''}
-        ${shortStay.cancellation ? `<span class="prop-chip chip-sscancel" title="Free cancellation window">
+        ${isSSCard && shortStay.cancellation ? `<span class="prop-chip chip-sscancel" title="Free cancellation window">
           <span class="prop-chip-icon icon-sscancel">🔄</span>
           ${esc(shortStay.cancellation)}
         </span>` : ''}
-        ${shortStay.couplesAllowed ? `<span class="prop-chip chip-sscouples" title="Unmarried couples allowed">
+        ${isSSCard && shortStay.couplesAllowed ? `<span class="prop-chip chip-sscouples" title="Unmarried couples allowed">
           <span class="prop-chip-icon icon-sscouples">💑</span>
           ${shortStay.couplesAllowed === 'Yes' ? 'Couples Allowed' : 'Couples Not Allowed'}
         </span>` : ''}
-      </div>` : ''}
+      </div>
+      ${amenityTagsHTML(p)}
       <div class="prop-footer">
         <div class="prop-quick-actions">
           <button class="prop-qa-btn prop-qa-3d qa-call" onclick="event.stopPropagation();openCall('${p.id}')" aria-label="Call owner">
@@ -6357,6 +6365,7 @@ function shortlistCardHTML(p) {
           Electricity: ${electricLabel}
         </span>` : ''}
       </div>` : ''}
+      ${amenityTagsHTML(p)}
       <div class="prop-footer">
         <div class="prop-quick-actions">
           <button class="prop-qa-btn prop-qa-3d qa-call" onclick="event.stopPropagation();openCall('${p.id}')" aria-label="Call owner">
@@ -10112,7 +10121,7 @@ function _autoSlidePropRows(){
     if (justDragged) { e.stopPropagation(); e.preventDefault(); justDragged = false; }
   }, true);
 })();
-setInterval(_autoSlidePropRows, 10000);
+setInterval(_autoSlidePropRows, 20000);
 
 /* ─── Auto-slide the reviews row every 10s ──────────────────────────
    Bounces forward one review at a time until the last review is
