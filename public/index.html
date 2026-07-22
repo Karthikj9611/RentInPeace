@@ -700,18 +700,11 @@ ul{list-style:none}
 .prop-chip-row-scroll.is-dragging{cursor:grabbing;scroll-behavior:auto;user-select:none}
 .prop-chip-row-scroll::-webkit-scrollbar{display:none}
 .prop-chip-row-scroll .prop-chip{flex-shrink:0}
-/* List view: no room to scroll sideways card-by-card, so arrange the spec/
-   amenity chips as an equal 4-column grid instead of hiding behind a
-   horizontal scroll or wrapping unevenly. */
+/* List view: no room to scroll sideways card-by-card, so let the spec/
+   amenity chips wrap onto additional lines instead of hiding behind a
+   horizontal scroll. */
 .prop-card.list-view .prop-chip-row-scroll{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
-  overflow-x:visible;cursor:default;
-}
-.prop-card.list-view .prop-chip-row-scroll .prop-chip{
-  width:100%;justify-content:center;
-}
-@media(max-width:768px){
-  .prop-card.list-view .prop-chip-row-scroll{grid-template-columns:repeat(2,1fr)}
+  flex-wrap:wrap;overflow-x:visible;cursor:default;
 }
 .prop-id{font-size:12px;font-family:monospace;color:var(--text-3);margin-top:2px;letter-spacing:.02em}
 .prop-desc-preview{margin-top:8px;font-size:12px;line-height:1.4;color:var(--text-3);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -821,24 +814,13 @@ ul{list-style:none}
    compact icon plus its name side by side, all equal width — instead of
    the big 56px circular icon with a label stacked underneath (which had
    no room and spilled past the card's bottom edge). */
-/* List view: 5 labeled buttons (Contact/WhatsApp/Visit/Compare/Views) rarely
-   fit the narrower content column (esp. in the 2-up list layout). Instead of
-   letting flex:1 squeeze each one down to an unreadable sliver — which also
-   forced the row wider than the card and let it spill past the edge — give
-   each button a guaranteed minimum width and let the row itself scroll
-   horizontally within the card so nothing overflows the layout. */
-.prop-card.list-view .prop-quick-actions{
-  gap:6px;overflow-x:auto;overflow-y:hidden;
-  scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;
-}
-.prop-card.list-view .prop-quick-actions::-webkit-scrollbar{display:none}
+.prop-card.list-view .prop-quick-actions{gap:6px}
 .prop-card.list-view .prop-quick-actions .prop-qa-btn.prop-qa-3d,
 .prop-card.list-view .prop-quick-actions .prop-qa-icon.prop-qa-3d,
 .prop-card.list-view .prop-quick-actions .prop-views{
   flex-direction:row;align-items:center;justify-content:center;gap:5px;
   height:38px;border-radius:9px;
   border:1.5px solid var(--border-2);background:var(--bg);
-  flex:0 0 auto;min-width:76px;padding:0 10px;
 }
 .prop-card.list-view .prop-quick-actions .qa-3d-icon,
 .prop-card.list-view .prop-quick-actions .prop-views-icon{
@@ -6287,17 +6269,9 @@ function cardHTML(p, compact) {
           <span class="chip-ico-wrap icon-maint"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
           ${fmtRupee(maintenance)} Maint.
         </span>` : ''}
-        ${waterLabel ? `<span class="prop-chip chip-water" title="Water supply">
-          <span class="chip-ico-wrap icon-water"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.69s-5.5 6.16-5.5 10.31a5.5 5.5 0 0 0 11 0c0-4.15-5.5-10.31-5.5-10.31z"/></svg></span>
-          Water: ${waterLabel}
-        </span>` : ''}
-        ${electricLabel ? `<span class="prop-chip chip-electric" title="Electricity">
-          <span class="chip-ico-wrap icon-electric"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
-          Electricity: ${electricLabel}
-        </span>` : ''}
         ${availableFmt ? `<span class="prop-chip chip-avail" title="Available from">
           <span class="chip-ico-wrap icon-avail"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
-          Available From ${availableFmt}
+          ${availableFmt}
         </span>` : ''}
         ${isPGCard && pg.gender ? `<span class="prop-chip chip-gender" title="Gender preference">
           <span class="prop-chip-icon icon-gender">🚻</span>
@@ -6456,14 +6430,6 @@ function shortlistCardHTML(p) {
         ${maintenance > 0 ? `<span class="prop-chip chip-maint" title="Monthly maintenance">
           <span class="chip-ico-wrap icon-maint"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
           ${fmtRupee(maintenance)} maintenance
-        </span>` : ''}
-        ${waterLabel ? `<span class="prop-chip chip-water" title="Water supply">
-          <span class="chip-ico-wrap icon-water"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.69s-5.5 6.16-5.5 10.31a5.5 5.5 0 0 0 11 0c0-4.15-5.5-10.31-5.5-10.31z"/></svg></span>
-          Water: ${waterLabel}
-        </span>` : ''}
-        ${electricLabel ? `<span class="prop-chip chip-electric" title="Electricity">
-          <span class="chip-ico-wrap icon-electric"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
-          Electricity: ${electricLabel}
         </span>` : ''}
       </div>` : ''}
       ${amenityTagsHTML(p)}
