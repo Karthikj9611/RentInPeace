@@ -5659,13 +5659,16 @@ function renderCards() {
   empty.classList.remove('show');
 
   const promoted = list.filter(p => p.promoted);
-  const rest = list.filter(p => !p.promoted);
+  // Promoted listings still get their own section above, but they now also
+  // stay in their respective type section below (not excluded from the typed
+  // groups anymore), so a promoted Rent property shows under both
+  // "Promoted listings" and "Rent".
   const groups = {
     promoted,
-    rent:      rest.filter(p => sectionKeyFor(p) === 'rent'),
-    lease:     rest.filter(p => sectionKeyFor(p) === 'lease'),
-    pg:        rest.filter(p => sectionKeyFor(p) === 'pg'),
-    shortstay: rest.filter(p => sectionKeyFor(p) === 'shortstay'),
+    rent:      list.filter(p => sectionKeyFor(p) === 'rent'),
+    lease:     list.filter(p => sectionKeyFor(p) === 'lease'),
+    pg:        list.filter(p => sectionKeyFor(p) === 'pg'),
+    shortstay: list.filter(p => sectionKeyFor(p) === 'shortstay'),
   };
 
   const gridClass = 'prop-grid' + (isListView ? ' list-view' : '');
@@ -5774,7 +5777,7 @@ function paginationHTML(section, page, total) {
 function sectionItems(section) {
   const list = getFiltered();
   if (section === 'promoted') return list.filter(p => p.promoted);
-  return list.filter(p => !p.promoted && sectionKeyFor(p) === section);
+  return list.filter(p => sectionKeyFor(p) === section);
 }
 
 const SECTION_PAGE_GETTERS = { promoted: () => promotedPage, rent: () => rentPage, lease: () => leasePage, pg: () => pgPage, shortstay: () => shortstayPage };
