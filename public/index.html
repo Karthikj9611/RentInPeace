@@ -1344,18 +1344,44 @@ ul{list-style:none}
   box-shadow:0 0 0 2px var(--bg);
 }
 @media(max-width:640px){
-  .fab-stats{bottom:68px}
   /* The bottom-nav has 6 equal-width tabs (flex:1); "Shortlist" is the last
      one, so its center sits at 11/12 of the viewport width. Align the FAB
-     and stat icons to that same x-position (instead of a fixed right
-     offset) so the whole column sits straight above the Shortlist tab. */
-  .fab,.fab-stats{
+     to that same x-position (instead of a fixed right offset) so it sits
+     straight above the Shortlist tab. */
+  .fab{
     right:auto;
     left:calc(100% * 11 / 12);
     transform:translateX(-50%);
+    bottom:calc(56px + env(safe-area-inset-bottom) + 20px);
   }
-  .fab{bottom:206px}
   .fab:hover{background:var(--brand-hover);transform:translateX(-50%) scale(1.05)}
+  /* The visitor/daily/user stat icons move inline after the reviews
+     section on mobile (see .fab-stats-inline below), so hide the fixed
+     floating column. */
+  .fab-stats{display:none}
+}
+
+/* ─── FAB stats, mobile inline row (shown after Reviews section) ───
+   Same icons/badges as .fab-stats above, laid out horizontally in the
+   normal document flow instead of fixed-floating. Only shown ≤640px. */
+.fab-stats-inline{
+  display:none;
+  align-items:center;justify-content:center;
+  gap:22px;
+  padding:18px 20px calc(56px + env(safe-area-inset-bottom) + 20px);
+  background:var(--bg-2);
+}
+.fab-stats-inline .fab-stat-item{flex-shrink:0}
+.fab-stats-inline .fab-inline-add{
+  width:36px;height:36px;border-radius:50%;flex-shrink:0;
+  background:var(--brand);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 16px rgba(224,58,82,.35);
+  border:none;cursor:pointer;
+}
+.fab-stats-inline .fab-inline-add svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2}
+@media(max-width:640px){
+  .fab-stats-inline{display:flex}
 }
 
 /* ─── FAB add-type picker (opens above the FAB) ─────────── */
@@ -3724,6 +3750,34 @@ ul{list-style:none}
   </div>
   <button class="reviews-loadmore-btn" id="reviewsLoadMoreBtn" style="display:none" onclick="loadMoreReviews()">Show more reviews</button>
 </section>
+
+<!-- ─── FAB stats, mobile inline row: same buttons as the fixed
+     .fab / .fab-stats column, shown horizontally after Reviews on
+     mobile instead of floating. Badges are kept in sync with the
+     floating versions by initFabStats(). ─── -->
+<div class="fab-stats-inline" id="fabStatsInline" aria-hidden="false">
+  <div class="fab-stat-item" title="Total website visitors">
+    <span class="fab-stat-icon visitors">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+    </span>
+    <span class="fab-stat-badge" id="fabStatVisitorsInline">–</span>
+  </div>
+  <div class="fab-stat-item" title="Today's site visits">
+    <span class="fab-stat-icon daily">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    </span>
+    <span class="fab-stat-badge" id="fabStatDailyInline">–</span>
+  </div>
+  <div class="fab-stat-item" title="Total registered users">
+    <span class="fab-stat-icon users">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    </span>
+    <span class="fab-stat-badge" id="fabStatUsersInline">–</span>
+  </div>
+  <button class="fab-inline-add" onclick="openFabPicker()" aria-label="Add a listing" title="List your property">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+</div>
 
 <!-- ─── Service Request Modal ───────────────────── -->
 <div class="add-modal-overlay" id="serviceModal" role="dialog" aria-modal="true" aria-label="Request a service">
@@ -10756,10 +10810,33 @@ async function initFabStats(){
     document.getElementById('fabStatVisitors').textContent = formatStatCount(data.totalVisits);
     document.getElementById('fabStatDaily').textContent = formatStatCount(data.todayVisits);
     document.getElementById('fabStatUsers').textContent = formatStatCount(data.totalUsers);
+    const visitorsInline = document.getElementById('fabStatVisitorsInline');
+    const dailyInline = document.getElementById('fabStatDailyInline');
+    const usersInline = document.getElementById('fabStatUsersInline');
+    if (visitorsInline) visitorsInline.textContent = formatStatCount(data.totalVisits);
+    if (dailyInline) dailyInline.textContent = formatStatCount(data.todayVisits);
+    if (usersInline) usersInline.textContent = formatStatCount(data.totalUsers);
   }catch(err){
     console.error('initFabStats error:', err);
   }
 }
+
+/* ═══════════════════════════════════════════════
+   MOBILE: hide the floating + FAB once its inline
+   twin (in the row after Reviews) scrolls into view,
+   so there's never two + buttons on screen at once.
+═══════════════════════════════════════════════ */
+(function(){
+  const inlineRow = document.getElementById('fabStatsInline');
+  const floatingFab = document.querySelector('.fab');
+  if (!inlineRow || !floatingFab || !('IntersectionObserver' in window)) return;
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      floatingFab.style.display = entry.isIntersecting ? 'none' : '';
+    });
+  }, { threshold: 0.15 });
+  io.observe(inlineRow);
+})();
 
 /* ═══════════════════════════════════════════════
    INIT
