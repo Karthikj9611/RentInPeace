@@ -1312,12 +1312,16 @@ ul{list-style:none}
 .recently-viewed-clear{background:none;border:none;color:var(--text-2);font-size:13px;cursor:pointer;padding:4px 6px}
 .recently-viewed-clear:hover{color:var(--brand)}
 .recently-viewed-strip{
-  display:grid;
-  grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+  display:flex;
   gap:16px;
   padding:16px 20px 8px;
+  overflow-x:auto;
+  scrollbar-width:thin;
+  overscroll-behavior-x:contain;
 }
-.rv-card{position:relative;border:1px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;background:var(--bg);transition:box-shadow .15s,transform .15s}
+.recently-viewed-strip::-webkit-scrollbar{height:6px}
+.recently-viewed-strip::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.rv-card{position:relative;flex:0 0 var(--rv-card-w, 260px);border:1px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;background:var(--bg);transition:box-shadow .15s,transform .15s}
 .rv-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.08);transform:translateY(-1px)}
 .rv-card-thumb{width:100%;aspect-ratio:4/3;background-size:cover;background-position:center;background-color:var(--bg-2);display:flex;align-items:center;justify-content:center;color:var(--text-3);font-size:12px}
 .rv-card-body{padding:8px 10px}
@@ -1327,9 +1331,7 @@ ul{list-style:none}
 .rv-card-remove{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.92);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2}
 .rv-card-remove svg{width:12px;height:12px;stroke:var(--text-2);stroke-width:2.4;fill:none}
 .rv-card-remove:hover svg{stroke:var(--brand)}
-@media(max-width:768px){
-  .recently-viewed-strip{grid-template-columns:1fr 1fr;gap:10px}
-}
+
 
 /* ─── Shortlist Panel ──────────────────────────── */
 .shortlist-panel{
@@ -5708,6 +5710,20 @@ function recentlyViewedCardHTML(rv) {
   </div>`;
 }
 
+// Keeps Recently Viewed cards exactly as wide as the real property cards
+// currently on screen (the property grid is fluid — auto-fill(minmax(260px,1fr))
+// — so its rendered card width changes with viewport size). Reads one live
+// .prop-card's actual width and pushes it into a CSS var the rv-card flex-basis
+// uses, so the horizontally-scrollable strip always matches, on any screen size.
+function syncRecentlyViewedCardWidth() {
+  const sample = document.querySelector('.prop-grid .prop-card');
+  const strip = document.getElementById('recentlyViewedStrip');
+  if (!sample || !strip) return;
+  const w = sample.getBoundingClientRect().width;
+  if (w > 0) strip.style.setProperty('--rv-card-w', w + 'px');
+}
+window.addEventListener('resize', () => { clearTimeout(window._rvWidthTimer); window._rvWidthTimer = setTimeout(syncRecentlyViewedCardWidth, 150); });
+
 function renderRecentlyViewed() {
   const section = document.getElementById('recentlyViewedSection');
   if (!section) return;
@@ -5745,6 +5761,7 @@ function renderRecentlyViewed() {
   }
   section.style.display = '';
   strip.innerHTML = ids.map(id => recentlyViewedCardHTML(recentlyViewedData[id])).join('');
+  requestAnimationFrame(syncRecentlyViewedCardWidth);
 }
 let compareSet = new Set();
 let compareDiffOnly = false;
