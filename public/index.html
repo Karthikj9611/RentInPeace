@@ -2133,6 +2133,10 @@ ul{list-style:none}
 }
 .form-input:focus{border-color:var(--brand)}
 .form-input::placeholder{color:var(--text-3)}
+.form-input[readonly].identity-locked{
+  background:var(--bg-2,#f4f4f6);color:var(--text-2);cursor:default;
+}
+.identity-locked-hint{font-size:11px;color:var(--text-3);margin-top:2px}
 .add-modal.view-mode input:disabled,
 .add-modal.view-mode select:disabled,
 .add-modal.view-mode textarea:disabled{
@@ -4068,15 +4072,18 @@ ul{list-style:none}
     <div class="form-group">
       <label class="form-label">Your name</label>
       <input class="form-input" type="text" id="sched-name" />
+      <div class="identity-locked-hint" id="sched-name-hint" style="display:none">Auto-filled from your account</div>
     </div>
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Your phone</label>
         <input class="form-input" type="tel" id="sched-phone" inputmode="numeric" maxlength="10" oninput="sanitizeMobileInput(this)" />
+        <div class="identity-locked-hint" id="sched-phone-hint" style="display:none">Auto-filled</div>
       </div>
       <div class="form-group">
         <label class="form-label">Your email</label>
         <input class="form-input" type="email" id="sched-email" />
+        <div class="identity-locked-hint" id="sched-email-hint" style="display:none">Auto-filled</div>
       </div>
     </div>
     <div class="form-group">
@@ -4114,15 +4121,18 @@ ul{list-style:none}
     <div class="form-group">
       <label class="form-label">Your name</label>
       <input class="form-input" type="text" id="book-name" />
+      <div class="identity-locked-hint" id="book-name-hint" style="display:none">Auto-filled from your account</div>
     </div>
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Your phone</label>
         <input class="form-input" type="tel" id="book-phone" inputmode="numeric" maxlength="10" oninput="sanitizeMobileInput(this)" />
+        <div class="identity-locked-hint" id="book-phone-hint" style="display:none">Auto-filled</div>
       </div>
       <div class="form-group">
         <label class="form-label">Your email</label>
         <input class="form-input" type="email" id="book-email" />
+        <div class="identity-locked-hint" id="book-email-hint" style="display:none">Auto-filled</div>
       </div>
     </div>
     <div class="form-group">
@@ -4292,17 +4302,26 @@ ul{list-style:none}
         <label class="form-label">Google Maps link (optional)</label>
         <input class="form-input" type="url" id="f-googleMapsLink" />
       </div>
-      <div class="form-group"><label class="form-label">Owner name <span style="color:var(--brand)">*</span></label><input class="form-input" type="text" id="f-ownerName"/></div>
+      <div class="form-group">
+        <label class="form-label">Owner name <span style="color:var(--brand)">*</span></label>
+        <input class="form-input" type="text" id="f-ownerName"/>
+        <div class="identity-locked-hint" id="f-ownerName-hint" style="display:none">Auto-filled from your account</div>
+      </div>
       <div class="form-group">
         <label class="form-label">Phone number <span style="color:var(--brand)">*</span></label>
         <div class="input-icon-wrap">
           <input class="form-input" type="tel" id="f-ownerPhone" inputmode="numeric" maxlength="10" oninput="sanitizeMobileInput(this)"/>
-          <button type="button" class="contact-pick-btn" onclick="pickContactFromDevice('f-ownerPhone','f-ownerName')" title="Pick from contacts">
+          <button type="button" class="contact-pick-btn" id="f-ownerPhone-pickBtn" onclick="pickContactFromDevice('f-ownerPhone','f-ownerName')" title="Pick from contacts">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </button>
         </div>
+        <div class="identity-locked-hint" id="f-ownerPhone-hint" style="display:none">Auto-filled from your account</div>
       </div>
-      <div class="form-group"><label class="form-label">Email (optional)</label><input class="form-input" type="email" id="f-ownerEmail"/></div>
+      <div class="form-group">
+        <label class="form-label">Email (optional)</label>
+        <input class="form-input" type="email" id="f-ownerEmail"/>
+        <div class="identity-locked-hint" id="f-ownerEmail-hint" style="display:none">Auto-filled from your account</div>
+      </div>
       <div class="form-group">
         <label class="form-label">Alternate number</label>
         <div class="input-icon-wrap">
@@ -8037,6 +8056,17 @@ function openScheduleModal(propId) {
   document.getElementById('sched-phone').value = (user && user.mobile) || '';
   document.getElementById('sched-email').value = (user && user.email) || '';
   document.getElementById('sched-note').value = '';
+  // Lock these to the signed-up account's own details — a visit request
+  // should always carry the real identity of the logged-in user, not an
+  // editable stand-in for it.
+  ['sched-name', 'sched-phone', 'sched-email'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.readOnly = true;
+    el.classList.add('identity-locked');
+    const hint = document.getElementById(id + '-hint');
+    if (hint) hint.style.display = '';
+  });
   // default the date picker's minimum to today so past dates can't be picked
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('sched-date').min = today;
@@ -8144,6 +8174,17 @@ function openBookingModal(propId) {
   document.getElementById('book-phone').value = (user && user.mobile) || '';
   document.getElementById('book-email').value = (user && user.email) || '';
   document.getElementById('book-note').value = '';
+  // Lock these to the signed-up account's own details, same as the
+  // schedule-visit form — a booking should always carry the real identity
+  // of the logged-in user, not an editable stand-in for it.
+  ['book-name', 'book-phone', 'book-email'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.readOnly = true;
+    el.classList.add('identity-locked');
+    const hint = document.getElementById(id + '-hint');
+    if (hint) hint.style.display = '';
+  });
   // default the date picker's minimum to today so past dates can't be picked
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('book-checkin').min = today;
@@ -8402,6 +8443,45 @@ function selectFabType(type) {
   openAddModal(type);
 }
 
+// Fills the owner name/phone/email fields with the signed-up account's own
+// details and locks them (readonly) so a listing always carries the real,
+// verified contact info of whoever created it — same identity the account
+// was signed up with. Only used for a brand-new listing (openAddModal);
+// editing an existing listing (openEditListingFull) leaves these editable
+// since a listing's saved contact can differ from the editor's own account.
+function lockIdentityFieldsForNewListing() {
+  const user = getLoggedInUser();
+  if (!user) return;
+  const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.name || '';
+  const fields = [
+    ['f-ownerName', fullName],
+    ['f-ownerPhone', user.mobile || ''],
+    ['f-ownerEmail', user.email || '']
+  ];
+  fields.forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.value = val;
+    el.readOnly = true;
+    el.classList.add('identity-locked');
+    const hint = document.getElementById(id + '-hint');
+    if (hint) hint.style.display = '';
+  });
+  const pickBtn = document.getElementById('f-ownerPhone-pickBtn');
+  if (pickBtn) pickBtn.style.display = 'none';
+}
+function unlockIdentityFieldsForEdit() {
+  ['f-ownerName', 'f-ownerPhone', 'f-ownerEmail'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.readOnly = false;
+    el.classList.remove('identity-locked');
+    const hint = document.getElementById(id + '-hint');
+    if (hint) hint.style.display = 'none';
+  });
+  const pickBtn = document.getElementById('f-ownerPhone-pickBtn');
+  if (pickBtn) pickBtn.style.display = '';
+}
 function openAddModal(presetType) {
   if (!getLoggedInUser()) { openAuthModal(); return; }
   const restored = restoreListingDraft();
@@ -8411,6 +8491,10 @@ function openAddModal(presetType) {
   }
   const typeSelect = document.getElementById('f-type');
   if (typeSelect) typeSelect.disabled = !!presetType;
+  // Always reflect the logged-in account's own name/phone/email here — even
+  // a restored draft — so the listing's contact identity can't drift from
+  // the signed-up account, and lock the fields so it can't be edited away.
+  lockIdentityFieldsForNewListing();
   document.getElementById('addModal').classList.add('open');
   lockBodyScroll();
   onFTypeChange(document.getElementById('f-type').value);
@@ -9167,6 +9251,7 @@ function openEditListingFull(id) {
   closeProfileModal();
   editingPropertyId = id;
   resetListingForm();
+  unlockIdentityFieldsForEdit();
   applyImportedProperty(p);
   onFTypeChange(document.getElementById('f-type').value);
 
