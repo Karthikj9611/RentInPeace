@@ -7854,6 +7854,11 @@ function openDetail(id) {
   document.getElementById('viewActionsRow2').style.display = '';
   document.getElementById('viewActionsFooter').style.display = 'block';
 
+  // Read-only view of an existing property — "Clear form" only makes sense
+  // for a listing actually being drafted, never here.
+  const clearBtn = document.getElementById('clearFormBtn');
+  if (clearBtn) clearBtn.style.display = 'none';
+
   document.getElementById('addModalBox').classList.add('view-mode');
   document.getElementById('addModal').classList.add('view-mode');
   document.getElementById('addModal').classList.add('open');
@@ -8000,6 +8005,8 @@ function closeDetail() {
   document.getElementById('addModal').classList.remove('view-mode');
   unlockBodyScroll();
   propertyViewMode = false;
+  const clearBtn = document.getElementById('clearFormBtn');
+  if (clearBtn) clearBtn.style.display = '';
   const gallerySlot = document.getElementById('detailGallerySlot');
   if (gallerySlot) gallerySlot.innerHTML = '';
   const tableWrap = document.getElementById('detailTableWrap');
