@@ -8795,6 +8795,10 @@ function applyImportedProperty(p) {
 
 function clearAddModalDraft() {
   resetListingForm();
+  // resetListingForm() blanket-clears every input, including owner
+  // name/phone/email — those should never actually be clearable since
+  // they're locked to the signed-up account, so restore them right after.
+  lockIdentityFieldsForNewListing();
   clearListingDraft();
   onFTypeChange(document.getElementById('f-type').value);
   showToast('Form cleared');
