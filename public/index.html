@@ -700,6 +700,21 @@ ul{list-style:none}
 .prop-chip-row-scroll.is-dragging{cursor:grabbing;scroll-behavior:auto;user-select:none}
 .prop-chip-row-scroll::-webkit-scrollbar{display:none}
 .prop-chip-row-scroll .prop-chip{flex-shrink:0}
+/* Grid view: show exactly 2 equal-width chips per "page" of both the
+   Furnished/Maint/Available row and the amenity (Refrigerator, Cupboards…)
+   row below it, instead of variable-width chips. Extra chips still slide
+   into view horizontally as before, just two at a time. */
+.prop-card:not(.list-view) .prop-chip-row-scroll{
+  display:grid;
+  grid-auto-flow:column;
+  grid-auto-columns:minmax(calc(50% - 2.5px),1fr);
+  scroll-snap-type:x mandatory;
+}
+.prop-card:not(.list-view) .prop-chip-row-scroll .prop-chip{
+  scroll-snap-align:start;
+  justify-content:center;
+  width:100%;
+}
 /* List view: no room to scroll sideways card-by-card, so let the spec/
    amenity chips wrap onto additional lines instead of hiding behind a
    horizontal scroll. */
