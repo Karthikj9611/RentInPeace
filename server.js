@@ -114,6 +114,10 @@ const UserSchema = new mongoose.Schema({
   email:     { type: String, trim: true, lowercase: true, sparse: true, unique: true },
   mobile:    { type: String, trim: true, sparse: true, unique: true },
   password:  { type: String, required: true },
+  // URL of the user's avatar, e.g. '/uploads/<ImageAsset id>' — set at signup
+  // (or later via PUT /api/user/me) using the same image pipeline as listing
+  // photos. Empty string means "no photo", and the UI falls back to initials.
+  profilePhoto: { type: String, trim: true, default: '' },
   // Which of the two signup paths the person picked — drives what admin sees
   // and can later drive customer- vs owner-specific UI. Defaults to
   // 'customer' for any pre-existing accounts created before this field existed.
@@ -328,7 +332,7 @@ app.post('/api/user/signup/verify-otp', otpLimiter, async (req, res) => {
 // ── User Signup ──
 app.post('/api/user/signup', userAuthLimiter, async (req, res) => {
   try {
-    const { firstName, lastName, email, mobile, password, confirmPassword, accountType } = req.body || {};
+    const { firstName, lastName, email, mobile, password, confirmPassword, accountType, profilePic } = req.body || {};
 
     if (!firstName || !String(firstName).trim()) return res.status(400).json({ message: 'First name is required' });
     if (!lastName  || !String(lastName).trim())  return res.status(400).json({ message: 'Last name is required' });
@@ -358,6 +362,12 @@ app.post('/api/user/signup', userAuthLimiter, async (req, res) => {
     const otpRecord = await EmailOtp.findOne({ email: cleanEmail, verified: true });
     if (!otpRecord) return res.status(403).json({ message: 'Please verify your email with the code we sent before continuing.' });
 
+    // Only trust a photo URL that actually points at an image we generated via
+    // /api/upload-images — never store an arbitrary attacker-supplied URL here.
+    const cleanProfilePhoto = (typeof profilePic === 'string' && /^\/uploads\/[a-f0-9]{24}$/.test(profilePic.trim()))
+      ? profilePic.trim()
+      : '';
+
     const hashed = await bcrypt.hash(password, 10);
     const userId = await nextSequenceId('USER');
     const name = `${String(firstName).trim()} ${String(lastName).trim()}`.trim();
@@ -369,6 +379,7 @@ app.post('/api/user/signup', userAuthLimiter, async (req, res) => {
       mobile:    cleanMobile,
       password:  hashed,
       accountType: cleanAccountType,
+      profilePhoto: cleanProfilePhoto,
       userId,
     });
     const userKey = await issueUserSession(user);
@@ -379,6 +390,7 @@ app.post('/api/user/signup', userAuthLimiter, async (req, res) => {
       _id: user._id, userId: user.userId,
       firstName: user.firstName, lastName: user.lastName, name: user.name,
       email: user.email, mobile: user.mobile, accountType: user.accountType,
+      profilePhoto: user.profilePhoto || '',
       userKey,
     });
   } catch (err) {
@@ -409,6 +421,7 @@ app.post('/api/user/login', userAuthLimiter, async (req, res) => {
       _id: user._id, userId: user.userId,
       firstName: user.firstName, lastName: user.lastName, name: user.name,
       email: user.email, mobile: user.mobile, accountType: user.accountType,
+      profilePhoto: user.profilePhoto || '',
       userKey,
     });
   } catch (err) {
@@ -438,6 +451,7 @@ app.get('/api/user/me', requireUser, async (req, res) => {
       _id: user._id, userId: user.userId || '',
       firstName: user.firstName || '', lastName: user.lastName || '', name: user.name || '',
       email: user.email || '', mobile: user.mobile || '',
+      profilePhoto: user.profilePhoto || '',
       createdAt: user.createdAt,
     });
   } catch (err) {
@@ -449,7 +463,7 @@ app.get('/api/user/me', requireUser, async (req, res) => {
 // ── UPDATE current user profile (name / email / mobile) ──
 app.put('/api/user/me', requireUser, async (req, res) => {
   try {
-    const { name, email, mobile } = req.body || {};
+    const { name, email, mobile, profilePhoto } = req.body || {};
     const update = {};
     if (name !== undefined) update.name = String(name).trim();
     if (email !== undefined) {
@@ -467,9 +481,19 @@ app.put('/api/user/me', requireUser, async (req, res) => {
       if (existing) return res.status(409).json({ message: 'That mobile number is already in use by another account' });
       update.mobile = cleanMobile;
     }
+    if (profilePhoto !== undefined) {
+      // Same trust boundary as signup: only accept URLs we generated ourselves
+      // via /api/upload-images, or an explicit empty string to remove the photo.
+      const cleanPhoto = String(profilePhoto).trim();
+      if (cleanPhoto === '' || /^\/uploads\/[a-f0-9]{24}$/.test(cleanPhoto)) {
+        update.profilePhoto = cleanPhoto;
+      } else {
+        return res.status(400).json({ message: 'Invalid profile photo' });
+      }
+    }
     const user = await User.findByIdAndUpdate(req.userId, update, { new: true });
     if (!user) return res.status(404).json({ message: 'User not found' });
-    res.json({ message: 'Profile updated', _id: user._id, name: user.name || '', email: user.email || '', mobile: user.mobile || '' });
+    res.json({ message: 'Profile updated', _id: user._id, name: user.name || '', email: user.email || '', mobile: user.mobile || '', profilePhoto: user.profilePhoto || '' });
   } catch (err) {
     console.error('PUT /api/user/me error:', err);
     res.status(500).json({ message: 'Server error. Please try again.' });

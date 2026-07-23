@@ -1698,7 +1698,9 @@ ul{list-style:none}
   background:var(--brand-light);color:var(--brand);
   display:flex;align-items:center;justify-content:center;
   font-size:14px;font-weight:600;flex-shrink:0;
+  overflow:hidden;
 }
+.menu-avatar img{width:100%;height:100%;object-fit:cover}
 .menu-user-name{font-size:14px;font-weight:600}
 .menu-user-sub{font-size:11.5px;color:var(--text-3);margin-top:1px}
 .menu-list{flex:1;overflow-y:auto;padding:10px 8px}
@@ -2336,7 +2338,9 @@ ul{list-style:none}
   font-size:24px;font-weight:800;letter-spacing:.3px;
   display:flex;align-items:center;justify-content:center;
   box-shadow:0 0 0 4px var(--bg),0 0 0 6px var(--brand-light);
+  overflow:hidden;
 }
+.profile-avatar-lg img{width:100%;height:100%;object-fit:cover}
 .profile-info-name{font-size:18.5px;font-weight:800;color:var(--text);letter-spacing:-.2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .profile-info-contact{font-size:12.5px;color:var(--text-3);margin-top:3px;display:flex;align-items:center;gap:5px;overflow:hidden}
 .profile-info-contact span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -2836,6 +2840,23 @@ ul{list-style:none}
   transition:border-color .12s;
 }
 .img-btn-sec:hover{border-color:var(--text)}
+.auth-photo-row{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.auth-photo-preview{
+  width:64px;height:64px;border-radius:50%;flex-shrink:0;position:relative;
+  background:var(--bg-2);border:1.5px solid var(--border-2);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text-3);overflow:hidden;
+  box-shadow:0 0 0 3px var(--bg);
+}
+.auth-photo-preview svg{width:24px;height:24px;stroke:var(--text-3);fill:none;stroke-width:1.6}
+.auth-photo-preview img{width:100%;height:100%;object-fit:cover}
+.auth-photo-remove{
+  position:absolute;top:-2px;right:-2px;width:20px;height:20px;border-radius:50%;
+  background:var(--text);color:#fff;display:flex;align-items:center;justify-content:center;
+  border:2px solid var(--bg);cursor:pointer;transition:background .12s;
+}
+.auth-photo-remove:hover{background:var(--brand)}
+.auth-photo-remove svg{width:10px;height:10px;stroke:#fff;fill:none;stroke-width:3}
 .img-thumb-grid{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px}
 .img-thumb{position:relative;width:72px;height:72px;border-radius:9px;overflow:hidden;border:1.5px solid var(--border-2);flex-shrink:0}
 .img-thumb img{width:100%;height:100%;object-fit:cover;display:block}
@@ -4738,6 +4759,26 @@ ul{list-style:none}
           <div class="auth-tab active" id="authTypeCustomer" onclick="selectAccountType('customer')">Looking for a home</div>
           <div class="auth-tab" id="authTypeOwner" onclick="selectAccountType('owner')">Property owner</div>
         </div>
+      </div>
+      <div id="authSignupPhotoField" style="display:none">
+        <label class="form-label">Profile photo (optional)</label>
+        <div class="auth-photo-row">
+          <div id="authPhotoPreview" class="auth-photo-preview">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </div>
+          <div class="img-btns">
+            <button type="button" class="img-btn-sec" onclick="document.getElementById('auth-photo-camera').click()">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              Take photo
+            </button>
+            <button type="button" class="img-btn-sec" onclick="document.getElementById('auth-photo-file').click()">
+              <svg viewBox="0 0 24 24" aria-hidden="true" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Upload
+            </button>
+          </div>
+        </div>
+        <input type="file" id="auth-photo-camera" accept="image/*" capture="user" style="display:none" onchange="addAuthProfilePic(this)"/>
+        <input type="file" id="auth-photo-file" accept="image/*" style="display:none" onchange="addAuthProfilePic(this)"/>
       </div>
       <div id="authSignupNameField" style="display:none">
         <div class="form-row">
@@ -8885,7 +8926,7 @@ function closeAuthModal() {
 function openProfileModal() {
   const user = getLoggedInUser();
   if (!user) return;
-  document.getElementById('profileAvatarLg').textContent = (user.name || user.email || '?')[0].toUpperCase();
+  setAvatarContent(document.getElementById('profileAvatarLg'), user);
   document.getElementById('profileModalName').textContent = user.name || 'User';
   document.getElementById('profileModalContact').textContent = user.email || '';
   document.getElementById('profileTileName').textContent = user.name || '—';
@@ -8916,6 +8957,17 @@ function formatPostedDateTime(date) {
 function getLoggedInUser() {
   try { return JSON.parse(localStorage.getItem('quatar_user')); } catch { return null; }
 }
+// Fills an avatar circle with the user's uploaded photo when they have one,
+// falling back to their initial on a colored background otherwise. Shared by
+// the nav menu avatar and the profile modal's large avatar.
+function setAvatarContent(el, user) {
+  if (!el || !user) return;
+  if (user.profilePhoto) {
+    el.innerHTML = '<img src="' + user.profilePhoto + '" alt="' + (user.name || 'Profile') + '"/>';
+  } else {
+    el.textContent = (user.name || user.email || '?')[0].toUpperCase();
+  }
+}
 // Every authenticated request to /api/user/... or /api/properties/... edits
 // must carry this header so the server can verify which account is asking.
 function userAuthHeaders(extra) {
@@ -8943,7 +8995,7 @@ function updateNavAuth() {
   const navBtn = document.getElementById('navAuthBtn');
   if (user) {
     navBtn.innerHTML = '';
-    document.getElementById('menuAvatar').textContent = (user.name || 'U')[0].toUpperCase();
+    setAvatarContent(document.getElementById('menuAvatar'), user);
     document.getElementById('menuUserName').textContent = user.name || 'User';
     document.getElementById('menuUserSub').textContent = user.email || 'Logged in';
     document.getElementById('menuAuthLabel').textContent = 'My Profile / Log out';
@@ -8963,6 +9015,7 @@ function switchAuthTab(tab) {
   document.getElementById('authTabLogin').classList.toggle('active', isLogin);
   document.getElementById('authTabSignup').classList.toggle('active', !isLogin);
   document.getElementById('authSignupTypeField').style.display = isLogin ? 'none' : '';
+  document.getElementById('authSignupPhotoField').style.display = isLogin ? 'none' : '';
   document.getElementById('authSignupNameField').style.display = isLogin ? 'none' : '';
   document.getElementById('authLoginContactField').style.display = isLogin ? '' : 'none';
   document.getElementById('authSignupContactFields').style.display = isLogin ? 'none' : '';
@@ -8981,6 +9034,51 @@ function selectAccountType(type) {
   selectedAccountType = type;
   document.getElementById('authTypeCustomer').classList.toggle('active', type === 'customer');
   document.getElementById('authTypeOwner').classList.toggle('active', type === 'owner');
+}
+
+// Signup profile photo — captured live via the front camera or picked from
+// the device. Uploaded immediately (same endpoint as listing photos) and the
+// resulting URL is sent along with the rest of the signup form.
+let authProfilePicUrl = null;
+// Placeholder icon shown when no photo has been picked yet.
+const AUTH_PHOTO_PLACEHOLDER = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>';
+function resetAuthProfilePic() {
+  authProfilePicUrl = null;
+  const preview = document.getElementById('authPhotoPreview');
+  if (preview) preview.innerHTML = AUTH_PHOTO_PLACEHOLDER;
+  const camInput = document.getElementById('auth-photo-camera');
+  const fileInput = document.getElementById('auth-photo-file');
+  if (camInput) camInput.value = '';
+  if (fileInput) fileInput.value = '';
+}
+async function addAuthProfilePic(input) {
+  const file = (input.files || [])[0];
+  input.value = '';
+  if (!file) return;
+
+  const preview = document.getElementById('authPhotoPreview');
+  if (preview) preview.innerHTML = '<span style="font-size:11px">…</span>';
+
+  const form = new FormData();
+  form.append('images', file);
+
+  try {
+    const res = await fetch('/api/upload-images', { method: 'POST', body: form });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Upload failed');
+    const url = (data.urls || [])[0];
+    if (url) {
+      authProfilePicUrl = url;
+      if (preview) {
+        preview.innerHTML = '<img src="' + url + '" alt="Profile photo"/>'
+          + '<span class="auth-photo-remove" onclick="event.stopPropagation();resetAuthProfilePic()" title="Remove photo">'
+          + '<svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>';
+      }
+    }
+  } catch (err) {
+    showToast(err.message || 'Could not upload photo. Please try again.');
+    if (preview) preview.innerHTML = AUTH_PHOTO_PLACEHOLDER;
+  }
 }
 
 // Holds the collected signup form data between "send OTP" and "verify OTP",
@@ -9013,7 +9111,7 @@ async function submitAuth() {
     if (!isValidIndianMobile(mobile)) { showToast('Enter a valid 10-digit mobile number starting with 6, 7, 8 or 9'); return; }
     if (!password) { showToast('Please enter a password'); return; }
     if (password !== confirmPassword) { showToast('Passwords do not match'); return; }
-    body = { firstName, lastName, email, mobile, password, confirmPassword, accountType: selectedAccountType };
+    body = { firstName, lastName, email, mobile, password, confirmPassword, accountType: selectedAccountType, profilePic: authProfilePicUrl || null };
   }
 
   btn.disabled = true;
@@ -9067,6 +9165,7 @@ function finishAuthSuccess(data) {
     id: data._id, userId: data.userId,
     firstName: data.firstName, lastName: data.lastName, name: data.name,
     email: data.email, mobile: data.mobile, accountType: data.accountType,
+    profilePhoto: data.profilePhoto || '',
     userKey: data.userKey
   }));
   closeAuthModal();
@@ -9140,6 +9239,7 @@ async function resendSignupOtp() {
 // modal opens/closes or the login/signup tab is switched.
 function backToSignupForm() {
   pendingSignupBody = null;
+  resetAuthProfilePic();
   const otpStep = document.getElementById('authOtpStep');
   if (otpStep) otpStep.style.display = 'none';
   const formStep = document.getElementById('authFormStep');
@@ -9209,7 +9309,7 @@ async function saveProfileEdits() {
     user.mobile = data.mobile;
     localStorage.setItem('quatar_user', JSON.stringify(user));
 
-    document.getElementById('profileAvatarLg').textContent = (user.name || user.email || '?')[0].toUpperCase();
+    setAvatarContent(document.getElementById('profileAvatarLg'), user);
     document.getElementById('profileModalName').textContent = user.name || 'User';
     document.getElementById('profileModalContact').textContent = user.email || '';
     document.getElementById('profileTileName').textContent = user.name || '—';
