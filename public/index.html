@@ -714,6 +714,7 @@ ul{list-style:none}
   scroll-snap-align:start;
   justify-content:center;
   width:100%;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 /* List view: no room to scroll sideways card-by-card, so let the spec/
    amenity chips wrap onto additional lines instead of hiding behind a
@@ -726,6 +727,7 @@ ul{list-style:none}
 .prop-card.list-view .prop-chip-row-scroll .prop-chip{
   width:100%;
   justify-content:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .prop-id{font-size:12px;font-family:monospace;color:var(--text-3);margin-top:2px;letter-spacing:.02em}
 .prop-desc-preview{margin-top:8px;font-size:12px;line-height:1.4;color:var(--text-3);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -6170,7 +6172,7 @@ function amenityTagsHTML(p) {
   const list = (p.amenities?.selected || []).slice();
   if (p.amenities?.extra) list.push(...p.amenities.extra.split(',').map(s => s.trim()).filter(Boolean));
   if (!list.length) return '';
-  return `<div class="prop-chip-row prop-chip-row-scroll prop-amenity-row">${list.map(a => `<span class="prop-chip chip-amenity"><span class="prop-chip-icon">${amenityIcon(a)}</span>${esc(a)}</span>`).join('')}</div>`;
+  return `<div class="prop-chip-row prop-chip-row-scroll prop-amenity-row">${list.map(a => `<span class="prop-chip chip-amenity" title="${esc(a)}"><span class="prop-chip-icon">${amenityIcon(a)}</span>${esc(a)}</span>`).join('')}</div>`;
 }
 
 function cardHTML(p, compact) {
