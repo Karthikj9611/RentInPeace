@@ -4192,7 +4192,6 @@ ul{list-style:none}
          they're never affected by hiding the actual form. See
          buildDetailTable()/openDetail()/closeDetail(). -->
     <div class="detail-gallery" id="detailGallerySlot"></div>
-    <div class="detail-table-wrap" id="detailTableWrap"></div>
     <div class="video-embed-wrap" id="videoEmbedWrap" style="display:none"></div>
     <div class="video-view-row" id="videoViewRow" style="display:none">
       <a href="#" id="videoViewLink" target="_blank" rel="noopener noreferrer" class="video-view-link">
@@ -4203,6 +4202,7 @@ ul{list-style:none}
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
       </button>
     </div>
+    <div class="detail-table-wrap" id="detailTableWrap"></div>
 
     <!-- Everything below is the actual "list your property" form (create +
          edit modes). It's hidden as a single block in view mode — see
@@ -7854,95 +7854,120 @@ function buildDetailTable(p) {
   const status = basic.status || 'For Rent';
   const isPG = status === 'PG', isLease = status === 'Lease', isShortStay = status === 'Short Stay';
 
-  const rows = [];
-  function row(label, value, wide) {
-    if (value === null || value === undefined) return;
+  // Each section is built independently — a header (matching the .lm-section
+  // style used by the "list your property" form) followed by its own
+  // key/value table — instead of one long flat table, so the view mirrors
+  // how the create form itself is broken into labelled sections.
+  const sections = [];
+  function section(label, rows) {
+    const filtered = rows.filter(Boolean);
+    if (!filtered.length) return;
+    sections.push('<div class="lm-section">' + label + '</div><div class="detail-kv-table">' + filtered.join('') + '</div>');
+  }
+  function kv(label, value, wide) {
+    if (value === null || value === undefined) return null;
     const text = String(value).trim();
-    if (!text) return;
-    rows.push('<div class="kv-cell' + (wide ? ' wide' : '') + '"><div class="kv-label">' + esc(label) + '</div><div class="kv-value">' + esc(text) + '</div></div>');
+    if (!text) return null;
+    return '<div class="kv-cell' + (wide ? ' wide' : '') + '"><div class="kv-label">' + esc(label) + '</div><div class="kv-value">' + esc(text) + '</div></div>';
   }
 
-  row('Status', status);
-  row('Listed by', basic.listedBy);
-  row('Area / Locality', location.area);
-  row('City', location.city);
+  section('📋 Basic Information', [
+    kv('Status', status),
+    kv('Listed by', basic.listedBy),
+  ]);
+
+  section('📍 Location', [
+    kv('Area / Locality', location.area),
+    kv('City', location.city),
+  ]);
 
   if (isLease) {
-    row('Lease amount', price.rent != null ? fmtRupee(price.rent) + '/month' : null);
-    row('Maintenance', price.maintenance != null ? fmtRupee(price.maintenance) : null);
+    section('💰 Pricing', [
+      kv('Lease amount', price.rent != null ? fmtRupee(price.rent) + '/month' : null),
+      kv('Maintenance', price.maintenance != null ? fmtRupee(price.maintenance) : null),
+    ]);
   } else {
-    row('Rent', price.rent != null ? fmtRupee(price.rent) + '/month' : null);
-    if (!isShortStay) row('Deposit', price.deposit != null ? fmtRupee(price.deposit) : null);
-    row('Maintenance', price.maintenance != null ? fmtRupee(price.maintenance) : null);
-    row('Rent increase', price.rentIncrease);
-    row('Electricity included', price.electricity);
-    row('Water charge', price.water);
-    row('Negotiable', price.negotiable);
+    section('💰 Pricing', [
+      kv('Rent', price.rent != null ? fmtRupee(price.rent) + '/month' : null),
+      !isShortStay ? kv('Deposit', price.deposit != null ? fmtRupee(price.deposit) : null) : null,
+      kv('Maintenance', price.maintenance != null ? fmtRupee(price.maintenance) : null),
+      kv('Rent increase', price.rentIncrease),
+      kv('Electricity included', price.electricity),
+      kv('Water charge', price.water),
+      kv('Negotiable', price.negotiable),
+    ]);
   }
 
-  if (!isPG && !isShortStay) {
-    row('Property type', property.type);
-    row('BHK', property.bhk);
-    row('Built-up area', property.area);
-    row('Age of property', property.age);
-    row('Preferred tenants', property.tenant);
-    row('Facing', property.facing);
-  }
-  row('Bike parking', property.bike);
-  row('Car parking', property.car);
-  row('Floor', property.floor);
-  row('Bathrooms', property.bathrooms);
-  row('Furnishing', property.furnish);
-  if (!isPG) row('Available from', property.available);
+  section('🏢 Property Details', [
+    !isPG && !isShortStay ? kv('Property type', property.type) : null,
+    !isPG && !isShortStay ? kv('BHK', property.bhk) : null,
+    !isPG && !isShortStay ? kv('Built-up area', property.area) : null,
+    !isPG && !isShortStay ? kv('Age of property', property.age) : null,
+    !isPG && !isShortStay ? kv('Preferred tenants', property.tenant) : null,
+    !isPG && !isShortStay ? kv('Facing', property.facing) : null,
+    kv('Bike parking', property.bike),
+    kv('Car parking', property.car),
+    kv('Floor', property.floor),
+    kv('Bathrooms', property.bathrooms),
+    kv('Furnishing', property.furnish),
+    !isPG ? kv('Available from', property.available) : null,
+  ]);
 
-  if (isLease) {
-    row('Notice period', terms.notice);
-    row('Lease duration', terms.lease);
-    row('Lease type', terms.leaseType);
-    row('Lock-in period', terms.lockIn);
-  } else if (!isPG && !isShortStay) {
-    row('Notice period', terms.notice);
-    row('Lease duration', terms.lease);
-  }
+  section('📅 Availability & Terms', [
+    isLease ? kv('Notice period', terms.notice) : (!isPG && !isShortStay ? kv('Notice period', terms.notice) : null),
+    isLease ? kv('Lease duration', terms.lease) : (!isPG && !isShortStay ? kv('Lease duration', terms.lease) : null),
+    isLease ? kv('Lease type', terms.leaseType) : null,
+    isLease ? kv('Lock-in period', terms.lockIn) : null,
+  ]);
 
   if (!isShortStay) {
-    row('Pets allowed', rules.pets);
-    row('Non-veg allowed', rules.nonVeg);
-    row('Piped gas', rules.gas);
+    section('⚖️ Tenant Rules', [
+      kv('Pets allowed', rules.pets),
+      kv('Non-veg allowed', rules.nonVeg),
+      kv('Piped gas', rules.gas),
+    ]);
   }
 
   if (isPG) {
-    row('Property type', pg.type);
-    row('Gender preference', pg.gender);
-    row('Room type', pg.room);
-    row('Meals', pg.meals);
-    row('Occupancy', pg.occupancy);
-    row('Notice period', pg.notice);
-    row('Bathroom', pg.bathroom);
-    row('Room furnishing', pg.furnish);
-    row('Food type', pg.food);
-    row('Available from', pg.available);
-    row('Visitor policy', pg.visitors);
-    row('Gate closing time', pg.gateTime);
+    section('🛏 PG Details', [
+      kv('Property type', pg.type),
+      kv('Gender preference', pg.gender),
+      kv('Room type', pg.room),
+      kv('Meals', pg.meals),
+      kv('Occupancy', pg.occupancy),
+      kv('Notice period', pg.notice),
+      kv('Bathroom', pg.bathroom),
+      kv('Room furnishing', pg.furnish),
+      kv('Food type', pg.food),
+      kv('Available from', pg.available),
+      kv('Visitor policy', pg.visitors),
+      kv('Gate closing time', pg.gateTime),
+    ]);
   }
 
   if (isShortStay) {
-    row('Property type', shortStay.type);
-    row('Room type', shortStay.roomType);
-    row('Available 24 hours', shortStay.available24hrs);
-    row('Free cancellation window', shortStay.cancellation);
-    row('Unmarried couples allowed', shortStay.couplesAllowed);
-    row('Room furnishing', shortStay.furnish);
+    section('🛎 Short Stay Details', [
+      kv('Property type', shortStay.type),
+      kv('Room type', shortStay.roomType),
+      kv('Available 24 hours', shortStay.available24hrs),
+      kv('Free cancellation window', shortStay.cancellation),
+      kv('Unmarried couples allowed', shortStay.couplesAllowed),
+      kv('Room furnishing', shortStay.furnish),
+    ]);
   }
 
   const selected = Array.isArray(amenities.selected) ? amenities.selected : [];
-  row('Amenities', selected.join(', '), true);
-  row('Additional amenities', amenities.extra, true);
+  section('✨ Amenities', [
+    kv('Amenities', selected.join(', '), true),
+    kv('Additional amenities', amenities.extra, true),
+  ]);
 
-  row('Description', media.desc, true);
+  section('📝 Description', [
+    kv('Description', media.desc, true),
+  ]);
 
-  if (!rows.length) return '<div class="profile-list-empty" style="padding:14px 0">No details added yet.</div>';
-  return '<div class="detail-kv-table">' + rows.join('') + '</div>';
+  if (!sections.length) return '<div class="profile-list-empty" style="padding:14px 0">No details added yet.</div>';
+  return sections.join('');
 }
 
 function closeDetail() {
