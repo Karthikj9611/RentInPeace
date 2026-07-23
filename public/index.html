@@ -1308,16 +1308,14 @@ ul{list-style:none}
 }
 
 /* ─── Recently Viewed ──────────────────────────── */
-.recently-viewed-section{padding:16px 20px 4px}
-.recently-viewed-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.recently-viewed-title{font-size:15px;font-weight:700;color:var(--text-1)}
+.recently-viewed-section{padding-bottom:4px}
 .recently-viewed-clear{background:none;border:none;color:var(--text-2);font-size:13px;cursor:pointer;padding:4px 6px}
 .recently-viewed-clear:hover{color:var(--brand)}
 .recently-viewed-strip{
   display:grid;
   grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
   gap:16px;
-  padding-bottom:8px;
+  padding:16px 20px 8px;
 }
 .rv-card{position:relative;border:1px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;background:var(--bg);transition:box-shadow .15s,transform .15s}
 .rv-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.08);transform:translateY(-1px)}
@@ -3565,14 +3563,6 @@ ul{list-style:none}
 
 <!-- ─── Main Content ────────────────────────────── -->
 <main class="main">
-  <div id="recentlyViewedSection" class="recently-viewed-section" style="display:none">
-    <div class="recently-viewed-header">
-      <span class="recently-viewed-title">Recently viewed</span>
-      <button class="recently-viewed-clear" onclick="clearRecentlyViewed()">Clear all</button>
-    </div>
-    <div class="recently-viewed-strip" id="recentlyViewedStrip"></div>
-  </div>
-
   <div class="results-header">
     <div class="results-count"><strong id="resultCount">12</strong> <strong>Properties found</strong></div>
 
@@ -3612,6 +3602,19 @@ ul{list-style:none}
         </button>
       </div>
     </div>
+  </div>
+
+  <div id="recentlyViewedSection" class="recently-viewed-section" style="display:none">
+    <div class="section-divider" style="position:relative">
+      <div class="section-divider-inner">
+        <span class="section-divider-label promoted-label">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          Recently viewed
+        </span>
+      </div>
+      <button class="recently-viewed-clear" onclick="clearRecentlyViewed()" style="position:absolute;right:20px;top:50%;transform:translateY(-50%)">Clear all</button>
+    </div>
+    <div class="recently-viewed-strip" id="recentlyViewedStrip"></div>
   </div>
 
   <div id="promotedSection">
