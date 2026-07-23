@@ -3451,13 +3451,13 @@ ul{list-style:none}
     </div>
   </div>
 
-  <!-- RENT + LEASE: Lease duration -->
+  <!-- RENT + LEASE: Contract Term -->
   <div class="fd-btn fd-rent fd-lease" id="fdb-leaseDuration" onclick="toggleFd('leaseDuration',this)">
     <span class="fd-icon">📆</span>
     <span class="fd-label">Duration</span> <span class="fd-badge" id="fdbc-leaseDuration" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     <div class="fd-pop" id="fdp-leaseDuration" onclick="event.stopPropagation()">
-      <div class="fd-pop-label">Lease duration</div>
+      <div class="fd-pop-label">Contract Term</div>
       <div class="fd-opts" id="fdo-leaseDuration"></div>
       <div class="fd-pop-footer">
         <button class="fd-clear-btn" onclick="clearFd('leaseDuration')">Clear</button>
@@ -4326,11 +4326,6 @@ ul{list-style:none}
         <div class="identity-locked-hint" id="f-ownerPhone-hint" style="display:none">Auto-filled from your account</div>
       </div>
       <div class="form-group">
-        <label class="form-label">Email (optional)</label>
-        <input class="form-input" type="email" id="f-ownerEmail"/>
-        <div class="identity-locked-hint" id="f-ownerEmail-hint" style="display:none">Auto-filled from your account</div>
-      </div>
-      <div class="form-group">
         <label class="form-label">Alternate number</label>
         <div class="input-icon-wrap">
           <input class="form-input" type="tel" id="f-ownerAltPhone" inputmode="numeric" maxlength="10" oninput="sanitizeMobileInput(this)"/>
@@ -4338,6 +4333,11 @@ ul{list-style:none}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </button>
         </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email (optional)</label>
+        <input class="form-input" type="email" id="f-ownerEmail"/>
+        <div class="identity-locked-hint" id="f-ownerEmail-hint" style="display:none">Auto-filled from your account</div>
       </div>
       <div class="form-group">
         <label class="form-label">Preferred contact time</label>
@@ -4379,13 +4379,13 @@ ul{list-style:none}
       <div class="form-group"><label class="form-label" id="f-rentLabel">Monthly rent (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-rent" min="0" max="9999999" /></div>
       <div class="form-group" id="f-depositWrap"><label class="form-label">Security deposit (₹) <span style="color:var(--brand)">*</span></label><input class="form-input" type="number" id="f-deposit" min="0" max="9999999" /></div>
       <div class="form-group" id="f-maintenanceWrap"><label class="form-label">Maintenance (₹/ Month)</label><input class="form-input" type="number" id="f-maintenance" oninput="onMaintenanceChange()" /></div>
-      <div class="form-group" id="f-escalationWrap"><label class="form-label">Annual rent escalation (%)</label><input class="form-input" type="number" step="0.5" id="f-escalation" /></div>
+      <div class="form-group" id="f-escalationWrap"><label class="form-label">Escalation (%)</label><input class="form-input" type="number" step="0.5" id="f-escalation" /></div>
       <div class="form-group" id="f-electricityWrap">
-        <label class="form-label">Electricity included?</label>
+        <label class="form-label">Electricity</label>
         <select class="form-select" id="f-electricityIncluded"><option>Included</option><option>Separate</option><option>Shared meter</option></select>
       </div>
       <div class="form-group" id="f-waterWrap">
-        <label class="form-label">Water / borewell charges</label>
+        <label class="form-label">Water</label>
         <select class="form-select" id="f-waterCharge"><option>Included</option><option>Separate</option><option>Tanker</option></select>
       </div>
 	  <div class="form-group" id="f-negotiableWrap">
@@ -4402,7 +4402,7 @@ ul{list-style:none}
       <div class="form-group">
         <label class="form-label">Property type</label>
         <select class="form-select" id="f-propertyType">
-          <option>Apartment</option><option>Independent House</option><option>Villa</option><option>Studio</option>
+          <option>Apartment</option><option>House</option><option>Villa</option><option>Studio</option><option>Duplex</option><option>Penthouse</option><option>Bungalow</option><option>Loft</option><option>Cottage</option><option>Farmhouse</option><option>PG</option><option>Hostel</option><option>Homestay</option>
         </select>
       </div>
       <div class="form-group">
@@ -4427,8 +4427,11 @@ ul{list-style:none}
       </div>
 	  
       <div class="form-group">
-        <label class="form-label">Floor (out of total)</label>
-        <input class="form-input" type="text" id="f-floor" onblur="formatFloorOrdinal(this)" />
+        <label class="form-label">Floor</label>
+        <select class="form-select" id="f-floor">
+          <option value="">Select</option>
+          <option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option>
+        </select>
       </div>
       <div class="form-group">
         <label class="form-label">Area (sqft)</label>
@@ -4441,7 +4444,7 @@ ul{list-style:none}
       <div class="form-group">
         <label class="form-label">Furnishing</label>
         <select class="form-select" id="f-furnishing">
-          <option>Furnished</option><option>Semi-Furnished</option><option>Unfurnished</option>
+          <option>Fully</option><option>Semi</option><option>Basic</option>
         </select>
       </div>
       <div class="form-group">
@@ -4453,12 +4456,26 @@ ul{list-style:none}
       <div class="form-group">
         <label class="form-label">Age of property</label>
         <select class="form-select" id="f-age">
-          <option value="">Select</option><option>New (0–2 yrs)</option><option>3–5 yrs</option><option>6–10 yrs</option><option>10+ yrs</option>
+          <option value="">Select</option><option>New</option><option>1 yr</option><option>2 yrs</option><option>3 yrs</option><option>4 yrs</option><option>5 yrs</option><option>6 yrs</option><option>7 yrs</option><option>8 yrs</option><option>9 yrs</option><option>10 yrs</option><option>11 yrs</option><option>12 yrs</option><option>13 yrs</option><option>14 yrs</option><option>15 yrs</option><option>16 yrs</option><option>17 yrs</option><option>18 yrs</option><option>19 yrs</option><option>20 yrs</option>
         </select>
       </div>
-      <div class="form-group">
-        <label class="form-label">Tenant preference</label>
-        <select class="form-select" id="f-tenant"><option>Any</option><option>Family</option><option>Bachelor</option><option>Female only</option></select>
+      <div class="form-group" id="tenantFormGroup">
+        <label class="form-label">Tenant preference <span style="color:var(--brand)">*</span></label>
+        <div class="am-dd" id="tenantDropdown">
+          <button type="button" class="am-dd-trigger" onclick="toggleTenantDropdown(event)">
+            <span><span class="am-dd-count" id="tenantDdCount" style="display:none">0</span><span id="tenantDdLabel">Choose tenant preference…</span></span>
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="am-dd-panel" id="tenantDdPanel">
+            <div class="am-dd-grid" style="grid-template-columns:1fr">
+              <label class="am-dd-item"><input type="checkbox" id="tenant-any" onchange="onTenantCheck()"/> Any</label>
+              <label class="am-dd-item"><input type="checkbox" id="tenant-family" onchange="onTenantCheck()"/> Family</label>
+              <label class="am-dd-item"><input type="checkbox" id="tenant-bachelor" onchange="onTenantCheck()"/> Bachelor</label>
+              <label class="am-dd-item"><input type="checkbox" id="tenant-female" onchange="onTenantCheck()"/> Female only</label>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" id="f-tenant" />
       </div>
       <div class="form-group" id="f-availWrap">
         <label class="form-label">Available from</label>
@@ -4475,7 +4492,7 @@ ul{list-style:none}
       <div class="lm-section">📅 Availability &amp; Terms</div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
         <div class="form-group"><label class="form-label">Notice period</label><select class="form-select" id="f-noticePeriod"><option value="">Select</option><option>15 Days</option><option>1 Month</option><option>2 Months</option><option selected>3 Months</option></select></div>
-        <div class="form-group"><label class="form-label">Lease duration</label><select class="form-select" id="f-leaseDuration"><option value="">Any</option><option>6 Months</option><option selected>12 Months</option><option>24 Months</option><option>36 Months</option><option>48 Months</option><option>48+ Months</option></select></div>
+        <div class="form-group"><label class="form-label">Contract Term</label><select class="form-select" id="f-leaseDuration"><option value="">Any</option><option>6 Months</option><option selected>12 Months</option><option>24 Months</option><option>36 Months</option><option>48 Months</option><option>48+ Months</option></select></div>
       </div>
       <div class="lm-section">⚖️ Tenant Rules</div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
@@ -4493,7 +4510,7 @@ ul{list-style:none}
       </div>
       <div class="lm-section">📋 Lease Terms</div>
       <div class="form-row" style="grid-template-columns:1fr 1fr 1fr">
-        <div class="form-group"><label class="form-label">Lease duration</label><select class="form-select" id="f-leaseDurationVal"><option value="">Select</option><option>1 Year</option><option selected>2 Years</option><option>3 Years</option><option>5 Years</option><option>9 Years</option><option>15 Years</option><option>30 Years</option></select></div>
+        <div class="form-group"><label class="form-label">Contract Term</label><select class="form-select" id="f-leaseDurationVal"><option value="">Select</option><option>1 Year</option><option selected>2 Years</option><option>3 Years</option><option>5 Years</option><option>9 Years</option><option>15 Years</option><option>30 Years</option></select></div>
         <div class="form-group"><label class="form-label">Lease type</label><select class="form-select" id="f-leaseType"><option value="">Select</option><option>Residential</option><option>Commercial</option><option>Industrial</option><option>Mixed Use</option></select></div>
         <div class="form-group"><label class="form-label">Lock-in period</label><select class="form-select" id="f-lockInPeriod"><option value="">None</option><option>1 Year</option><option>2 Years</option><option>3 Years</option></select></div>
         <div class="form-group"><label class="form-label">Available from</label><input class="form-input" type="date" id="f-leaseAvailableFrom" /></div>
@@ -4594,7 +4611,7 @@ ul{list-style:none}
     <div id="addAmenitiesSection">
     <div class="lm-section">✨ Amenities</div>
     <div class="form-group" id="amSelectFormGroup">
-      <label class="form-label">Select amenities</label>
+      <label class="form-label">Select amenities <span style="color:var(--brand)">*</span></label>
       <div class="am-dd" id="amDropdown">
         <button type="button" class="am-dd-trigger" onclick="toggleAmDropdown(event)">
           <span><span class="am-dd-count" id="amDdCount" style="display:none">0</span><span id="amDdLabel">Choose amenities…</span></span>
@@ -4646,7 +4663,7 @@ ul{list-style:none}
     <div id="mediaSection">
     <div class="lm-section" id="mediaSectionHeader">📸 Media &amp; Description</div>
     <div class="form-group" id="videoUrlGroup">
-      <label class="form-label">Video tour URL (optional)</label>
+      <label class="form-label">Video tour URL</label>
       <input class="form-input" type="url" id="f-videoUrl" />
     </div>
     <div class="form-group" id="imgFormGroup">
@@ -6785,7 +6802,7 @@ function renderCompareTable() {
     section('Terms'),
     { label: 'Notice period', get: p => dash(p.terms?.notice) },
     ...(anyLease ? [
-      { label: 'Lease duration', get: p => dash(p.terms?.lease) },
+      { label: 'Contract Term', get: p => dash(p.terms?.lease) },
       { label: 'Lease type', get: p => dash(p.terms?.leaseType) },
       { label: 'Lock-in period', get: p => dash(p.terms?.lockIn) },
     ] : []),
@@ -7103,7 +7120,11 @@ function fdCollectValues(field, predicate) {
     if (predicate && !predicate(p)) return;
     const v = pFieldByPath(p, path);
     if (v === null || v === undefined || v === '') return;
-    set.add(String(v).trim());
+    if (field === 'tenant') {
+      String(v).split(',').map(s => s.trim()).filter(Boolean).forEach(t => set.add(t));
+    } else {
+      set.add(String(v).trim());
+    }
   });
   return Array.from(set);
 }
@@ -7644,8 +7665,8 @@ function getFiltered() {
       if (furnishVal != null && furnishVal !== '' && !fs.furnishing.includes(furnishVal)) return false;
     }
     if (fs.tenant) {
-      const tenant = p.property?.tenant;
-      if (!fs.tenant.some(t => t==='Any' || tenant===t || tenant==='Any')) return false;
+      const tenantList = String(p.property?.tenant || '').split(',').map(s => s.trim()).filter(Boolean);
+      if (!fs.tenant.some(t => t==='Any' || tenantList.includes(t) || tenantList.includes('Any'))) return false;
     }
     if (fs.facing && !fs.facing.includes(p.property?.facing)) return false;
     if (fs.bathrooms) {
@@ -7966,7 +7987,7 @@ function buildDetailTable(p) {
 
   section('📅 Availability & Terms', [
     isLease ? kv('Notice period', terms.notice) : (!isPG && !isShortStay ? kv('Notice period', terms.notice) : null),
-    isLease ? kv('Lease duration', terms.lease) : (!isPG && !isShortStay ? kv('Lease duration', terms.lease) : null),
+    isLease ? kv('Contract Term', terms.lease) : (!isPG && !isShortStay ? kv('Contract Term', terms.lease) : null),
     isLease ? kv('Lease type', terms.leaseType) : null,
     isLease ? kv('Lock-in period', terms.lockIn) : null,
   ]);
@@ -8351,6 +8372,9 @@ function resetListingForm() {
   applySameAsBuildingAddressState();
   // Clear amenity unit qty fields and re-render
   amClearAll();
+  // Reset tenant preference dropdown label/hidden value (checkboxes were
+  // already unchecked by the loop above)
+  if (typeof renderTenantSelected === 'function') renderTenantSelected();
   // Reset image previews
   fImages = [];
   renderFImages();
@@ -8733,6 +8757,7 @@ function applyImportedProperty(p) {
     formatAreaSqft(document.getElementById('f-area'));
     sv('f-age', property.age);
     sv('f-tenant', property.tenant);
+    if (typeof syncTenantCheckboxesFromValue === 'function') syncTenantCheckboxesFromValue(property.tenant);
     sv('f-facing', property.facing);
   }
   sv('f-bikepark', (isPG || isShortStay) ? '0' : property.bike);
@@ -10008,6 +10033,49 @@ AM_LIST.forEach(([, , unitId]) => {
   el.addEventListener('input', renderAmSelected);
 });
 
+/* ─── Tenant preference multi-select dropdown ───────────
+   Mirrors the amenities dropdown pattern above, but with no per-item
+   quantity inputs. Selections are stored as a comma-joined string in
+   the hidden #f-tenant input, which the rest of the form (submit +
+   edit-prefill + filters) already reads/writes as plain text. */
+const TENANT_LIST = [
+  ['tenant-any',      'Any'],
+  ['tenant-family',   'Family'],
+  ['tenant-bachelor', 'Bachelor'],
+  ['tenant-female',   'Female only'],
+];
+
+function toggleTenantDropdown(e) {
+  e.stopPropagation();
+  document.getElementById('tenantDropdown').classList.toggle('open');
+}
+
+function onTenantCheck() {
+  renderTenantSelected();
+}
+
+function renderTenantSelected() {
+  const label = document.getElementById('tenantDdLabel');
+  const count = document.getElementById('tenantDdCount');
+  const hidden = document.getElementById('f-tenant');
+  const selected = TENANT_LIST.filter(([id]) => document.getElementById(id).checked).map(([, name]) => name);
+
+  hidden.value = selected.join(', ');
+  label.textContent = selected.length ? selected.join(', ') : 'Choose tenant preference…';
+  count.style.display = selected.length ? '' : 'none';
+  count.textContent = selected.length;
+}
+
+/* Checks the boxes matching a comma-joined value (used on edit-prefill). */
+function syncTenantCheckboxesFromValue(val) {
+  const parts = String(val || '').split(',').map(s => s.trim()).filter(Boolean);
+  TENANT_LIST.forEach(([id, name]) => {
+    const cb = document.getElementById(id);
+    if (cb) cb.checked = parts.includes(name);
+  });
+  renderTenantSelected();
+}
+
 /* ═══════════════════════════════════════════════
    REVIEWS
    Site-wide feedback from logged-in users, stored on
@@ -10419,6 +10487,10 @@ document.addEventListener('click', function(e) {
   if (dd.classList.contains('open') && !dd.contains(e.target)) {
     dd.classList.remove('open');
   }
+  const tdd = document.getElementById('tenantDropdown');
+  if (tdd && tdd.classList.contains('open') && !tdd.contains(e.target)) {
+    tdd.classList.remove('open');
+  }
 });
 
 /* ═══════════════════════════════════════════════
@@ -10515,16 +10587,8 @@ function formatFloorOrdinal(el) {
   el.value = n + suffix;
 }
 function onMaintenanceChange() {
-  const maint = parseFloat(document.getElementById('f-maintenance').value) || 0;
-  const elec = document.getElementById('f-electricityIncluded');
-  const water = document.getElementById('f-waterCharge');
-  if (maint > 0) {
-    elec.value = 'Included'; elec.disabled = true;
-    water.value = 'Included'; water.disabled = true;
-  } else {
-    elec.disabled = false;
-    water.disabled = false;
-  }
+  // Electricity and water charges are independent of maintenance — the
+  // user picks these themselves regardless of what's entered here.
 }
 function fCaptureLocation() {
   const btnTxt = document.getElementById('f-locBtnTxt');
@@ -10570,6 +10634,7 @@ const OPTIONAL_FIELD_IDS = new Set([
   'f-latitude', 'f-longitude', 'f-latLngDisplay',
   'f-imgFileInput', 'f-imgCameraInput',
   'f-amenities-extra',
+  'f-ownerAltPhone', 'f-videoUrl', 'f-age', 'f-area',
 ]);
 function isUnitField(id) { return /Units$/.test(id); }
 
@@ -10641,6 +10706,18 @@ function validateListingForm() {
   if (imgGroup && isFieldVisible(imgGroup) && (!Array.isArray(fImages) || fImages.length === 0)) {
     setGroupError(imgGroup, 'Please add at least one property image');
     if (!firstErrorEl) firstErrorEl = imgGroup;
+  }
+  // Amenities — at least one must be selected
+  const amGroup = document.getElementById('amSelectFormGroup');
+  if (amGroup && isFieldVisible(amGroup) && !AM_LIST.some(([id]) => { const cb = document.getElementById(id); return cb && cb.checked; })) {
+    setGroupError(amGroup, 'Please select at least one amenity');
+    if (!firstErrorEl) firstErrorEl = amGroup;
+  }
+  // Tenant preference — at least one option must be selected
+  const tenantGroup = document.getElementById('tenantFormGroup');
+  if (tenantGroup && isFieldVisible(tenantGroup) && !document.getElementById('f-tenant').value.trim()) {
+    setGroupError(tenantGroup, 'Tenant preference is required');
+    if (!firstErrorEl) firstErrorEl = tenantGroup;
   }
   return firstErrorEl;
 }
