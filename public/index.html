@@ -717,9 +717,15 @@ ul{list-style:none}
 }
 /* List view: no room to scroll sideways card-by-card, so let the spec/
    amenity chips wrap onto additional lines instead of hiding behind a
-   horizontal scroll. */
+   horizontal scroll — laid out as 3 equal-width columns per row. */
 .prop-card.list-view .prop-chip-row-scroll{
-  flex-wrap:wrap;overflow-x:visible;cursor:default;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  overflow-x:visible;cursor:default;
+}
+.prop-card.list-view .prop-chip-row-scroll .prop-chip{
+  width:100%;
+  justify-content:center;
 }
 .prop-id{font-size:12px;font-family:monospace;color:var(--text-3);margin-top:2px;letter-spacing:.02em}
 .prop-desc-preview{margin-top:8px;font-size:12px;line-height:1.4;color:var(--text-3);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -825,20 +831,18 @@ ul{list-style:none}
 }
 /* Quick-action name labels: hidden by default (icon-only, as in grid view). */
 .prop-qa-label{display:none}
-/* List view: the buttons themselves become small horizontal pills — a
-   compact icon plus its name side by side, all equal width — instead of
-   the big 56px circular icon with a label stacked underneath (which had
-   no room and spilled past the card's bottom edge). */
+/* List view: compact pills with the icon on top and a short label below —
+   using short words (Call/Chat/Visit/Compare) so they fit five-across
+   without truncating. */
 .prop-card.list-view .prop-quick-actions{gap:6px}
 .prop-card.list-view .prop-quick-actions .prop-qa-btn.prop-qa-3d,
 .prop-card.list-view .prop-quick-actions .prop-qa-icon.prop-qa-3d,
 .prop-card.list-view .prop-quick-actions .prop-views{
-  flex-direction:row;align-items:center;justify-content:center;gap:5px;
-  height:38px;border-radius:9px;
+  flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  height:52px;border-radius:10px;padding:6px 2px;
   border:1.5px solid var(--border-2);background:var(--bg);
 }
-.prop-card.list-view .prop-quick-actions .qa-3d-icon,
-.prop-card.list-view .prop-quick-actions .prop-views-icon{
+.prop-card.list-view .prop-quick-actions .qa-3d-icon{
   width:20px;height:20px;border-radius:6px;box-shadow:none;flex-shrink:0;
 }
 .prop-card.list-view .prop-quick-actions .qa-3d-icon svg{width:11px;height:11px}
@@ -852,10 +856,12 @@ ul{list-style:none}
   background:none;color:var(--brand);box-shadow:none;
 }
 .prop-card.list-view .prop-quick-actions .prop-qa-label{
-  display:block;font-size:11px;font-weight:600;white-space:nowrap;
+  display:block;font-size:9.5px;font-weight:600;white-space:nowrap;
   overflow:hidden;text-overflow:ellipsis;max-width:100%;margin-top:0;color:var(--text-2);
+  line-height:1;
 }
 .prop-card.list-view .prop-quick-actions .prop-qa-count{top:-4px;right:2px}
+
 
 /* ─── Colorful 3D quick-action icons (Contact / WhatsApp / Visit / Compare) ─── */
 .prop-qa-btn.prop-qa-3d,
@@ -6322,11 +6328,11 @@ function cardHTML(p, compact) {
         <div class="prop-quick-actions">
           <button class="prop-qa-btn prop-qa-3d qa-call" onclick="event.stopPropagation();openCall('${p.id}')" aria-label="Call owner">
             <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
-            <span class="prop-qa-label">Contact</span>
+            <span class="prop-qa-label">Call</span>
           </button>
           <button class="prop-qa-btn prop-qa-3d qa-whatsapp" onclick="event.stopPropagation();openWhatsApp('${p.id}')" aria-label="Contact on WhatsApp">
             <span class="qa-3d-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg></span>
-            <span class="prop-qa-label">WhatsApp</span>
+            <span class="prop-qa-label">Chat</span>
           </button>
           ${pType === 'ShortStay' ? `
           <div class="prop-qa-icon prop-qa-3d qa-book" id="prop-qa-icon-${p.id}" data-prop-id="${p.id}" onclick="event.stopPropagation();openBookingModal('${p.id}')" aria-label="Book now" title="Book now">
