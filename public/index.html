@@ -2134,7 +2134,7 @@ ul{list-style:none}
 .form-input:focus{border-color:var(--brand)}
 .form-input::placeholder{color:var(--text-3)}
 .form-input[readonly].identity-locked{
-  background:var(--bg-2,#f4f4f6);color:var(--text-2);cursor:default;
+  background:var(--bg-2,#f4f4f6);cursor:not-allowed;
 }
 .identity-locked-hint{font-size:11px;color:var(--text-3);margin-top:2px}
 .add-modal.view-mode input:disabled,
@@ -4301,6 +4301,7 @@ ul{list-style:none}
       <div class="form-group" id="mapsLinkGroup">
         <label class="form-label">Google Maps link (optional)</label>
         <input class="form-input" type="url" id="f-googleMapsLink" />
+        <div style="font-size:11px;color:var(--text-2);margin-top:2px">Auto-filled from your location · replace it if you have a more exact link</div>
       </div>
       <div class="form-group">
         <label class="form-label">Owner name <span style="color:var(--brand)">*</span></label>
@@ -4337,6 +4338,10 @@ ul{list-style:none}
       </div>
       <div class="form-group" style="grid-column:span 3">
         <label class="form-label">Owner address (optional)</label>
+        <div style="display:flex;align-items:center;gap:5px;font-weight:400;font-size:12px;color:var(--text-2);margin:2px 0 6px">
+          <input type="checkbox" id="f-sameAsBuildingAddress" onchange="toggleSameAsBuildingAddress(this)" style="width:auto;margin:0" />
+          <label for="f-sameAsBuildingAddress" style="font-weight:400;cursor:pointer">Same as building live address</label>
+        </div>
         <textarea class="form-input" id="f-ownerAddress" rows="2" style="resize:vertical"></textarea>
       </div>
       <!-- Agent-only fields — shown when Listed by = Agent -->
@@ -8312,6 +8317,9 @@ function resetListingForm() {
   if (waterReset) waterReset.disabled = false;
   // Uncheck all checkboxes (amenities + misc toggles)
   document.querySelectorAll('#addModal input[type="checkbox"]').forEach(el => { el.checked = false; });
+  // The "Same as building live address" checkbox above was just unchecked by
+  // the loop — make sure Owner address goes back to editable with it.
+  applySameAsBuildingAddressState();
   // Clear amenity unit qty fields and re-render
   amClearAll();
   // Reset image previews
@@ -8449,6 +8457,24 @@ function selectFabType(type) {
 // was signed up with. Only used for a brand-new listing (openAddModal);
 // editing an existing listing (openEditListingFull) leaves these editable
 // since a listing's saved contact can differ from the editor's own account.
+// "Same as building live address" checkbox next to Owner address — when
+// checked, copies the auto-captured Building Live Address in and locks the
+// field (readonly) so it can't quietly drift out of sync; unchecking frees
+// it back up for a different owner address.
+function applySameAsBuildingAddressState() {
+  const chk = document.getElementById('f-sameAsBuildingAddress');
+  const ownerAddr = document.getElementById('f-ownerAddress');
+  if (!chk || !ownerAddr) return;
+  ownerAddr.readOnly = chk.checked;
+  ownerAddr.classList.toggle('identity-locked', chk.checked);
+}
+function toggleSameAsBuildingAddress(checkbox) {
+  const ownerAddr = document.getElementById('f-ownerAddress');
+  const buildingAddr = document.getElementById('f-fullAddress');
+  if (!ownerAddr) return;
+  if (checkbox.checked && buildingAddr) ownerAddr.value = buildingAddr.value.trim();
+  applySameAsBuildingAddressState();
+}
 function lockIdentityFieldsForNewListing() {
   const user = getLoggedInUser();
   if (!user) return;
@@ -8495,6 +8521,7 @@ function openAddModal(presetType) {
   // a restored draft — so the listing's contact identity can't drift from
   // the signed-up account, and lock the fields so it can't be edited away.
   lockIdentityFieldsForNewListing();
+  applySameAsBuildingAddressState();
   document.getElementById('addModal').classList.add('open');
   lockBodyScroll();
   onFTypeChange(document.getElementById('f-type').value);
@@ -10477,11 +10504,22 @@ function fCaptureLocation() {
     document.getElementById('f-longitude').value = lon;
     document.getElementById('f-latLngDisplay').value = lat.toFixed(6) + '° N, ' + lon.toFixed(6) + '° E';
     btnTxt.textContent = 'OK';
+    // Auto-fill Google Maps link from the same coordinates as the Building
+    // Live Address — a plain pin link that opens straight to this spot.
+    // Left editable (field is optional) so it can be swapped for a more
+    // specific link (e.g. the exact building entrance) if the owner has one.
+    document.getElementById('f-googleMapsLink').value = 'https://www.google.com/maps?q=' + lat + ',' + lon;
     fetch('https://nominatim.openstreetmap.org/reverse?lat=' + lat + '&lon=' + lon + '&format=json&accept-language=en')
       .then(r => r.json())
       .then(d => {
         document.getElementById('f-fullAddress').value = d.display_name || '';
         status.textContent = 'Address captured · Enter Location / Area manually';
+        // Keep Owner address in sync if "Same as building live address" is checked
+        const sameChk = document.getElementById('f-sameAsBuildingAddress');
+        if (sameChk && sameChk.checked) {
+          const ownerAddr = document.getElementById('f-ownerAddress');
+          if (ownerAddr) ownerAddr.value = d.display_name || '';
+        }
       }).catch(() => { status.textContent = 'Coordinates saved.'; });
   }, function() { btnTxt.textContent = 'Live'; status.textContent = 'Permission denied.'; });
 }
