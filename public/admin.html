@@ -4188,8 +4188,9 @@ $(document).ready(function(){
   // "top-controls" button row immediately above the <table>, so we move
   // the toolbar to sit right after that generated row).
   $('#bulkToolbar').insertAfter($('#propertyTable_wrapper .top-controls'));
-  buildPropColumnToggle();
+  loadPropColVisibility();
   applyPropCategoryColumnVisibility(_propCategoryState);
+  buildPropColumnToggle();
   propTable.on('column-visibility.dt', function(e, settings, column, state){
     syncPropColToggleCheckbox(column, state);
   });
@@ -4739,6 +4740,35 @@ const PROP_COL_GROUPS = [
   ]}
 ];
 
+// Persist user's manual show/hide choices for the toggleable property
+// columns so they survive a page refresh. Only the columns offered in
+// PROP_COL_GROUPS are saved — the auto-managed PG/Short-Stay visibility
+// driven by the active category tab is left alone (applyPropCategoryColumnVisibility
+// still overrides those on load/tab-switch, same as before).
+const PROP_COL_VISIBILITY_KEY = 'rip_admin_propColVisibility';
+
+function savePropColVisibility(){
+  if(!propTable) return;
+  const state = {};
+  PROP_COL_GROUPS.forEach(group=>{
+    group.cols.forEach(c=>{ state[c.idx] = propTable.column(c.idx).visible(); });
+  });
+  try{ localStorage.setItem(PROP_COL_VISIBILITY_KEY, JSON.stringify(state)); }catch(e){}
+}
+
+function loadPropColVisibility(){
+  if(!propTable) return;
+  try{
+    const raw = localStorage.getItem(PROP_COL_VISIBILITY_KEY);
+    if(!raw) return;
+    const state = JSON.parse(raw);
+    Object.keys(state).forEach(idx=>{
+      propTable.column(parseInt(idx,10)).visible(!!state[idx], false);
+    });
+    propTable.columns.adjust();
+  }catch(e){}
+}
+
 function buildPropColumnToggle(){
   const menu = document.getElementById('propColToggleMenu');
   if(!menu || !propTable) return;
@@ -4763,6 +4793,7 @@ function buildPropColumnToggle(){
 window.onPropColToggleChange = function(inputEl){
   const idx = parseInt(inputEl.getAttribute('data-col-idx'), 10);
   if(propTable) propTable.column(idx).visible(inputEl.checked);
+  savePropColVisibility();
 };
 
 window.setAllPropColumns = function(show){
@@ -4773,6 +4804,7 @@ window.setAllPropColumns = function(show){
   propTable.columns.adjust();
   updatePropStickyOffset();
   buildPropColumnToggle();
+  savePropColVisibility();
 };
 
 function syncPropColToggleCheckbox(colIdx, visible){
