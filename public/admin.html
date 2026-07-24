@@ -1768,6 +1768,14 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
   <div class="tab-panel" id="panel-customers">
     <div class="card">
       <div class="table-wrapper">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+          <div class="col-toggle-wrap" id="custColToggleWrap">
+            <button type="button" class="col-toggle-btn" id="custColToggleBtn" onclick="toggleColMenu('cust')">
+              <i class="fas fa-table-columns"></i> Columns
+            </button>
+            <div class="col-toggle-menu" id="custColToggleMenu"></div>
+          </div>
+        </div>
         <table id="bookingTable" class="display nowrap" style="width:100%">
           <thead>
             <tr>
@@ -1937,6 +1945,14 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
   <div class="tab-panel" id="panel-appointments">
     <div class="card">
       <div class="table-wrapper">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+          <div class="col-toggle-wrap" id="apptColToggleWrap">
+            <button type="button" class="col-toggle-btn" id="apptColToggleBtn" onclick="toggleColMenu('appt')">
+              <i class="fas fa-table-columns"></i> Columns
+            </button>
+            <div class="col-toggle-menu" id="apptColToggleMenu"></div>
+          </div>
+        </div>
         <table id="appointmentTable" class="display nowrap" style="width:100%">
           <thead>
             <tr>
@@ -2091,6 +2107,14 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
             <button class="bulk-btn bulk-btn-outline-danger" disabled title="Temporarily disabled">
               <i class="fas fa-triangle-exclamation"></i> <span class="bulk-btn-label">Delete All Reviews</span>
             </button>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+          <div class="col-toggle-wrap" id="reviewColToggleWrap">
+            <button type="button" class="col-toggle-btn" id="reviewColToggleBtn" onclick="toggleColMenu('review')">
+              <i class="fas fa-table-columns"></i> Columns
+            </button>
+            <div class="col-toggle-menu" id="reviewColToggleMenu"></div>
           </div>
         </div>
         <table id="honestReviewsTable" class="display nowrap" style="width:100%">
@@ -3914,6 +3938,7 @@ $(document).ready(function(){
     ],
     drawCallback:function(){}
   });
+  initColumnToggle('cust');
   } catch(e){ console.error('Customers table failed to initialize:', e); }
 
   /* ════════════════════════════════════
@@ -4361,6 +4386,7 @@ $(document).ready(function(){
     ],
     drawCallback:function(){}
   });
+  initColumnToggle('appt');
   } catch(e){ console.error('Appointments table failed to initialize:', e); }
 
   /* ════════════════════════════════════
@@ -4451,6 +4477,7 @@ $(document).ready(function(){
     },
     drawCallback:function(){}
   });
+  initColumnToggle('review');
   } catch(e){ console.error('Honest Reviews table failed to initialize:', e); }
 
 });
@@ -4840,6 +4867,136 @@ document.addEventListener('click', function(e){
     if(btn) btn.classList.remove('active');
   }
 });
+
+/* ── COLUMN VISIBILITY TOGGLE (Customers / Appointments / Honest Reviews) ──
+   Same pattern as the Properties column toggle above, generalized so the
+   three simpler grids don't need their own copy-pasted set of functions.
+   Each entry names its DataTable var, the columns offered in the menu
+   (identity/select and Action columns are excluded — always visible),
+   the DOM ids for its button/menu, and a localStorage key so choices
+   survive a refresh, same as Properties. */
+const COL_TOGGLE_CONFIGS = {
+  cust: {
+    getTable: ()=>dataTable,
+    cols: [
+      {idx:1, label:'Type'}, {idx:2, label:'User ID'}, {idx:3, label:'Phone'},
+      {idx:4, label:'Email'}, {idx:5, label:'Property Listings'}, {idx:6, label:'Visit Requests'},
+      {idx:7, label:'Registered'}, {idx:8, label:'Remarks'}
+    ],
+    menuId:'custColToggleMenu', btnId:'custColToggleBtn', wrapId:'custColToggleWrap',
+    storageKey:'rip_admin_custColVisibility'
+  },
+  appt: {
+    getTable: ()=>apptTable,
+    cols: [
+      {idx:0, label:'Visit ID'}, {idx:2, label:'User ID'}, {idx:3, label:'Contact'},
+      {idx:4, label:'Property'}, {idx:5, label:'Purpose'}, {idx:6, label:'Visit Date'},
+      {idx:7, label:'Time Slot'}, {idx:8, label:'Message'}, {idx:9, label:'Status'},
+      {idx:10, label:'Booked On'}, {idx:11, label:'Remarks'}
+    ],
+    menuId:'apptColToggleMenu', btnId:'apptColToggleBtn', wrapId:'apptColToggleWrap',
+    storageKey:'rip_admin_apptColVisibility'
+  },
+  review: {
+    getTable: ()=>honestReviewsTable,
+    cols: [
+      {idx:2, label:'Meta'}, {idx:3, label:'Status'}, {idx:4, label:'Active'}, {idx:5, label:'Order'}
+    ],
+    menuId:'reviewColToggleMenu', btnId:'reviewColToggleBtn', wrapId:'reviewColToggleWrap',
+    storageKey:'rip_admin_reviewColVisibility'
+  }
+};
+
+function buildColumnToggle(key){
+  const cfg = COL_TOGGLE_CONFIGS[key];
+  const table = cfg.getTable();
+  const menu = document.getElementById(cfg.menuId);
+  if(!menu || !table) return;
+  let html = '';
+  cfg.cols.forEach(c=>{
+    const visible = table.column(c.idx).visible();
+    html += `<label class="col-toggle-item">
+      <input type="checkbox" data-col-idx="${c.idx}" ${visible?'checked':''} onchange="onColToggleChange('${key}',this)">
+      <span>${c.label}</span>
+    </label>`;
+  });
+  html += `<div class="col-toggle-footer">
+    <button type="button" onclick="setAllColumns('${key}',true)">Show all</button>
+    <button type="button" onclick="setAllColumns('${key}',false)">Hide all</button>
+  </div>`;
+  menu.innerHTML = html;
+}
+
+window.onColToggleChange = function(key, inputEl){
+  const cfg = COL_TOGGLE_CONFIGS[key];
+  const table = cfg.getTable();
+  const idx = parseInt(inputEl.getAttribute('data-col-idx'), 10);
+  if(table) table.column(idx).visible(inputEl.checked);
+  saveColVisibility(key);
+};
+
+window.setAllColumns = function(key, show){
+  const cfg = COL_TOGGLE_CONFIGS[key];
+  const table = cfg.getTable();
+  if(!table) return;
+  cfg.cols.forEach(c=>{ table.column(c.idx).visible(show, false); });
+  table.columns.adjust();
+  buildColumnToggle(key);
+  saveColVisibility(key);
+};
+
+window.toggleColMenu = function(key){
+  const cfg = COL_TOGGLE_CONFIGS[key];
+  const menu = document.getElementById(cfg.menuId);
+  const btn = document.getElementById(cfg.btnId);
+  if(!menu) return;
+  const opening = !menu.classList.contains('open');
+  menu.classList.toggle('open', opening);
+  if(btn) btn.classList.toggle('active', opening);
+};
+
+document.addEventListener('click', function(e){
+  Object.keys(COL_TOGGLE_CONFIGS).forEach(key=>{
+    const cfg = COL_TOGGLE_CONFIGS[key];
+    const wrap = document.getElementById(cfg.wrapId);
+    const menu = document.getElementById(cfg.menuId);
+    const btn = document.getElementById(cfg.btnId);
+    if(!wrap || !menu || !menu.classList.contains('open')) return;
+    if(!wrap.contains(e.target)){
+      menu.classList.remove('open');
+      if(btn) btn.classList.remove('active');
+    }
+  });
+});
+
+function saveColVisibility(key){
+  const cfg = COL_TOGGLE_CONFIGS[key];
+  const table = cfg.getTable();
+  if(!table) return;
+  const state = {};
+  cfg.cols.forEach(c=>{ state[c.idx] = table.column(c.idx).visible(); });
+  try{ localStorage.setItem(cfg.storageKey, JSON.stringify(state)); }catch(e){}
+}
+
+function loadColVisibility(key){
+  const cfg = COL_TOGGLE_CONFIGS[key];
+  const table = cfg.getTable();
+  if(!table) return;
+  try{
+    const raw = localStorage.getItem(cfg.storageKey);
+    if(!raw) return;
+    const state = JSON.parse(raw);
+    Object.keys(state).forEach(idx=>{
+      table.column(parseInt(idx,10)).visible(!!state[idx], false);
+    });
+    table.columns.adjust();
+  }catch(e){}
+}
+
+function initColumnToggle(key){
+  loadColVisibility(key);
+  buildColumnToggle(key);
+}
 
 function applyPropCategoryColumnVisibility(cat){
   if(!propTable) return;
