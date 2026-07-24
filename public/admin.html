@@ -2877,6 +2877,15 @@ function formatDateTime(createdAt){
     <span class="date-time">${time}</span>
   </div>`;
 }
+// Plain-text version of formatDateTime for CSV/Excel/PDF/Print exports,
+// where the HTML wrapper above would just show up as raw markup.
+function plainDateTime(createdAt){
+  if(!createdAt) return '—';
+  const d = new Date(createdAt);
+  const date = d.toLocaleDateString('en-GB');
+  const time = d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
+  return `${date} ${time}`;
+}
 
 /* ── PROPERTY RENDERERS ── */
 function statusBadge(s){
@@ -3828,7 +3837,11 @@ $(document).ready(function(){
       /* 6 – Visit Requests (count) */
       { data:'visitsCount', className:'dt-body-center', render:(d)=> String(d ?? 0) },
       /* 7 – Registered */
-      { data:'createdAt', render:(d,t)=> t==='display' ? formatDateTime(d) : (d||'—') },
+      { data:'createdAt', render:(d,t)=>{
+          if(t==='display') return formatDateTime(d);
+          if(t==='export') return plainDateTime(d);
+          return d||'—';
+      }},
       /* 8 – Remarks */
       { data:'remarks', orderable:false, render:(d,t,row)=>{
           if(t==='display') return remarkCellHtml(row.mobile||row._id, d, 'customer');
@@ -3905,7 +3918,7 @@ $(document).ready(function(){
           }}
         }
       }, */
-      {
+      /*{
         extend:'print', text:'<i class="fas fa-print"></i> Print', title:'HomeLoop Leads',
         exportOptions:{columns:[0,1,2,3,4,5,6,7,8]},
         customize:function(win){
@@ -3916,7 +3929,7 @@ $(document).ready(function(){
             var emText=cells.eq(4).text().trim(); if(emText&&emText!=='—') cells.eq(4).html('<a class="em" href="mailto:'+emText+'">'+emText+'</a>');
           });
         }
-      },
+      },*/
       {
         extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
         orientation:'landscape', pageSize:'A4', title:'HomeLoop — Customer Leads',
@@ -4096,7 +4109,11 @@ $(document).ready(function(){
       /* 25 – User ID */
       { data:'userId', visible:false, render:(d)=> escapeHtml(d||'—') },
       /* 26 – Listed On */
-      { data:'createdAt', render:(d,t)=> t==='display' ? formatDateTime(d) : (d||'—') },
+      { data:'createdAt', render:(d,t)=>{
+          if(t==='display') return formatDateTime(d);
+          if(t==='export') return plainDateTime(d);
+          return d||'—';
+      }},
       /* 27 – Remarks */
       { data:'remarks', orderable:false, render:(d,t,row)=>{
           if(t==='display') return remarkCellHtml(row._id, d, 'property');
@@ -4167,9 +4184,9 @@ $(document).ready(function(){
           }}
         }
       },*/
-      {
+      /*{
         extend:'print', text:'<i class="fas fa-print"></i> Print', title:'HomeLoop Properties',
-        exportOptions:{columns:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28],
+        exportOptions:{columns:propExportColumnPredicate,
           format:{ body:function(data,row,col){
             var rd=propTable.row(row).data(); if(!rd) return data;
             if(col===2) return rd.promoted ? 'Yes' : 'No';
@@ -4179,18 +4196,20 @@ $(document).ready(function(){
           }}
         },
         customize:function(win){
+          var ownerNumPos = propExportColumnIndices().indexOf(8);
           $(win.document.head).append('<style>table td a{color:#1a7a5e;text-decoration:underline}</style>');
+          if(ownerNumPos < 0) return;
           $(win.document.body).find('table tbody tr').each(function(){
             var cells=$(this).find('td');
-            var phText=cells.eq(7).text().trim();
-            if(phText&&phText!=='—') cells.eq(7).html('<a href="tel:'+phText+'">'+phText+'</a>');
+            var phText=cells.eq(ownerNumPos).text().trim();
+            if(phText&&phText!=='—') cells.eq(ownerNumPos).html('<a href="tel:'+phText+'">'+phText+'</a>');
           });
         }
-      },
+      },*/
 	  {
         extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
         orientation:'landscape', pageSize:'A4', title:'HomeLoop — Properties',
-        exportOptions:{columns:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28],
+        exportOptions:{columns:propExportColumnPredicate,
           format:{ body:function(data,row,col){
             var rd=propTable.row(row).data(); if(!rd) return data;
             if(col===2) return rd.promoted ? 'Yes' : 'No';
@@ -4202,13 +4221,15 @@ $(document).ready(function(){
         customize:function(doc){
           doc.styles.tableHeader={fillColor:'#0c0d10',color:'white',bold:true,fontSize:9,alignment:'center'};
           doc.defaultStyle={fontSize:8,color:'#0c0d10'};
+          var ownerNumPos = propExportColumnIndices().indexOf(8);
+          if(ownerNumPos < 0) return;
           var rows=propTable.rows({search:'applied'}).data().toArray();
           var tableBody=doc.content[1]&&doc.content[1].table?doc.content[1].table.body:null;
           if(!tableBody) return;
           rows.forEach(function(rd,i){
             var pdfRow=tableBody[i+1]; if(!pdfRow) return;
             var ph=rd.ownerNumber||'';
-            if(ph&&pdfRow[7]) pdfRow[7]={text:ph,link:'tel:'+ph,color:'#1a7a5e',decoration:'underline',fontSize:8};
+            if(ph&&pdfRow[ownerNumPos]) pdfRow[ownerNumPos]={text:ph,link:'tel:'+ph,color:'#1a7a5e',decoration:'underline',fontSize:8};
           });
         }
       }
@@ -4276,9 +4297,11 @@ $(document).ready(function(){
           t==='display' ? `<span class="purpose-badge">${escapeHtml(d||'—')}</span>` : (d||'—')
       },
       /* 6 – Visit Date */
-      { data:'date', render:(d,t)=>
-          t==='display' ? renderApptDate(d) : (d||'—')
-      },
+      { data:'date', render:(d,t)=>{
+          if(t==='display') return renderApptDate(d);
+          if(t==='export') return plainApptDate(d);
+          return d||'—';
+      }},
       /* 7 – Time Slot */
       { data:'timeSlot', render:(d,t)=>
           t==='display' ? renderTimeSlot(d) : (d||'—')
@@ -4298,9 +4321,11 @@ $(document).ready(function(){
           return d||'pending';
       }},
       /* 10 – Booked On */
-      { data:'createdAt', render:(d,t)=>
-          t==='display' ? formatDateTime(d) : (d||'—')
-      },
+      { data:'createdAt', render:(d,t)=>{
+          if(t==='display') return formatDateTime(d);
+          if(t==='export') return plainDateTime(d);
+          return d||'—';
+      }},
       /* 11 – Remarks */
       { data:'remarks', orderable:false, render:(d,t,row)=>{
           if(t==='display') return remarkCellHtml(row._id, d, 'appointment');
@@ -4370,10 +4395,10 @@ $(document).ready(function(){
           }}
         }
       },*/
-      {
+      /*{
         extend:'print', text:'<i class="fas fa-print"></i> Print', title:'HomeLoop Appointments',
         exportOptions:{columns:[0,1,2,3,4,5,6,7,8,9,10,11]}
-      },
+      },*/
       {
         extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
         orientation:'landscape', pageSize:'A4', title:'HomeLoop — Appointments',
@@ -4782,6 +4807,21 @@ const PROP_COL_GROUPS = [
 // PROP_COL_GROUPS are saved — the auto-managed PG/Short-Stay visibility
 // driven by the active category tab is left alone (applyPropCategoryColumnVisibility
 // still overrides those on load/tab-switch, same as before).
+// Which master column indices should be included in a Properties export
+// right now. Mirrors whatever's currently visible (category-tab-driven
+// PG/Short-Stay columns + the manual Columns toggle), plus column 8
+// (Owner Number) which is always force-included even though it's
+// permanently hidden on screen — it only exists to feed the phone
+// hyperlink in the Owner Name column.
+function propExportColumnPredicate(idx){
+  return idx>=1 && idx<=28 && (propTable.column(idx).visible() || idx===8);
+}
+function propExportColumnIndices(){
+  const idxs=[];
+  for(let i=0;i<=28;i++){ if(propExportColumnPredicate(i)) idxs.push(i); }
+  return idxs;
+}
+
 const PROP_COL_VISIBILITY_KEY = 'rip_admin_propColVisibility';
 
 function savePropColVisibility(){
@@ -5121,6 +5161,13 @@ function renderApptDate(dateStr){
   const opts = {weekday:'short',day:'2-digit',month:'short',year:'numeric'};
   const formatted = d.toLocaleDateString('en-GB', opts);
   return `<div class="date-cell"><div class="date-main"><i class="far fa-calendar-alt" style="color:var(--gold);margin-right:5px"></i>${formatted}</div></div>`;
+}
+// Plain-text version of renderApptDate for CSV/Excel/PDF/Print exports.
+function plainApptDate(dateStr){
+  if(!dateStr) return '—';
+  const d = new Date(dateStr+'T00:00:00');
+  const opts = {weekday:'short',day:'2-digit',month:'short',year:'numeric'};
+  return d.toLocaleDateString('en-GB', opts);
 }
 
 function renderTimeSlot(slot){
