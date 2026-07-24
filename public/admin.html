@@ -4146,78 +4146,33 @@ $(document).ready(function(){
     },
     dom:'<"top-controls"B>rt<"bottom-controls"ip>',
     buttons:[
-      /*{
-        extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV', title:'HomeLoop Properties',
-        exportOptions:{ columns:[1,2,3,4,5,6,7,8,9,10],
-          format:{ body:function(data,row,col){
-            var rd=propTable.row(row).data(); if(!rd) return data;
-            if(col===1) return (rd.title||'').trim()||'—';
-            if(col===2) return rd.status||'—';
-            if(col===3) return rd.displayPrice||'—';
-            if(col===4) return rd.ownerName||'—';
-            if(col===5){ var ph=rd.ownerNumber||''; return ph?'=HYPERLINK("tel:'+ph+'","'+ph+'")':'—'; }
-            if(col===6) return rd.loc||'—';
-            if(col===7){ if(!rd.createdAt) return '—'; const d=new Date(rd.createdAt); return d.toLocaleDateString('en-GB')+' '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}); }
-            if(col===8) return rd.promoted ? 'Yes' : 'No';
-            if(col===9) return rd.verified ? 'Yes' : 'No';
-            if(col===10) return flattenRemarks(rd.remarks);
-            return data;
-          }}
-        }
-      },
-      {
-        extend:'excel', text:'<i class="fas fa-file-excel"></i> Excel', title:'HomeLoop Properties',
-        exportOptions:{ columns:[1,2,3,4,5,6,7,8,9,10],
-          format:{ body:function(data,row,col){
-            var rd=propTable.row(row).data(); if(!rd) return data;
-            if(col===1) return (rd.title||'').trim()||'—';
-            if(col===2) return rd.status||'—';
-            if(col===3) return rd.displayPrice||'—';
-            if(col===4) return rd.ownerName||'—';
-            if(col===5) return rd.ownerNumber||'—';
-            if(col===6) return rd.loc||'—';
-            if(col===7){ if(!rd.createdAt) return '—'; return new Date(rd.createdAt).toLocaleString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true}); }
-            if(col===8) return rd.promoted ? 'Yes' : 'No';
-            if(col===9) return rd.verified ? 'Yes' : 'No';
-            if(col===10) return flattenRemarks(rd.remarks);
-            return data;
-          }}
-        }
-      },*/
-      /*{
-        extend:'print', text:'<i class="fas fa-print"></i> Print', title:'HomeLoop Properties',
-        exportOptions:{columns:propExportColumnPredicate,
-          format:{ body:function(data,row,col){
-            var rd=propTable.row(row).data(); if(!rd) return data;
-            if(col===2) return rd.promoted ? 'Yes' : 'No';
-            if(col===3) return rd.verified ? 'Yes' : 'No';
-            if(col===4) return rd.booked ? 'Yes' : 'No';
-            return data;
-          }}
-        },
-        customize:function(win){
-          var ownerNumPos = propExportColumnIndices().indexOf(8);
-          $(win.document.head).append('<style>table td a{color:#1a7a5e;text-decoration:underline}</style>');
-          if(ownerNumPos < 0) return;
-          $(win.document.body).find('table tbody tr').each(function(){
-            var cells=$(this).find('td');
-            var phText=cells.eq(ownerNumPos).text().trim();
-            if(phText&&phText!=='—') cells.eq(ownerNumPos).html('<a href="tel:'+phText+'">'+phText+'</a>');
-          });
-        }
-      },*/
 	  {
         extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
         orientation:'landscape', pageSize:'A4', title:'HomeLoop — Properties',
-        exportOptions:{columns:propExportColumnPredicate,
-          format:{ body:function(data,row,col){
-            var rd=propTable.row(row).data(); if(!rd) return data;
-            if(col===2) return rd.promoted ? 'Yes' : 'No';
-            if(col===3) return rd.verified ? 'Yes' : 'No';
-            if(col===4) return rd.booked ? 'Yes' : 'No';
-            return data;
-          }}
-        },
+       exportOptions: {
+			columns: function (idx, data, node) {
+				return idx !== 27 && idx !== 28 &&
+					   propTable.column(idx).visible();
+			},
+			stripHtml: true,
+			format: {
+				body: function (data, row, column, node) {
+
+					if (typeof data === "string") {
+						data = data.replace(/<[^>]*>/g, "");
+					}
+
+					var rd = propTable.row(row).data();
+					if (!rd) return data;
+
+					if (column === 2) return rd.promoted ? "Yes" : "No";
+					if (column === 3) return rd.verified ? "Yes" : "No";
+					if (column === 4) return rd.booked ? "Yes" : "No";
+
+					return data.trim();
+				}
+			}
+		},
         customize:function(doc){
           doc.styles.tableHeader={fillColor:'#0c0d10',color:'white',bold:true,fontSize:9,alignment:'center'};
           doc.defaultStyle={fontSize:8,color:'#0c0d10'};
