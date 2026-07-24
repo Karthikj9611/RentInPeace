@@ -1857,12 +1857,26 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
               <th>Verified</th>
               <th>Booked</th>
               <th>Owner Name</th>
+              <th>Owner Number</th>
+              <th>Owner Alt Phone</th>
+              <th>Owner Email</th>
+              <th>Owner Contact Time</th>
               <th>Status</th>
               <th>Price</th>
-              <th>Owner Number</th>
+              <th>Deposit</th>
+              <th>Maintenance</th>
+              <th>Negotiable</th>
               <th>Location</th>
               <th>City</th>
-              <th>Details</th>
+              <th>Type</th>
+              <th>Area</th>
+              <th>Floor</th>
+              <th>Furnishing</th>
+              <th>Bathroom</th>
+              <th>Car Parking</th>
+              <th>Bike Parking</th>
+              <th>Facing</th>
+              <th>Age</th>
               <th>PG Gender</th>
               <th>PG Room Type</th>
               <th>PG Meals</th>
@@ -1883,17 +1897,31 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
             </tr>
             <tr class="col-filter-row">
               <th class="col-sticky-1"></th>
-              <th class="col-sticky-2"><input type="text" class="col-filter-input" placeholder="Name, ID, or location…" oninput="onPropColumnFilter('title', this.value, this)"></th>
+              <th class="col-sticky-2"><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('title', this.value, this)"></th>
               <th><select class="col-filter-select" onchange="onPropColumnFilter('promoted', this.value, this)"><option value="">All</option><option value="yes">Yes</option><option value="no">No</option></select></th>
               <th></th>
               <th><select class="col-filter-select" onchange="onPropColumnFilter('booked', this.value, this)"><option value="">All</option><option value="yes">Yes</option><option value="no">No</option></select></th>
-              <th><input type="text" class="col-filter-input" placeholder="Name, email, alt#, time…" oninput="onPropColumnFilter('ownerName', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('ownerName', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('ownerNumber', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('ownerAltPhone', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('ownerEmail', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('ownerContactTime', this.value, this)"></th>
               <th><select class="col-filter-select" id="colFilterStatus" onchange="onPropColumnFilter('status', this.value, this)"><option value="">All</option></select></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('displayPrice', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('ownerNumber', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('deposit', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('maintenance', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('negotiable', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('loc', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('city', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('typeCol', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('area', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('floor', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('furnishing', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('toilet', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('carparking', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('bikeparking', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('facing', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('age', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('pgGender', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('pgRoomType', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('pgMeals', this.value, this)"></th>
@@ -1914,7 +1942,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
             </tr>
           </thead>
           <tbody>
-            <tr><td colspan="37" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
+            <tr><td colspan="43" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
           </tbody>
         </table>
 
@@ -3987,12 +4015,10 @@ $(document).ready(function(){
           const checked = _selectedPropIds.has(row._id) ? 'checked' : '';
           return `<input type="checkbox" class="prop-row-check" data-id="${row._id}" onchange="onPropRowCheck(this,'${row._id}')" ${checked}>`;
       }},
-      /* 1 – Property title + ID + location */
+      /* 1 – Property title (Property ID and Location are their own columns below) */
       { data:null, className:'col-sticky-2', render:(d,t,row)=>{
           const title = escapeHtml(row.title||'Untitled');
-          const pid   = escapeHtml(row.propertyId||'—');
-          const loc   = escapeHtml(row.loc||'—');
-          if(t==='display') return `<div><div class="prop-title prop-name">${title}</div><div class="prop-title">${pid}</div><div class="prop-title">${loc}</div></div>`;
+          if(t==='display') return `<div class="prop-title prop-name">${title}</div>`;
           return (row.title||'').trim();
       }},
       /* 2 – Promoted (toggle) */
@@ -4019,99 +4045,113 @@ $(document).ready(function(){
             <span class="slider"></span>
           </span></label>`;
       }},
-      /* 5 – Owner Name (combined: photo, name, phone, alt phone, email, preferred contact time) */
+      /* 5 – Owner Name (avatar + name only; phone/email/alt/time are their own columns) */
       { data:null, render:(d,t,row)=>{
-          if(t!=='display'){
-            return [row.ownerName, row.ownerNumber, row.ownerAltPhone, row.ownerEmail, row.ownerContactTime]
-              .filter(Boolean).join(' ');
-          }
+          if(t!=='display') return row.ownerName||'';
           const name  = escapeHtml(row.ownerName||'—');
           const initial = (row.ownerName||'?').trim().charAt(0).toUpperCase() || '?';
           const photo = row.ownerProfilePhoto;
           const avatar = photo
             ? `<div class="customer-avatar"><img src="${escapeHtml(photo)}" alt="${name}"/></div>`
             : `<div class="customer-avatar">${initial}</div>`;
-          const phone = row.ownerNumber ? `<a href="tel:${row.ownerNumber}" class="phone-link"><i class="fas fa-phone"></i>${escapeHtml(row.ownerNumber)}</a>` : '';
-          const alt   = row.ownerAltPhone ? `<a href="tel:${row.ownerAltPhone}" class="phone-link"><i class="fas fa-phone"></i>${escapeHtml(row.ownerAltPhone)}</a>` : '';
-          const email = row.ownerEmail ? `<a href="mailto:${row.ownerEmail}" class="email-link"><i class="fas fa-envelope"></i>${escapeHtml(row.ownerEmail)}</a>` : '';
-          const time  = row.ownerContactTime ? `<div class="prop-sub"><i class="fas fa-clock"></i> ${escapeHtml(row.ownerContactTime)}</div>` : '';
-          return `<div class="owner-combined-cell" style="display:flex;gap:8px;align-items:flex-start">
-            ${avatar}
-            <div>
-              <div class="prop-title">${name}</div>
-              ${phone}${alt}${email}${time}
-            </div>
-          </div>`;
+          return `<div style="display:flex;gap:8px;align-items:center">${avatar}<div class="prop-title">${name}</div></div>`;
       }},
-      /* 6 – Status */
-      { data:'status', render:(d,t)=> t==='display' ? statusBadge(d) : (d||'—') },
-      /* 7 – Price (combined: rent, deposit, maintenance, negotiable) */
+      /* 6 – Owner Number */
       { data:null, render:(d,t,row)=>{
-          const maintVal = row.maintenance ?? (row.price && row.price.maintenance);
-          const negVal   = row.negotiable ?? (row.price && row.price.negotiable);
-          if(t!=='display'){
-            return [row.displayPrice, row.deposit, maintVal, negVal].filter(v=>v!=null && v!=='').join(' ');
-          }
-          const price = escapeHtml(row.displayPrice||'—');
-          const deposit = (row.deposit!=null && row.deposit!=='') ? `<div class="prop-sub">Deposit: ${escapeHtml(String(row.deposit))}</div>` : '';
-          const maint   = (maintVal!=null && maintVal!=='') ? `<div class="prop-sub">Maintenance: ₹${escapeHtml(String(maintVal))}</div>` : '';
-          const neg     = (negVal!=null && negVal!=='') ? `<div class="prop-sub">Negotiable: ${escapeHtml(String(negVal))}</div>` : '';
-          return `<div><div class="prop-title">${price}</div>${deposit}${maint}${neg}</div>`;
-      }},
-      /* 8 – Owner Number (merged into Owner Name column above) */
-      { data:null, visible:false, render:(d,t,row)=>{
           if(t==='display') return renderOwnerPhone(row);
           return row.ownerNumber||'—';
       }},
-      /* 9 – Location */
-      { data:'loc', visible:false, render:(d)=> escapeHtml(d||'—') },
-      /* 10 – City */
-      { data:'city', visible:false, render:(d)=> escapeHtml(d||'—') },
-      /* 11 – Details (combined: type, area, floor, furnishing, bathroom, car parking, bike parking, facing, age) */
+      /* 7 – Owner Alt Phone */
+      { data:'ownerAltPhone', render:(d,t)=>{
+          if(t!=='display') return d||'';
+          return d ? `<a href="tel:${escapeHtml(d)}" class="phone-link"><i class="fas fa-phone"></i>${escapeHtml(d)}</a>` : '—';
+      }},
+      /* 8 – Owner Email */
+      { data:'ownerEmail', render:(d,t)=>{
+          if(t!=='display') return d||'';
+          return d ? `<a href="mailto:${escapeHtml(d)}" class="email-link"><i class="fas fa-envelope"></i>${escapeHtml(d)}</a>` : '—';
+      }},
+      /* 9 – Owner Contact Time */
+      { data:'ownerContactTime', render:(d)=> escapeHtml(d||'—') },
+      /* 10 – Status */
+      { data:'status', render:(d,t)=> t==='display' ? statusBadge(d) : (d||'—') },
+      /* 11 – Price (rent only; deposit/maintenance/negotiable are their own columns) */
+      { data:'displayPrice', render:(d,t)=>{
+          if(t!=='display') return d||'';
+          return `<div class="prop-title">${escapeHtml(d||'—')}</div>`;
+      }},
+      /* 12 – Deposit */
+      { data:null, render:(d,t,row)=>{
+          const v = row.deposit;
+          if(t!=='display') return (v!=null && v!=='') ? String(v) : '';
+          return (v!=null && v!=='') ? escapeHtml(String(v)) : '—';
+      }},
+      /* 13 – Maintenance */
+      { data:null, render:(d,t,row)=>{
+          const v = row.maintenance ?? (row.price && row.price.maintenance);
+          if(t!=='display') return (v!=null && v!=='') ? String(v) : '';
+          return (v!=null && v!=='') ? '₹'+escapeHtml(String(v)) : '—';
+      }},
+      /* 14 – Negotiable */
+      { data:null, render:(d,t,row)=>{
+          const v = row.negotiable ?? (row.price && row.price.negotiable);
+          if(t!=='display') return (v!=null && v!=='') ? String(v) : '';
+          return (v!=null && v!=='') ? escapeHtml(String(v)) : '—';
+      }},
+      /* 15 – Location */
+      { data:'loc', render:(d)=> escapeHtml(d||'—') },
+      /* 16 – City */
+      { data:'city', render:(d)=> escapeHtml(d||'—') },
+      /* 17 – Type */
       { data:null, render:(d,t,row)=>{
           const type = row.bhk || row.pgPropertyType || row.ssPropertyType || '';
-          if(t!=='display'){
-            return [type, row.area, row.floor, row.furnishing, row.toilet, row.carparking, row.bikeparking, row.facing, row.age]
-              .filter(v=>v!=null && v!=='').join(' ');
-          }
-          const line = (label, v) => (v!=null && v!=='') ? `<div class="prop-sub">${label}: ${escapeHtml(String(v))}</div>` : '';
-          return `<div>
-            <div class="prop-title">${escapeHtml(type||'—')}</div>
-            ${line('Area', row.area ? row.area+' sqft' : '')}
-            ${line('Floor', row.floor)}
-            ${line('Furnishing', row.furnishing)}
-            ${line('Bathroom', row.toilet)}
-            ${line('Car Parking', row.carparking)}
-            ${line('Bike Parking', row.bikeparking)}
-            ${line('Facing', row.facing)}
-            ${line('Age', row.age)}
-          </div>`;
+          if(t!=='display') return type;
+          return escapeHtml(type||'—');
       }},
-      /* 12 – PG Gender */
+      /* 18 – Area */
+      { data:'area', render:(d,t)=>{
+          if(t!=='display') return (d!=null && d!=='') ? String(d) : '';
+          return (d!=null && d!=='') ? escapeHtml(String(d))+' sqft' : '—';
+      }},
+      /* 19 – Floor */
+      { data:'floor', render:(d)=> escapeHtml(d!=null && d!=='' ? String(d) : '—') },
+      /* 20 – Furnishing */
+      { data:'furnishing', render:(d)=> escapeHtml(d||'—') },
+      /* 21 – Bathroom */
+      { data:'toilet', render:(d)=> escapeHtml(d!=null && d!=='' ? String(d) : '—') },
+      /* 22 – Car Parking */
+      { data:'carparking', render:(d)=> escapeHtml(d!=null && d!=='' ? String(d) : '—') },
+      /* 23 – Bike Parking */
+      { data:'bikeparking', render:(d)=> escapeHtml(d!=null && d!=='' ? String(d) : '—') },
+      /* 24 – Facing */
+      { data:'facing', render:(d)=> escapeHtml(d||'—') },
+      /* 25 – Age */
+      { data:'age', render:(d)=> escapeHtml(d!=null && d!=='' ? String(d) : '—') },
+      /* 26 – PG Gender */
       { data:'pgGender', render:(d)=> escapeHtml(d||'—') },
-      /* 13 – PG Room Type */
+      /* 27 – PG Room Type */
       { data:'pgRoomType', render:(d)=> escapeHtml(d||'—') },
-      /* 14 – PG Meals */
+      /* 28 – PG Meals */
       { data:'pgMeals', render:(d)=> escapeHtml(d||'—') },
-      /* 15 – PG Occupancy */
+      /* 29 – PG Occupancy */
       { data:'pgOccupancy', render:(d)=> escapeHtml(d||'—') },
-      /* 16 – PG Notice */
+      /* 30 – PG Notice */
       { data:'pgNotice', render:(d)=> escapeHtml(d||'—') },
-      /* 17 – SS Room Type */
+      /* 31 – SS Room Type */
       { data:'ssRoomType', render:(d)=> escapeHtml(d||'—') },
-      /* 18 – SS Available 24hrs */
+      /* 32 – SS Available 24hrs */
       { data:'ssAvailable24hrs', render:(d)=> escapeHtml(d||'—') },
-      /* 19 – SS Cancellation */
+      /* 33 – SS Cancellation */
       { data:'ssCancellation', render:(d)=> escapeHtml(d||'—') },
-      /* 20 – SS Couples Allowed */
+      /* 34 – SS Couples Allowed */
       { data:'ssCouplesAllowed', render:(d)=> escapeHtml(d||'—') },
-      /* 21 – Visits */
+      /* 35 – Visits */
       { data:'visitCount', render:(d)=> (d==null?'0':escapeHtml(String(d))) },
-      /* 22 – Photos (count) */
+      /* 36 – Photos (count) */
       { data:null, orderable:false, visible:false, className:'dt-body-center', render:(d,t,row)=>{
           return Array.isArray(row.images) ? row.images.length : 0;
       }},
-      /* 23 – Amenities (list, +N more opens modal) */
+      /* 37 – Amenities (list, +N more opens modal) */
       { data:null, orderable:false, render:(d,t,row)=>{
           const list = Array.isArray(row.amenities) ? row.amenities : [];
           if(t!=='display') return list.join(' ');
@@ -4122,22 +4162,22 @@ $(document).ready(function(){
           const encoded = escapeHtml(JSON.stringify(list));
           return `<div style="white-space:normal;max-width:260px">${shown}, <a href="javascript:void(0)" class="amenities-more-link" data-list="${encoded}" onclick="openAmenitiesModal(this)">+${more} more</a></div>`;
       }},
-      /* 24 – Property ID */
-      { data:'propertyId', visible:false, render:(d)=> escapeHtml(d||'—') },
-      /* 25 – User ID */
+      /* 38 – Property ID */
+      { data:'propertyId', render:(d)=> escapeHtml(d||'—') },
+      /* 39 – User ID */
       { data:'userId', visible:false, render:(d)=> escapeHtml(d||'—') },
-      /* 26 – Listed On */
+      /* 40 – Listed On */
       { data:'createdAt', render:(d,t)=>{
           if(t==='display') return formatDateTime(d);
           if(t==='export') return plainDateTime(d);
           return d||'—';
       }},
-      /* 27 – Remarks */
+      /* 41 – Remarks */
       { data:'remarks', orderable:false, render:(d,t,row)=>{
           if(t==='display') return remarkCellHtml(row._id, d, 'property');
           return d||'';
       }},
-      /* 28 – Action */
+      /* 42 – Action */
       { data:null, orderable:false, render:(d,t,row)=>{
           _adminPropCache[row._id] = row;
           const bookingBtn = row.booked
@@ -4169,7 +4209,7 @@ $(document).ready(function(){
         orientation:'landscape', pageSize:'A4', title:'Property_Leads_' + new Date().toLocaleDateString('en-GB'),
        exportOptions: {
 			columns: function (idx, data, node) {
-				return idx !== 27 && idx !== 28 &&
+				return idx !== 41 && idx !== 42 &&
 					   propTable.column(idx).visible();
 			},
 			stripHtml: true,
@@ -4194,7 +4234,7 @@ $(document).ready(function(){
         customize:function(doc){
           doc.styles.tableHeader={fillColor:'#0c0d10',color:'white',bold:true,fontSize:9,alignment:'center'};
           doc.defaultStyle={fontSize:8,color:'#0c0d10'};
-          var ownerNumPos = propExportColumnIndices().indexOf(8);
+          var ownerNumPos = propExportColumnIndices().indexOf(6);
           if(ownerNumPos < 0) return;
           var rows=propTable.rows({search:'applied'}).data().toArray();
           var tableBody=doc.content[1]&&doc.content[1].table?doc.content[1].table.body:null;
@@ -4738,7 +4778,10 @@ function buildPropFilters(data){
 // Owner Number, Location, Listed On, Promoted, Verified, Booked, Remarks).
 const _propColumnFilters = {
   title:'', status:'', displayPrice:'', ownerName:'', ownerNumber:'',
+  ownerAltPhone:'', ownerEmail:'', ownerContactTime:'',
+  deposit:'', maintenance:'', negotiable:'',
   loc:'', city:'', typeCol:'',
+  area:'', floor:'', furnishing:'', toilet:'', carparking:'', bikeparking:'', facing:'', age:'',
   pgGender:'', pgRoomType:'', pgMeals:'', pgOccupancy:'', pgNotice:'',
   ssRoomType:'', ssAvailable24hrs:'', ssCancellation:'', ssCouplesAllowed:'',
   visitCount:'', propertyId:'', userId:'',
@@ -4765,8 +4808,8 @@ let _propCategoryState = 'Rent';
 
 // PG-only and Short-Stay-only column indices in #propertyTable (see the
 // numbered comments in the propTable columns:[...] definition above).
-const PG_ONLY_COLS = [12, 13, 14, 15, 16]; // PG Gender, Room Type, Meals, Occupancy, Notice
-const SS_ONLY_COLS = [17, 18, 19, 20];     // SS Room Type, Available 24hrs, Cancellation, Couples Allowed
+const PG_ONLY_COLS = [26, 27, 28, 29, 30]; // PG Gender, Room Type, Meals, Occupancy, Notice
+const SS_ONLY_COLS = [31, 32, 33, 34];     // SS Room Type, Available 24hrs, Cancellation, Couples Allowed
 
 // Measures the real rendered width of the properties table's 1st sticky
 // column (the row-select checkbox) and stores it as a CSS custom property
@@ -4793,22 +4836,28 @@ window.addEventListener('resize', function(){
 const PROP_COL_GROUPS = [
   { label:'Basic', cols:[
     {idx:1, label:'Property'}, {idx:2, label:'Promoted'}, {idx:3, label:'Verified'}, {idx:4, label:'Booked'},
-    {idx:5, label:'Owner Name'}, {idx:6, label:'Status'},
-    {idx:7, label:'Price'}, {idx:8, label:'Owner Number'},
-    {idx:9, label:'Location'}, {idx:10, label:'City'}, {idx:11, label:'Details'}
+    {idx:5, label:'Owner Name'}, {idx:6, label:'Owner Number'}, {idx:7, label:'Owner Alt Phone'},
+    {idx:8, label:'Owner Email'}, {idx:9, label:'Owner Contact Time'}, {idx:10, label:'Status'},
+    {idx:11, label:'Price'}, {idx:12, label:'Deposit'}, {idx:13, label:'Maintenance'}, {idx:14, label:'Negotiable'},
+    {idx:15, label:'Location'}, {idx:16, label:'City'}
+  ]},
+  { label:'Details', cols:[
+    {idx:17, label:'Type'}, {idx:18, label:'Area'}, {idx:19, label:'Floor'}, {idx:20, label:'Furnishing'},
+    {idx:21, label:'Bathroom'}, {idx:22, label:'Car Parking'}, {idx:23, label:'Bike Parking'},
+    {idx:24, label:'Facing'}, {idx:25, label:'Age'}
   ]},
   { label:'PG Details', cols:[
-    {idx:12, label:'PG Gender'}, {idx:13, label:'PG Room Type'}, {idx:14, label:'PG Meals'},
-    {idx:15, label:'PG Occupancy'}, {idx:16, label:'PG Notice'}
+    {idx:26, label:'PG Gender'}, {idx:27, label:'PG Room Type'}, {idx:28, label:'PG Meals'},
+    {idx:29, label:'PG Occupancy'}, {idx:30, label:'PG Notice'}
   ]},
   { label:'Short Stay Details', cols:[
-    {idx:17, label:'SS Room Type'}, {idx:18, label:'SS Available 24hrs'},
-    {idx:19, label:'SS Cancellation'}, {idx:20, label:'SS Couples Allowed'}
+    {idx:31, label:'SS Room Type'}, {idx:32, label:'SS Available 24hrs'},
+    {idx:33, label:'SS Cancellation'}, {idx:34, label:'SS Couples Allowed'}
   ]},
   { label:'Meta', cols:[
-    {idx:21, label:'Visits'}, {idx:22, label:'Photos'}, {idx:23, label:'Amenities'},
-    {idx:24, label:'Property ID'}, {idx:25, label:'User ID'}, {idx:26, label:'Listed On'},
-    {idx:27, label:'Remarks'}
+    {idx:35, label:'Visits'}, {idx:36, label:'Photos'}, {idx:37, label:'Amenities'},
+    {idx:38, label:'Property ID'}, {idx:39, label:'User ID'}, {idx:40, label:'Listed On'},
+    {idx:41, label:'Remarks'}
   ]}
 ];
 
@@ -4819,16 +4868,13 @@ const PROP_COL_GROUPS = [
 // still overrides those on load/tab-switch, same as before).
 // Which master column indices should be included in a Properties export
 // right now. Mirrors whatever's currently visible (category-tab-driven
-// PG/Short-Stay columns + the manual Columns toggle), plus column 8
-// (Owner Number) which is always force-included even though it's
-// permanently hidden on screen — it only exists to feed the phone
-// hyperlink in the Owner Name column.
+// PG/Short-Stay columns + the manual Columns toggle).
 function propExportColumnPredicate(idx){
-  return idx>=1 && idx<=28 && (propTable.column(idx).visible() || idx===8);
+  return idx>=1 && idx<=41 && propTable.column(idx).visible();
 }
 function propExportColumnIndices(){
   const idxs=[];
-  for(let i=0;i<=28;i++){ if(propExportColumnPredicate(i)) idxs.push(i); }
+  for(let i=0;i<=41;i++){ if(propExportColumnPredicate(i)) idxs.push(i); }
   return idxs;
 }
 
@@ -5118,17 +5164,28 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex){
   }
   const cf = _propColumnFilters;
   const contains = (val, needle) => String(val||'').toLowerCase().includes(needle.toLowerCase());
-  if(cf.title && !(contains(row.title, cf.title) || contains(row.propertyId, cf.title) || contains(row.loc, cf.title))) return false;
+  if(cf.title && !contains(row.title, cf.title)) return false;
   if(cf.status && (row.status||'') !== cf.status) return false;
   if(cf.displayPrice && !contains(row.displayPrice, cf.displayPrice)) return false;
-  if(cf.ownerName && !(contains(row.ownerName, cf.ownerName) || contains(row.ownerAltPhone, cf.ownerName) || contains(row.ownerEmail, cf.ownerName) || contains(row.ownerContactTime, cf.ownerName))) return false;
+  if(cf.ownerName && !contains(row.ownerName, cf.ownerName)) return false;
   if(cf.ownerNumber && !contains(row.ownerNumber, cf.ownerNumber)) return false;
-  if(cf.loc && !contains((row.loc||'')+' '+(row.city||''), cf.loc)) return false;
+  if(cf.ownerAltPhone && !contains(row.ownerAltPhone, cf.ownerAltPhone)) return false;
+  if(cf.ownerEmail && !contains(row.ownerEmail, cf.ownerEmail)) return false;
+  if(cf.ownerContactTime && !contains(row.ownerContactTime, cf.ownerContactTime)) return false;
+  if(cf.deposit && !contains(row.deposit, cf.deposit)) return false;
+  if(cf.maintenance && !contains(row.maintenance ?? (row.price && row.price.maintenance), cf.maintenance)) return false;
+  if(cf.negotiable && !contains(row.negotiable ?? (row.price && row.price.negotiable), cf.negotiable)) return false;
+  if(cf.loc && !contains(row.loc, cf.loc)) return false;
   if(cf.city && !contains(row.city, cf.city)) return false;
-  if(cf.typeCol && !(contains(row.bhk || row.pgPropertyType || row.ssPropertyType || '', cf.typeCol)
-    || contains(row.area, cf.typeCol) || contains(row.floor, cf.typeCol) || contains(row.furnishing, cf.typeCol)
-    || contains(row.toilet, cf.typeCol) || contains(row.carparking, cf.typeCol) || contains(row.bikeparking, cf.typeCol)
-    || contains(row.facing, cf.typeCol) || contains(row.age, cf.typeCol))) return false;
+  if(cf.typeCol && !contains(row.bhk || row.pgPropertyType || row.ssPropertyType || '', cf.typeCol)) return false;
+  if(cf.area && !contains(row.area, cf.area)) return false;
+  if(cf.floor && !contains(row.floor, cf.floor)) return false;
+  if(cf.furnishing && !contains(row.furnishing, cf.furnishing)) return false;
+  if(cf.toilet && !contains(row.toilet, cf.toilet)) return false;
+  if(cf.carparking && !contains(row.carparking, cf.carparking)) return false;
+  if(cf.bikeparking && !contains(row.bikeparking, cf.bikeparking)) return false;
+  if(cf.facing && !contains(row.facing, cf.facing)) return false;
+  if(cf.age && !contains(row.age, cf.age)) return false;
   if(cf.pgGender && !contains(row.pgGender, cf.pgGender)) return false;
   if(cf.pgRoomType && !contains(row.pgRoomType, cf.pgRoomType)) return false;
   if(cf.pgMeals && !contains(row.pgMeals, cf.pgMeals)) return false;
