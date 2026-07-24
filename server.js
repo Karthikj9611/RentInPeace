@@ -1609,6 +1609,7 @@ app.get('/api/users', requireAdmin, async (req, res) => {
       mobile:        u.mobile || '',
       email:         u.email  || '',
       password:      u.password || '',
+      profilePhoto:  u.profilePhoto || '',
       remarks:       u.remarks || [],
       listingsCount: propMap[String(u._id)]  || 0,
       visitsCount:   visitMap[String(u._id)] || 0,

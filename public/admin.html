@@ -352,6 +352,12 @@ table.dataTable.no-footer{border-bottom:none!important}
 
 /* ── CUSTOMER NAME ── */
 .customer-name{display:flex;align-items:center;justify-content:center;gap:9px}
+.customer-avatar{
+  width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--brand);color:#fff;font-weight:700;font-size:13px;
+}
+.customer-avatar img{width:100%;height:100%;object-fit:cover}
 .customer-text-name{font-weight:600;font-size:0.88rem;color:var(--ink)}
 
 /* ── PHONE / EMAIL LINKS ── */
@@ -2789,7 +2795,11 @@ function renderName(row){
     row.name ||
     ((row.firstName||'') + ' ' + (row.lastName||'')).trim()
   ) || 'Unknown';
-  return `<div class="customer-name"><div><div class="customer-text-name">${full}</div></div></div>`;
+  const initial = (row.name || row.firstName || full || '?').trim().charAt(0).toUpperCase() || '?';
+  const avatar = row.profilePhoto
+    ? `<div class="customer-avatar"><img src="${escapeHtml(row.profilePhoto)}" alt="${full}"/></div>`
+    : `<div class="customer-avatar">${initial}</div>`;
+  return `<div class="customer-name">${avatar}<div><div class="customer-text-name">${full}</div></div></div>`;
 }
 function renderPhone(row){
   if(row.mobile) return `<a href="tel:${escapeHtml(row.mobile)}" class="phone-link"><i class="fas fa-phone-flip"></i>${escapeHtml(row.mobile)}</a>`;
@@ -5070,6 +5080,13 @@ function openCustomerModal(id){
   document.getElementById('customerModalName').innerHTML =
     _adminModalEsc(fullName || c.name || 'Customer');
 
+  const avatarEl = document.getElementById('customerModalAvatar');
+  if (avatarEl) {
+    avatarEl.innerHTML = c.profilePhoto
+      ? `<img src="${_adminModalEsc(c.profilePhoto)}" alt="${_adminModalEsc(fullName || c.name || 'Customer')}" style="width:100%;height:100%;object-fit:cover"/>`
+      : `<i class="fas fa-user"></i>`;
+  }
+
   const details = [
     {
       label:'User ID',
@@ -6165,7 +6182,7 @@ markRequiredLabels();
 
       <!-- Avatar -->
       <div style="display:flex;justify-content:center;margin-bottom:20px">
-        <div style="
+        <div id="customerModalAvatar" style="
           width:90px;
           height:90px;
           border-radius:50%;
@@ -6173,6 +6190,7 @@ markRequiredLabels();
           display:flex;
           align-items:center;
           justify-content:center;
+          overflow:hidden;
           font-size:2rem;
           color:var(--gold-dark);
         ">
