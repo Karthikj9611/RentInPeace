@@ -8999,7 +8999,7 @@ function getLoggedInUser() {
 function setAvatarContent(el, user) {
   if (!el || !user) return;
   if (user.profilePhoto) {
-    el.innerHTML = '<img src="' + user.profilePhoto + '" alt="' + (user.name || 'Profile') + '"/>';
+    el.innerHTML = '<img src="' + esc(user.profilePhoto) + '" alt="' + esc(user.name || 'Profile') + '"/>';
   } else {
     el.textContent = (user.name || user.email || '?')[0].toUpperCase();
   }
@@ -9038,7 +9038,7 @@ function updateNavAuth() {
     document.getElementById('menuAuthLabel').textContent = 'My Profile / Log out';
     if (qmbIcon) {
       if (user.profilePhoto) {
-        qmbIcon.innerHTML = '<img src="' + user.profilePhoto + '" alt="Profile"/>';
+        qmbIcon.innerHTML = '<img src="' + esc(user.profilePhoto) + '" alt="Profile"/>';
         qmbIcon.classList.add('qmb-icon-photo');
       } else {
         qmbIcon.textContent = '🧑\u200d💼';

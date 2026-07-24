@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const express    = require('express');
+const helmet     = require('helmet');
 const mongoose   = require('mongoose');
 const cors       = require('cors');
 const path       = require('path');
@@ -26,6 +27,10 @@ if (!process.env.BREVO_API_KEY) {
 
 const app = express();
 app.set('trust proxy', 1); // we're behind Render's proxy; needed for express-rate-limit to key off the real client IP
+// contentSecurityPolicy left off for now — index.html/admin.html use inline
+// <script> blocks throughout, so a default CSP would break them; enabling it
+// properly needs a nonce- or hash-based rework of those pages first.
+app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({ origin: process.env.ALLOWED_ORIGIN || '*' }));
 app.use(express.json({ limit: '10mb' })); // 10mb to allow base64 images
 app.use(express.static('public', { maxAge: '7d', etag: true }));
@@ -252,6 +257,16 @@ async function attachUserIfPresent(req, res, next) {
   }
 }
 
+// Strips everything but digits, then drops a leading '91' country code when
+// the result is longer than the standard 10-digit Indian mobile number —
+// so "9876543210", "+91 98765 43210", and "091-98765-43210" are all treated
+// as the same number for uniqueness checks and lookups.
+function normalizeMobile(raw) {
+  let digits = String(raw || '').replace(/\D/g, '');
+  if (digits.length > 10 && digits.startsWith('91')) digits = digits.slice(digits.length - 10);
+  return digits;
+}
+
 // ── Signup: Step 1 — send email OTP ──
 // Called when the person fills in their email on the signup form, before the
 // account is actually created. Generates a 6-digit code, bcrypt-hashes it into
@@ -262,7 +277,7 @@ app.post('/api/user/signup/send-otp', otpLimiter, async (req, res) => {
     const { email } = req.body || {};
     if (!email || !String(email).trim()) return res.status(400).json({ message: 'Email is required' });
     const cleanEmail = String(email).toLowerCase().trim();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) return res.status(400).json({ message: 'Please enter a valid email address' });
+    if (!/^[^\s@"'<>\\]+@[^\s@"'<>\\]+\.[^\s@"'<>\\]+$/.test(cleanEmail)) return res.status(400).json({ message: 'Please enter a valid email address' });
 
     const existingUser = await User.findOne({ email: cleanEmail });
     if (existingUser) return res.status(409).json({ message: 'Account already exists for this email. Please log in.' });
@@ -337,7 +352,7 @@ app.post('/api/user/signup', userAuthLimiter, async (req, res) => {
     if (!firstName || !String(firstName).trim()) return res.status(400).json({ message: 'First name is required' });
     if (!lastName  || !String(lastName).trim())  return res.status(400).json({ message: 'Last name is required' });
     if (!email     || !String(email).trim())     return res.status(400).json({ message: 'Email is required' });
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim())) return res.status(400).json({ message: 'Please enter a valid email address' });
+    if (!/^[^\s@"'<>\\]+@[^\s@"'<>\\]+\.[^\s@"'<>\\]+$/.test(String(email).trim())) return res.status(400).json({ message: 'Please enter a valid email address' });
     if (!mobile    || !String(mobile).trim())    return res.status(400).json({ message: 'Mobile number is required' });
     if (!/^[\d+\-\s]{7,15}$/.test(String(mobile).trim())) return res.status(400).json({ message: 'Please enter a valid mobile number' });
     if (!password || password.length < 6) return res.status(400).json({ message: 'Password must be at least 6 characters' });
@@ -346,7 +361,7 @@ app.post('/api/user/signup', userAuthLimiter, async (req, res) => {
     const cleanAccountType = accountType === 'owner' ? 'owner' : 'customer';
 
     const cleanEmail  = String(email).toLowerCase().trim();
-    const cleanMobile = String(mobile).trim();
+    const cleanMobile = normalizeMobile(mobile);
 
     const [existingEmail, existingMobile] = await Promise.all([
       User.findOne({ email: cleanEmail }),
@@ -408,7 +423,7 @@ app.post('/api/user/login', userAuthLimiter, async (req, res) => {
     // 'contact' is whatever the person typed into the single "Phone or email"
     // field — figure out which one it is and match the corresponding column.
     const identifier = String(contact).toLowerCase().trim();
-    const query = identifier.includes('@') ? { email: identifier } : { mobile: identifier };
+    const query = identifier.includes('@') ? { email: identifier } : { mobile: normalizeMobile(identifier) };
     const user = await User.findOne(query);
     if (!user) return res.status(401).json({ message: 'No account found. Please sign up.' });
 
@@ -469,13 +484,13 @@ app.put('/api/user/me', requireUser, async (req, res) => {
     if (email !== undefined) {
       const cleanEmail = String(email).toLowerCase().trim();
       if (!cleanEmail) return res.status(400).json({ message: 'Email cannot be empty' });
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) return res.status(400).json({ message: 'Please enter a valid email address' });
+      if (!/^[^\s@"'<>\\]+@[^\s@"'<>\\]+\.[^\s@"'<>\\]+$/.test(cleanEmail)) return res.status(400).json({ message: 'Please enter a valid email address' });
       const existing = await User.findOne({ email: cleanEmail, _id: { $ne: req.userId } });
       if (existing) return res.status(409).json({ message: 'That email is already in use by another account' });
       update.email = cleanEmail;
     }
     if (mobile !== undefined) {
-      const cleanMobile = String(mobile).trim();
+      const cleanMobile = normalizeMobile(mobile);
       if (!cleanMobile) return res.status(400).json({ message: 'Mobile number cannot be empty' });
       const existing = await User.findOne({ mobile: cleanMobile, _id: { $ne: req.userId } });
       if (existing) return res.status(409).json({ message: 'That mobile number is already in use by another account' });
@@ -998,7 +1013,7 @@ function validatePropertyFields(fields) {
   }
   const email = (fields.owner || {}).email;
   if (email && String(email).trim() &&
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim()))
+      !/^[^\s@"'<>\\]+@[^\s@"'<>\\]+\.[^\s@"'<>\\]+$/.test(String(email).trim()))
     return `Invalid email address in field 'owner.email'.`;
 
   const images = (fields.media || {}).images;
@@ -1205,7 +1220,7 @@ app.post('/api/properties', listingLimiter, requireUser, async (req, res) => {
     res.status(201).json({ message: 'Property added successfully!', property: saved });
   } catch (err) {
     console.error('POST /api/properties error:', err);
-    res.status(500).json({ message: 'Error saving property: ' + err.message });
+    res.status(500).json({ message: 'Error saving property' });
   }
 });
 
@@ -1273,7 +1288,7 @@ app.get('/api/properties', async (req, res) => {
     res.json({ properties: mapped, total: mapped.length });
   } catch (err) {
     console.error('GET /api/properties error:', err);
-    res.status(500).json({ message: 'Error fetching properties: ' + err.message });
+    res.status(500).json({ message: 'Error fetching properties' });
   }
 });
 
@@ -1353,7 +1368,7 @@ app.post('/api/visits', visitLimiter, requireUser, async (req, res) => {
     });
   } catch (err) {
     console.error('POST /api/visits error:', err);
-    res.status(500).json({ message: 'Error saving visit request: ' + err.message });
+    res.status(500).json({ message: 'Error saving visit request' });
   }
 });
 
@@ -1439,7 +1454,7 @@ app.post('/api/bookings', bookingLimiter, requireUser, async (req, res) => {
     });
   } catch (err) {
     console.error('POST /api/bookings error:', err);
-    res.status(500).json({ message: 'Error saving booking: ' + err.message });
+    res.status(500).json({ message: 'Error saving booking' });
   }
 });
 
@@ -1453,7 +1468,7 @@ app.get('/api/user/my-visits', requireUser, async (req, res) => {
     res.json({ visits: docs });
   } catch (err) {
     console.error('GET /api/user/my-visits error:', err);
-    res.status(500).json({ message: 'Error fetching your visit requests: ' + err.message });
+    res.status(500).json({ message: 'Error fetching your visit requests' });
   }
 });
 
@@ -1468,7 +1483,7 @@ app.get('/api/user/notifications', requireUser, async (req, res) => {
     res.json({ notifications, unreadCount });
   } catch (err) {
     console.error('GET /api/user/notifications error:', err);
-    res.status(500).json({ message: 'Error fetching notifications: ' + err.message });
+    res.status(500).json({ message: 'Error fetching notifications' });
   }
 });
 
@@ -1479,7 +1494,7 @@ app.get('/api/user/notifications/unread-count', requireUser, async (req, res) =>
     res.json({ unreadCount });
   } catch (err) {
     console.error('GET /api/user/notifications/unread-count error:', err);
-    res.status(500).json({ message: 'Error fetching unread count: ' + err.message });
+    res.status(500).json({ message: 'Error fetching unread count' });
   }
 });
 
@@ -1495,7 +1510,7 @@ app.patch('/api/user/notifications/:id/read', requireUser, async (req, res) => {
     res.json({ message: 'Marked as read', notification: notif });
   } catch (err) {
     console.error('PATCH /api/user/notifications/:id/read error:', err);
-    res.status(500).json({ message: 'Error marking notification as read: ' + err.message });
+    res.status(500).json({ message: 'Error marking notification as read' });
   }
 });
 
@@ -1506,7 +1521,7 @@ app.patch('/api/user/notifications/read-all', requireUser, async (req, res) => {
     res.json({ message: 'All notifications marked as read' });
   } catch (err) {
     console.error('PATCH /api/user/notifications/read-all error:', err);
-    res.status(500).json({ message: 'Error marking notifications as read: ' + err.message });
+    res.status(500).json({ message: 'Error marking notifications as read' });
   }
 });
 
@@ -1520,7 +1535,7 @@ app.get('/api/admin/visits', requireAdmin, async (req, res) => {
     res.json({ visits: docs, total: docs.length });
   } catch (err) {
     console.error('GET /api/admin/visits error:', err);
-    res.status(500).json({ message: 'Error fetching visit requests: ' + err.message });
+    res.status(500).json({ message: 'Error fetching visit requests' });
   }
 });
 
@@ -1551,7 +1566,7 @@ app.patch('/api/admin/visits/:id/status', requireAdmin, async (req, res) => {
     res.json({ message: 'Status updated', visit });
   } catch (err) {
     console.error('PATCH /api/admin/visits/:id/status error:', err);
-    res.status(500).json({ message: 'Error updating visit status: ' + err.message });
+    res.status(500).json({ message: 'Error updating visit status' });
   }
 });
 
@@ -1603,7 +1618,7 @@ app.get('/api/users', requireAdmin, async (req, res) => {
     res.json(rows);
   } catch (err) {
     console.error('GET /api/users error:', err);
-    res.status(500).json({ message: 'Error fetching customers: ' + err.message });
+    res.status(500).json({ message: 'Error fetching customers' });
   }
 });
 
@@ -1624,7 +1639,7 @@ app.delete('/api/users/mobile/:mobile', requireAdmin, async (req, res) => {
     res.json({ message: 'Customer deleted' });
   } catch (err) {
     console.error('DELETE /api/users/mobile/:mobile error:', err);
-    res.status(500).json({ message: 'Error deleting customer: ' + err.message });
+    res.status(500).json({ message: 'Error deleting customer' });
   }
 });
 
@@ -1642,7 +1657,7 @@ app.post('/api/users/bulk-delete', requireAdmin, async (req, res) => {
     res.json({ message: `${result.deletedCount} customer(s) deleted`, deletedCount: result.deletedCount });
   } catch (err) {
     console.error('POST /api/users/bulk-delete error:', err);
-    res.status(500).json({ message: 'Error deleting customers: ' + err.message });
+    res.status(500).json({ message: 'Error deleting customers' });
   }
 });
 
@@ -1657,7 +1672,7 @@ app.patch('/api/users/mobile/:mobile/remarks', requireAdmin, async (req, res) =>
     res.json({ message: 'Remark added', remarks: user.remarks });
   } catch (err) {
     console.error('PATCH /api/users/mobile/:mobile/remarks error:', err);
-    res.status(500).json({ message: 'Error saving remark: ' + err.message });
+    res.status(500).json({ message: 'Error saving remark' });
   }
 });
 
@@ -1673,7 +1688,7 @@ app.delete('/api/users/mobile/:mobile/remarks/:idx', requireAdmin, async (req, r
     res.json({ message: 'Remark deleted', remarks: user.remarks });
   } catch (err) {
     console.error('DELETE /api/users/mobile/:mobile/remarks/:idx error:', err);
-    res.status(500).json({ message: 'Error deleting remark: ' + err.message });
+    res.status(500).json({ message: 'Error deleting remark' });
   }
 });
 
@@ -1736,7 +1751,7 @@ app.get('/api/appointments', requireAdmin, async (req, res) => {
     res.json(docs.map(toApptRow));
   } catch (err) {
     console.error('GET /api/appointments error:', err);
-    res.status(500).json({ message: 'Error fetching appointments: ' + err.message });
+    res.status(500).json({ message: 'Error fetching appointments' });
   }
 });
 
@@ -1766,7 +1781,7 @@ app.patch('/api/appointments/:id', requireAdmin, async (req, res) => {
     res.json({ message: 'Status updated' });
   } catch (err) {
     console.error('PATCH /api/appointments/:id error:', err);
-    res.status(500).json({ message: 'Error updating appointment: ' + err.message });
+    res.status(500).json({ message: 'Error updating appointment' });
   }
 });
 
@@ -1781,7 +1796,7 @@ app.patch('/api/appointments/:id/remarks', requireAdmin, async (req, res) => {
     res.json({ message: 'Remark added', remarks: visit.remarks });
   } catch (err) {
     console.error('PATCH /api/appointments/:id/remarks error:', err);
-    res.status(500).json({ message: 'Error saving remark: ' + err.message });
+    res.status(500).json({ message: 'Error saving remark' });
   }
 });
 
@@ -1797,7 +1812,7 @@ app.delete('/api/appointments/:id/remarks/:idx', requireAdmin, async (req, res) 
     res.json({ message: 'Remark deleted', remarks: visit.remarks });
   } catch (err) {
     console.error('DELETE /api/appointments/:id/remarks/:idx error:', err);
-    res.status(500).json({ message: 'Error deleting remark: ' + err.message });
+    res.status(500).json({ message: 'Error deleting remark' });
   }
 });
 
@@ -1808,7 +1823,7 @@ app.delete('/api/appointments/:id', requireAdmin, async (req, res) => {
     res.json({ message: 'Appointment deleted' });
   } catch (err) {
     console.error('DELETE /api/appointments/:id error:', err);
-    res.status(500).json({ message: 'Error deleting appointment: ' + err.message });
+    res.status(500).json({ message: 'Error deleting appointment' });
   }
 });
 
@@ -1825,7 +1840,7 @@ app.post('/api/appointments/bulk-delete', requireAdmin, async (req, res) => {
     res.json({ message: `${result.deletedCount} appointment(s) deleted`, deletedCount: result.deletedCount });
   } catch (err) {
     console.error('POST /api/appointments/bulk-delete error:', err);
-    res.status(500).json({ message: 'Error deleting appointments: ' + err.message });
+    res.status(500).json({ message: 'Error deleting appointments' });
   }
 });
 
@@ -1945,7 +1960,7 @@ app.get('/api/admin/properties', requireAdmin, async (req, res) => {
     res.json(flat);
   } catch (err) {
     console.error('GET /api/admin/properties error:', err);
-    res.status(500).json({ message: 'Error fetching properties: ' + err.message });
+    res.status(500).json({ message: 'Error fetching properties' });
   }
 });
 
@@ -1966,7 +1981,7 @@ app.patch('/api/properties/:id/remarks', requireAdmin, async (req, res) => {
     res.json({ message: 'Remark added', remarks: prop.remarks });
   } catch (err) {
     console.error('PATCH /api/properties/:id/remarks error:', err);
-    res.status(500).json({ message: 'Error adding remark: ' + err.message });
+    res.status(500).json({ message: 'Error adding remark' });
   }
 });
 
@@ -1984,7 +1999,7 @@ app.delete('/api/properties/:id/remarks/:idx', requireAdmin, async (req, res) =>
     res.json({ message: 'Remark deleted', remarks: prop.remarks });
   } catch (err) {
     console.error('DELETE /api/properties/:id/remarks/:idx error:', err);
-    res.status(500).json({ message: 'Error deleting remark: ' + err.message });
+    res.status(500).json({ message: 'Error deleting remark' });
   }
 });
 
@@ -2013,7 +2028,7 @@ app.patch('/api/properties/:id/verified', requireAdmin, async (req, res) => {
     res.json({ message: 'Verified status updated', verified: prop.verified });
   } catch (err) {
     console.error('PATCH /api/properties/:id/verified error:', err);
-    res.status(500).json({ message: 'Error updating verified status: ' + err.message });
+    res.status(500).json({ message: 'Error updating verified status' });
   }
 });
 
@@ -2029,7 +2044,7 @@ app.patch('/api/properties/:id/promoted', requireAdmin, async (req, res) => {
     res.json({ message: 'Promoted status updated', promoted: prop.promoted });
   } catch (err) {
     console.error('PATCH /api/properties/:id/promoted error:', err);
-    res.status(500).json({ message: 'Error updating promoted status: ' + err.message });
+    res.status(500).json({ message: 'Error updating promoted status' });
   }
 });
 
@@ -2048,7 +2063,7 @@ app.patch('/api/properties/:id/booked', requireAdmin, async (req, res) => {
     res.json({ message: 'Booked status updated', booked: prop.booked });
   } catch (err) {
     console.error('PATCH /api/properties/:id/booked error:', err);
-    res.status(500).json({ message: 'Error updating booked status: ' + err.message });
+    res.status(500).json({ message: 'Error updating booked status' });
   }
 });
 
@@ -2060,7 +2075,7 @@ app.delete('/api/properties/:id', requireAdmin, async (req, res) => {
     res.json({ message: 'Property deleted' });
   } catch (err) {
     console.error('DELETE /api/properties/:id error:', err);
-    res.status(500).json({ message: 'Error deleting property: ' + err.message });
+    res.status(500).json({ message: 'Error deleting property' });
   }
 });
 
@@ -2091,7 +2106,7 @@ app.patch('/api/properties/:id/booking-details', requireAdmin, async (req, res) 
     // All fields are required — mirrors the admin.html modal's own validation,
     // enforced again here since the API can be called directly.
     const phoneOk = (v) => /^\d{10}$/.test(v);
-    const emailOk = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+    const emailOk = (v) => /^[^\s@"'<>\\]+@[^\s@"'<>\\]+\.[^\s@"'<>\\]+$/.test(v);
     if (
       !bookingDetails.bookedOn || !ownerId || !tenantId || !bookingDetails.description ||
       !bookingDetails.ownerName  || !phoneOk(bookingDetails.ownerPhone)  || !emailOk(bookingDetails.ownerEmail) ||
@@ -2105,7 +2120,7 @@ app.patch('/api/properties/:id/booking-details', requireAdmin, async (req, res) 
     res.json({ message: 'Booking details saved', bookingDetails: prop.bookingDetails });
   } catch (err) {
     console.error('PATCH /api/properties/:id/booking-details error:', err);
-    res.status(500).json({ message: 'Error saving booking details: ' + err.message });
+    res.status(500).json({ message: 'Error saving booking details' });
   }
 });
 
@@ -2123,7 +2138,7 @@ app.post('/api/properties/bulk-delete', requireAdmin, async (req, res) => {
     res.json({ message: `${deletedCount} propert${deletedCount === 1 ? 'y' : 'ies'} deleted`, deletedCount });
   } catch (err) {
     console.error('POST /api/properties/bulk-delete error:', err);
-    res.status(500).json({ message: 'Error deleting properties: ' + err.message });
+    res.status(500).json({ message: 'Error deleting properties' });
   }
 });
 
@@ -2155,7 +2170,7 @@ app.get('/api/user/my-listings', requireUser, async (req, res) => {
     res.json({ properties: mapped, total: mapped.length });
   } catch (err) {
     console.error('GET /api/user/my-listings error:', err);
-    res.status(500).json({ message: 'Error fetching your listings: ' + err.message });
+    res.status(500).json({ message: 'Error fetching your listings' });
   }
 });
 
@@ -2215,7 +2230,7 @@ app.put('/api/user/listings/:id', requireUser, async (req, res) => {
     res.json({ message: 'Listing updated successfully', property: saved });
   } catch (err) {
     console.error('PUT /api/user/listings/:id error:', err);
-    res.status(500).json({ message: 'Error updating listing: ' + err.message });
+    res.status(500).json({ message: 'Error updating listing' });
   }
 });
 
@@ -2264,7 +2279,7 @@ app.put('/api/admin/properties/:id', requireAdmin, async (req, res) => {
     res.json({ message: 'Listing updated successfully', property: saved });
   } catch (err) {
     console.error('PUT /api/admin/properties/:id error:', err);
-    res.status(500).json({ message: 'Error updating listing: ' + err.message });
+    res.status(500).json({ message: 'Error updating listing' });
   }
 });
 
@@ -2280,19 +2295,9 @@ app.delete('/api/user/listings/:id', requireUser, async (req, res) => {
     res.json({ message: 'Listing deleted' });
   } catch (err) {
     console.error('DELETE /api/user/listings/:id error:', err);
-    res.status(500).json({ message: 'Error deleting listing: ' + err.message });
+    res.status(500).json({ message: 'Error deleting listing' });
   }
 });
-
-// ── Serve frontend ──
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-
-// ── Global error handler ──
-app.use((err, req, res, next) => {
-  console.error('Unhandled error:', err);
-  res.status(err.status || 500).json({ message: err.message || 'An unexpected error occurred.' });
-});
-
 
 const reviewSchema = new mongoose.Schema({
   userId:    { type: mongoose.Schema.Types.ObjectId, required: true, index: true },
@@ -2354,9 +2359,18 @@ app.get('/api/reviews/mine', async (req, res) => {
   }
 });
 
+// Rate limiter for review submission — the one-review-per-user check below
+// already stops repeat spam from the same account, but this caps attempts
+// (e.g. account-cycling) the same way every other write route here does.
+const reviewLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, max: 10,
+  standardHeaders: true, legacyHeaders: false,
+  message: { message: 'Too many review submissions. Please try again later.' }
+});
+
 // POST /api/reviews — requires a logged-in user (x-user-key header).
 // Mirrors the same auth pattern used by your other /api/user/... routes.
-app.post('/api/reviews', async (req, res) => {
+app.post('/api/reviews', reviewLimiter, async (req, res) => {
   try {
     const userKey = req.headers['x-user-key'];
     if (!userKey) return res.status(401).json({ error: 'Please log in to leave a review' });
@@ -2674,7 +2688,7 @@ app.post('/api/upload-images', uploadLimiter, attachUserIfPresent, upload.array(
     res.status(201).json({ message: 'Images uploaded successfully', urls });
   } catch (err) {
     console.error('POST /api/upload-images error:', err);
-    res.status(500).json({ message: 'Error uploading images: ' + err.message });
+    res.status(500).json({ message: 'Error uploading images' });
   }
 });
 
@@ -2892,33 +2906,15 @@ app.post('/api/admin/daily-stats/:type/delete-all', requireAdmin, async (req, re
   }
 });
 
-// ── ADMIN: Total Visits tab ──
-// The all-time SiteStat counter, shown as its own tab (distinct from the
-// Daily Visits breakdown, which only started tracking once DailyStat was
-// introduced and won't necessarily match this older running total).
-app.get('/api/admin/total-visits', requireAdmin, async (req, res) => {
-  try {
-    const doc = await SiteStat.findOne({ key: 'totalVisits' }).lean();
-    res.json({ totalVisits: doc ? doc.value : 0 });
-  } catch (err) {
-    console.error('GET /api/admin/total-visits error:', err.message);
-    res.status(500).json({ message: 'Error fetching total visits' });
-  }
-});
+// 404 for any API route that didn't match above.
+app.use('/api', (req, res) => res.status(404).json({ message: 'Not found' }));
 
-// POST /api/admin/total-visits/reset — reset the all-time counter to 0.
-app.post('/api/admin/total-visits/reset', requireAdmin, async (req, res) => {
-  try {
-    const doc = await SiteStat.findOneAndUpdate(
-      { key: 'totalVisits' },
-      { $set: { value: 0 } },
-      { upsert: true, new: true }
-    );
-    res.json({ message: 'Total visits reset', totalVisits: doc.value });
-  } catch (err) {
-    console.error('POST /api/admin/total-visits/reset error:', err.message);
-    res.status(500).json({ message: 'Error resetting total visits' });
-  }
+// ── Global error handler ── (registered last, after every route, so it
+// actually catches errors from all of them — see requireAdmin section above
+// for why an earlier position in the stack wouldn't work.)
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(err.status || 500).json({ message: 'An unexpected error occurred.' });
 });
 
 const PORT = process.env.PORT || 5000;
