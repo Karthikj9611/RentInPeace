@@ -283,7 +283,7 @@ app.post('/api/user/signup/send-otp', otpLimiter, async (req, res) => {
       { upsert: true }
     );
 
-    const mailResult = await sendEmailWithBrevo(cleanEmail, 'Your Quatar verification code', otpEmailTemplate(otp));
+    const mailResult = await sendEmailWithBrevo(cleanEmail, 'Your HomeLoop verification code', otpEmailTemplate(otp));
     if (!mailResult.success) {
       console.error('Failed to send signup OTP email:', mailResult.error);
       return res.status(502).json({ message: 'Could not send the verification email. Please try again in a moment.' });
@@ -2384,7 +2384,7 @@ app.post('/api/reviews', async (req, res) => {
     const review = await Review.create({
       userId: user._id,
       userKey,
-      userName: user.name || 'Quatar user',
+      userName: user.name || 'HomeLoop user',
       rating,
       text
     });
@@ -2508,7 +2508,7 @@ app.post('/api/honest-reviews/submit', requireUser, async (req, res) => {
       thumbUrl: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
       caption: caption || title,
       title: title.slice(0, 120),
-      meta: `Submitted by ${user.name || 'a Quatar user'}`,
+      meta: `Submitted by ${user.name || 'a HomeLoop user'}`,
       verifiedLabel: 'Verified user',
       active: true,
       status: 'approved',
