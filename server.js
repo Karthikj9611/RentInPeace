@@ -1717,6 +1717,7 @@ function visitTimeToSlot(hhmm) {
 
 function toApptRow(doc) {
   const prop         = doc.propertyId && typeof doc.propertyId === 'object' ? doc.propertyId : null;
+  const user         = doc.userId && typeof doc.userId === 'object' ? doc.userId : null;
   const propertyName = (prop && prop.owner    && prop.owner.propertyName) || '';
   const propertyArea = (prop && prop.location && prop.location.area)      || '';
   const purpose      = (prop && prop.basic    && prop.basic.status)       || 'General Enquiry';
@@ -1726,6 +1727,7 @@ function toApptRow(doc) {
     name:            doc.visitorName  || '',
     mobile:          doc.visitorPhone || '',
     email:           doc.email        || '',
+    profilePhoto:    (user && user.profilePhoto) || '',
     propertyId:      (prop && prop.propertyId) || '', // human-readable Property.propertyId code (e.g. AAA123), not the Mongo _id
     propertyName,
     propertyArea,
@@ -1737,7 +1739,7 @@ function toApptRow(doc) {
     message:         doc.note         || '',
     status:          String(doc.status || 'Pending').toLowerCase(),
     remarks:         doc.remarks      || [],
-    userId:          doc.userId       || null,
+    userId:          (user && user._id) || doc.userId || null,
     userReadableId:  doc.userReadableId || '',
     createdAt:       doc.createdAt,
   };
@@ -1748,6 +1750,7 @@ app.get('/api/appointments', requireAdmin, async (req, res) => {
     const docs = await VisitRequest.find({})
       .sort({ createdAt: -1 })
       .populate('propertyId', 'basic.status owner.propertyName location.area propertyId')
+      .populate('userId', 'profilePhoto')
       .lean();
     res.json(docs.map(toApptRow));
   } catch (err) {
@@ -1853,7 +1856,7 @@ app.post('/api/appointments/bulk-delete', requireAdmin, async (req, res) => {
 // nested shape stays untouched for whatever already consumes it.
 app.get('/api/admin/properties', requireAdmin, async (req, res) => {
   try {
-    const docArrays = await Promise.all(LISTING_MODEL_LIST.map(M => M.find({}).lean()));
+    const docArrays = await Promise.all(LISTING_MODEL_LIST.map(M => M.find({}).populate('userId', 'profilePhoto').lean()));
     const docs = docArrays.flat().sort((a, b) =>
       (Number(b.promoted) - Number(a.promoted)) ||
       ((a.promotedPriority ?? 3) - (b.promotedPriority ?? 3)) ||
@@ -1944,6 +1947,10 @@ app.get('/api/admin/properties', requireAdmin, async (req, res) => {
         ownerEmail:   owner.email || '',
         ownerAltPhone:owner.altPhone || '',
         ownerContactTime: owner.contactTime || '',
+        // There's no photo on the manually-entered owner contact card itself —
+        // this borrows the profilePhoto off the User account that posted the
+        // listing (same field the Customers/Appointments tables use).
+        ownerProfilePhoto: (doc.userId && typeof doc.userId === 'object' && doc.userId.profilePhoto) || '',
 
         // Admin
         remarks:      doc.remarks || [],
