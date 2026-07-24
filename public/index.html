@@ -6359,7 +6359,7 @@ function cardHTML(p, compact) {
       ${buildImgSlider(p, fg, '-grid')}
       <div class="prop-card-top-row">
         <div class="prop-left-badges">
-          ${(currentTab==='All'||currentTab==='Promoted') ? `<span class="prop-badge-type badge-${pType.toLowerCase()}">${pType}</span>` : ''}
+          ${(!compact && !['Rent','Lease','PG','ShortStay'].includes(currentTab)) ? `<span class="prop-badge-type badge-${pType.toLowerCase()}">${pType}</span>` : ''}
         </div>
         <div class="prop-right-badges">
           <div class="prop-heart${liked?' liked':''}" onclick="event.stopPropagation();toggleShortlist('${p.id}',this)" aria-label="${liked?'Remove from':'Add to'} shortlist">
@@ -6373,7 +6373,7 @@ function cardHTML(p, compact) {
     <div class="prop-body">
       <div class="prop-title" title="${esc(p.propertyId)}">
         <span class="prop-title-text">${esc(p.propertyId || 'Untitled listing')}</span>
-        ${ptype ? `<span class="prop-title-buildtype" title="${esc(ptype)}">${esc(ptype)}</span>` : ''}
+        ${(ptype && !p.promoted) ? `<span class="prop-title-buildtype" title="${esc(ptype)}">${esc(ptype)}</span>` : ''}
       </div>
       <div class="prop-price-row">
         <div class="prop-price">${fmtRupee(p.price?.rent||0)}<span class="prop-price-unit">/ ${pType === 'Lease' ? (leaseDur || 'Lease') : pType === 'ShortStay' ? 'Day' : 'Month'}</span></div>
@@ -6531,7 +6531,6 @@ function shortlistCardHTML(p) {
       ${buildImgSlider(p, fg, '-sl')}
       <div class="prop-card-top-row">
         <div class="prop-left-badges">
-          ${(currentTab==='All'||currentTab==='Promoted') ? `<span class="prop-badge-type badge-${pType.toLowerCase()}">${pType}</span>` : ''}
         </div>
         <div class="prop-right-badges">
           <div class="prop-heart${liked?' liked':''}" onclick="event.stopPropagation();toggleShortlist('${p.id}',this)" aria-label="${liked?'Remove from':'Add to'} shortlist">
