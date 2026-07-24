@@ -334,6 +334,11 @@ ul{list-style:none}
   white-space:nowrap;position:relative;
 }
 .qmb-icon{font-size:21px;line-height:1;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.18))}
+.qmb-icon-photo{filter:none}
+.qmb-icon-photo img{
+  width:24px;height:24px;border-radius:50%;object-fit:cover;display:block;
+  border:1.5px solid var(--border-2);
+}
 .qmb-rupee-coin{
   display:inline-flex;align-items:center;justify-content:center;
   width:24px;height:24px;border-radius:50%;
@@ -3149,7 +3154,7 @@ ul{list-style:none}
 <!-- ─── Quick Menu Bar (mobile-only, replaces topnav) ────── -->
 <div class="quick-menu-bar" id="quickMenuBar">
   <div class="qmb-item" onclick="handleMenuAuthClick()">
-    <span class="qmb-icon">🧑‍💼</span>
+    <span class="qmb-icon" id="qmbProfileIcon">🧑‍💼</span>
     Profile
   </div>
   <div class="qmb-item" onclick="openNotifModal()">
@@ -9024,18 +9029,32 @@ function handleMenuAuthClick() {
 function updateNavAuth() {
   const user = getLoggedInUser();
   const navBtn = document.getElementById('navAuthBtn');
+  const qmbIcon = document.getElementById('qmbProfileIcon');
   if (user) {
     navBtn.innerHTML = '';
     setAvatarContent(document.getElementById('menuAvatar'), user);
     document.getElementById('menuUserName').textContent = user.name || 'User';
     document.getElementById('menuUserSub').textContent = user.email || 'Logged in';
     document.getElementById('menuAuthLabel').textContent = 'My Profile / Log out';
+    if (qmbIcon) {
+      if (user.profilePhoto) {
+        qmbIcon.innerHTML = '<img src="' + user.profilePhoto + '" alt="Profile"/>';
+        qmbIcon.classList.add('qmb-icon-photo');
+      } else {
+        qmbIcon.textContent = '🧑\u200d💼';
+        qmbIcon.classList.remove('qmb-icon-photo');
+      }
+    }
   } else {
     navBtn.innerHTML = '';
     document.getElementById('menuAvatar').textContent = 'G';
     document.getElementById('menuUserName').textContent = 'Guest';
     document.getElementById('menuUserSub').textContent = 'Log in to manage listings';
     document.getElementById('menuAuthLabel').textContent = 'Log in / Sign up';
+    if (qmbIcon) {
+      qmbIcon.textContent = '🧑\u200d💼';
+      qmbIcon.classList.remove('qmb-icon-photo');
+    }
   }
   initReviewForm();
   refreshNotifPolling();
