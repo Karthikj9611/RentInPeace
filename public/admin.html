@@ -293,6 +293,9 @@ table.dataTable.no-footer{border-bottom:none!important}
 #propertyTable .col-sticky-1{
   min-width:40px;
 }
+#propertyTable .col-sno{
+  min-width:44px;
+}
 #propertyTable .col-sticky-2{
   max-width:230px;text-align:left!important;
 }
@@ -1779,6 +1782,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
         <table id="bookingTable" class="display nowrap" style="width:100%">
           <thead>
             <tr>
+              <th>S.No</th>
               <th>Customer</th>
               <th>Type</th>
               <th>User ID</th>
@@ -1791,6 +1795,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
               <th>Action</th>
             </tr>
             <tr class="col-filter-row">
+              <th></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onCustColumnFilter('name', this.value, this)"></th>
               <th><select class="col-filter-select" onchange="onCustColumnFilter('accountType', this.value, this)"><option value="">All</option><option value="customer">Customer</option><option value="owner">Owner</option></select></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onCustColumnFilter('userId', this.value, this)"></th>
@@ -1804,7 +1809,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
             </tr>
           </thead>
           <tbody>
-            <tr><td colspan="10" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
+            <tr><td colspan="11" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
           </tbody>
         </table>
       </div>
@@ -1851,6 +1856,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
         <table id="propertyTable" class="display nowrap" style="width:100%">
           <thead>
             <tr>
+              <th class="col-sno">S.No</th>
               <th class="col-sticky-1"><input type="checkbox" class="prop-select-all-checkbox" id="propSelectAllCheckbox" onchange="onPropSelectAllChange(this)"></th>
               <th class="col-sticky-2">Property</th>
               <th>Promoted</th>
@@ -1896,6 +1902,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
               <th>Action</th>
             </tr>
             <tr class="col-filter-row">
+              <th class="col-sno"></th>
               <th class="col-sticky-1"></th>
               <th class="col-sticky-2"><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('title', this.value, this)"></th>
               <th><select class="col-filter-select" onchange="onPropColumnFilter('promoted', this.value, this)"><option value="">All</option><option value="yes">Yes</option><option value="no">No</option></select></th>
@@ -1942,7 +1949,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
             </tr>
           </thead>
           <tbody>
-            <tr><td colspan="43" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
+            <tr><td colspan="44" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
           </tbody>
         </table>
 
@@ -1984,6 +1991,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
         <table id="appointmentTable" class="display nowrap" style="width:100%">
           <thead>
             <tr>
+              <th>S.No</th>
               <th>Visit ID</th>
               <th>Customer</th>
               <th>User ID</th>
@@ -1999,6 +2007,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
               <th>Action</th>
             </tr>
             <tr class="col-filter-row">
+              <th></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('visitId', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('customer', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('userId', this.value, this)"></th>
@@ -2039,7 +2048,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
             </tr>
           </thead>
           <tbody>
-            <tr><td colspan="13" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
+            <tr><td colspan="14" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
           </tbody>
         </table>
       </div>
@@ -3850,32 +3859,34 @@ $(document).ready(function(){
       }
     },
     columns:[
-      /* 0 – Customer name */
+      /* 0 – S.No (serial number) */
+      { data:null, orderable:false, className:'dt-body-center', render:(d,t,row,meta)=> String(meta.row+1) },
+      /* 1 – Customer name */
       { data:null, render:(d,t,row)=> t==='display' ? renderName(row) : ((row.firstName||'')+' '+(row.lastName||'')).trim() },
-      /* 1 – Type (customer looking for a home, or property owner) */
+      /* 2 – Type (customer looking for a home, or property owner) */
       { data:'accountType', render:(d,t)=> t==='display' ? accountTypeBadge(d||'customer') : (d||'customer') },
-      /* 2 – User ID */
+      /* 3 – User ID */
       { data:'userId', render:(d)=> escapeHtml(d||'—') },
-      /* 3 – Phone */
+      /* 4 – Phone */
       { data:null, render:(d,t,row)=>{ if(t==='display') return renderPhone(row); return plainPhone(row); }},
-      /* 4 – Email */
+      /* 5 – Email */
       { data:null, render:(d,t,row)=>{ if(t==='display') return renderEmail(row); return plainEmail(row); }},
-      /* 5 – Property Listings (count) */
+      /* 6 – Property Listings (count) */
       { data:'listingsCount', className:'dt-body-center', render:(d)=> String(d ?? 0) },
-      /* 6 – Visit Requests (count) */
+      /* 7 – Visit Requests (count) */
       { data:'visitsCount', className:'dt-body-center', render:(d)=> String(d ?? 0) },
-      /* 7 – Registered */
+      /* 8 – Registered */
       { data:'createdAt', render:(d,t)=>{
           if(t==='display') return formatDateTime(d);
           if(t==='export') return plainDateTime(d);
           return d||'—';
       }},
-      /* 8 – Remarks */
+      /* 9 – Remarks */
       { data:'remarks', orderable:false, render:(d,t,row)=>{
           if(t==='display') return remarkCellHtml(row.mobile||row._id, d, 'customer');
           return d||'';
       }},
-      /* 9 – Action */
+      /* 10 – Action */
       { 
 		  data:null, 
 		  orderable:false, 
@@ -3899,7 +3910,7 @@ $(document).ready(function(){
 		  }
 		}
     ],
-    order:[[7,'desc']],
+    order:[[8,'desc']],
     orderCellsTop:true,
     pageLength:10,
     scrollX:true,
@@ -3963,17 +3974,17 @@ $(document).ready(function(){
         orientation:'landscape', pageSize:'A4', title:'Customer_Leads_' + new Date().toLocaleDateString('en-GB'),
         exportOptions:{
           columns: function(idx){
-            // Remarks(8) and Action(9) are never printed to PDF; everything
+            // Remarks(9) and Action(10) are never printed to PDF; everything
             // else follows whatever the Columns toggle currently shows.
-            return idx!==8 && idx!==9 && dataTable.column(idx).visible();
+            return idx!==9 && idx!==10 && dataTable.column(idx).visible();
           }
         },
         customize:function(doc){
           doc.styles.tableHeader={fillColor:'#0c0d10',color:'white',bold:true,fontSize:10,alignment:'center'};
           doc.defaultStyle={fontSize:9,color:'#0c0d10'};
           var idxs = custExportColumnIndices();
-          var phonePos = idxs.indexOf(3);
-          var emailPos = idxs.indexOf(4);
+          var phonePos = idxs.indexOf(4);
+          var emailPos = idxs.indexOf(5);
           if(phonePos<0 && emailPos<0) return;
           var rows=dataTable.rows({search:'applied'}).data().toArray();
           var tableBody=doc.content[1]&&doc.content[1].table?doc.content[1].table.body:null;
@@ -4009,7 +4020,9 @@ $(document).ready(function(){
       }
     },
     columns:[
-      /* 0 – Select checkbox */
+      /* 0 – S.No (serial number) */
+      { data:null, orderable:false, className:'dt-body-center col-sno', render:(d,t,row,meta)=> String(meta.row+1) },
+      /* 1 – Select checkbox */
       { data:null, orderable:false, className:'dt-body-center col-sticky-1', render:(d,t,row)=>{
           if(t!=='display') return '';
           const checked = _selectedPropIds.has(row._id) ? 'checked' : '';
@@ -4209,7 +4222,7 @@ $(document).ready(function(){
         orientation:'landscape', pageSize:'A4', title:'Property_Leads_' + new Date().toLocaleDateString('en-GB'),
        exportOptions: {
 			columns: function (idx, data, node) {
-				return idx !== 41 && idx !== 42 &&
+				return idx !== 42 && idx !== 43 &&
 					   propTable.column(idx).visible();
 			},
 			stripHtml: true,
@@ -4223,9 +4236,9 @@ $(document).ready(function(){
 					var rd = propTable.row(row).data();
 					if (!rd) return data;
 
-					if (column === 2) return rd.promoted ? "Yes" : "No";
-					if (column === 3) return rd.verified ? "Yes" : "No";
-					if (column === 4) return rd.booked ? "Yes" : "No";
+					if (column === 3) return rd.promoted ? "Yes" : "No";
+					if (column === 4) return rd.verified ? "Yes" : "No";
+					if (column === 5) return rd.booked ? "Yes" : "No";
 
 					return typeof data === "string" ? data.trim() : data;
 				}
@@ -4234,7 +4247,7 @@ $(document).ready(function(){
         customize:function(doc){
           doc.styles.tableHeader={fillColor:'#0c0d10',color:'white',bold:true,fontSize:9,alignment:'center'};
           doc.defaultStyle={fontSize:8,color:'#0c0d10',alignment:'center'};
-          var ownerNumPos = propExportColumnIndices().indexOf(6);
+          var ownerNumPos = propExportColumnIndices().indexOf(7);
           var rows=propTable.rows({search:'applied'}).data().toArray();
           var tableIdx = doc.content.findIndex(function(c){ return c && c.table; });
           var tableBody = tableIdx>=0 ? doc.content[tableIdx].table.body : null;
@@ -4327,21 +4340,23 @@ $(document).ready(function(){
       }
     },
     columns:[
-      /* 0 – Visit ID */
+      /* 0 – S.No (serial number) */
+      { data:null, orderable:false, className:'dt-body-center', render:(d,t,row,meta)=> String(meta.row+1) },
+      /* 1 – Visit ID */
       { data:'visitId', render:(d)=> escapeHtml(d||'—') },
-      /* 1 – Customer Name */
+      /* 2 – Customer Name */
       { data:null, render:(d,t,row)=>{
           if(t==='display') return renderName(row);
           return ((row.name||row.firstName||'')+' '+(row.lastName||'')).trim();
       }},
-      /* 2 – User ID */
+      /* 3 – User ID */
       { data:'userReadableId', render:(d)=> escapeHtml(d||'—') },
-      /* 3 – Contact */
+      /* 4 – Contact */
       { data:null, orderable:false, render:(d,t,row)=>{
           if(t==='display') return renderApptContact(row);
           return row.mobile||'';
       }},
-      /* 4 – Property */
+      /* 5 – Property */
       { data:null, render:(d,t,row)=>{
           const pname = row.propertyName || '';
           const parts = [row.propertyArea, row.propertyId].filter(Boolean).join(' · ');
@@ -4351,27 +4366,27 @@ $(document).ready(function(){
           }
           return [pname, parts].filter(Boolean).join(' ');
       }},
-      /* 5 – Purpose */
+      /* 6 – Purpose */
       { data:'purpose', render:(d,t)=>
           t==='display' ? `<span class="purpose-badge">${escapeHtml(d||'—')}</span>` : (d||'—')
       },
-      /* 6 – Visit Date */
+      /* 7 – Visit Date */
       { data:'date', render:(d,t)=>{
           if(t==='display') return renderApptDate(d);
           if(t==='export') return plainApptDate(d);
           return d||'—';
       }},
-      /* 7 – Time Slot */
+      /* 8 – Time Slot */
       { data:'timeSlot', render:(d,t)=>
           t==='display' ? renderTimeSlot(d) : (d||'—')
       },
-      /* 8 – Message */
+      /* 9 – Message */
       { data:'message', orderable:false, render:(d)=>{
           const msg = escapeHtml(d||'');
           if(!msg) return '<span class="no-contact">—</span>';
           return `<div style="max-width:200px;font-size:0.8rem;color:var(--ink2);white-space:normal;line-height:1.5;">${msg}</div>`;
       }},
-      /* 9 – Status (inline change) */
+      /* 10 – Status (inline change) */
       { data:'status', render:(d,t,row)=>{
           if(t==='display'){
             _apptCache[row._id] = row;
@@ -4379,18 +4394,18 @@ $(document).ready(function(){
           }
           return d||'pending';
       }},
-      /* 10 – Booked On */
+      /* 11 – Booked On */
       { data:'createdAt', render:(d,t)=>{
           if(t==='display') return formatDateTime(d);
           if(t==='export') return plainDateTime(d);
           return d||'—';
       }},
-      /* 11 – Remarks */
+      /* 12 – Remarks */
       { data:'remarks', orderable:false, render:(d,t,row)=>{
           if(t==='display') return remarkCellHtml(row._id, d, 'appointment');
           return d||'';
       }},
-      /* 12 – Action */
+      /* 13 – Action */
       { data:null, orderable:false, render:(d,t,row)=>{
           _apptCache[row._id] = row;
           return `<div style="display:inline-flex;gap:6px;flex-wrap:nowrap;justify-content:center">
@@ -4399,7 +4414,7 @@ $(document).ready(function(){
           </div>`;
       }}
     ],
-    order:[[6,'asc']],
+    order:[[7,'asc']],
     orderCellsTop:true,
     pageLength:10,
     scrollX:true,
@@ -4463,9 +4478,9 @@ $(document).ready(function(){
         orientation:'landscape', pageSize:'A4', title:'Appointment_Leads_' + new Date().toLocaleDateString('en-GB'),
         exportOptions: {
 			columns: function(idx){
-				// Remarks(11) and Action(12) are never printed to PDF; everything
+				// Remarks(12) and Action(13) are never printed to PDF; everything
 				// else follows whatever the Columns toggle currently shows.
-				return idx!==11 && idx!==12 && apptTable.column(idx).visible();
+				return idx!==12 && idx!==13 && apptTable.column(idx).visible();
 			},
 			format: {
 				body: function (data, row, column, node) {
@@ -4476,12 +4491,12 @@ $(document).ready(function(){
 					var origIdx = apptExportColumnIndices()[column];
 
 					// Customer Name
-					if (origIdx === 1) {
+					if (origIdx === 2) {
 						return (rd.name || ((rd.firstName || '') + ' ' + (rd.lastName || ''))).trim();
 					}
 
 					// Property Details
-					if (origIdx === 4) {
+					if (origIdx === 5) {
 						return [
 							rd.propertyName || '',
 							rd.propertyArea || '',
@@ -4490,7 +4505,7 @@ $(document).ready(function(){
 					}
 
 					// Status
-					if (origIdx === 9) {
+					if (origIdx === 10) {
 						return rd.status || '';
 					}
 
@@ -4854,8 +4869,8 @@ let _propCategoryState = 'Rent';
 
 // PG-only and Short-Stay-only column indices in #propertyTable (see the
 // numbered comments in the propTable columns:[...] definition above).
-const PG_ONLY_COLS = [26, 27, 28, 29, 30]; // PG Gender, Room Type, Meals, Occupancy, Notice
-const SS_ONLY_COLS = [31, 32, 33, 34];     // SS Room Type, Available 24hrs, Cancellation, Couples Allowed
+const PG_ONLY_COLS = [27, 28, 29, 30, 31]; // PG Gender, Room Type, Meals, Occupancy, Notice
+const SS_ONLY_COLS = [32, 33, 34, 35];     // SS Room Type, Available 24hrs, Cancellation, Couples Allowed
 
 // Measures the real rendered width of the properties table's 1st sticky
 // column (the row-select checkbox) and stores it as a CSS custom property
@@ -4881,29 +4896,29 @@ window.addEventListener('resize', function(){
    and the last column (Action) are always visible and not offered here. */
 const PROP_COL_GROUPS = [
   { label:'Basic', cols:[
-    {idx:1, label:'Property'}, {idx:2, label:'Promoted'}, {idx:3, label:'Verified'}, {idx:4, label:'Booked'},
-    {idx:5, label:'Owner Name'}, {idx:6, label:'Owner Number'}, {idx:7, label:'Owner Alt Phone'},
-    {idx:8, label:'Owner Email'}, {idx:9, label:'Owner Contact Time'}, {idx:10, label:'Status'},
-    {idx:11, label:'Price'}, {idx:12, label:'Deposit'}, {idx:13, label:'Maintenance'}, {idx:14, label:'Negotiable'},
-    {idx:15, label:'Location'}, {idx:16, label:'City'}
+    {idx:2, label:'Property'}, {idx:3, label:'Promoted'}, {idx:4, label:'Verified'}, {idx:5, label:'Booked'},
+    {idx:6, label:'Owner Name'}, {idx:7, label:'Owner Number'}, {idx:8, label:'Owner Alt Phone'},
+    {idx:9, label:'Owner Email'}, {idx:10, label:'Owner Contact Time'}, {idx:11, label:'Status'},
+    {idx:12, label:'Price'}, {idx:13, label:'Deposit'}, {idx:14, label:'Maintenance'}, {idx:15, label:'Negotiable'},
+    {idx:16, label:'Location'}, {idx:17, label:'City'}
   ]},
   { label:'Details', cols:[
-    {idx:17, label:'Type'}, {idx:18, label:'Area'}, {idx:19, label:'Floor'}, {idx:20, label:'Furnishing'},
-    {idx:21, label:'Bathroom'}, {idx:22, label:'Car Parking'}, {idx:23, label:'Bike Parking'},
-    {idx:24, label:'Facing'}, {idx:25, label:'Age'}
+    {idx:18, label:'Type'}, {idx:19, label:'Area'}, {idx:20, label:'Floor'}, {idx:21, label:'Furnishing'},
+    {idx:22, label:'Bathroom'}, {idx:23, label:'Car Parking'}, {idx:24, label:'Bike Parking'},
+    {idx:25, label:'Facing'}, {idx:26, label:'Age'}
   ]},
   { label:'PG Details', cols:[
-    {idx:26, label:'PG Gender'}, {idx:27, label:'PG Room Type'}, {idx:28, label:'PG Meals'},
-    {idx:29, label:'PG Occupancy'}, {idx:30, label:'PG Notice'}
+    {idx:27, label:'PG Gender'}, {idx:28, label:'PG Room Type'}, {idx:29, label:'PG Meals'},
+    {idx:30, label:'PG Occupancy'}, {idx:31, label:'PG Notice'}
   ]},
   { label:'Short Stay Details', cols:[
-    {idx:31, label:'SS Room Type'}, {idx:32, label:'SS Available 24hrs'},
-    {idx:33, label:'SS Cancellation'}, {idx:34, label:'SS Couples Allowed'}
+    {idx:32, label:'SS Room Type'}, {idx:33, label:'SS Available 24hrs'},
+    {idx:34, label:'SS Cancellation'}, {idx:35, label:'SS Couples Allowed'}
   ]},
   { label:'Meta', cols:[
-    {idx:35, label:'Visits'}, {idx:36, label:'Photos'}, {idx:37, label:'Amenities'},
-    {idx:38, label:'Property ID'}, {idx:39, label:'User ID'}, {idx:40, label:'Listed On'},
-    {idx:41, label:'Remarks'}
+    {idx:36, label:'Visits'}, {idx:37, label:'Photos'}, {idx:38, label:'Amenities'},
+    {idx:39, label:'Property ID'}, {idx:40, label:'User ID'}, {idx:41, label:'Listed On'},
+    {idx:42, label:'Remarks'}
   ]}
 ];
 
@@ -4916,11 +4931,11 @@ const PROP_COL_GROUPS = [
 // right now. Mirrors whatever's currently visible (category-tab-driven
 // PG/Short-Stay columns + the manual Columns toggle).
 function propExportColumnPredicate(idx){
-  return idx!==41 && idx!==42 && propTable.column(idx).visible();
+  return idx!==42 && idx!==43 && propTable.column(idx).visible();
 }
 function propExportColumnIndices(){
   const idxs=[];
-  for(let i=0;i<=41;i++){ if(propExportColumnPredicate(i)) idxs.push(i); }
+  for(let i=0;i<=42;i++){ if(propExportColumnPredicate(i)) idxs.push(i); }
   return idxs;
 }
 
@@ -5021,9 +5036,9 @@ const COL_TOGGLE_CONFIGS = {
   cust: {
     getTable: ()=>dataTable,
     cols: [
-      {idx:1, label:'Type'}, {idx:2, label:'User ID'}, {idx:3, label:'Phone'},
-      {idx:4, label:'Email'}, {idx:5, label:'Property Listings'}, {idx:6, label:'Visit Requests'},
-      {idx:7, label:'Registered'}, {idx:8, label:'Remarks'}
+      {idx:2, label:'Type'}, {idx:3, label:'User ID'}, {idx:4, label:'Phone'},
+      {idx:5, label:'Email'}, {idx:6, label:'Property Listings'}, {idx:7, label:'Visit Requests'},
+      {idx:8, label:'Registered'}, {idx:9, label:'Remarks'}
     ],
     menuId:'custColToggleMenu', btnId:'custColToggleBtn', wrapId:'custColToggleWrap',
     storageKey:'rip_admin_custColVisibility'
@@ -5031,10 +5046,10 @@ const COL_TOGGLE_CONFIGS = {
   appt: {
     getTable: ()=>apptTable,
     cols: [
-      {idx:0, label:'Visit ID'}, {idx:2, label:'User ID'}, {idx:3, label:'Contact'},
-      {idx:4, label:'Property'}, {idx:5, label:'Purpose'}, {idx:6, label:'Visit Date'},
-      {idx:7, label:'Time Slot'}, {idx:8, label:'Message'}, {idx:9, label:'Status'},
-      {idx:10, label:'Booked On'}, {idx:11, label:'Remarks'}
+      {idx:1, label:'Visit ID'}, {idx:3, label:'User ID'}, {idx:4, label:'Contact'},
+      {idx:5, label:'Property'}, {idx:6, label:'Purpose'}, {idx:7, label:'Visit Date'},
+      {idx:8, label:'Time Slot'}, {idx:9, label:'Message'}, {idx:10, label:'Status'},
+      {idx:11, label:'Booked On'}, {idx:12, label:'Remarks'}
     ],
     menuId:'apptColToggleMenu', btnId:'apptColToggleBtn', wrapId:'apptColToggleWrap',
     storageKey:'rip_admin_apptColVisibility'
@@ -5056,12 +5071,12 @@ const COL_TOGGLE_CONFIGS = {
 // (which shifts whenever a column is hidden) back to the original index.
 function custExportColumnIndices(){
   const idxs=[];
-  for(let i=0;i<=9;i++){ if(i!==8 && i!==9 && dataTable.column(i).visible()) idxs.push(i); }
+  for(let i=0;i<=10;i++){ if(i!==9 && i!==10 && dataTable.column(i).visible()) idxs.push(i); }
   return idxs;
 }
 function apptExportColumnIndices(){
   const idxs=[];
-  for(let i=0;i<=12;i++){ if(i!==11 && i!==12 && apptTable.column(i).visible()) idxs.push(i); }
+  for(let i=0;i<=13;i++){ if(i!==12 && i!==13 && apptTable.column(i).visible()) idxs.push(i); }
   return idxs;
 }
 
