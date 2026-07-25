@@ -4149,7 +4149,7 @@ $(document).ready(function(){
       { data:'visitCount', render:(d)=> (d==null?'0':escapeHtml(String(d))) },
       /* 36 – Photos (count) */
       { data:null, orderable:false, visible:false, className:'dt-body-center', render:(d,t,row)=>{
-          return Array.isArray(row.images) ? row.images.length : 0;
+          return String(Array.isArray(row.images) ? row.images.length : 0);
       }},
       /* 37 – Amenities (list, +N more opens modal) */
       { data:null, orderable:false, render:(d,t,row)=>{
@@ -4227,7 +4227,7 @@ $(document).ready(function(){
 					if (column === 3) return rd.verified ? "Yes" : "No";
 					if (column === 4) return rd.booked ? "Yes" : "No";
 
-					return data.trim();
+					return typeof data === "string" ? data.trim() : data;
 				}
 			}
 		},
@@ -4235,15 +4235,61 @@ $(document).ready(function(){
           doc.styles.tableHeader={fillColor:'#0c0d10',color:'white',bold:true,fontSize:9,alignment:'center'};
           doc.defaultStyle={fontSize:8,color:'#0c0d10'};
           var ownerNumPos = propExportColumnIndices().indexOf(6);
-          if(ownerNumPos < 0) return;
           var rows=propTable.rows({search:'applied'}).data().toArray();
-          var tableBody=doc.content[1]&&doc.content[1].table?doc.content[1].table.body:null;
+          var tableIdx = doc.content.findIndex(function(c){ return c && c.table; });
+          var tableBody = tableIdx>=0 ? doc.content[tableIdx].table.body : null;
           if(!tableBody) return;
-          rows.forEach(function(rd,i){
-            var pdfRow=tableBody[i+1]; if(!pdfRow) return;
-            var ph=rd.ownerNumber||'';
-            if(ph&&pdfRow[ownerNumPos]) pdfRow[ownerNumPos]={text:ph,link:'tel:'+ph,color:'#1a7a5e',decoration:'underline',fontSize:8};
-          });
+
+          // Apply the clickable tel: link to the Owner Number cells.
+          if(ownerNumPos >= 0){
+            rows.forEach(function(rd,i){
+              var pdfRow=tableBody[i+1]; if(!pdfRow) return;
+              var ph=rd.ownerNumber||'';
+              if(ph&&pdfRow[ownerNumPos]) pdfRow[ownerNumPos]={text:ph,link:'tel:'+ph,color:'#1a7a5e',decoration:'underline',fontSize:8};
+            });
+          }
+
+          // Rather than paginate, size the sheet itself to the column
+          // count so everything fits on one page — pdfMake accepts a
+          // custom {width,height} in points (72pt/inch) instead of a
+          // named size like A4/A3. Margin stays fixed; page width grows
+          // with the number of visible columns, and font/column width
+          // shrink a little once there are a lot of them so text doesn't
+          // just get clipped.
+          //
+          // IMPORTANT: pdfMake adds cell padding ON TOP of a column's
+          // declared width (it doesn't carve the padding out of it), so
+          // the real on-page width of each column is wider than the
+          // number in `widths`. Left at pdfMake's own default padding
+          // that gap is undocumented and drifts the whole table right by
+          // a few hundred points over many columns — enough to push the
+          // last several columns off the edge of the page entirely. We
+          // fix padding to a known small value via a custom `layout`
+          // below and build that exact overhead into the page-width math
+          // instead of guessing at pdfMake's default.
+          var totalCols = tableBody[0].length;
+          var margin = 20;
+          var padX = 2;      // enforced via layout.paddingLeft/Right below
+          var safety = 2;    // covers hairline borders/rounding, per column
+          var perColWidth = totalCols > 20 ? 50 : (totalCols > 12 ? 60 : 75); // declared inner width
+          var colPitch = perColWidth + (padX*2) + safety; // real on-page width per column
+          var fontSize = totalCols > 20 ? 6 : (totalCols > 12 ? 7 : 8);
+          var pageWidth = totalCols*colPitch + margin*2;
+
+          delete doc.pageOrientation; // only applies to named sizes, not custom {width,height}
+          doc.pageSize = { width: pageWidth, height: 595.28 }; // height = standard A4-landscape height
+          doc.pageMargins = [margin, margin, margin, margin];
+          doc.defaultStyle.fontSize = fontSize;
+          doc.styles.tableHeader.fontSize = fontSize + 1;
+          doc.content[tableIdx].table.widths = tableBody[0].map(function(){ return perColWidth; });
+          doc.content[tableIdx].layout = {
+            paddingLeft: function(){ return padX; },
+            paddingRight: function(){ return padX; },
+            paddingTop: function(){ return 2; },
+            paddingBottom: function(){ return 2; },
+            hLineWidth: function(){ return 0.5; },
+            vLineWidth: function(){ return 0.5; }
+          };
         }
       }
     ],
@@ -4870,7 +4916,7 @@ const PROP_COL_GROUPS = [
 // right now. Mirrors whatever's currently visible (category-tab-driven
 // PG/Short-Stay columns + the manual Columns toggle).
 function propExportColumnPredicate(idx){
-  return idx>=1 && idx<=41 && propTable.column(idx).visible();
+  return idx!==41 && idx!==42 && propTable.column(idx).visible();
 }
 function propExportColumnIndices(){
   const idxs=[];
