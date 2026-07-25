@@ -4233,7 +4233,7 @@ $(document).ready(function(){
 		},
         customize:function(doc){
           doc.styles.tableHeader={fillColor:'#0c0d10',color:'white',bold:true,fontSize:9,alignment:'center'};
-          doc.defaultStyle={fontSize:8,color:'#0c0d10'};
+          doc.defaultStyle={fontSize:8,color:'#0c0d10',alignment:'center'};
           var ownerNumPos = propExportColumnIndices().indexOf(6);
           var rows=propTable.rows({search:'applied'}).data().toArray();
           var tableIdx = doc.content.findIndex(function(c){ return c && c.table; });
