@@ -238,6 +238,21 @@ async function requireUser(req, res, next) {
   }
 }
 
+// Runs after requireUser. Blocks tenants (accountType 'customer') from
+// creating listings — only 'owner' accounts may list a property.
+async function requireOwner(req, res, next) {
+  try {
+    const user = await User.findById(req.userId).select('accountType').lean();
+    if (!user || user.accountType !== 'owner') {
+      return res.status(403).json({ message: 'Only property owner accounts can list a property.' });
+    }
+    next();
+  } catch (err) {
+    console.error('requireOwner error:', err);
+    res.status(500).json({ message: 'Server error. Please try again.' });
+  }
+}
+
 // Like requireUser, but never blocks the request — just attaches req.userId
 // (and req.userReadableId) if a valid session key was sent (null otherwise).
 // Used on routes that must still work for guests, e.g. submitting a listing
@@ -1140,7 +1155,7 @@ const listingLimiter = rateLimit({
 });
 
 // ── POST /api/properties ──
-app.post('/api/properties', listingLimiter, requireUser, async (req, res) => {
+app.post('/api/properties', listingLimiter, requireUser, requireOwner, async (req, res) => {
   try {
     const body = req.body || {};
     const fields = NESTED_SECTIONS.reduce((acc, k) => {

@@ -3621,14 +3621,14 @@ ul{list-style:none}
 </div>
 
 <!-- ─── Main Content ────────────────────────────── -->
-<main class="main">
-  <div class="results-header">
+<main class="main" id="mainContent">
+  <div class="results-header" id="resultsHeader">
     <div class="results-count"><strong id="resultCount">12</strong> <strong>Properties found</strong></div>
 
     <!-- Ad Banner -->
     <div class="ad-banner" id="adBanner">
       <div class="ad-track" id="adTrack">
-        <div class="ad-slide ad-slide-1" onclick="window.location.href='tel:9035205230'">
+        <div class="ad-slide ad-slide-1" id="adSlideListProperty" onclick="window.location.href='tel:9035205230'">
           <span class="ad-slide-icon">🏠</span>
           <span class="ad-slide-text">List Property For Free</span>
           <span class="ad-slide-cta">List now</span>
@@ -3645,13 +3645,13 @@ ul{list-style:none}
         </div>
       </div>
       <div class="ad-dots" id="adDots">
-        <div class="ad-dot active"></div>
+        <div class="ad-dot" id="adDotListProperty"></div>
         <div class="ad-dot"></div>
         <div class="ad-dot"></div>
       </div>
     </div>
 
-    <div style="display:flex;align-items:center;gap:8px">
+    <div style="display:flex;align-items:center;gap:8px;margin-left:auto" id="viewToggleWrap">
       <div class="view-toggle">
         <button class="view-btn active" onclick="setView('grid',this)" aria-label="Grid view">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
@@ -3906,7 +3906,7 @@ ul{list-style:none}
     </span>
     <span class="fab-stat-badge" id="fabStatUsersInline">–</span>
   </div>
-  <button class="fab-inline-add" onclick="openFabPicker()" aria-label="Add a listing" title="List your property">
+  <button class="fab-inline-add" id="fabInlineAdd" onclick="openFabPicker()" aria-label="Add a listing" title="List your property">
     <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
   </button>
 </div>
@@ -3979,7 +3979,7 @@ ul{list-style:none}
 </div>
 
 <!-- ─── FAB: Add listing ────────────────────────── -->
-<button class="fab" onclick="openFabPicker()" aria-label="Add a listing" title="List your property">
+<button class="fab" id="fabAdd" onclick="openFabPicker()" aria-label="Add a listing" title="List your property">
   <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
 </button>
 
@@ -5434,20 +5434,20 @@ ul{list-style:none}
       <span class="menu-item-badge" id="menuNotifCount">0</span>
     </div>
     <div class="menu-divider"></div>
-    <div class="menu-section-label">Manage</div>
-    <div class="menu-item" onclick="toggleMenuPanel(); openAddModal('Rent');">
+    <div class="menu-section-label" id="menuManageLabel">Manage</div>
+    <div class="menu-item" id="menuListRent" onclick="toggleMenuPanel(); openAddModal('Rent');">
       <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       List Rent Property
     </div>
-    <div class="menu-item" onclick="toggleMenuPanel(); openAddModal('Lease');">
+    <div class="menu-item" id="menuListLease" onclick="toggleMenuPanel(); openAddModal('Lease');">
       <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       List Lease Property
     </div>
-    <div class="menu-item" onclick="toggleMenuPanel(); openAddModal('PG');">
+    <div class="menu-item" id="menuListPG" onclick="toggleMenuPanel(); openAddModal('PG');">
       <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       List PG Property
     </div>
-    <div class="menu-item" onclick="toggleMenuPanel(); openAddModal('ShortStay');">
+    <div class="menu-item" id="menuListShortStay" onclick="toggleMenuPanel(); openAddModal('ShortStay');">
       <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       List Short Stay Property
     </div>
@@ -5925,16 +5925,20 @@ function renderCards() {
   empty.classList.remove('show');
 
   const promoted = list.filter(p => p.promoted);
-  // Promoted listings still get their own section above, but they now also
-  // stay in their respective type section below (not excluded from the typed
-  // groups anymore), so a promoted Rent property shows under both
-  // "Promoted listings" and "Rent".
+  // On a single-type tab (Rent/Lease/PG/ShortStay), `list` is already
+  // scoped to just that type, so the "promoted" and typed buckets below
+  // would otherwise be drawing from the exact same set — showing every
+  // promoted item twice. Exclude that overlap only on those tabs; on
+  // All/Promoted, `list` spans multiple types and showing a promoted
+  // property in both the highlights section and its type section is
+  // intentional (that's what makes those views comprehensive).
+  const dedupe = ['Rent', 'Lease', 'PG', 'ShortStay'].includes(currentTab);
   const groups = {
     promoted,
-    rent:      list.filter(p => sectionKeyFor(p) === 'rent'),
-    lease:     list.filter(p => sectionKeyFor(p) === 'lease'),
-    pg:        list.filter(p => sectionKeyFor(p) === 'pg'),
-    shortstay: list.filter(p => sectionKeyFor(p) === 'shortstay'),
+    rent:      list.filter(p => (!dedupe || !p.promoted) && sectionKeyFor(p) === 'rent'),
+    lease:     list.filter(p => (!dedupe || !p.promoted) && sectionKeyFor(p) === 'lease'),
+    pg:        list.filter(p => (!dedupe || !p.promoted) && sectionKeyFor(p) === 'pg'),
+    shortstay: list.filter(p => (!dedupe || !p.promoted) && sectionKeyFor(p) === 'shortstay'),
   };
 
   const gridClass = 'prop-grid' + (isListView ? ' list-view' : '');
@@ -6043,7 +6047,8 @@ function paginationHTML(section, page, total) {
 function sectionItems(section) {
   const list = getFiltered();
   if (section === 'promoted') return list.filter(p => p.promoted);
-  return list.filter(p => sectionKeyFor(p) === section);
+  const dedupe = ['Rent', 'Lease', 'PG', 'ShortStay'].includes(currentTab);
+  return list.filter(p => (!dedupe || !p.promoted) && sectionKeyFor(p) === section);
 }
 
 const SECTION_PAGE_GETTERS = { promoted: () => promotedPage, rent: () => rentPage, lease: () => leasePage, pg: () => pgPage, shortstay: () => shortstayPage };
@@ -9056,8 +9061,41 @@ function updateNavAuth() {
       qmbIcon.classList.remove('qmb-icon-photo');
     }
   }
+  updateListPropertyVisibility(user);
   initReviewForm();
   refreshNotifPolling();
+}
+// Tenants ('customer' accounts) and guests don't get to list a property —
+// only 'owner' accounts do. Hides both FAB add buttons and the four
+// "List ... Property" items (plus their Manage section label) in the menu
+// panel; "Post Your Video Review" stays visible for everyone since it's a
+// testimonial, not a listing.
+function updateListPropertyVisibility(user) {
+  const canList = !!user && user.accountType === 'owner';
+  const display = canList ? '' : 'none';
+  // Verify/Promote are also owner-only actions on listings a tenant/guest
+  // wouldn't have, so the whole banner (not just the "List Property" slide)
+  // is owner-only.
+  ['fabAdd', 'fabInlineAdd', 'menuManageLabel', 'menuListRent', 'menuListLease', 'menuListPG', 'menuListShortStay', 'adBanner']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.style.display = display; });
+  // viewToggleWrap has no CSS class of its own (display:flex is only set
+  // inline in the HTML), so clearing to '' would fall back to the browser
+  // default (block) instead of restoring the flex row — set explicitly.
+  const vt = document.getElementById('viewToggleWrap');
+  if (vt) vt.style.display = canList ? 'flex' : 'none';
+  // For non-owners every child of this row is now hidden — collapse the row
+  // itself too, or its margin-bottom leaves a bare gap above the listings.
+  const rh = document.getElementById('resultsHeader');
+  if (rh) rh.style.display = canList ? '' : 'none';
+  // .main's top padding existed to sit above the results-header row; with
+  // that row now hidden for non-owners, the padding alone was leaving a
+  // bare gap above the listings — drop it to 0 in that case.
+  const mainEl = document.getElementById('mainContent');
+  if (mainEl) mainEl.style.paddingTop = canList ? '' : '0';
+  // Carousel already initialized (DOMContentLoaded) reads live DOM state, but
+  // needs a nudge to reset `cur` if it was mid-rotation when the banner got
+  // hidden/shown by a login/logout that happened after page load.
+  if (typeof window.refreshAdBannerCarousel === 'function') window.refreshAdBannerCarousel();
 }
 function switchAuthTab(tab) {
   backToSignupForm();
@@ -10515,11 +10553,18 @@ document.addEventListener('DOMContentLoaded', function() {
   })();
 
   const track = document.getElementById('adTrack');
-  const dots = document.querySelectorAll('#adDots .ad-dot');
-  if (!track || !dots.length) return;
-  const total = dots.length;
+  const allDots = document.querySelectorAll('#adDots .ad-dot');
+  if (!track || !allDots.length) return;
   let cur = 0, timer;
+  // Reads live DOM state each call, so a slide/dot hidden for tenants
+  // (see updateListPropertyVisibility) is simply skipped — no separate
+  // "total" to keep in sync.
+  function visibleSlides() { return Array.from(track.children).filter(el => el.style.display !== 'none'); }
+  function visibleDots() { return Array.from(allDots).filter(el => el.style.display !== 'none'); }
   function goTo(n) {
+    const slides = visibleSlides(), dots = visibleDots();
+    const total = slides.length;
+    if (!total) return;
     cur = (n + total) % total;
     track.style.transform = 'translateX(-' + (cur * 100) + '%)';
     dots.forEach((d, i) => d.classList.toggle('active', i === cur));
@@ -10528,7 +10573,9 @@ document.addEventListener('DOMContentLoaded', function() {
   function stop()  { clearInterval(timer); }
   document.getElementById('adBanner').addEventListener('mouseenter', stop);
   document.getElementById('adBanner').addEventListener('mouseleave', start);
-  dots.forEach((d, i) => d.addEventListener('click', e => { e.stopPropagation(); stop(); goTo(i); start(); }));
+  allDots.forEach(d => d.addEventListener('click', e => { e.stopPropagation(); stop(); goTo(visibleDots().indexOf(d)); start(); }));
+  window.refreshAdBannerCarousel = () => goTo(0);
+  goTo(0);
   start();
 });
 
