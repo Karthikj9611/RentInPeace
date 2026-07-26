@@ -422,6 +422,23 @@ ul{list-style:none}
 }
 .results-count{display:none}
 
+/* ─── Nearby-location banner ─── */
+.nearby-banner{
+  display:none;align-items:center;gap:8px;
+  margin:0 20px 14px;padding:10px 14px;
+  background:var(--brand-light);border:1px solid var(--brand);border-radius:10px;
+  font-size:13px;font-weight:600;color:var(--brand-hover);
+}
+.nearby-banner svg{width:16px;height:16px;stroke:var(--brand);fill:none;stroke-width:2;flex-shrink:0}
+.nearby-banner-text{flex:1;min-width:0}
+.nearby-banner-clear{
+  background:none;border:none;font-size:12px;font-weight:600;color:var(--brand);
+  cursor:pointer;text-decoration:underline;flex-shrink:0;padding:0;
+}
+@media(max-width:640px){
+  .nearby-banner{margin:0 12px 12px;font-size:12.5px}
+}
+
 /* ── Ad Banner ── */
 .ad-banner{
   flex:1;min-width:0;overflow:hidden;border-radius:12px;
@@ -3663,6 +3680,12 @@ ul{list-style:none}
     </div>
   </div>
 
+  <div class="nearby-banner" id="nearbyBanner">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-7.5 8-13a8 8 0 1 0-16 0c0 5.5 8 13 8 13z"/><circle cx="12" cy="9" r="3"/></svg>
+    <span class="nearby-banner-text" id="nearbyBannerText">Showing properties near your current location first</span>
+    <button class="nearby-banner-clear" onclick="clearNearbySort()">Show all</button>
+  </div>
+
   <div id="recentlyViewedSection" class="recently-viewed-section" style="display:none">
     <div class="section-divider" style="position:relative">
       <div class="section-divider-inner">
@@ -4085,6 +4108,10 @@ ul{list-style:none}
     </div>
     <div class="sort-option" onclick="setSort(this,'promoted')" data-sort="promoted">
       Promoted first
+      <div class="sort-radio"><div class="sort-radio-dot"></div></div>
+    </div>
+    <div class="sort-option" onclick="setSort(this,'nearby')" data-sort="nearby">
+      Near me first
       <div class="sort-radio"><div class="sort-radio-dot"></div></div>
     </div>
   </div>
@@ -5674,6 +5701,9 @@ function formatViews(n) {
 let currentTab = 'Rent'; // default tab shown on load
 const SHOW_VERIFIED_BADGE = false; // verified badge hidden on cards for now — flip to true to bring it back
 let currentSort = 'newest';
+let userCoords = null;      // {lat, lng} once geolocation succeeds, used for "Near me first" sort
+let nearbyAreaName = '';    // reverse-geocoded locality name, for the banner text only
+let sortSetByUser = false;  // true once the visitor manually opens Sort and picks an option
 const SHORTLIST_KEY = 'homeloop_shortlisted_properties';
 const SHORTLIST_DATA_KEY = 'homeloop_shortlisted_properties_data';
 function loadShortlist() {
@@ -7896,6 +7926,14 @@ function getFiltered() {
   if (currentSort==='price-asc') list.sort((a,b)=>(a.price?.rent||0)-(b.price?.rent||0));
   else if (currentSort==='price-desc') list.sort((a,b)=>(b.price?.rent||0)-(a.price?.rent||0));
   else if (currentSort==='promoted') list.sort((a,b)=>(b.promoted?1:0)-(a.promoted?1:0));
+  else if (currentSort==='nearby' && userCoords) {
+    // Properties without saved coordinates sort to the end rather than
+    // dropping out of the list entirely.
+    const distFor = p => (p.location?.lat != null && p.location?.lng != null)
+      ? haversineKm(userCoords.lat, userCoords.lng, p.location.lat, p.location.lng)
+      : Infinity;
+    list.sort((a, b) => distFor(a) - distFor(b));
+  }
   else list.sort((a,b)=>String(a.id).localeCompare(String(b.id)));
   return list;
 }
@@ -7906,6 +7944,84 @@ function toggleFilters(){}
 function applyFilters(){ closeAllFd(); renderCards(); }
 
 
+
+/* ═══════════════════════════════════════════════
+   NEARBY LOCATION
+   Detects the visitor's current position (with permission),
+   then sorts listings so the closest ones show first.
+   Falls back silently (no error shown) if geolocation is
+   unavailable, denied, or times out — the default sort just
+   stays in place.
+═══════════════════════════════════════════════ */
+function haversineKm(lat1, lon1, lat2, lon2) {
+  const toRad = d => d * Math.PI / 180;
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat / 2) ** 2 +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+function showNearbyBanner() {
+  const el = document.getElementById('nearbyBanner');
+  const textEl = document.getElementById('nearbyBannerText');
+  if (!el) return;
+  if (!userCoords || currentSort !== 'nearby') { el.style.display = 'none'; return; }
+  if (textEl) {
+    textEl.textContent = nearbyAreaName
+      ? `Showing properties near ${nearbyAreaName} first`
+      : 'Showing properties near your current location first';
+  }
+  el.style.display = 'flex';
+}
+
+// "Show all" in the banner drops back to the default sort without
+// discarding the detected coordinates, so switching back to "Near me
+// first" from the Sort menu later still works without asking again.
+function clearNearbySort() {
+  sortSetByUser = true;
+  currentSort = 'newest';
+  document.querySelectorAll('.sort-option').forEach(o => o.classList.remove('active'));
+  const def = document.querySelector('.sort-option[data-sort="newest"]');
+  if (def) def.classList.add('active');
+  showNearbyBanner();
+  renderCards();
+}
+
+function initNearbyLocation() {
+  if (!('geolocation' in navigator)) return;
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      // Auto-switch to "Near me first" only if the visitor hasn't manually
+      // picked a sort yet. But if currentSort is already 'nearby' — either
+      // from that auto-switch or because they picked it manually before we
+      // had coordinates — re-render now that we finally have a position.
+      if (!sortSetByUser) {
+        currentSort = 'nearby';
+        document.querySelectorAll('.sort-option').forEach(o => o.classList.remove('active'));
+        const opt = document.querySelector('.sort-option[data-sort="nearby"]');
+        if (opt) opt.classList.add('active');
+      }
+      if (currentSort === 'nearby') renderCards();
+      showNearbyBanner();
+      // Reverse-geocode just for the banner's area name — the actual
+      // sort above already runs on lat/lng, so this is cosmetic only
+      // and its failure/latency never blocks the sort itself.
+      fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${userCoords.lat}&longitude=${userCoords.lng}&localityLanguage=en`)
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          if (!data) return;
+          nearbyAreaName = data.locality || data.city || data.principalSubdivision || '';
+          showNearbyBanner();
+        })
+        .catch(err => console.error('reverse geocode error:', err));
+    },
+    (err) => console.error('geolocation error:', err.message),
+    { enableHighAccuracy: true, timeout: 12000, maximumAge: 5 * 60 * 1000 }
+  );
+}
 
 /* ═══════════════════════════════════════════════
    SORT
@@ -7920,7 +8036,10 @@ function setSort(el, val) {
   document.querySelectorAll('.sort-option').forEach(o => o.classList.remove('active'));
   el.classList.add('active');
   currentSort = val;
+  sortSetByUser = true; // don't let a late-resolving geolocation callback override a manual pick
   closeSort();
+  if (val === 'nearby' && !userCoords) initNearbyLocation(); // ask now if we don't have a position yet
+  showNearbyBanner(); // shows the banner if they picked "Near me first" (and coords exist); hides it otherwise
   renderCards();
 }
 
@@ -10573,6 +10692,7 @@ document.addEventListener('DOMContentLoaded', function() {
   (async function loadPropertiesFromDB() {
     const ok = await fetchProperties();
     if (!ok) return;
+    initNearbyLocation(); // ask for location once listings are in, so "Near me first" has data to sort
 
     // ── Deep-link: auto-open property from URL param ──
     const _dlParam = new URLSearchParams(window.location.search).get('property');
