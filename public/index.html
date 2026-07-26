@@ -5944,6 +5944,11 @@ function renderCards() {
   const gridClass = 'prop-grid' + (isListView ? ' list-view' : '');
   const pageGetters = { promoted: () => promotedPage, rent: () => rentPage, lease: () => leasePage, pg: () => pgPage, shortstay: () => shortstayPage };
   const pageSetters = { promoted: v => promotedPage = v, rent: v => rentPage = v, lease: v => leasePage = v, pg: v => pgPage = v, shortstay: v => shortstayPage = v };
+  // On the single-type tabs (Rent/Lease/PG/ShortStay) that section is the
+  // only one populated, so pagination just adds noise — show every
+  // matching listing on one page with no page controls. All/Promoted
+  // still page normally since multiple sections stack together there.
+  const noPagination = ['Rent', 'Lease', 'PG', 'ShortStay'].includes(currentTab);
 
   SECTIONS.forEach(key => {
     const items = groups[key];
@@ -5959,6 +5964,12 @@ function renderCards() {
 
     divider.style.display = '';
     document.getElementById(key + 'Count').textContent = items.length;
+
+    if (noPagination) {
+      grid.innerHTML = items.map(p => cardHTML(p, key !== 'promoted')).join('');
+      return;
+    }
+
     let page = Math.min(pageGetters[key](), Math.floor((items.length - 1) / PAGE_SIZE));
     pageSetters[key](page);
     const slice = items.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
