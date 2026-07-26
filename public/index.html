@@ -9867,13 +9867,15 @@ const HR_VERIFIED_ICON = '<svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5.5 3.
 
 function renderHonestReviews(reviews) {
   const wrap = document.getElementById('honestReviewsScroll');
+  const section = document.getElementById('honestReviewsSection');
   if (!wrap) return;
 
   if (!reviews || !reviews.length) {
-    wrap.innerHTML = '<div class="hr-empty">No reviews yet — check back soon.</div>';
+    if (section) section.style.display = 'none';
     return;
   }
 
+  if (section) section.style.display = '';
   wrap.innerHTML = reviews.map(r => {
     const url = safeUrl(r.videoUrl);
     return `
@@ -9928,7 +9930,7 @@ async function submitVideoReview(evt) {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Could not submit your video');
-    showToast(data.message || 'Thanks! Your video is now live in Honest Reviews.');
+    showToast(data.message || 'Thanks! Your video has been submitted for review and will go live once approved.');
     document.getElementById('submitVideoForm').reset();
     closeSubmitVideoModal();
     loadHonestReviews();

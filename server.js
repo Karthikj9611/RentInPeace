@@ -2547,13 +2547,13 @@ app.post('/api/honest-reviews/submit', requireUser, async (req, res) => {
       title: title.slice(0, 120),
       meta: `Submitted by ${user.name || 'a HomeLoop user'}`,
       verifiedLabel: 'Verified user',
-      active: true,
-      status: 'approved',
+      active: false,
+      status: 'pending',
       userId: user._id,
       userName: user.name || ''
     });
 
-    res.status(201).json({ review, message: 'Thanks! Your video is now live in Honest Reviews.' });
+    res.status(201).json({ review, message: 'Thanks! Your video has been submitted for review and will go live once approved.' });
   } catch (err) {
     console.error('POST /api/honest-reviews/submit error:', err.message);
     res.status(500).json({ error: 'Could not submit your video' });
