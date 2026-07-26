@@ -233,6 +233,19 @@ table.dataTable thead tr.col-filter-row th{
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%238a6820'/></svg>");
   background-repeat:no-repeat;background-position:right 8px center;padding-right:22px;
 }
+.col-date-range{display:flex;flex-direction:column;gap:4px;min-width:118px}
+.col-date-range input[type="date"]{width:100%;box-sizing:border-box;
+  padding:4px 6px;border:1.3px solid var(--border);border-radius:7px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:0.68rem;font-weight:500;
+  color:var(--ink);background:#fff;outline:none;
+  transition:border-color 0.15s,box-shadow 0.15s;
+}
+.col-date-range input[type="date"]:focus{
+  border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,144,60,0.12);
+}
+.col-date-range input[type="date"].active-col-filter{
+  border-color:var(--gold);background:var(--gold-light);
+}
 
 /* ── PROMOTED / VERIFIED MINI TOGGLES ── */
 .mini-toggle-wrap{display:flex;align-items:center;justify-content:center}
@@ -1830,7 +1843,10 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onCustColumnFilter('email', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="e.g. 3" oninput="onCustColumnFilter('listings', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="e.g. 0" oninput="onCustColumnFilter('visits', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="dd/mm/yyyy" oninput="onCustColumnFilter('registered', this.value, this)"></th>
+              <th><div class="col-date-range">
+                <input type="date" title="From" onchange="onCustRegisteredRangeFilter('start', this.value, this)">
+                <input type="date" title="To" onchange="onCustRegisteredRangeFilter('end', this.value, this)">
+              </div></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onCustColumnFilter('remarks', this.value, this)"></th>
               <th></th>
             </tr>
@@ -1986,7 +2002,10 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
               <th></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('propertyId', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('userId', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="dd/mm/yyyy" oninput="onPropColumnFilter('listedOn', this.value, this)"></th>
+              <th><div class="col-date-range">
+                <input type="date" title="From" onchange="onPropListedOnRangeFilter('start', this.value, this)">
+                <input type="date" title="To" onchange="onPropListedOnRangeFilter('end', this.value, this)">
+              </div></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('remarks', this.value, this)"></th>
               <th></th>
             </tr>
@@ -2061,7 +2080,10 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
                   <option value="General Enquiry">General Enquiry</option>
                 </select>
               </th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('date', this.value, this)"></th>
+              <th><div class="col-date-range">
+                <input type="date" title="From" onchange="onApptDateRangeFilter('start', this.value, this)">
+                <input type="date" title="To" onchange="onApptDateRangeFilter('end', this.value, this)">
+              </div></th>
               <th>
                 <select class="col-filter-select" onchange="onApptColumnFilter('timeSlot', this.value, this)">
                   <option value="">All</option>
@@ -2080,7 +2102,10 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
                   <option value="completed">Completed</option>
                 </select>
               </th>
-              <th><input type="text" class="col-filter-input" placeholder="dd/mm/yyyy" oninput="onApptColumnFilter('bookedOn', this.value, this)"></th>
+              <th><div class="col-date-range">
+                <input type="date" title="From" onchange="onApptBookedOnRangeFilter('start', this.value, this)">
+                <input type="date" title="To" onchange="onApptBookedOnRangeFilter('end', this.value, this)">
+              </div></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('remarks', this.value, this)"></th>
               <th></th>
             </tr>
@@ -2912,11 +2937,21 @@ function plainPhone(row){ return row.mobile||''; }
 function plainEmail(row){ return row.email||''; }
 
 /* ── CUSTOMERS: PER-COLUMN HEADER SEARCH FILTERS ── */
-const _custColumnFilters = { name:'', userId:'', mobile:'', email:'', accountType:'', listings:'', visits:'', registered:'', remarks:'' };
+const _custColumnFilters = { name:'', userId:'', mobile:'', email:'', accountType:'', listings:'', visits:'', registeredStart:'', registeredEnd:'', remarks:'' };
 
 window.onCustColumnFilter = function(field, value, inputEl){
   _custColumnFilters[field] = (value||'').trim();
   if(inputEl) inputEl.classList.toggle('active-col-filter', !!_custColumnFilters[field]);
+  if(dataTable) dataTable.draw();
+};
+
+// Registered date-range filter (start/end <input type="date">, values as
+// yyyy-mm-dd). Both bounds are inclusive, compared against raw createdAt.
+window.onCustRegisteredRangeFilter = function(which, value, inputEl){
+  const v = (value||'').trim();
+  if(which === 'start') _custColumnFilters.registeredStart = v;
+  else _custColumnFilters.registeredEnd = v;
+  if(inputEl) inputEl.classList.toggle('active-col-filter', !!v);
   if(dataTable) dataTable.draw();
 };
 
@@ -2934,9 +2969,17 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex){
   if(cf.accountType && (row.accountType||'customer') !== cf.accountType) return false;
   if(cf.listings && !contains(row.listingsCount ?? 0, cf.listings)) return false;
   if(cf.visits && !contains(row.visitsCount ?? 0, cf.visits)) return false;
-  if(cf.registered){
-    const formatted = row.createdAt ? new Date(row.createdAt).toLocaleDateString('en-GB') : '';
-    if(!formatted.includes(cf.registered)) return false;
+  if(cf.registeredStart || cf.registeredEnd){
+    if(!row.createdAt) return false;
+    const created = new Date(row.createdAt);
+    if(cf.registeredStart){
+      const startD = new Date(cf.registeredStart + 'T00:00:00');
+      if(created < startD) return false;
+    }
+    if(cf.registeredEnd){
+      const endD = new Date(cf.registeredEnd + 'T23:59:59.999');
+      if(created > endD) return false;
+    }
   }
   if(cf.remarks && !contains(flattenRemarks(row.remarks||[]), cf.remarks)) return false;
   return true;
@@ -5148,12 +5191,23 @@ const _propColumnFilters = {
   pgGender:'', pgRoomType:'', pgMeals:'', pgOccupancy:'', pgNotice:'',
   ssRoomType:'', ssAvailable24hrs:'', ssCancellation:'', ssCouplesAllowed:'',
   visitCount:'', propertyId:'', userId:'',
-  listedOn:'', promoted:'', booked:'', remarks:''
+  listedOnStart:'', listedOnEnd:'', promoted:'', booked:'', remarks:''
 };
 
 window.onPropColumnFilter = function(field, value, inputEl){
   _propColumnFilters[field] = (value||'').trim();
   if(inputEl) inputEl.classList.toggle('active-col-filter', !!_propColumnFilters[field]);
+  if(propTable) propTable.draw();
+};
+
+// Listed On date-range filter (start/end <input type="date">, values as
+// yyyy-mm-dd). "which" is 'start' or 'end'; both are inclusive bounds
+// compared against each row's raw createdAt timestamp.
+window.onPropListedOnRangeFilter = function(which, value, inputEl){
+  const v = (value||'').trim();
+  if(which === 'start') _propColumnFilters.listedOnStart = v;
+  else _propColumnFilters.listedOnEnd = v;
+  if(inputEl) inputEl.classList.toggle('active-col-filter', !!v);
   if(propTable) propTable.draw();
 };
 
@@ -5598,9 +5652,17 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex){
   if(cf.visitCount && !contains(row.visitCount, cf.visitCount)) return false;
   if(cf.propertyId && !contains(row.propertyId, cf.propertyId)) return false;
   if(cf.userId && !contains(row.userId, cf.userId)) return false;
-  if(cf.listedOn){
-    const formatted = row.createdAt ? new Date(row.createdAt).toLocaleDateString('en-GB') : '';
-    if(!formatted.includes(cf.listedOn)) return false;
+  if(cf.listedOnStart || cf.listedOnEnd){
+    if(!row.createdAt) return false;
+    const created = new Date(row.createdAt);
+    if(cf.listedOnStart){
+      const startD = new Date(cf.listedOnStart + 'T00:00:00');
+      if(created < startD) return false;
+    }
+    if(cf.listedOnEnd){
+      const endD = new Date(cf.listedOnEnd + 'T23:59:59.999');
+      if(created > endD) return false;
+    }
   }
   if(cf.promoted === 'yes' && !row.promoted) return false;
   if(cf.promoted === 'no'  && row.promoted)  return false;
@@ -5708,13 +5770,34 @@ const _apptCache = {};
 
 /* ── APPOINTMENTS: PER-COLUMN HEADER SEARCH FILTERS ── */
 const _apptColumnFilters = {
-  visitId:'', customer:'', userId:'', contact:'', property:'', purpose:'', date:'', timeSlot:'',
-  message:'', status:'', bookedOn:'', remarks:''
+  visitId:'', customer:'', userId:'', contact:'', property:'', purpose:'', dateStart:'', dateEnd:'', timeSlot:'',
+  message:'', status:'', bookedOnStart:'', bookedOnEnd:'', remarks:''
 };
 
 window.onApptColumnFilter = function(field, value, inputEl){
   _apptColumnFilters[field] = (value||'').trim();
   if(inputEl) inputEl.classList.toggle('active-col-filter', !!_apptColumnFilters[field]);
+  if(apptTable) apptTable.draw();
+};
+
+// Scheduled visit Date range filter (start/end <input type="date">, values
+// as yyyy-mm-dd). Compared against row.date, which is itself a yyyy-mm-dd
+// string (no time component).
+window.onApptDateRangeFilter = function(which, value, inputEl){
+  const v = (value||'').trim();
+  if(which === 'start') _apptColumnFilters.dateStart = v;
+  else _apptColumnFilters.dateEnd = v;
+  if(inputEl) inputEl.classList.toggle('active-col-filter', !!v);
+  if(apptTable) apptTable.draw();
+};
+
+// Booked On date-range filter (start/end <input type="date">, values as
+// yyyy-mm-dd). Both bounds are inclusive, compared against raw createdAt.
+window.onApptBookedOnRangeFilter = function(which, value, inputEl){
+  const v = (value||'').trim();
+  if(which === 'start') _apptColumnFilters.bookedOnStart = v;
+  else _apptColumnFilters.bookedOnEnd = v;
+  if(inputEl) inputEl.classList.toggle('active-col-filter', !!v);
   if(apptTable) apptTable.draw();
 };
 
@@ -5739,16 +5822,32 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex){
     if(!contains(propBlob, cf.property)) return false;
   }
   if(cf.purpose && (row.purpose||'') !== cf.purpose) return false;
-  if(cf.date){
-    const formatted = row.date ? new Date(row.date+'T00:00:00').toLocaleDateString('en-GB', {weekday:'short',day:'2-digit',month:'short',year:'numeric'}) : '';
-    if(!contains(formatted, cf.date)) return false;
+  if(cf.dateStart || cf.dateEnd){
+    if(!row.date) return false;
+    const visitDate = new Date(row.date + 'T00:00:00');
+    if(cf.dateStart){
+      const startD = new Date(cf.dateStart + 'T00:00:00');
+      if(visitDate < startD) return false;
+    }
+    if(cf.dateEnd){
+      const endD = new Date(cf.dateEnd + 'T00:00:00');
+      if(visitDate > endD) return false;
+    }
   }
   if(cf.timeSlot && (row.timeSlot||'') !== cf.timeSlot) return false;
   if(cf.message && !contains(row.message, cf.message)) return false;
   if(cf.status && (row.status||'pending') !== cf.status) return false;
-  if(cf.bookedOn){
-    const formatted = row.createdAt ? new Date(row.createdAt).toLocaleDateString('en-GB') : '';
-    if(!formatted.includes(cf.bookedOn)) return false;
+  if(cf.bookedOnStart || cf.bookedOnEnd){
+    if(!row.createdAt) return false;
+    const created = new Date(row.createdAt);
+    if(cf.bookedOnStart){
+      const startD = new Date(cf.bookedOnStart + 'T00:00:00');
+      if(created < startD) return false;
+    }
+    if(cf.bookedOnEnd){
+      const endD = new Date(cf.bookedOnEnd + 'T23:59:59.999');
+      if(created > endD) return false;
+    }
   }
   if(cf.remarks && !contains(flattenRemarks(row.remarks||[]), cf.remarks)) return false;
 
