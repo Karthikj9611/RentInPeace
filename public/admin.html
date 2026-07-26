@@ -233,7 +233,9 @@ table.dataTable thead tr.col-filter-row th{
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%238a6820'/></svg>");
   background-repeat:no-repeat;background-position:right 8px center;padding-right:22px;
 }
-.col-date-range{display:flex;flex-direction:column;gap:4px;min-width:118px}
+.col-date-range{display:flex;flex-direction:column;gap:4px;min-width:126px;
+  padding:4px;border:1px solid var(--border);border-radius:9px;background:rgba(0,0,0,0.015);
+}
 .col-date-range input[type="date"]{width:100%;box-sizing:border-box;
   padding:4px 6px;border:1.3px solid var(--border);border-radius:7px;
   font-family:'Plus Jakarta Sans',sans-serif;font-size:0.68rem;font-weight:500;
@@ -2051,8 +2053,12 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
               <th>Visit ID</th>
               <th>Customer</th>
               <th>User ID</th>
-              <th>Contact</th>
-              <th>Property</th>
+              <th>Mobile</th>
+              <th>Alt Mobile</th>
+              <th>Email</th>
+              <th>Property Name</th>
+              <th>Location</th>
+              <th>Property ID</th>
               <th>Purpose</th>
               <th>Date</th>
               <th>Time Slot</th>
@@ -2068,8 +2074,12 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('visitId', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('customer', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('userId', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('contact', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('property', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('mobile', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('altMobile', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('email', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('propertyName', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('propertyArea', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('propertyId', this.value, this)"></th>
               <th>
                 <select class="col-filter-select" onchange="onApptColumnFilter('purpose', this.value, this)">
                   <option value="">All</option>
@@ -4680,42 +4690,45 @@ $(document).ready(function(){
       }},
       /* 4 – User ID */
       { data:'userReadableId', render:(d)=> escapeHtml(d||'—') },
-      /* 5 – Contact */
-      { data:null, orderable:false, render:(d,t,row)=>{
-          if(t==='display') return renderApptContact(row);
-          return row.mobile||'';
+      /* 5 – Mobile */
+      { data:'mobile', orderable:false, render:(d)=>{
+          return d ? `<a href="tel:${escapeHtml(d)}" class="phone-link"><i class="fas fa-phone-flip"></i>${escapeHtml(d)}</a>` : '<span class="no-contact">—</span>';
       }},
-      /* 6 – Property */
-      { data:null, render:(d,t,row)=>{
-          const pname = row.propertyName || '';
-          const parts = [row.propertyArea, row.propertyId].filter(Boolean).join(' · ');
-          if(t==='display'){
-            if(!pname && !parts) return '<span class="no-contact">—</span>';
-            return `<div><div class="prop-title">${escapeHtml(pname||'—')}</div><div class="prop-sub">${escapeHtml(parts)}</div></div>`;
-          }
-          return [pname, parts].filter(Boolean).join(' ');
+      /* 6 – Alt Mobile */
+      { data:'altMobile', orderable:false, render:(d)=>{
+          return d ? `<a href="tel:${escapeHtml(d)}" class="phone-link" style="background:#f0f9ff;color:#2563eb;border-color:rgba(37,99,235,0.18)"><i class="fas fa-phone"></i>${escapeHtml(d)}</a>` : '<span class="no-contact">—</span>';
       }},
-      /* 7 – Purpose */
+      /* 7 – Email */
+      { data:'email', orderable:false, render:(d)=>{
+          return d ? `<a href="mailto:${escapeHtml(d)}" class="email-link" title="${escapeHtml(d)}"><i class="fas fa-envelope"></i>${escapeHtml(d)}</a>` : '<span class="no-contact">—</span>';
+      }},
+      /* 8 – Property Name */
+      { data:'propertyName', render:(d)=> d ? `<div class="prop-title">${escapeHtml(d)}</div>` : '<span class="no-contact">—</span>' },
+      /* 9 – Location (Property Area) */
+      { data:'propertyArea', render:(d)=> escapeHtml(d||'—') },
+      /* 10 – Property ID */
+      { data:'propertyId', render:(d)=> escapeHtml(d||'—') },
+      /* 11 – Purpose */
       { data:'purpose', render:(d,t)=>
           t==='display' ? `<span class="purpose-badge">${escapeHtml(d||'—')}</span>` : (d||'—')
       },
-      /* 8 – Visit Date */
+      /* 12 – Visit Date */
       { data:'date', render:(d,t)=>{
           if(t==='display') return renderApptDate(d);
           if(t==='export') return plainApptDate(d);
           return d||'—';
       }},
-      /* 9 – Time Slot */
+      /* 13 – Time Slot */
       { data:'timeSlot', render:(d,t)=>
           t==='display' ? renderTimeSlot(d) : (d||'—')
       },
-      /* 10 – Message */
+      /* 14 – Message */
       { data:'message', orderable:false, render:(d)=>{
           const msg = escapeHtml(d||'');
           if(!msg) return '<span class="no-contact">—</span>';
           return `<div style="max-width:200px;font-size:0.8rem;color:var(--ink2);white-space:normal;line-height:1.5;">${msg}</div>`;
       }},
-      /* 11 – Status (inline change) */
+      /* 15 – Status (inline change) */
       { data:'status', render:(d,t,row)=>{
           if(t==='display'){
             _apptCache[row._id] = row;
@@ -4723,18 +4736,18 @@ $(document).ready(function(){
           }
           return d||'pending';
       }},
-      /* 12 – Booked On */
+      /* 16 – Booked On */
       { data:'createdAt', render:(d,t)=>{
           if(t==='display') return formatDateTime(d);
           if(t==='export') return plainDateTime(d);
           return d||'—';
       }},
-      /* 13 – Remarks */
+      /* 17 – Remarks */
       { data:'remarks', orderable:false, render:(d,t,row)=>{
           if(t==='display') return remarkCellHtml(row._id, d, 'appointment');
           return d||'';
       }},
-      /* 14 – Action */
+      /* 18 – Action */
       { data:null, orderable:false, render:(d,t,row)=>{
           _apptCache[row._id] = row;
           return `<div style="display:inline-flex;gap:6px;flex-wrap:nowrap;justify-content:center">
@@ -4743,7 +4756,7 @@ $(document).ready(function(){
           </div>`;
       }}
     ],
-    order:[[8,'asc']],
+    order:[[12,'asc']], // Visit Date
     orderCellsTop:true,
     pageLength:10,
     scrollX:true,
@@ -4807,10 +4820,10 @@ $(document).ready(function(){
         orientation:'landscape', pageSize:'A4', title:'Appointment_Leads_' + new Date().toLocaleDateString('en-GB'),
         exportOptions: {
 			columns: function(idx){
-				// Checkbox(0) has no printable value; Remarks(13) and
-				// Action(14) are never printed to PDF; everything else
+				// Checkbox(0) has no printable value; Remarks(17) and
+				// Action(18) are never printed to PDF; everything else
 				// follows whatever the Columns toggle currently shows.
-				return idx!==0 && idx!==13 && idx!==14 && apptTable.column(idx).visible();
+				return idx!==0 && idx!==17 && idx!==18 && apptTable.column(idx).visible();
 			},
 			format: {
 				body: function (data, row, column, node) {
@@ -4825,21 +4838,14 @@ $(document).ready(function(){
 						return (rd.name || ((rd.firstName || '') + ' ' + (rd.lastName || ''))).trim();
 					}
 
-					// Property Details
-					if (origIdx === 6) {
-						return [
-							rd.propertyName || '',
-							rd.propertyArea || '',
-							rd.propertyId || ''
-						].filter(Boolean).join('\n');
-					}
-
 					// Status
-					if (origIdx === 11) {
+					if (origIdx === 15) {
 						return rd.status || '';
 					}
 
-					// Other columns
+					// Other columns (Mobile, Alt Mobile, Email, Property Name,
+					// Location, Property ID are now separate simple-text
+					// columns, so the default text-strip handles them fine)
 					return $(node).text().trim();
 				}
 			}
@@ -5438,10 +5444,12 @@ const COL_TOGGLE_CONFIGS = {
   appt: {
     getTable: ()=>apptTable,
     cols: [
-      {idx:2, label:'Visit ID'}, {idx:4, label:'User ID'}, {idx:5, label:'Contact'},
-      {idx:6, label:'Property'}, {idx:7, label:'Purpose'}, {idx:8, label:'Visit Date'},
-      {idx:9, label:'Time Slot'}, {idx:10, label:'Message'}, {idx:11, label:'Status'},
-      {idx:12, label:'Booked On'}, {idx:13, label:'Remarks'}
+      {idx:2, label:'Visit ID'}, {idx:4, label:'User ID'},
+      {idx:5, label:'Mobile'}, {idx:6, label:'Alt Mobile'}, {idx:7, label:'Email'},
+      {idx:8, label:'Property Name'}, {idx:9, label:'Location'}, {idx:10, label:'Property ID'},
+      {idx:11, label:'Purpose'}, {idx:12, label:'Visit Date'},
+      {idx:13, label:'Time Slot'}, {idx:14, label:'Message'}, {idx:15, label:'Status'},
+      {idx:16, label:'Booked On'}, {idx:17, label:'Remarks'}
     ],
     menuId:'apptColToggleMenu', btnId:'apptColToggleBtn', wrapId:'apptColToggleWrap',
     storageKey:'rip_admin_apptColVisibility'
@@ -5468,7 +5476,7 @@ function custExportColumnIndices(){
 }
 function apptExportColumnIndices(){
   const idxs=[];
-  for(let i=0;i<=14;i++){ if(i!==0 && i!==13 && i!==14 && apptTable.column(i).visible()) idxs.push(i); }
+  for(let i=0;i<=18;i++){ if(i!==0 && i!==17 && i!==18 && apptTable.column(i).visible()) idxs.push(i); }
   return idxs;
 }
 
@@ -5770,7 +5778,8 @@ const _apptCache = {};
 
 /* ── APPOINTMENTS: PER-COLUMN HEADER SEARCH FILTERS ── */
 const _apptColumnFilters = {
-  visitId:'', customer:'', userId:'', contact:'', property:'', purpose:'', dateStart:'', dateEnd:'', timeSlot:'',
+  visitId:'', customer:'', userId:'', mobile:'', altMobile:'', email:'',
+  propertyName:'', propertyArea:'', propertyId:'', purpose:'', dateStart:'', dateEnd:'', timeSlot:'',
   message:'', status:'', bookedOnStart:'', bookedOnEnd:'', remarks:''
 };
 
@@ -5813,14 +5822,12 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex){
   if(cf.visitId && !contains(row.visitId, cf.visitId)) return false;
   if(cf.customer && !contains(fullName, cf.customer)) return false;
   if(cf.userId && !contains(row.userReadableId, cf.userId)) return false;
-  if(cf.contact){
-    const contactBlob = [row.mobile, row.altMobile, row.email].filter(Boolean).join(' ');
-    if(!contains(contactBlob, cf.contact)) return false;
-  }
-  if(cf.property){
-    const propBlob = [row.propertyName, row.propertyArea, row.propertyId].filter(Boolean).join(' ');
-    if(!contains(propBlob, cf.property)) return false;
-  }
+  if(cf.mobile && !contains(row.mobile, cf.mobile)) return false;
+  if(cf.altMobile && !contains(row.altMobile, cf.altMobile)) return false;
+  if(cf.email && !contains(row.email, cf.email)) return false;
+  if(cf.propertyName && !contains(row.propertyName, cf.propertyName)) return false;
+  if(cf.propertyArea && !contains(row.propertyArea, cf.propertyArea)) return false;
+  if(cf.propertyId && !contains(row.propertyId, cf.propertyId)) return false;
   if(cf.purpose && (row.purpose||'') !== cf.purpose) return false;
   if(cf.dateStart || cf.dateEnd){
     if(!row.date) return false;
