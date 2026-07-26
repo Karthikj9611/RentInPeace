@@ -337,7 +337,7 @@ table.dataTable.no-footer{border-bottom:none!important}
 .col-toggle-btn:hover{background:var(--surface2);border-color:var(--border2)}
 .col-toggle-btn.active{background:var(--ink);color:#fff;border-color:var(--ink)}
 .col-toggle-menu{
-  display:none;position:absolute;top:calc(100% + 8px);left:0;z-index:50;
+  display:none;position:fixed;z-index:9999;
   width:300px;max-height:420px;overflow-y:auto;
   background:var(--surface);border:1px solid var(--border);
   border-radius:var(--radius-sm);box-shadow:var(--shadow-lg);padding:10px;
@@ -1783,17 +1783,31 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
   <div class="tab-panel" id="panel-customers">
     <div class="card">
       <div class="table-wrapper">
-        <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
-          <div class="col-toggle-wrap" id="custColToggleWrap">
-            <button type="button" class="col-toggle-btn" id="custColToggleBtn" onclick="toggleColMenu('cust')">
-              <i class="fas fa-table-columns"></i> Columns
+        <div class="bulk-toolbar bulk-toolbar-spaced" id="custBulkToolbar">
+          <div class="bulk-toolbar-left">
+            <span class="bulk-selected-count" id="custSelectedCount" style="display:none">
+              <i class="fas fa-check-circle"></i> <span id="custSelectedNum">0</span><span class="bulk-btn-label"> selected</span>
+            </span>
+            <button class="bulk-btn bulk-btn-clear" id="custClearBtn" style="display:none" onclick="clearCustSelection()" title="Clear selection">
+              <i class="fas fa-xmark"></i> <span class="bulk-btn-label">Clear selection</span>
             </button>
-            <div class="col-toggle-menu" id="custColToggleMenu"></div>
+          </div>
+          <div class="bulk-toolbar-right">
+            <button class="bulk-btn bulk-btn-danger" id="custDeleteSelectedBtn" style="display:none" onclick="deleteSelectedCustomers()" title="Delete selected">
+              <i class="fas fa-trash-alt"></i> <span class="bulk-btn-label">Delete Selected&nbsp;</span>(<span id="custDeleteCount">0</span>)
+            </button>
+            <div class="col-toggle-wrap" id="custColToggleWrap">
+              <button type="button" class="col-toggle-btn" id="custColToggleBtn" onclick="toggleColMenu('cust')">
+                <i class="fas fa-table-columns"></i> Columns
+              </button>
+              <div class="col-toggle-menu" id="custColToggleMenu"></div>
+            </div>
           </div>
         </div>
         <table id="bookingTable" class="display nowrap" style="width:100%">
           <thead>
             <tr>
+              <th><input type="checkbox" class="cust-select-all-checkbox" id="custSelectAllCheckbox" onchange="onCustSelectAllChange(this)"></th>
               <th>S.No</th>
               <th>Customer</th>
               <th>Type</th>
@@ -1808,6 +1822,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
             </tr>
             <tr class="col-filter-row">
               <th></th>
+              <th></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onCustColumnFilter('name', this.value, this)"></th>
               <th><select class="col-filter-select" onchange="onCustColumnFilter('accountType', this.value, this)"><option value="">All</option><option value="customer">Customer</option><option value="owner">Owner</option></select></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onCustColumnFilter('userId', this.value, this)"></th>
@@ -1821,7 +1836,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
             </tr>
           </thead>
           <tbody>
-            <tr><td colspan="11" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
+            <tr><td colspan="12" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
           </tbody>
         </table>
       </div>
@@ -1850,7 +1865,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
       <button class="cat-tab-btn" data-cat="PG" onclick="switchPropCategory('PG')">
         <i class="fas fa-bed"></i><span>PG</span><span class="cat-count" id="cat-count-PG">—</span>
       </button>
-      <button class="cat-tab-btn" data-cat="Short Stay" onclick="switchPropCategory('Short Stay')">
+      <button class="cat-tab-btn" data-cat="Short Stay" onclick="switchPropCategory('Short Stay')" style="display:none">
         <i class="fas fa-suitcase-rolling"></i><span>Short Stay</span><span class="cat-count" id="cat-count-Short-Stay">—</span>
       </button>
     </div>
@@ -1884,8 +1899,8 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
         <table id="propertyTable" class="display nowrap" style="width:100%">
           <thead>
             <tr>
-              <th class="col-sno">S.No</th>
               <th class="col-sticky-1"><input type="checkbox" class="prop-select-all-checkbox" id="propSelectAllCheckbox" onchange="onPropSelectAllChange(this)"></th>
+              <th class="col-sno">S.No</th>
               <th class="col-sticky-2">Property</th>
               <th>Promoted</th>
               <th>Verified</th>
@@ -1930,8 +1945,8 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
               <th>Action</th>
             </tr>
             <tr class="col-filter-row">
-              <th class="col-sno"></th>
               <th class="col-sticky-1"></th>
+              <th class="col-sno"></th>
               <th class="col-sticky-2"><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('title', this.value, this)"></th>
               <th><select class="col-filter-select" onchange="onPropColumnFilter('promoted', this.value, this)"><option value="">All</option><option value="yes">Yes</option><option value="no">No</option></select></th>
               <th></th>
@@ -1988,17 +2003,31 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
   <div class="tab-panel" id="panel-appointments">
     <div class="card">
       <div class="table-wrapper">
-        <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
-          <div class="col-toggle-wrap" id="apptColToggleWrap">
-            <button type="button" class="col-toggle-btn" id="apptColToggleBtn" onclick="toggleColMenu('appt')">
-              <i class="fas fa-table-columns"></i> Columns
+        <div class="bulk-toolbar bulk-toolbar-spaced" id="apptBulkToolbar">
+          <div class="bulk-toolbar-left">
+            <span class="bulk-selected-count" id="apptSelectedCount" style="display:none">
+              <i class="fas fa-check-circle"></i> <span id="apptSelectedNum">0</span><span class="bulk-btn-label"> selected</span>
+            </span>
+            <button class="bulk-btn bulk-btn-clear" id="apptClearBtn" style="display:none" onclick="clearApptSelection()" title="Clear selection">
+              <i class="fas fa-xmark"></i> <span class="bulk-btn-label">Clear selection</span>
             </button>
-            <div class="col-toggle-menu" id="apptColToggleMenu"></div>
+          </div>
+          <div class="bulk-toolbar-right">
+            <button class="bulk-btn bulk-btn-danger" id="apptDeleteSelectedBtn" style="display:none" onclick="deleteSelectedAppointments()" title="Delete selected">
+              <i class="fas fa-trash-alt"></i> <span class="bulk-btn-label">Delete Selected&nbsp;</span>(<span id="apptDeleteCount">0</span>)
+            </button>
+            <div class="col-toggle-wrap" id="apptColToggleWrap">
+              <button type="button" class="col-toggle-btn" id="apptColToggleBtn" onclick="toggleColMenu('appt')">
+                <i class="fas fa-table-columns"></i> Columns
+              </button>
+              <div class="col-toggle-menu" id="apptColToggleMenu"></div>
+            </div>
           </div>
         </div>
         <table id="appointmentTable" class="display nowrap" style="width:100%">
           <thead>
             <tr>
+              <th><input type="checkbox" class="appt-select-all-checkbox" id="apptSelectAllCheckbox" onchange="onApptSelectAllChange(this)"></th>
               <th>S.No</th>
               <th>Visit ID</th>
               <th>Customer</th>
@@ -2015,6 +2044,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
               <th>Action</th>
             </tr>
             <tr class="col-filter-row">
+              <th></th>
               <th></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('visitId', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('customer', this.value, this)"></th>
@@ -2056,7 +2086,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
             </tr>
           </thead>
           <tbody>
-            <tr><td colspan="14" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
+            <tr><td colspan="15" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
           </tbody>
         </table>
       </div>
@@ -3647,6 +3677,214 @@ window.deleteAllProperties = async function(){
   }
 };
 
+/* ── CUSTOMER SELECTION & BULK DELETE ── */
+window.onCustRowCheck = function(checkboxEl, id){
+  if(checkboxEl.checked) _selectedCustIds.add(id);
+  else _selectedCustIds.delete(id);
+  updateCustBulkToolbarUI();
+  syncCustSelectionUI();
+};
+
+// Header checkbox selects/deselects every row matching the current filters,
+// not just the current page.
+window.onCustSelectAllChange = function(headerCheckboxEl){
+  const filteredRows = dataTable.rows({search:'applied'}).data().toArray();
+  if(headerCheckboxEl.checked){
+    filteredRows.forEach(r => _selectedCustIds.add(r.mobile || r._id));
+  } else {
+    filteredRows.forEach(r => _selectedCustIds.delete(r.mobile || r._id));
+  }
+  dataTable.draw(false);
+  updateCustBulkToolbarUI();
+  syncCustSelectionUI();
+  setTimeout(syncCustSelectionUI, 0);
+};
+
+function syncVisibleCustRowCheckboxes(){
+  document.querySelectorAll('#bookingTable tbody .cust-row-check').forEach(cb=>{
+    cb.checked = _selectedCustIds.has(cb.getAttribute('data-id'));
+  });
+}
+
+function syncCustSelectAllCheckbox(){
+  if(typeof dataTable === 'undefined' || !dataTable) return;
+  const headerCbs = document.querySelectorAll('.cust-select-all-checkbox');
+  if(!headerCbs.length) return;
+  const filteredRows = dataTable.rows({search:'applied'}).data().toArray();
+  let checked, indeterminate;
+  if(!filteredRows.length){
+    checked = false; indeterminate = false;
+  } else {
+    const selectedCount = filteredRows.filter(r => _selectedCustIds.has(r.mobile || r._id)).length;
+    checked = selectedCount === filteredRows.length;
+    indeterminate = selectedCount > 0 && selectedCount < filteredRows.length;
+  }
+  headerCbs.forEach(cb=>{ cb.checked = checked; cb.indeterminate = indeterminate; });
+}
+
+function syncCustSelectionUI(){
+  syncVisibleCustRowCheckboxes();
+  syncCustSelectAllCheckbox();
+}
+
+function updateCustBulkToolbarUI(){
+  const n = _selectedCustIds.size;
+  const countEl   = document.getElementById('custSelectedCount');
+  const numEl     = document.getElementById('custSelectedNum');
+  const clearBtn  = document.getElementById('custClearBtn');
+  const delBtn    = document.getElementById('custDeleteSelectedBtn');
+  const delCountEl= document.getElementById('custDeleteCount');
+  const show = n > 0;
+  countEl.style.display = show ? 'inline-flex' : 'none';
+  clearBtn.style.display = show ? 'inline-flex' : 'none';
+  delBtn.style.display = show ? 'inline-flex' : 'none';
+  numEl.textContent = n;
+  delCountEl.textContent = n;
+}
+
+window.clearCustSelection = function(){
+  _selectedCustIds.clear();
+  dataTable.draw(false);
+  updateCustBulkToolbarUI();
+  syncCustSelectionUI();
+  setTimeout(syncCustSelectionUI, 0);
+};
+
+// There's no bulk-delete endpoint for customers on the backend, so this
+// sends the existing per-customer DELETE request for each selected row
+// (in parallel) and reports how many succeeded/failed.
+window.deleteSelectedCustomers = async function(){
+  const ids = Array.from(_selectedCustIds);
+  if(!ids.length) return;
+  const ok = await showConfirmModal({
+    title: `Delete ${ids.length} customer${ids.length===1?'':'s'}?`,
+    message: 'This will permanently remove the selected customer registrations. This cannot be undone.'
+  });
+  if(!ok) return;
+  try{
+    const results = await Promise.all(ids.map(async id=>{
+      try{
+        const res = await fetch(`${BASE}/api/users/mobile/${id}`, { method:'DELETE', headers: authHeaders() });
+        return res.ok;
+      } catch(e){ return false; }
+    }));
+    const failCount = results.filter(r=>!r).length;
+    _selectedCustIds.clear();
+    dataTable.ajax.reload(null, false);
+    setTimeout(()=>{
+      const total = dataTable.data().count();
+      document.getElementById('tab-customers-count').innerText = total;
+    }, 600);
+    updateCustBulkToolbarUI();
+    if(failCount) alert(`${failCount} of ${ids.length} could not be deleted. Please try again.`);
+  } catch(err){
+    alert('Bulk delete failed. Please try again.');
+  }
+};
+
+/* ── APPOINTMENT SELECTION & BULK DELETE ── */
+window.onApptRowCheck = function(checkboxEl, id){
+  if(checkboxEl.checked) _selectedApptIds.add(id);
+  else _selectedApptIds.delete(id);
+  updateApptBulkToolbarUI();
+  syncApptSelectionUI();
+};
+
+window.onApptSelectAllChange = function(headerCheckboxEl){
+  const filteredRows = apptTable.rows({search:'applied'}).data().toArray();
+  if(headerCheckboxEl.checked){
+    filteredRows.forEach(r => _selectedApptIds.add(r._id));
+  } else {
+    filteredRows.forEach(r => _selectedApptIds.delete(r._id));
+  }
+  apptTable.draw(false);
+  updateApptBulkToolbarUI();
+  syncApptSelectionUI();
+  setTimeout(syncApptSelectionUI, 0);
+};
+
+function syncVisibleApptRowCheckboxes(){
+  document.querySelectorAll('#appointmentTable tbody .appt-row-check').forEach(cb=>{
+    cb.checked = _selectedApptIds.has(cb.getAttribute('data-id'));
+  });
+}
+
+function syncApptSelectAllCheckbox(){
+  if(typeof apptTable === 'undefined' || !apptTable) return;
+  const headerCbs = document.querySelectorAll('.appt-select-all-checkbox');
+  if(!headerCbs.length) return;
+  const filteredRows = apptTable.rows({search:'applied'}).data().toArray();
+  let checked, indeterminate;
+  if(!filteredRows.length){
+    checked = false; indeterminate = false;
+  } else {
+    const selectedCount = filteredRows.filter(r => _selectedApptIds.has(r._id)).length;
+    checked = selectedCount === filteredRows.length;
+    indeterminate = selectedCount > 0 && selectedCount < filteredRows.length;
+  }
+  headerCbs.forEach(cb=>{ cb.checked = checked; cb.indeterminate = indeterminate; });
+}
+
+function syncApptSelectionUI(){
+  syncVisibleApptRowCheckboxes();
+  syncApptSelectAllCheckbox();
+}
+
+function updateApptBulkToolbarUI(){
+  const n = _selectedApptIds.size;
+  const countEl   = document.getElementById('apptSelectedCount');
+  const numEl     = document.getElementById('apptSelectedNum');
+  const clearBtn  = document.getElementById('apptClearBtn');
+  const delBtn    = document.getElementById('apptDeleteSelectedBtn');
+  const delCountEl= document.getElementById('apptDeleteCount');
+  const show = n > 0;
+  countEl.style.display = show ? 'inline-flex' : 'none';
+  clearBtn.style.display = show ? 'inline-flex' : 'none';
+  delBtn.style.display = show ? 'inline-flex' : 'none';
+  numEl.textContent = n;
+  delCountEl.textContent = n;
+}
+
+window.clearApptSelection = function(){
+  _selectedApptIds.clear();
+  apptTable.draw(false);
+  updateApptBulkToolbarUI();
+  syncApptSelectionUI();
+  setTimeout(syncApptSelectionUI, 0);
+};
+
+// There's no bulk-delete endpoint for appointments on the backend, so this
+// sends the existing per-appointment DELETE request for each selected row
+// (in parallel) and reports how many succeeded/failed.
+window.deleteSelectedAppointments = async function(){
+  const ids = Array.from(_selectedApptIds);
+  if(!ids.length) return;
+  const ok = await showConfirmModal({
+    title: `Delete ${ids.length} appointment${ids.length===1?'':'s'}?`,
+    message: 'This will permanently remove the selected appointments. This cannot be undone.'
+  });
+  if(!ok) return;
+  try{
+    const results = await Promise.all(ids.map(async id=>{
+      try{
+        const res = await fetch(`${BASE}/api/appointments/${id}`, { method:'DELETE', headers: authHeaders() });
+        return res.ok;
+      } catch(e){ return false; }
+    }));
+    const failCount = results.filter(r=>!r).length;
+    _selectedApptIds.clear();
+    apptTable.ajax.reload(null, false);
+    setTimeout(()=>{
+      const total = apptTable.data().count();
+      document.getElementById('tab-appointments-count').innerText = total;
+    }, 600);
+    updateApptBulkToolbarUI();
+    if(failCount) alert(`${failCount} of ${ids.length} could not be deleted. Please try again.`);
+  } catch(err){
+    alert('Bulk delete failed. Please try again.');
+  }
+};
+
 /* ── REMARKS ── */
 function remarkCellHtml(id, remark, type){
 
@@ -3867,34 +4105,41 @@ $(document).ready(function(){
       }
     },
     columns:[
-      /* 0 – S.No (serial number) */
+      /* 0 – Select checkbox */
+      { data:null, orderable:false, className:'dt-body-center', render:(d,t,row)=>{
+          if(t!=='display') return '';
+          const id = row.mobile || row._id;
+          const checked = _selectedCustIds.has(id) ? 'checked' : '';
+          return `<input type="checkbox" class="cust-row-check" data-id="${id}" onchange="onCustRowCheck(this,'${id}')" ${checked}>`;
+      }},
+      /* 1 – S.No (serial number) */
       { data:null, orderable:false, className:'dt-body-center', render:(d,t,row,meta)=> String(meta.row+1) },
-      /* 1 – Customer name */
+      /* 2 – Customer name */
       { data:null, render:(d,t,row)=> t==='display' ? renderName(row) : ((row.firstName||'')+' '+(row.lastName||'')).trim() },
-      /* 2 – Type (customer looking for a home, or property owner) */
+      /* 3 – Type (customer looking for a home, or property owner) */
       { data:'accountType', render:(d,t)=> t==='display' ? accountTypeBadge(d||'customer') : (d||'customer') },
-      /* 3 – User ID */
+      /* 4 – User ID */
       { data:'userId', render:(d)=> escapeHtml(d||'—') },
-      /* 4 – Phone */
+      /* 5 – Phone */
       { data:null, render:(d,t,row)=>{ if(t==='display') return renderPhone(row); return plainPhone(row); }},
-      /* 5 – Email */
+      /* 6 – Email */
       { data:null, render:(d,t,row)=>{ if(t==='display') return renderEmail(row); return plainEmail(row); }},
-      /* 6 – Property Listings (count) */
+      /* 7 – Property Listings (count) */
       { data:'listingsCount', className:'dt-body-center', render:(d)=> String(d ?? 0) },
-      /* 7 – Visit Requests (count) */
+      /* 8 – Visit Requests (count) */
       { data:'visitsCount', className:'dt-body-center', render:(d)=> String(d ?? 0) },
-      /* 8 – Registered */
+      /* 9 – Registered */
       { data:'createdAt', render:(d,t)=>{
           if(t==='display') return formatDateTime(d);
           if(t==='export') return plainDateTime(d);
           return d||'—';
       }},
-      /* 9 – Remarks */
+      /* 10 – Remarks */
       { data:'remarks', orderable:false, render:(d,t,row)=>{
           if(t==='display') return remarkCellHtml(row.mobile||row._id, d, 'customer');
           return d||'';
       }},
-      /* 10 – Action */
+      /* 11 – Action */
       { 
 		  data:null, 
 		  orderable:false, 
@@ -3918,7 +4163,7 @@ $(document).ready(function(){
 		  }
 		}
     ],
-    order:[[8,'desc']],
+    order:[[9,'desc']],
     orderCellsTop:true,
     pageLength:10,
     scrollX:true,
@@ -3982,17 +4227,18 @@ $(document).ready(function(){
         orientation:'landscape', pageSize:'A4', title:'Customer_Leads_' + new Date().toLocaleDateString('en-GB'),
         exportOptions:{
           columns: function(idx){
-            // Remarks(9) and Action(10) are never printed to PDF; everything
-            // else follows whatever the Columns toggle currently shows.
-            return idx!==9 && idx!==10 && dataTable.column(idx).visible();
+            // Checkbox(0) has no printable value; Remarks(10) and Action(11)
+            // are never printed to PDF; everything else follows whatever
+            // the Columns toggle currently shows.
+            return idx!==0 && idx!==10 && idx!==11 && dataTable.column(idx).visible();
           }
         },
         customize:function(doc){
           doc.styles.tableHeader={fillColor:'#0c0d10',color:'white',bold:true,fontSize:10,alignment:'center'};
           doc.defaultStyle={fontSize:9,color:'#0c0d10'};
           var idxs = custExportColumnIndices();
-          var phonePos = idxs.indexOf(4);
-          var emailPos = idxs.indexOf(5);
+          var phonePos = idxs.indexOf(5);
+          var emailPos = idxs.indexOf(6);
           if(phonePos<0 && emailPos<0) return;
           var rows=dataTable.rows({search:'applied'}).data().toArray();
           var tableBody=doc.content[1]&&doc.content[1].table?doc.content[1].table.body:null;
@@ -4006,8 +4252,19 @@ $(document).ready(function(){
         }
       }
     ],
-    drawCallback:function(){}
+    drawCallback:function(){
+      try{ syncCustSelectionUI(); }catch(e){ /* table not fully initialized yet */ }
+    }
   });
+  // Merge the auto-created PDF button into our bulk-select toolbar so PDF
+  // export, selection controls, and Columns toggle all sit on one row.
+  // (See the Properties table init below for why we anchor on
+  // ".top-controls" rather than a "table" selector — scrollX clones the
+  // <table> element, which would make a "table"-based selector match more
+  // than one element.)
+  var $custTopControls = $('#bookingTable_wrapper > .top-controls');
+  $custTopControls.find('.dt-buttons').prependTo('#custBulkToolbar .bulk-toolbar-left');
+  $custTopControls.remove();
   initColumnToggle('cust');
   } catch(e){ console.error('Customers table failed to initialize:', e); }
 
@@ -4028,14 +4285,14 @@ $(document).ready(function(){
       }
     },
     columns:[
-      /* 0 – S.No (serial number) */
-      { data:null, orderable:false, className:'dt-body-center col-sno', render:(d,t,row,meta)=> String(meta.row+1) },
-      /* 1 – Select checkbox */
+      /* 0 – Select checkbox */
       { data:null, orderable:false, className:'dt-body-center col-sticky-1', render:(d,t,row)=>{
           if(t!=='display') return '';
           const checked = _selectedPropIds.has(row._id) ? 'checked' : '';
           return `<input type="checkbox" class="prop-row-check" data-id="${row._id}" onchange="onPropRowCheck(this,'${row._id}')" ${checked}>`;
       }},
+      /* 1 – S.No (serial number) */
+      { data:null, orderable:false, className:'dt-body-center col-sno', render:(d,t,row,meta)=> String(meta.row+1) },
       /* 1 – Property title (Property ID and Location are their own columns below) */
       { data:null, className:'col-sticky-2', render:(d,t,row)=>{
           const title = escapeHtml(row.title||'Untitled');
@@ -4230,9 +4487,18 @@ $(document).ready(function(){
         orientation:'landscape', pageSize:'A4', title:'Property_Leads_' + new Date().toLocaleDateString('en-GB'),
        exportOptions: {
 			columns: function (idx, data, node) {
-				return idx !== 42 && idx !== 43 &&
+				// Column 0 is the select checkbox — it has no printable
+				// value, so leave it out of the PDF entirely instead of
+				// exporting a blank column.
+				return idx !== 0 && idx !== 42 && idx !== 43 &&
 					   propTable.column(idx).visible();
 			},
+			// Use each column's dedicated "export" text instead of stripping
+			// tags from the "display" HTML. Stripping tags alone left behind
+			// visible text nodes that aren't part of the real value — e.g.
+			// the Owner Name cell's avatar-circle initial ("K") stayed in
+			// the string in front of the name, producing "KKeerthi J".
+			orthogonal: 'export',
 			stripHtml: true,
 			format: {
 				body: function (data, row, column, node) {
@@ -4244,10 +4510,6 @@ $(document).ready(function(){
 					var rd = propTable.row(row).data();
 					if (!rd) return data;
 
-					if (column === 3) return rd.promoted ? "Yes" : "No";
-					if (column === 4) return rd.verified ? "Yes" : "No";
-					if (column === 5) return rd.booked ? "Yes" : "No";
-
 					return typeof data === "string" ? data.trim() : data;
 				}
 			}
@@ -4256,19 +4518,24 @@ $(document).ready(function(){
           doc.styles.tableHeader={fillColor:'#0c0d10',color:'white',bold:true,fontSize:9,alignment:'center'};
           doc.defaultStyle={fontSize:8,color:'#0c0d10',alignment:'center'};
           var ownerNumPos = propExportColumnIndices().indexOf(7);
+          var ownerAltPos = propExportColumnIndices().indexOf(8);
+          var ownerEmailPos = propExportColumnIndices().indexOf(9);
           var rows=propTable.rows({search:'applied'}).data().toArray();
           var tableIdx = doc.content.findIndex(function(c){ return c && c.table; });
           var tableBody = tableIdx>=0 ? doc.content[tableIdx].table.body : null;
           if(!tableBody) return;
 
-          // Apply the clickable tel: link to the Owner Number cells.
-          if(ownerNumPos >= 0){
-            rows.forEach(function(rd,i){
-              var pdfRow=tableBody[i+1]; if(!pdfRow) return;
-              var ph=rd.ownerNumber||'';
-              if(ph&&pdfRow[ownerNumPos]) pdfRow[ownerNumPos]={text:ph,link:'tel:'+ph,color:'#1a7a5e',decoration:'underline',fontSize:8};
-            });
-          }
+          // Make Owner Number, Owner Alt Phone, and Owner Email clickable
+          // (tel:/mailto: links) in the exported PDF.
+          rows.forEach(function(rd,i){
+            var pdfRow=tableBody[i+1]; if(!pdfRow) return;
+            var ph=rd.ownerNumber||'';
+            var altPh=rd.ownerAltPhone||'';
+            var em=rd.ownerEmail||'';
+            if(ownerNumPos>=0 && ph && pdfRow[ownerNumPos]) pdfRow[ownerNumPos]={text:ph,link:'tel:'+ph,color:'#1a7a5e',decoration:'underline',fontSize:8};
+            if(ownerAltPos>=0 && altPh && pdfRow[ownerAltPos]) pdfRow[ownerAltPos]={text:altPh,link:'tel:'+altPh,color:'#1a7a5e',decoration:'underline',fontSize:8};
+            if(ownerEmailPos>=0 && em && pdfRow[ownerEmailPos]) pdfRow[ownerEmailPos]={text:em,link:'mailto:'+em,color:'#8a6820',decoration:'underline',fontSize:8};
+          });
 
           // Rather than paginate, size the sheet itself to the column
           // count so everything fits on one page — pdfMake accepts a
@@ -4353,23 +4620,29 @@ $(document).ready(function(){
       }
     },
     columns:[
-      /* 0 – S.No (serial number) */
+      /* 0 – Select checkbox */
+      { data:null, orderable:false, className:'dt-body-center', render:(d,t,row)=>{
+          if(t!=='display') return '';
+          const checked = _selectedApptIds.has(row._id) ? 'checked' : '';
+          return `<input type="checkbox" class="appt-row-check" data-id="${row._id}" onchange="onApptRowCheck(this,'${row._id}')" ${checked}>`;
+      }},
+      /* 1 – S.No (serial number) */
       { data:null, orderable:false, className:'dt-body-center', render:(d,t,row,meta)=> String(meta.row+1) },
-      /* 1 – Visit ID */
+      /* 2 – Visit ID */
       { data:'visitId', render:(d)=> escapeHtml(d||'—') },
-      /* 2 – Customer Name */
+      /* 3 – Customer Name */
       { data:null, render:(d,t,row)=>{
           if(t==='display') return renderName(row);
           return ((row.name||row.firstName||'')+' '+(row.lastName||'')).trim();
       }},
-      /* 3 – User ID */
+      /* 4 – User ID */
       { data:'userReadableId', render:(d)=> escapeHtml(d||'—') },
-      /* 4 – Contact */
+      /* 5 – Contact */
       { data:null, orderable:false, render:(d,t,row)=>{
           if(t==='display') return renderApptContact(row);
           return row.mobile||'';
       }},
-      /* 5 – Property */
+      /* 6 – Property */
       { data:null, render:(d,t,row)=>{
           const pname = row.propertyName || '';
           const parts = [row.propertyArea, row.propertyId].filter(Boolean).join(' · ');
@@ -4379,27 +4652,27 @@ $(document).ready(function(){
           }
           return [pname, parts].filter(Boolean).join(' ');
       }},
-      /* 6 – Purpose */
+      /* 7 – Purpose */
       { data:'purpose', render:(d,t)=>
           t==='display' ? `<span class="purpose-badge">${escapeHtml(d||'—')}</span>` : (d||'—')
       },
-      /* 7 – Visit Date */
+      /* 8 – Visit Date */
       { data:'date', render:(d,t)=>{
           if(t==='display') return renderApptDate(d);
           if(t==='export') return plainApptDate(d);
           return d||'—';
       }},
-      /* 8 – Time Slot */
+      /* 9 – Time Slot */
       { data:'timeSlot', render:(d,t)=>
           t==='display' ? renderTimeSlot(d) : (d||'—')
       },
-      /* 9 – Message */
+      /* 10 – Message */
       { data:'message', orderable:false, render:(d)=>{
           const msg = escapeHtml(d||'');
           if(!msg) return '<span class="no-contact">—</span>';
           return `<div style="max-width:200px;font-size:0.8rem;color:var(--ink2);white-space:normal;line-height:1.5;">${msg}</div>`;
       }},
-      /* 10 – Status (inline change) */
+      /* 11 – Status (inline change) */
       { data:'status', render:(d,t,row)=>{
           if(t==='display'){
             _apptCache[row._id] = row;
@@ -4407,18 +4680,18 @@ $(document).ready(function(){
           }
           return d||'pending';
       }},
-      /* 11 – Booked On */
+      /* 12 – Booked On */
       { data:'createdAt', render:(d,t)=>{
           if(t==='display') return formatDateTime(d);
           if(t==='export') return plainDateTime(d);
           return d||'—';
       }},
-      /* 12 – Remarks */
+      /* 13 – Remarks */
       { data:'remarks', orderable:false, render:(d,t,row)=>{
           if(t==='display') return remarkCellHtml(row._id, d, 'appointment');
           return d||'';
       }},
-      /* 13 – Action */
+      /* 14 – Action */
       { data:null, orderable:false, render:(d,t,row)=>{
           _apptCache[row._id] = row;
           return `<div style="display:inline-flex;gap:6px;flex-wrap:nowrap;justify-content:center">
@@ -4427,7 +4700,7 @@ $(document).ready(function(){
           </div>`;
       }}
     ],
-    order:[[7,'asc']],
+    order:[[8,'asc']],
     orderCellsTop:true,
     pageLength:10,
     scrollX:true,
@@ -4491,9 +4764,10 @@ $(document).ready(function(){
         orientation:'landscape', pageSize:'A4', title:'Appointment_Leads_' + new Date().toLocaleDateString('en-GB'),
         exportOptions: {
 			columns: function(idx){
-				// Remarks(12) and Action(13) are never printed to PDF; everything
-				// else follows whatever the Columns toggle currently shows.
-				return idx!==12 && idx!==13 && apptTable.column(idx).visible();
+				// Checkbox(0) has no printable value; Remarks(13) and
+				// Action(14) are never printed to PDF; everything else
+				// follows whatever the Columns toggle currently shows.
+				return idx!==0 && idx!==13 && idx!==14 && apptTable.column(idx).visible();
 			},
 			format: {
 				body: function (data, row, column, node) {
@@ -4504,12 +4778,12 @@ $(document).ready(function(){
 					var origIdx = apptExportColumnIndices()[column];
 
 					// Customer Name
-					if (origIdx === 2) {
+					if (origIdx === 3) {
 						return (rd.name || ((rd.firstName || '') + ' ' + (rd.lastName || ''))).trim();
 					}
 
 					// Property Details
-					if (origIdx === 5) {
+					if (origIdx === 6) {
 						return [
 							rd.propertyName || '',
 							rd.propertyArea || '',
@@ -4518,7 +4792,7 @@ $(document).ready(function(){
 					}
 
 					// Status
-					if (origIdx === 10) {
+					if (origIdx === 11) {
 						return rd.status || '';
 					}
 
@@ -4533,8 +4807,16 @@ $(document).ready(function(){
         }
       }
     ],
-    drawCallback:function(){}
+    drawCallback:function(){
+      try{ syncApptSelectionUI(); }catch(e){ /* table not fully initialized yet */ }
+    }
   });
+  // Merge the auto-created PDF button into our bulk-select toolbar (see the
+  // Properties table init for why ".top-controls" is used as the anchor
+  // instead of a "table" selector — scrollX clones the <table> element).
+  var $apptTopControls = $('#appointmentTable_wrapper > .top-controls');
+  $apptTopControls.find('.dt-buttons').prependTo('#apptBulkToolbar .bulk-toolbar-left');
+  $apptTopControls.remove();
   initColumnToggle('appt');
   } catch(e){ console.error('Appointments table failed to initialize:', e); }
 
@@ -4637,6 +4919,8 @@ $(document).ready(function(){
 const _adminPropCache = {};
 const _customerCache = {};
 const _selectedPropIds = new Set();
+const _selectedCustIds = new Set();
+const _selectedApptIds = new Set();
 
 function _adminModalEsc(str){
   if(str==null) return '—';
@@ -4840,6 +5124,11 @@ function buildPropFilters(data){
 
   function populate(id, values, prefix=''){
     const sel = document.getElementById(id);
+    // If this column is currently hidden, DataTables has removed its <th>
+    // (and this <select> along with it) from the DOM entirely — not just
+    // CSS-hidden it. Nothing to populate in that case; the next reload
+    // after the column's shown again will re-populate it from fresh data.
+    if(!sel) return;
     const cur = sel.value;
     sel.innerHTML = `<option value="">${sel.options[0].text}</option>` +
       values.map(v=>`<option value="${_adminModalEsc(v)}" ${cur===String(v)?'selected':''}>${prefix}${_adminModalEsc(String(v))}</option>`).join('');
@@ -4944,7 +5233,7 @@ const PROP_COL_GROUPS = [
 // right now. Mirrors whatever's currently visible (category-tab-driven
 // PG/Short-Stay columns + the manual Columns toggle).
 function propExportColumnPredicate(idx){
-  return idx!==42 && idx!==43 && propTable.column(idx).visible();
+  return idx!==0 && idx!==42 && idx!==43 && propTable.column(idx).visible();
 }
 function propExportColumnIndices(){
   const idxs=[];
@@ -5019,11 +5308,26 @@ function syncPropColToggleCheckbox(colIdx, visible){
   if(cb) cb.checked = visible;
 }
 
+// The dropdown is position:fixed (see .col-toggle-menu) so it isn't clipped
+// by the .card{overflow:hidden} it lives inside — so its position has to be
+// computed from the button's on-screen rect instead of relying on CSS
+// top/left relative to a wrapper.
+function positionColToggleMenu(btn, menu){
+  const rect = btn.getBoundingClientRect();
+  const menuWidth = 300;
+  let left = rect.right - menuWidth;
+  if (left < 8) left = 8;
+  if (left + menuWidth > window.innerWidth - 8) left = window.innerWidth - menuWidth - 8;
+  menu.style.top = (rect.bottom + 8) + 'px';
+  menu.style.left = left + 'px';
+}
+
 window.togglePropColMenu = function(){
   const menu = document.getElementById('propColToggleMenu');
   const btn = document.getElementById('propColToggleBtn');
   if(!menu) return;
   const opening = !menu.classList.contains('open');
+  if(opening) positionColToggleMenu(btn, menu);
   menu.classList.toggle('open', opening);
   if(btn) btn.classList.toggle('active', opening);
 };
@@ -5037,6 +5341,27 @@ document.addEventListener('click', function(e){
     if(btn) btn.classList.remove('active');
   }
 });
+// The dropdown is position:fixed now, so it won't track its button if the
+// page scrolls underneath it — close it, but only for scrolls happening
+// outside the dropdown itself (it has its own overflow-y:auto scrollbar,
+// and this listener runs in the capture phase to catch scroll on nested
+// scroll containers too, so without this check scrolling the dropdown's
+// own list would immediately close it).
+window.addEventListener('scroll', function(e){
+  document.querySelectorAll('.col-toggle-menu.open').forEach(menu => {
+    if(menu.contains(e.target)) return;
+    menu.classList.remove('open');
+    const btn = document.querySelector('[id$="ColToggleBtn"].active');
+    if(btn) btn.classList.remove('active');
+  });
+}, true);
+window.addEventListener('resize', function(){
+  document.querySelectorAll('.col-toggle-menu.open').forEach(menu => {
+    menu.classList.remove('open');
+    const btn = document.querySelector('[id$="ColToggleBtn"].active');
+    if(btn) btn.classList.remove('active');
+  });
+});
 
 /* ── COLUMN VISIBILITY TOGGLE (Customers / Appointments / Honest Reviews) ──
    Same pattern as the Properties column toggle above, generalized so the
@@ -5049,9 +5374,9 @@ const COL_TOGGLE_CONFIGS = {
   cust: {
     getTable: ()=>dataTable,
     cols: [
-      {idx:2, label:'Type'}, {idx:3, label:'User ID'}, {idx:4, label:'Phone'},
-      {idx:5, label:'Email'}, {idx:6, label:'Property Listings'}, {idx:7, label:'Visit Requests'},
-      {idx:8, label:'Registered'}, {idx:9, label:'Remarks'}
+      {idx:3, label:'Type'}, {idx:4, label:'User ID'}, {idx:5, label:'Phone'},
+      {idx:6, label:'Email'}, {idx:7, label:'Property Listings'}, {idx:8, label:'Visit Requests'},
+      {idx:9, label:'Registered'}, {idx:10, label:'Remarks'}
     ],
     menuId:'custColToggleMenu', btnId:'custColToggleBtn', wrapId:'custColToggleWrap',
     storageKey:'rip_admin_custColVisibility'
@@ -5059,10 +5384,10 @@ const COL_TOGGLE_CONFIGS = {
   appt: {
     getTable: ()=>apptTable,
     cols: [
-      {idx:1, label:'Visit ID'}, {idx:3, label:'User ID'}, {idx:4, label:'Contact'},
-      {idx:5, label:'Property'}, {idx:6, label:'Purpose'}, {idx:7, label:'Visit Date'},
-      {idx:8, label:'Time Slot'}, {idx:9, label:'Message'}, {idx:10, label:'Status'},
-      {idx:11, label:'Booked On'}, {idx:12, label:'Remarks'}
+      {idx:2, label:'Visit ID'}, {idx:4, label:'User ID'}, {idx:5, label:'Contact'},
+      {idx:6, label:'Property'}, {idx:7, label:'Purpose'}, {idx:8, label:'Visit Date'},
+      {idx:9, label:'Time Slot'}, {idx:10, label:'Message'}, {idx:11, label:'Status'},
+      {idx:12, label:'Booked On'}, {idx:13, label:'Remarks'}
     ],
     menuId:'apptColToggleMenu', btnId:'apptColToggleBtn', wrapId:'apptColToggleWrap',
     storageKey:'rip_admin_apptColVisibility'
@@ -5084,12 +5409,12 @@ const COL_TOGGLE_CONFIGS = {
 // (which shifts whenever a column is hidden) back to the original index.
 function custExportColumnIndices(){
   const idxs=[];
-  for(let i=0;i<=10;i++){ if(i!==9 && i!==10 && dataTable.column(i).visible()) idxs.push(i); }
+  for(let i=0;i<=11;i++){ if(i!==0 && i!==10 && i!==11 && dataTable.column(i).visible()) idxs.push(i); }
   return idxs;
 }
 function apptExportColumnIndices(){
   const idxs=[];
-  for(let i=0;i<=13;i++){ if(i!==12 && i!==13 && apptTable.column(i).visible()) idxs.push(i); }
+  for(let i=0;i<=14;i++){ if(i!==0 && i!==13 && i!==14 && apptTable.column(i).visible()) idxs.push(i); }
   return idxs;
 }
 
@@ -5137,6 +5462,7 @@ window.toggleColMenu = function(key){
   const btn = document.getElementById(cfg.btnId);
   if(!menu) return;
   const opening = !menu.classList.contains('open');
+  if(opening) positionColToggleMenu(btn, menu);
   menu.classList.toggle('open', opening);
   if(btn) btn.classList.toggle('active', opening);
 };
