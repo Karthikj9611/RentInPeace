@@ -194,6 +194,18 @@ body{
 .bulk-toolbar-below{
   justify-content:center;border-bottom:none;border-top:1px solid var(--border);
 }
+.bulk-toolbar-spaced{
+  justify-content:space-between;margin-bottom:16px;
+  flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;-ms-overflow-style:none;
+}
+.bulk-toolbar-spaced::-webkit-scrollbar{display:none}
+.bulk-toolbar-spaced .bulk-toolbar-left,
+.bulk-toolbar-spaced .bulk-toolbar-right{flex-wrap:nowrap;flex-shrink:0}
+.bulk-toolbar-spaced .dt-buttons{margin-bottom:0;flex-wrap:nowrap}
+.bulk-toolbar-spaced .bulk-btn,
+.bulk-toolbar-spaced .bulk-selected-count,
+.bulk-toolbar-spaced .col-toggle-wrap{flex-shrink:0}
 #propSelectAllCheckbox,.prop-select-all-checkbox,.prop-row-check{
   width:16px;height:16px;cursor:pointer;accent-color:var(--ink);
 }
@@ -1844,15 +1856,31 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
     </div>
     <div class="card">
       <div class="table-wrapper">
-        <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
-          <div class="col-toggle-wrap" id="propColToggleWrap">
-            <button type="button" class="col-toggle-btn" id="propColToggleBtn" onclick="togglePropColMenu()">
-              <i class="fas fa-table-columns"></i> Columns
+        <!-- Toolbar: PDF export + selection controls + column toggle, all in one row -->
+        <div class="bulk-toolbar bulk-toolbar-spaced" id="bulkToolbar">
+          <div class="bulk-toolbar-left">
+            <span class="bulk-selected-count" id="bulkSelectedCount" style="display:none">
+              <i class="fas fa-check-circle"></i> <span id="bulkSelectedNum">0</span><span class="bulk-btn-label"> selected</span>
+            </span>
+            <button class="bulk-btn bulk-btn-clear" id="bulkClearBtn" style="display:none" onclick="clearPropSelection()" title="Clear selection">
+              <i class="fas fa-xmark"></i> <span class="bulk-btn-label">Clear selection</span>
             </button>
-            <div class="col-toggle-menu" id="propColToggleMenu"></div>
+          </div>
+          <div class="bulk-toolbar-right">
+            <button class="bulk-btn bulk-btn-danger" id="bulkDeleteSelectedBtn" style="display:none" onclick="deleteSelectedProperties()" title="Delete selected">
+              <i class="fas fa-trash-alt"></i> <span class="bulk-btn-label">Delete Selected&nbsp;</span>(<span id="bulkDeleteCount">0</span>)
+            </button>
+            <button class="bulk-btn bulk-btn-outline-danger" disabled title="Temporarily disabled">
+              <i class="fas fa-triangle-exclamation"></i> <span class="bulk-btn-label">Delete All Properties</span>
+            </button>
+            <div class="col-toggle-wrap" id="propColToggleWrap">
+              <button type="button" class="col-toggle-btn" id="propColToggleBtn" onclick="togglePropColMenu()">
+                <i class="fas fa-table-columns"></i> Columns
+              </button>
+              <div class="col-toggle-menu" id="propColToggleMenu"></div>
+            </div>
           </div>
         </div>
-
         <table id="propertyTable" class="display nowrap" style="width:100%">
           <thead>
             <tr>
@@ -1952,26 +1980,6 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
             <tr><td colspan="44" class="empty-state"><i class="fas fa-circle-notch fa-spin"></i>Loading…</td></tr>
           </tbody>
         </table>
-
-        <!-- Bulk delete toolbar -->
-        <div class="bulk-toolbar bulk-toolbar-below" id="bulkToolbar">
-          <div class="bulk-toolbar-left">
-            <span class="bulk-selected-count" id="bulkSelectedCount" style="display:none">
-              <i class="fas fa-check-circle"></i> <span id="bulkSelectedNum">0</span><span class="bulk-btn-label"> selected</span>
-            </span>
-            <button class="bulk-btn bulk-btn-clear" id="bulkClearBtn" style="display:none" onclick="clearPropSelection()" title="Clear selection">
-              <i class="fas fa-xmark"></i> <span class="bulk-btn-label">Clear selection</span>
-            </button>
-          </div>
-          <div class="bulk-toolbar-right">
-            <button class="bulk-btn bulk-btn-danger" id="bulkDeleteSelectedBtn" style="display:none" onclick="deleteSelectedProperties()" title="Delete selected">
-              <i class="fas fa-trash-alt"></i> <span class="bulk-btn-label">Delete Selected&nbsp;</span>(<span id="bulkDeleteCount">0</span>)
-            </button>
-            <button class="bulk-btn bulk-btn-outline-danger" disabled title="Temporarily disabled">
-              <i class="fas fa-triangle-exclamation"></i> <span class="bulk-btn-label">Delete All Properties</span>
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -4311,11 +4319,16 @@ $(document).ready(function(){
       try{ syncPropSelectionUI(); }catch(e){ /* table not fully initialized yet */ }
     }
   });
-  // Physically reposition the bulk-delete toolbar so it renders below the
-  // CSV/Excel/PDF/Print export buttons (DataTables always inserts its
-  // "top-controls" button row immediately above the <table>, so we move
-  // the toolbar to sit right after that generated row).
-  $('#bulkToolbar').insertAfter($('#propertyTable_wrapper .top-controls'));
+  // With scrollX enabled, DataTables clones the <table> element for the
+  // frozen scrolling header, so a selector like "#propertyTable_wrapper table"
+  // matches BOTH the clone and the original — inserting relative to that
+  // match set makes jQuery clone whatever you're inserting. Anchor on
+  // ".top-controls" instead (a plain sibling div, never cloned by scrollX,
+  // and guaranteed to be a single element as a direct child of the wrapper).
+  var $topControls = $('#propertyTable_wrapper > .top-controls');
+  $('#bulkToolbar').insertBefore($topControls);
+  $topControls.find('.dt-buttons').prependTo('#bulkToolbar .bulk-toolbar-left');
+  $topControls.remove();
   loadPropColVisibility();
   applyPropCategoryColumnVisibility(_propCategoryState);
   buildPropColumnToggle();
