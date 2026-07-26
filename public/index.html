@@ -7018,6 +7018,28 @@ function clearFiltersHiddenByTab() {
   });
 }
 
+/* UrbanAware (honest video reviews), the "Add a Review" section, and
+   Premium Services are only relevant when browsing the unfiltered full
+   listing set, so they're shown for the "All" tab only and hidden for
+   every other tab (Rent, Lease, PG, ShortStay, Promoted).
+   hasHonestReviews tracks whether there's actually data to show, so
+   UrbanAware still hides itself on the All tab if the API returns none;
+   renderHonestReviews() only flips that flag and defers to this function
+   for the actual display, instead of setting style.display itself
+   (which used to race with tab switches and re-show it on other tabs). */
+let hasHonestReviews = false;
+function updateAllOnlySections() {
+  const show = currentTab === 'All';
+  const urbanAware = document.getElementById('honestReviewsSection');
+  const reviewsSection = document.querySelector('.reviews-section');
+  const premiumServices = document.getElementById('premiumServicesSection');
+  const fabStatsInline = document.getElementById('fabStatsInline');
+  if (urbanAware) urbanAware.style.display = (show && hasHonestReviews) ? '' : 'none';
+  if (reviewsSection) reviewsSection.style.display = show ? '' : 'none';
+  if (premiumServices) premiumServices.style.display = show ? '' : 'none';
+  if (fabStatsInline) fabStatsInline.style.display = show ? '' : 'none';
+}
+
 function switchTab(el) {
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
@@ -7036,6 +7058,7 @@ function switchTab(el) {
   clearFiltersHiddenByTab();
   buildFilterOptions(); // rebuild dropdown options from only this tab's data (Rent/Lease/PG/ShortStay)
   closeAllFd();
+  updateAllOnlySections();
   renderCards();
   renderRecentlyViewed();
   renderShortlistPanel();
@@ -7050,6 +7073,7 @@ function switchTabMobile(el) {
   clearFiltersHiddenByTab();
   buildFilterOptions(); // rebuild dropdown options from only this tab's data (Rent/Lease/PG/ShortStay)
   closeAllFd();
+  updateAllOnlySections();
   renderCards();
   renderRecentlyViewed();
   renderShortlistPanel();
@@ -9875,15 +9899,12 @@ const HR_VERIFIED_ICON = '<svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5.5 3.
 
 function renderHonestReviews(reviews) {
   const wrap = document.getElementById('honestReviewsScroll');
-  const section = document.getElementById('honestReviewsSection');
   if (!wrap) return;
 
-  if (!reviews || !reviews.length) {
-    if (section) section.style.display = 'none';
-    return;
-  }
+  hasHonestReviews = !!(reviews && reviews.length);
+  updateAllOnlySections(); // apply combined tab + data-availability visibility
+  if (!hasHonestReviews) return;
 
-  if (section) section.style.display = '';
   wrap.innerHTML = reviews.map(r => {
     const url = safeUrl(r.videoUrl);
     return `
@@ -10535,6 +10556,7 @@ async function fetchProperties() {
 /* ── Ad Banner ── */
 document.addEventListener('DOMContentLoaded', function() {
   syncFdBar();
+  updateAllOnlySections(); // hide UrbanAware / Reviews on initial load (default tab is Rent, not All)
 
   // ── Load properties from DB ──
   (async function loadPropertiesFromDB() {
