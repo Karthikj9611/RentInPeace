@@ -1304,6 +1304,14 @@ ul{list-style:none}
   display:block;
 }
 @keyframes lightboxIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
+.lightbox-video{
+  width:min(90vw,900px);aspect-ratio:16/9;max-height:90vh;
+  background:#000;border-radius:6px;overflow:hidden;position:relative;
+  animation:lightboxIn .18s ease;
+}
+.lightbox-video iframe,
+.lightbox-video video{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+.lightbox-video .video-slide-fallback{color:#fff}
 .lightbox-close{
   position:absolute;top:10px;right:10px;z-index:5;
   width:38px;height:38px;border-radius:50%;
@@ -1330,6 +1338,8 @@ ul{list-style:none}
   border:2px solid transparent;opacity:.55;transition:opacity .15s,border-color .15s;
 }
 .lightbox-thumb.active{opacity:1;border-color:#fff}
+.lightbox-thumb.video-thumb{background:#000;display:flex;align-items:center;justify-content:center}
+.lightbox-thumb.video-thumb svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:1.8}
 @media (max-width:600px){
   .lightbox-thumbs{display:none}
 }
@@ -2215,31 +2225,36 @@ ul{list-style:none}
   color:var(--text-3);-webkit-text-fill-color:var(--text-3);font-weight:400;
 }
 .add-modal.view-mode #videoUrlGroup input{display:none}
-.video-embed-wrap{
-  position:relative;width:100%;aspect-ratio:16/9;
-  border-radius:12px;overflow:hidden;background:#000;margin-bottom:10px;
-}
-.video-embed-wrap iframe,
-.video-embed-wrap video{
+/* Video tour now lives as the LAST slide of the same swipeable gallery
+   (see buildImgSlider's videoSlideHtml param / buildVideoSlideHtml()),
+   not as a separate card below it. */
+.img-slide.video-slide{background:#000}
+.img-slide.video-slide iframe,
+.img-slide.video-slide video{
   position:absolute;inset:0;width:100%;height:100%;border:0;display:block;
 }
-.video-view-row{display:none;align-items:center;gap:8px}
-.video-view-link{
-  display:flex;align-items:center;gap:8px;flex:1;min-width:0;
-  color:var(--brand);font-weight:600;font-size:13px;
-  padding:9px 12px;border:1.5px solid var(--border-2);border-radius:9px;
-  overflow:hidden;
+/* Fallback content when the video URL isn't a recognizable embed format
+   (custom tour hosts, etc.) — a centered "watch" card instead of a player. */
+.video-slide-fallback{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:10px;color:#fff;text-align:center;padding:20px;
 }
-.video-view-link svg{width:16px;height:16px;flex-shrink:0;stroke:var(--brand);fill:none;stroke-width:1.8}
-.video-view-link span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.video-view-link:hover{background:var(--brand-light)}
-.video-view-copy{
-  width:38px;height:38px;flex-shrink:0;border-radius:9px;
-  border:1.5px solid var(--border-2);display:flex;align-items:center;justify-content:center;
-  color:var(--text-2);transition:border-color .12s,color .12s;
+.video-slide-fallback svg{width:40px;height:40px;stroke:#fff;fill:none;stroke-width:1.6;opacity:.85}
+.video-slide-fallback a{color:#fff;font-weight:700;font-size:14px;text-decoration:underline}
+/* Small "open externally" / copy chip overlaid bottom-right of the video
+   slide, so the raw link is always reachable even when a player embeds. */
+.video-slide-actions{
+  position:absolute;right:10px;bottom:10px;display:flex;gap:6px;z-index:2;
 }
-.video-view-copy:hover{border-color:var(--brand);color:var(--brand)}
-.video-view-copy svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8}
+.video-slide-actions a,
+.video-slide-actions button{
+  width:34px;height:34px;border-radius:9px;border:none;
+  background:rgba(0,0,0,.55);color:#fff;display:flex;align-items:center;
+  justify-content:center;backdrop-filter:blur(2px);cursor:pointer;
+}
+.video-slide-actions a:hover,
+.video-slide-actions button:hover{background:rgba(0,0,0,.75)}
+.video-slide-actions svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:1.8}
 .add-modal.view-mode .lm-section{cursor:default}
 .add-modal.view-mode .lm-section.view-hidden{display:none}
 .add-modal.view-mode .img-thumb-del{display:none}
@@ -2251,10 +2266,11 @@ ul{list-style:none}
 .add-modal.view-mode #fImgHint{display:none}
 .add-modal.view-mode #imgFormGroup{display:none}
 .add-modal.view-mode #mediaSectionHeader{display:none}
-/* View mode shows ONLY the gallery, the key/value spec table, and the video
-   display — the entire actual form (every input/select/textarea/button) is
-   hidden as one block, so nothing in it can ever be seen or interacted with
-   while just viewing a listing. */
+/* View mode shows ONLY the gallery, then the key/value spec table
+   (description), then the video display, in that order — the entire actual
+   form (every input/select/textarea/button) is hidden as one block, so
+   nothing in it can ever be seen or interacted with while just viewing a
+   listing. */
 .add-modal.view-mode #listingFormSections{display:none}
 .detail-table-wrap{display:none}
 .add-modal.view-mode #detailTableWrap{display:block;margin-bottom:16px}
@@ -2286,6 +2302,7 @@ ul{list-style:none}
    the property-view gallery we want the whole photo visible with nothing
    cut off, even if that means letterboxing rather than filling the box. */
 .detail-gallery .img-slide{object-fit:contain;background:var(--bg-3)}
+.detail-gallery .img-slide.video-slide{background:#000}
 .form-select{
   width:100%;border:1.5px solid var(--border-2);border-radius:9px;
   padding:9px 12px;font-size:13px;color:var(--brand);background:var(--bg);
@@ -4152,6 +4169,7 @@ ul{list-style:none}
 <div class="lightbox-overlay" id="lightboxOverlay" role="dialog" aria-modal="true" aria-label="Image viewer">
   <div class="lightbox-stage">
     <img class="lightbox-img" id="lightboxImg" src="" alt="Property photo" />
+    <div class="lightbox-video" id="lightboxVideo" style="display:none"></div>
     <button class="lightbox-close" onclick="closeLightbox()" aria-label="Close image viewer">
       <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
@@ -4305,22 +4323,13 @@ ul{list-style:none}
 
     <div style="overflow-y:auto;padding:20px 28px 28px;flex:1" id="addModalScrollBody">
 
-    <!-- View-mode only: photo gallery, a plain key/value spec table, and the
-         video display — all built directly from the property object in
-         openDetail(), and living outside #listingFormSections below so
-         they're never affected by hiding the actual form. See
-         buildDetailTable()/openDetail()/closeDetail(). -->
+    <!-- View-mode only: photo gallery (which also carries the video tour as
+         its last slide, when present) and a plain key/value spec table —
+         all built directly from the property object in openDetail(), and
+         living outside #listingFormSections below so they're never affected
+         by hiding the actual form. See buildDetailTable()/openDetail()/
+         closeDetail(). -->
     <div class="detail-gallery" id="detailGallerySlot"></div>
-    <div class="video-embed-wrap" id="videoEmbedWrap" style="display:none"></div>
-    <div class="video-view-row" id="videoViewRow" style="display:none">
-      <a href="#" id="videoViewLink" target="_blank" rel="noopener noreferrer" class="video-view-link">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-        <span id="videoViewLinkText"></span>
-      </a>
-      <button type="button" class="video-view-copy" onclick="copyVideoLink()" aria-label="Copy video link" title="Copy link">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-      </button>
-    </div>
     <div class="detail-table-wrap" id="detailTableWrap"></div>
 
     <!-- Everything below is the actual "list your property" form (create +
@@ -5644,7 +5653,7 @@ function buildVideoEmbed(url) {
   const info = getVideoEmbedInfo(url);
   if (!info) return '';
   if (info.type === 'youtube') {
-    return `<iframe src="https://www.youtube.com/embed/${info.id}" title="Video tour" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+    return `<iframe src="https://www.youtube-nocookie.com/embed/${info.id}" title="Video tour" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
   }
   if (info.type === 'vimeo') {
     return `<iframe src="https://player.vimeo.com/video/${info.id}" title="Video tour" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
@@ -6142,19 +6151,49 @@ function resetPages() {
   pgPage = 0;
 }
 
-function buildImgSlider(p, fg, uidSuffix) {
+// Builds the inner HTML for the video tour's slide: a real embedded player
+// when the URL is a recognizable YouTube/Vimeo/file link, otherwise a
+// centered "watch" fallback card — plus a small open-externally/copy chip
+// in the corner either way, so the raw link is always reachable.
+function buildVideoSlideHtml(p) {
+  const videoUrl = p.media?.video || '';
+  const safeVideoUrl = safeUrl(videoUrl);
+  if (!safeVideoUrl) return '';
+  const embedHtml = buildVideoEmbed(safeVideoUrl);
+  const body = embedHtml || `<div class="video-slide-fallback">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+      <a href="${esc(safeVideoUrl)}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Watch video tour</a>
+    </div>`;
+  const actions = `<div class="video-slide-actions" onclick="event.stopPropagation()">
+      <a href="${esc(safeVideoUrl)}" target="_blank" rel="noopener noreferrer" aria-label="Open video in new tab" title="Open in new tab">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>
+      <button type="button" class="video-copy-btn" data-url="${esc(videoUrl)}" onclick="copyVideoLink(this.dataset.url)" aria-label="Copy video link" title="Copy link">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      </button>
+    </div>`;
+  return body + actions;
+}
+
+function buildImgSlider(p, fg, uidSuffix, videoSlideHtml) {
   const imgs = (p.media?.images && p.media.images.length) ? p.media.images : [];
-  if (imgs.length === 0) {
+  if (imgs.length === 0 && !videoSlideHtml) {
     return `<div class="prop-img-placeholder"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="${fg}" opacity=".3"/><polyline points="9 22 9 12 15 12 15 22" stroke="${fg}" opacity=".3"/></svg></div>`;
   }
   const uid = 'sl' + p.id + (uidSuffix || '');
-  const slides = imgs.map((url, i) =>
+  const imgSlides = imgs.map((url, i) =>
     `<img class="img-slide${i===0?' active':''}" src="${safeUrl(url)}" loading="lazy" alt="" onclick="event.stopPropagation();openLightbox('${p.id}',${i})" />`
   ).join('');
-  const dots = imgs.length > 1 ? `<div class="slide-dots">${imgs.map((_,i)=>
+  // Video tour, when present, always comes after every photo — the last
+  // slide in the same swipeable gallery rather than a separate section.
+  const videoSlide = videoSlideHtml
+    ? `<div class="img-slide video-slide${imgs.length===0?' active':''}">${videoSlideHtml}</div>`
+    : '';
+  const totalSlides = imgs.length + (videoSlideHtml ? 1 : 0);
+  const dots = totalSlides > 1 ? `<div class="slide-dots">${imgs.map((_,i)=>
     `<button class="slide-dot${i===0?' active':''}" onclick="event.stopPropagation();slideGo('${uid}',${i})"></button>`
-  ).join('')}</div>` : '';
-  return `<div class="img-slides" id="${uid}">${slides}${dots}</div>`;
+  ).join('')}${videoSlideHtml ? `<button class="slide-dot${imgs.length===0?' active':''}" onclick="event.stopPropagation();slideGo('${uid}',${imgs.length})"></button>` : ''}</div>` : '';
+  return `<div class="img-slides" id="${uid}">${imgSlides}${videoSlide}${dots}</div>`;
 }
 
 function slideGo(uid, idx) {
@@ -6230,11 +6269,13 @@ function slideStep(uid, dir) {
 ═══════════════════════════════════════════════ */
 let lightboxImgs = [];
 let lightboxIdx = 0;
+let lightboxVideoHtml = ''; // '' when this property has no (valid) video tour
 
 function openLightbox(propId, idx) {
   const p = PROPERTIES.find(x => x.id === propId);
   if (!p || !p.media?.images || !p.media.images.length) return;
   lightboxImgs = p.media.images;
+  lightboxVideoHtml = buildVideoSlideHtml(p);
   lightboxIdx = idx || 0;
   renderLightbox();
   document.getElementById('lightboxOverlay').classList.add('open');
@@ -6244,9 +6285,14 @@ function closeLightbox() {
   document.getElementById('lightboxOverlay').classList.remove('open');
 }
 
+function lightboxTotal() {
+  return lightboxImgs.length + (lightboxVideoHtml ? 1 : 0);
+}
+
 function lightboxStep(dir) {
-  if (!lightboxImgs.length) return;
-  lightboxIdx = (lightboxIdx + dir + lightboxImgs.length) % lightboxImgs.length;
+  const total = lightboxTotal();
+  if (!total) return;
+  lightboxIdx = (lightboxIdx + dir + total) % total;
   renderLightbox();
 }
 
@@ -6256,12 +6302,26 @@ function lightboxGo(idx) {
 }
 
 function renderLightbox() {
-  if (!lightboxImgs.length) return;
-  document.getElementById('lightboxImg').src = lightboxImgs[lightboxIdx];
-  document.getElementById('lightboxCounter').textContent = (lightboxIdx + 1) + ' / ' + lightboxImgs.length;
-  const multi = lightboxImgs.length > 1;
+  const total = lightboxTotal();
+  if (!total) return;
+  const isVideo = lightboxIdx >= lightboxImgs.length;
+  const imgEl = document.getElementById('lightboxImg');
+  const videoEl = document.getElementById('lightboxVideo');
+  if (isVideo) {
+    imgEl.style.display = 'none';
+    videoEl.style.display = 'block';
+    videoEl.innerHTML = lightboxVideoHtml;
+  } else {
+    videoEl.style.display = 'none';
+    videoEl.innerHTML = '';
+    imgEl.style.display = 'block';
+    imgEl.src = lightboxImgs[lightboxIdx];
+  }
+  document.getElementById('lightboxCounter').textContent = (lightboxIdx + 1) + ' / ' + total;
+  const multi = total > 1;
   document.getElementById('lightboxThumbs').innerHTML = multi
     ? lightboxImgs.map((url, i) => `<div class="lightbox-thumb${i===lightboxIdx?' active':''}" style="background-image:url('${safeUrl(url)}')" onclick="lightboxGo(${i})"></div>`).join('')
+      + (lightboxVideoHtml ? `<div class="lightbox-thumb video-thumb${isVideo?' active':''}" onclick="lightboxGo(${lightboxImgs.length})"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div>` : '')
     : '';
 }
 
@@ -6273,7 +6333,7 @@ function renderLightbox() {
   const stage = document.querySelector('.lightbox-stage');
   if (stage) {
     stage.addEventListener('touchstart', function(e){
-      if (lightboxImgs.length < 2) { lactive = false; return; }
+      if (lightboxTotal() < 2) { lactive = false; return; }
       lactive = true;
       lsx = e.touches[0].clientX;
       lsy = e.touches[0].clientY;
@@ -6292,7 +6352,7 @@ function renderLightbox() {
     // Mouse-drag swipe for desktop, same idea as the touch handler above.
     let lmx = 0, lmy = 0, lmactive = false;
     stage.addEventListener('mousedown', function(e){
-      if (lightboxImgs.length < 2) { lmactive = false; return; }
+      if (lightboxTotal() < 2) { lmactive = false; return; }
       lmactive = true;
       lmx = e.clientX;
       lmy = e.clientY;
@@ -8104,43 +8164,21 @@ function openDetail(id) {
   if (sub) { sub.textContent = subArea; sub.style.display = subArea ? '' : 'none'; }
 
   // Render the same photo slider used on the property card (large image,
-  // arrows/dots, tap-to-zoom).
+  // arrows/dots, tap-to-zoom) — with the video tour, when present, appended
+  // as its own final slide so it always comes after every photo in the
+  // same swipeable gallery rather than a separate section.
   const gallerySlot = document.getElementById('detailGallerySlot');
   if (gallerySlot) {
     const pType = pTypeLabel(p);
     const colors = {Rent:'#e8f5ee:#1a6640',Lease:'#dde9fa:#1a4680',PG:'#eee8fa:#4a2a9a',ShortStay:'#e0f7fa:#00646e'};
     const [gbg, gfg] = (colors[pType]||'#f0f0f0:#333').split(':');
-    gallerySlot.innerHTML = `<div class="prop-img" style="background:${gbg}" data-idx="0">${buildImgSlider(p, gfg, '-detail')}</div>`;
+    const videoSlideHtml = buildVideoSlideHtml(p);
+    gallerySlot.innerHTML = `<div class="prop-img" style="background:${gbg}" data-idx="0">${buildImgSlider(p, gfg, '-detail', videoSlideHtml)}</div>`;
   }
 
   // Plain key/value table with every spec — see buildDetailTable() below.
   const tableWrap = document.getElementById('detailTableWrap');
   if (tableWrap) tableWrap.innerHTML = buildDetailTable(p);
-
-  // Video tour — a real embedded player when we recognize the URL
-  // (YouTube/Vimeo/direct file), plus a clickable link + copy button so it
-  // can always be opened externally or shared either way.
-  const videoUrl = p.media?.video || '';
-  const videoRow = document.getElementById('videoViewRow');
-  const videoEmbedWrap = document.getElementById('videoEmbedWrap');
-  if (videoRow) {
-    const safeVideoUrl = safeUrl(videoUrl);
-    if (safeVideoUrl) {
-      const link = document.getElementById('videoViewLink');
-      link.href = safeVideoUrl;
-      document.getElementById('videoViewLinkText').textContent = videoUrl;
-      link.dataset.url = videoUrl;
-      videoRow.style.display = 'flex';
-      if (videoEmbedWrap) {
-        const embedHtml = buildVideoEmbed(safeVideoUrl);
-        videoEmbedWrap.innerHTML = embedHtml;
-        videoEmbedWrap.style.display = embedHtml ? 'block' : 'none';
-      }
-    } else {
-      videoRow.style.display = 'none';
-      if (videoEmbedWrap) { videoEmbedWrap.innerHTML = ''; videoEmbedWrap.style.display = 'none'; }
-    }
-  }
 
   // Wire up the same quick actions the old detail view offered (save,
   // contact, schedule a visit, WhatsApp) onto the form's action row.
@@ -8317,10 +8355,6 @@ function closeDetail() {
   if (gallerySlot) gallerySlot.innerHTML = '';
   const tableWrap = document.getElementById('detailTableWrap');
   if (tableWrap) tableWrap.innerHTML = '';
-  const videoRow = document.getElementById('videoViewRow');
-  if (videoRow) videoRow.style.display = 'none';
-  const videoEmbedWrap = document.getElementById('videoEmbedWrap');
-  if (videoEmbedWrap) { videoEmbedWrap.innerHTML = ''; videoEmbedWrap.style.display = 'none'; }
 
   document.getElementById('addModalTitleText').textContent = 'List your property';
   const sub = document.getElementById('addModalSubtitleText');
@@ -9975,8 +10009,7 @@ function closeReferModal() {
   document.getElementById('referModal').classList.remove('open');
   unlockBodyScroll();
 }
-function copyVideoLink() {
-  const url = document.getElementById('videoViewLink').dataset.url || '';
+function copyVideoLink(url) {
   if (!url) return;
   if (navigator.clipboard) {
     navigator.clipboard.writeText(url).then(() => showToast('Video link copied!'));
