@@ -285,6 +285,13 @@ ul{list-style:none}
 }
 .fp-opt:hover{border-color:var(--brand);color:var(--brand)}
 .fp-opt.sel{background:var(--brand);color:#fff;border-color:var(--brand)}
+/* Marks the pincode pill matching the visitor's detected current location
+   (see fdHighlightNearbyPincode). Independent of .sel — a pill can be both
+   "your area" and actively selected at once, so .sel's solid brand fill
+   always wins visually when both apply. */
+.fp-opt.fp-nearby{border-color:var(--brand);border-style:dashed}
+.fp-opt.fp-nearby::after{content:"📍 Current location";margin-left:6px;font-size:10px;color:var(--brand);font-weight:600}
+.fp-opt.fp-nearby.sel::after{color:#fff}
 /* Range inside popover */
 .fd-range{display:flex;flex-direction:column;gap:6px;padding:2px 0}
 .fd-range input[type=range]{width:100%;accent-color:var(--brand);cursor:pointer}
@@ -7508,6 +7515,7 @@ function buildFilterOptions() {
   // hardcoded list to maintain.
   fdRenderOpts('fdo-pincode', 'pincode', fdSortValues('pincode', fdCollectPincodes()), 'pincode');
   restoreSel('fdo-pincode');
+  fdHighlightNearbyPincode();
 
   // Locality dropdown — same "rebuilt from live data" pattern, driven by
   // location.area instead of pincode. Alphabetical (fdSortValues falls back
@@ -8100,22 +8108,6 @@ function getFiltered() {
     return true;
   });
 
-  // Location-based restriction: once we know the visitor's pincode (from
-  // their current location), only ever show listings in that same pincode —
-  // applies no matter which sort is active (Newest, Price, Promoted, Near me),
-  // not just when "Near me" is picked. Intentionally strict: if nothing in
-  // that exact pincode is listed, the list is empty rather than falling back
-  // to showing everything else.
-  if (nearbyPincode) {
-    const before = list.length;
-    list = list.filter(p => {
-      const pPin = getPropertyPincode(p);
-      return !!pPin && pPin === nearbyPincode.trim();
-    });
-    console.log('[pincode-filter] visitor pincode:', nearbyPincode,
-      '| properties before filter:', before, '| after filter:', list.length);
-  }
-
   if (currentSort==='price-asc') list.sort((a,b)=>(a.price?.rent||0)-(b.price?.rent||0));
   else if (currentSort==='price-desc') list.sort((a,b)=>(b.price?.rent||0)-(a.price?.rent||0));
   else if (currentSort==='promoted') list.sort((a,b)=>(b.promoted?1:0)-(a.promoted?1:0));
@@ -8124,9 +8116,8 @@ function getFiltered() {
     //  1. Real distance — for listings with lat/lng saved.
     //  2. Area-text match — fallback, substring match against the
     //     free-text location.area field.
-    // (Pincode matching is no longer needed here — every listing left in
-    // `list` at this point is already in the visitor's pincode, filtered
-    // above. This just orders that same-pincode set by distance.)
+    // (Pincode matching is handled separately below as a priority boost,
+    // not a filter, so this distance sort just orders within that.)
     const AREA_MATCH_ASSUMED_KM = 3;
     const hasCoords = p => p.location?.lat != null && p.location?.lng != null;
     const areaMatches = (p) => {
@@ -8142,6 +8133,24 @@ function getFiltered() {
     list.sort((a, b) => distFor(a) - distFor(b));
   }
   else list.sort((a,b)=>String(a.id).localeCompare(String(b.id)));
+
+  // Location-based priority (not a restriction): once we know the visitor's
+  // pincode (from their current location), bring same-pincode listings to
+  // the top — but never drop the rest. Array.sort is spec-stable, so within
+  // "matches" and within "doesn't match" the order from the sort above
+  // (price/promoted/nearby/default) is preserved; this only partitions
+  // matches above non-matches.
+  if (nearbyPincode) {
+    const total = list.length;
+    const pin = nearbyPincode.trim();
+    list.sort((a, b) => {
+      const aMatch = getPropertyPincode(a) === pin ? 1 : 0;
+      const bMatch = getPropertyPincode(b) === pin ? 1 : 0;
+      return bMatch - aMatch;
+    });
+    console.log('[pincode-priority] visitor pincode:', nearbyPincode,
+      '| total properties:', total, '| same-pincode shown first, rest follow');
+  }
   return list;
 }
 
@@ -8171,6 +8180,24 @@ function getPropertyPincode(p) {
   const address = p.location?.address || '';
   const matches = String(address).match(/\b\d{6}\b/g);
   return matches ? matches[matches.length - 1] : '';
+}
+
+/* Marks whichever pincode pill in the filter dropdown matches nearbyPincode
+   (the visitor's reverse-geocoded postcode — see initNearbyLocation below)
+   with the .fp-nearby class, so it visually stands out as "your area"
+   without being auto-selected as a filter. Safe to call any time: clears
+   any stale mark first, then re-applies (or does nothing if nearbyPincode
+   isn't known yet, e.g. geolocation hasn't resolved). Called both after
+   every dropdown rebuild (buildFilterOptions) and again once the reverse-
+   geocode call finishes, since that can resolve after the dropdown already
+   rendered. */
+function fdHighlightNearbyPincode() {
+  const container = document.getElementById('fdo-pincode');
+  if (!container) return;
+  container.querySelectorAll('.fp-opt.fp-nearby').forEach(el => el.classList.remove('fp-nearby'));
+  if (!nearbyPincode) return;
+  const match = container.querySelector(`.fp-opt[data-val="${CSS.escape(nearbyPincode.trim())}"]`);
+  if (match) match.classList.add('fp-nearby');
 }
 
 function haversineKm(lat1, lon1, lat2, lon2) {
@@ -8215,6 +8242,7 @@ function initNearbyLocation() {
           nearbyPincode = addr.postcode || '';
           nearbyAreaName = addr.suburb || addr.neighbourhood || addr.city_district || addr.city || '';
           console.log('[nearby-location] resolved nearbyPincode:', nearbyPincode, '| nearbyAreaName:', nearbyAreaName);
+          fdHighlightNearbyPincode(); // mark the matching pill in the Pincode dropdown now that we know it
           if (nearbyPincode || nearbyAreaName) renderCards();
         })
         .catch(err => console.error('[nearby-location] reverse geocode error:', err));

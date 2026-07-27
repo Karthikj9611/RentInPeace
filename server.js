@@ -1253,7 +1253,18 @@ app.post('/api/properties', listingLimiter, requireUser, requireOwner, async (re
 // ── GET /api/properties ──
 app.get('/api/properties', async (req, res) => {
   try {
-    const { status, q, limit = 100, skip = 0 } = req.query;
+    // Default limit bumped from 100 → 2000: the frontend calls this endpoint
+    // with no query params at all (a single `fetch('/api/properties')` on
+    // page load) and uses the result as its *entire* in-memory dataset for
+    // rendering, searching, sorting, and building filter-dropdown options
+    // (pincodes, localities, etc). With more than 100 verified listings, the
+    // old default silently cut off everything past the 100th (by promoted →
+    // promotedPriority → newest order) — those listings' pincodes could
+    // never appear in the Pincode filter no matter what. 2000 comfortably
+    // covers real-world scale for this site while still bounding worst-case
+    // query size; raise further (or add real pagination + a dedicated
+    // lightweight distinct-pincodes endpoint) if the catalog outgrows this.
+    const { status, q, limit = 2000, skip = 0 } = req.query;
     const filter = { verified: true, booked: { $ne: true } }; // a listing only appears to the public once admin has verified it, and disappears again once marked booked
     if (status && typeof status === 'string') filter['basic.status'] = status;
     if (q && typeof q === 'string') {
@@ -1273,8 +1284,13 @@ app.get('/api/properties', async (req, res) => {
       // Call/WhatsApp.
       '-owner.name -owner.propertyName -owner.email -owner.phone -owner.altPhone -owner.contactTime -owner.address -owner.agentArea ' +
       // Location detail that's likewise only used to fill the always-hidden
-      // full-address/lat-lng/Google-Maps-link form groups
-      '-location.address -location.lat -location.lng -location.mapLink';
+      // full-address/lat-lng/Google-Maps-link form groups.
+      // NOTE: location.address is intentionally *not* excluded at the query
+      // level anymore — see the pincode-backfill step below, which needs it
+      // to derive a pincode for listings that never got location.pincode set
+      // directly. It's deleted from each doc right after that, so the full
+      // address still never reaches the public response.
+      '-location.lat -location.lng -location.mapLink';
 
     // If a status was requested, we already know exactly which single
     // collection to query. Otherwise we need to fan out to all four and
@@ -1287,6 +1303,27 @@ app.get('/api/properties', async (req, res) => {
       modelsToQuery.map(M => M.find(filter).select(PUBLIC_SELECT).lean())
     );
     let docs = docArrays.flat();
+
+    // Backfill location.pincode from the free-text address for listings that
+    // never got an explicit pincode saved (older/imported listings). Mirrors
+    // the same "last 6-digit run in the address" pattern the frontend used
+    // to rely on client-side via getPropertyPincode() — except that fallback
+    // never actually worked in production, because location.address was
+    // excluded from this response entirely, so the frontend had nothing to
+    // parse. Doing it here, before address is stripped below, means every
+    // listing with a parseable pincode in its address now surfaces it: the
+    // Pincode filter dropdown, "near me" priority-boost, and pincode search
+    // all fed off this field and were silently missing these listings.
+    docs.forEach(doc => {
+      if (!doc.location) return;
+      if (!doc.location.pincode) {
+        const matches = String(doc.location.address || '').match(/\b\d{6}\b/g);
+        if (matches) doc.location.pincode = matches[matches.length - 1];
+      }
+      // Full free-text address itself is still never sent to the public
+      // frontend — only the derived pincode above survives past this point.
+      delete doc.location.address;
+    });
 
     // Sort/paginate in memory across the merged set (same ordering as before:
     // promoted first, then promotedPriority, then newest).
