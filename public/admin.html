@@ -4390,16 +4390,20 @@ $(document).ready(function(){
     dom:'<"top-controls"B>rt<"bottom-controls"ip>',
     buttons:[
       {
-        extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV', title:'Customer_Leads_' + new Date().toLocaleDateString('en-GB'),
+        extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV',
+        title: function(){ return 'Customer_Leads_' + new Date().toLocaleDateString('en-GB') + (_selectedCustIds.size ? '_Selected' : ''); },
         exportOptions:{
+          rows: custExportRowSelector,
           columns: function(idx){ return idx!==0 && idx!==10 && idx!==11 && dataTable.column(idx).visible(); },
           orthogonal:'export', stripHtml:true,
           format:{ body:function(data){ return typeof data === "string" ? data.replace(/<[^>]*>/g,"").trim() : data; } }
         }
       },
       {
-        extend:'excel', text:'<i class="fas fa-file-excel"></i> Excel', title:'Customer_Leads_' + new Date().toLocaleDateString('en-GB'),
+        extend:'excel', text:'<i class="fas fa-file-excel"></i> Excel',
+        title: function(){ return 'Customer_Leads_' + new Date().toLocaleDateString('en-GB') + (_selectedCustIds.size ? '_Selected' : ''); },
         exportOptions:{
+          rows: custExportRowSelector,
           columns: function(idx){ return idx!==0 && idx!==10 && idx!==11 && dataTable.column(idx).visible(); },
           orthogonal:'export', stripHtml:true,
           format:{ body:function(data){ return typeof data === "string" ? data.replace(/<[^>]*>/g,"").trim() : data; } }
@@ -4419,8 +4423,10 @@ $(document).ready(function(){
       },*/
       {
         extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
-        orientation:'landscape', pageSize:'A4', title:'Customer_Leads_' + new Date().toLocaleDateString('en-GB'),
+        orientation:'landscape', pageSize:'A4',
+        title: function(){ return 'Customer_Leads_' + new Date().toLocaleDateString('en-GB') + (_selectedCustIds.size ? '_Selected' : ''); },
         exportOptions:{
+          rows: custExportRowSelector,
           columns: function(idx){
             // Checkbox(0) has no printable value; Remarks(10) and Action(11)
             // are never printed to PDF; everything else follows whatever
@@ -4435,7 +4441,10 @@ $(document).ready(function(){
           var phonePos = idxs.indexOf(5);
           var emailPos = idxs.indexOf(6);
           if(phonePos<0 && emailPos<0) return;
-          var rows=dataTable.rows({search:'applied'}).data().toArray();
+          // Must match exactly whatever exportOptions.rows just exported —
+          // {search:'applied'} would grab every filtered row even when a
+          // selection narrowed the actual PDF to a subset of them.
+          var rows=dataTable.rows(custExportRowSelector).data().toArray();
           var tableBody=doc.content[1]&&doc.content[1].table?doc.content[1].table.body:null;
           if(!tableBody) return;
           rows.forEach(function(rd,i){
@@ -4680,16 +4689,20 @@ $(document).ready(function(){
     dom:'<"top-controls"B>rt<"bottom-controls"ip>',
     buttons:[
 	  {
-        extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV', title:'Property_Leads_' + new Date().toLocaleDateString('en-GB'),
+        extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV',
+        title: function(){ return 'Property_Leads_' + new Date().toLocaleDateString('en-GB') + (_selectedPropIds.size ? '_Selected' : ''); },
         exportOptions:{
+          rows: propExportRowSelector,
           columns: propExportColumnPredicate,
           orthogonal:'export', stripHtml:true,
           format:{ body:function(data){ return typeof data === "string" ? data.replace(/<[^>]*>/g,"").trim() : data; } }
         }
       },
       {
-        extend:'excel', text:'<i class="fas fa-file-excel"></i> Excel', title:'Property_Leads_' + new Date().toLocaleDateString('en-GB'),
+        extend:'excel', text:'<i class="fas fa-file-excel"></i> Excel',
+        title: function(){ return 'Property_Leads_' + new Date().toLocaleDateString('en-GB') + (_selectedPropIds.size ? '_Selected' : ''); },
         exportOptions:{
+          rows: propExportRowSelector,
           columns: propExportColumnPredicate,
           orthogonal:'export', stripHtml:true,
           format:{ body:function(data){ return typeof data === "string" ? data.replace(/<[^>]*>/g,"").trim() : data; } }
@@ -4697,8 +4710,10 @@ $(document).ready(function(){
       },
 	  {
         extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
-        orientation:'landscape', pageSize:'A4', title:'Property_Leads_' + new Date().toLocaleDateString('en-GB'),
+        orientation:'landscape', pageSize:'A4',
+        title: function(){ return 'Property_Leads_' + new Date().toLocaleDateString('en-GB') + (_selectedPropIds.size ? '_Selected' : ''); },
        exportOptions: {
+			rows: propExportRowSelector,
 			columns: function (idx, data, node) {
 				// Column 0 is the select checkbox — it has no printable
 				// value, so leave it out of the PDF entirely instead of
@@ -4733,7 +4748,7 @@ $(document).ready(function(){
           var ownerNumPos = propExportColumnIndices().indexOf(7);
           var ownerAltPos = propExportColumnIndices().indexOf(8);
           var ownerEmailPos = propExportColumnIndices().indexOf(9);
-          var rows=propTable.rows({search:'applied'}).data().toArray();
+          var rows=propTable.rows(propExportRowSelector).data().toArray();
           var tableIdx = doc.content.findIndex(function(c){ return c && c.table; });
           var tableBody = tableIdx>=0 ? doc.content[tableIdx].table.body : null;
           if(!tableBody) return;
@@ -4932,8 +4947,10 @@ $(document).ready(function(){
     dom:'<"top-controls"B>rt<"bottom-controls"ip>',
     buttons:[
       {
-        extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV', title:'Appointment_Leads_' + new Date().toLocaleDateString('en-GB'),
+        extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV',
+        title: function(){ return 'Appointment_Leads_' + new Date().toLocaleDateString('en-GB') + (_selectedApptIds.size ? '_Selected' : ''); },
         exportOptions:{
+          rows: apptExportRowSelector,
           columns: function(idx){ return idx!==0 && idx!==17 && idx!==18 && apptTable.column(idx).visible(); },
           format:{ body:function(data,row,column,node){
             var rd=apptTable.row(row).data(); if(!rd) return data;
@@ -4945,8 +4962,10 @@ $(document).ready(function(){
         }
       },
       {
-        extend:'excel', text:'<i class="fas fa-file-excel"></i> Excel', title:'Appointment_Leads_' + new Date().toLocaleDateString('en-GB'),
+        extend:'excel', text:'<i class="fas fa-file-excel"></i> Excel',
+        title: function(){ return 'Appointment_Leads_' + new Date().toLocaleDateString('en-GB') + (_selectedApptIds.size ? '_Selected' : ''); },
         exportOptions:{
+          rows: apptExportRowSelector,
           columns: function(idx){ return idx!==0 && idx!==17 && idx!==18 && apptTable.column(idx).visible(); },
           format:{ body:function(data,row,column,node){
             var rd=apptTable.row(row).data(); if(!rd) return data;
@@ -4963,8 +4982,10 @@ $(document).ready(function(){
       },*/
       {
         extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
-        orientation:'landscape', pageSize:'A4', title:'Appointment_Leads_' + new Date().toLocaleDateString('en-GB'),
+        orientation:'landscape', pageSize:'A4',
+        title: function(){ return 'Appointment_Leads_' + new Date().toLocaleDateString('en-GB') + (_selectedApptIds.size ? '_Selected' : ''); },
         exportOptions: {
+			rows: apptExportRowSelector,
 			columns: function(idx){
 				// Checkbox(0) has no printable value; Remarks(17) and
 				// Action(18) are never printed to PDF; everything else
@@ -5509,6 +5530,32 @@ const PROP_COL_GROUPS = [
 // Which master column indices should be included in a Properties export
 // right now. Mirrors whatever's currently visible (category-tab-driven
 // PG/Short-Stay columns + the manual Columns toggle).
+// ── EXPORT ROW-SELECTION SCOPING ──
+// When at least one row is checked via the bulk-select checkboxes, every
+// export button (CSV/Excel/PDF) for that table exports only the checked
+// rows instead of every currently-filtered row. With nothing checked,
+// behavior is unchanged: export everything the filters currently show.
+// Passed as DataTables' `rows` selector for exportOptions (which accepts a
+// function(idx, data, node) same as `columns` does), and also used to
+// re-fetch the exact same row set for the Customer/Property PDF buttons'
+// after-the-fact tel:/mailto: link injection, so that stays in sync with
+// whatever subset actually got exported.
+function custExportRowSelector(idx){
+  if(_selectedCustIds.size === 0) return true;
+  const rd = dataTable.row(idx).data();
+  return !!(rd && _selectedCustIds.has(rd.mobile || rd._id));
+}
+function propExportRowSelector(idx){
+  if(_selectedPropIds.size === 0) return true;
+  const rd = propTable.row(idx).data();
+  return !!(rd && _selectedPropIds.has(rd._id));
+}
+function apptExportRowSelector(idx){
+  if(_selectedApptIds.size === 0) return true;
+  const rd = apptTable.row(idx).data();
+  return !!(rd && _selectedApptIds.has(rd._id));
+}
+
 function propExportColumnPredicate(idx){
   return idx!==0 && idx!==42 && idx!==43 && propTable.column(idx).visible();
 }
