@@ -1456,25 +1456,62 @@ ul{list-style:none}
 
 /* ─── FAB stats, mobile inline row (shown after Reviews section) ───
    Same icons/badges as .fab-stats above, laid out horizontally in the
-   normal document flow instead of fixed-floating. Only shown ≤640px. */
+   normal document flow instead of fixed-floating. Only shown ≤640px.
+   Each stat is a tinted "chip" (icon + count only, no separate text
+   label) — that fits comfortably at any width instead of squeezing a
+   label into shrinking flex space, which used to get clipped mid-word
+   on narrower phones. */
 .fab-stats-inline{
   display:none;
-  align-items:center;justify-content:center;
-  gap:22px;
-  padding:14px 20px calc(56px + env(safe-area-inset-bottom) + 20px);
-  background:var(--bg-2);
+  align-items:center;
+  gap:8px;
+  margin:0 16px calc(56px + env(safe-area-inset-bottom) + 20px);
+  padding:10px;
+  background:linear-gradient(180deg,#ffffff,#fafafa);
+  border:1px solid var(--border-2);
+  border-radius:20px;
+  box-shadow:0 10px 28px -10px rgba(20,16,17,.16),0 2px 8px rgba(20,16,17,.05);
 }
-.fab-stats-inline .fab-stat-item{flex-shrink:0}
+.fab-stats-inline .fab-stat-chip{
+  flex:1;min-width:0;display:flex;align-items:center;gap:7px;
+  padding:6px 10px 6px 6px;border-radius:999px;
+}
+.fab-stats-inline .fab-stat-chip.visitors{background:linear-gradient(135deg,rgba(111,155,255,.14),rgba(47,95,209,.06))}
+.fab-stats-inline .fab-stat-chip.daily{background:linear-gradient(135deg,rgba(75,201,164,.14),rgba(26,122,94,.06))}
+.fab-stats-inline .fab-stat-chip.users{background:linear-gradient(135deg,rgba(224,58,82,.14),rgba(190,30,55,.06))}
+.fab-stats-inline .fab-stat-icon{width:26px;height:26px;flex-shrink:0}
+.fab-stats-inline .fab-stat-icon svg{width:12px;height:12px}
+.fab-stats-inline .fab-stat-count{
+  font-size:14px;font-weight:800;color:var(--text);letter-spacing:-.2px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
 .fab-stats-inline .fab-inline-add{
-  width:36px;height:36px;border-radius:50%;flex-shrink:0;
-  background:var(--brand);color:#fff;
+  width:42px;height:42px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--brand),var(--brand-hover));color:#fff;
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 4px 16px rgba(224,58,82,.35);
-  border:none;cursor:pointer;
+  box-shadow:0 6px 18px -4px rgba(224,58,82,.55);
+  border:none;cursor:pointer;position:relative;
+  transition:transform .15s ease;
 }
-.fab-stats-inline .fab-inline-add svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2}
+.fab-stats-inline .fab-inline-add:active{transform:scale(.92)}
+.fab-stats-inline .fab-inline-add::after{
+  content:'';position:absolute;inset:-5px;border-radius:50%;
+  border:2px solid var(--brand);opacity:.55;pointer-events:none;
+  animation:fabInlinePulse 2.4s ease-out infinite;
+}
+.fab-stats-inline .fab-inline-add svg{width:17px;height:17px;stroke:#fff;fill:none;stroke-width:2.3}
+@keyframes fabInlinePulse{
+  0%{transform:scale(.85);opacity:.55}
+  70%{transform:scale(1.4);opacity:0}
+  100%{opacity:0}
+}
 @media(max-width:640px){
   .fab-stats-inline{display:flex}
+}
+@media(max-width:380px){
+  .fab-stats-inline{gap:6px;padding:8px}
+  .fab-stats-inline .fab-stat-chip{padding:6px 8px 6px 5px;gap:5px}
+  .fab-stats-inline .fab-stat-count{font-size:13px}
 }
 
 /* ─── FAB add-type picker (opens above the FAB) ─────────── */
@@ -3892,23 +3929,23 @@ ul{list-style:none}
      mobile instead of floating. Badges are kept in sync with the
      floating versions by initFabStats(). ─── -->
 <div class="fab-stats-inline" id="fabStatsInline" aria-hidden="false">
-  <div class="fab-stat-item" title="Total website visitors">
+  <div class="fab-stat-chip visitors" title="Total website visitors" aria-label="Total website visitors">
     <span class="fab-stat-icon visitors">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
     </span>
-    <span class="fab-stat-badge" id="fabStatVisitorsInline">–</span>
+    <span class="fab-stat-count" id="fabStatVisitorsInline">–</span>
   </div>
-  <div class="fab-stat-item" title="Today's site visits">
+  <div class="fab-stat-chip daily" title="Today's site visits" aria-label="Today's site visits">
     <span class="fab-stat-icon daily">
       <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
     </span>
-    <span class="fab-stat-badge" id="fabStatDailyInline">–</span>
+    <span class="fab-stat-count" id="fabStatDailyInline">–</span>
   </div>
-  <div class="fab-stat-item" title="Total registered users">
+  <div class="fab-stat-chip users" title="Total registered users" aria-label="Total registered users">
     <span class="fab-stat-icon users">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
     </span>
-    <span class="fab-stat-badge" id="fabStatUsersInline">–</span>
+    <span class="fab-stat-count" id="fabStatUsersInline">–</span>
   </div>
   <button class="fab-inline-add" id="fabInlineAdd" onclick="openFabPicker()" aria-label="Add a listing" title="List your property">
     <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
