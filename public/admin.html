@@ -177,6 +177,10 @@ body{
   font-size:0.82rem;font-weight:700;color:var(--gold-dark);
   display:inline-flex;align-items:center;gap:6px;
 }
+.filter-active-badge{
+  font-size:0.82rem;font-weight:700;color:#2563eb;
+  display:inline-flex;align-items:center;gap:6px;
+}
 .bulk-btn{
   display:inline-flex;align-items:center;gap:7px;
   padding:8px 16px;border-radius:99px;border:1.5px solid transparent;
@@ -248,6 +252,22 @@ table.dataTable thead tr.col-filter-row th{
 .col-date-range input[type="date"].active-col-filter{
   border-color:var(--gold);background:var(--gold-light);
 }
+.col-date-range input[type="date"].date-range-swapped{
+  animation:dateSwapFlash 0.9s ease;
+}
+@keyframes dateSwapFlash{
+  0%{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,0.18);background:#eef4ff}
+  100%{border-color:var(--border);box-shadow:none;background:#fff}
+}
+.date-preset-select{width:100%;box-sizing:border-box;cursor:pointer;
+  padding:4px 20px 4px 6px;border:1.3px dashed var(--border);border-radius:7px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:0.64rem;font-weight:600;
+  color:var(--ink3);background:#fff;outline:none;appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='9' height='5'><path d='M0 0l4.5 5 4.5-5z' fill='%238a6820'/></svg>");
+  background-repeat:no-repeat;background-position:right 7px center;
+  transition:border-color 0.15s;
+}
+.date-preset-select:focus{border-color:var(--gold)}
 
 /* ── PROMOTED / VERIFIED MINI TOGGLES ── */
 .mini-toggle-wrap{display:flex;align-items:center;justify-content:center}
@@ -1800,6 +1820,12 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
       <div class="table-wrapper">
         <div class="bulk-toolbar bulk-toolbar-spaced" id="custBulkToolbar">
           <div class="bulk-toolbar-left">
+            <span class="filter-active-badge" id="custFilterBadge" style="display:none">
+              <i class="fas fa-filter"></i> <span id="custFilterCount">0</span><span class="bulk-btn-label"> filters active</span>
+            </span>
+            <button class="bulk-btn bulk-btn-clear" id="custClearFiltersBtn" style="display:none" onclick="clearCustFilters()" title="Clear all filters">
+              <i class="fas fa-filter-circle-xmark"></i> <span class="bulk-btn-label">Clear filters</span>
+            </button>
             <span class="bulk-selected-count" id="custSelectedCount" style="display:none">
               <i class="fas fa-check-circle"></i> <span id="custSelectedNum">0</span><span class="bulk-btn-label"> selected</span>
             </span>
@@ -1838,18 +1864,25 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
             <tr class="col-filter-row">
               <th></th>
               <th></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onCustColumnFilter('name', this.value, this)"></th>
-              <th><select class="col-filter-select" onchange="onCustColumnFilter('accountType', this.value, this)"><option value="">All</option><option value="customer">Customer</option><option value="owner">Owner</option></select></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onCustColumnFilter('userId', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onCustColumnFilter('mobile', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onCustColumnFilter('email', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="e.g. 3" oninput="onCustColumnFilter('listings', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="e.g. 0" oninput="onCustColumnFilter('visits', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="name" placeholder="Search…" oninput="onCustColumnFilter('name', this.value, this)"></th>
+              <th><select class="col-filter-select" data-filter-key="accountType" onchange="onCustColumnFilter('accountType', this.value, this)"><option value="">All</option><option value="customer">Customer</option><option value="owner">Owner</option></select></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="userId" placeholder="Search…" oninput="onCustColumnFilter('userId', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="mobile" placeholder="Search…" oninput="onCustColumnFilter('mobile', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="email" placeholder="Search…" oninput="onCustColumnFilter('email', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="listings" placeholder="e.g. 3" oninput="onCustColumnFilter('listings', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="visits" placeholder="e.g. 0" oninput="onCustColumnFilter('visits', this.value, this)"></th>
               <th><div class="col-date-range">
-                <input type="date" title="From" onchange="onCustRegisteredRangeFilter('start', this.value, this)">
-                <input type="date" title="To" onchange="onCustRegisteredRangeFilter('end', this.value, this)">
+                <select class="date-preset-select" onchange="applyDatePreset(this,'onCustRegisteredRangeFilter')">
+                  <option value="">Presets</option>
+                  <option value="today">Today</option>
+                  <option value="week">This Week</option>
+                  <option value="month">This Month</option>
+                  <option value="last30">Last 30 Days</option>
+                </select>
+                <input type="date" data-filter-key="registeredStart" title="From" onchange="onCustRegisteredRangeFilter('start', this.value, this)">
+                <input type="date" data-filter-key="registeredEnd" title="To" onchange="onCustRegisteredRangeFilter('end', this.value, this)">
               </div></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onCustColumnFilter('remarks', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="remarks" placeholder="Search…" oninput="onCustColumnFilter('remarks', this.value, this)"></th>
               <th></th>
             </tr>
           </thead>
@@ -1892,6 +1925,12 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
         <!-- Toolbar: PDF export + selection controls + column toggle, all in one row -->
         <div class="bulk-toolbar bulk-toolbar-spaced" id="bulkToolbar">
           <div class="bulk-toolbar-left">
+            <span class="filter-active-badge" id="propFilterBadge" style="display:none">
+              <i class="fas fa-filter"></i> <span id="propFilterCount">0</span><span class="bulk-btn-label"> filters active</span>
+            </span>
+            <button class="bulk-btn bulk-btn-clear" id="propClearFiltersBtn" style="display:none" onclick="clearPropFilters()" title="Clear all filters">
+              <i class="fas fa-filter-circle-xmark"></i> <span class="bulk-btn-label">Clear filters</span>
+            </button>
             <span class="bulk-selected-count" id="bulkSelectedCount" style="display:none">
               <i class="fas fa-check-circle"></i> <span id="bulkSelectedNum">0</span><span class="bulk-btn-label"> selected</span>
             </span>
@@ -1965,50 +2004,57 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
             <tr class="col-filter-row">
               <th class="col-sticky-1"></th>
               <th class="col-sno"></th>
-              <th class="col-sticky-2"><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('title', this.value, this)"></th>
-              <th><select class="col-filter-select" onchange="onPropColumnFilter('promoted', this.value, this)"><option value="">All</option><option value="yes">Yes</option><option value="no">No</option></select></th>
+              <th class="col-sticky-2"><input type="text" class="col-filter-input" data-filter-key="title" placeholder="Search…" oninput="onPropColumnFilter('title', this.value, this)"></th>
+              <th><select class="col-filter-select" data-filter-key="promoted" onchange="onPropColumnFilter('promoted', this.value, this)"><option value="">All</option><option value="yes">Yes</option><option value="no">No</option></select></th>
               <th></th>
-              <th><select class="col-filter-select" onchange="onPropColumnFilter('booked', this.value, this)"><option value="">All</option><option value="yes">Yes</option><option value="no">No</option></select></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('ownerName', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('ownerNumber', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('ownerAltPhone', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('ownerEmail', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('ownerContactTime', this.value, this)"></th>
-              <th><select class="col-filter-select" id="colFilterStatus" onchange="onPropColumnFilter('status', this.value, this)"><option value="">All</option></select></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('displayPrice', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('deposit', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('maintenance', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('negotiable', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('loc', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('city', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('typeCol', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('area', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('floor', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('furnishing', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('toilet', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('carparking', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('bikeparking', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('facing', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('age', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('pgGender', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('pgRoomType', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('pgMeals', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('pgOccupancy', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('pgNotice', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('ssRoomType', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('ssAvailable24hrs', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('ssCancellation', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('ssCouplesAllowed', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('visitCount', this.value, this)"></th>
+              <th><select class="col-filter-select" data-filter-key="booked" onchange="onPropColumnFilter('booked', this.value, this)"><option value="">All</option><option value="yes">Yes</option><option value="no">No</option></select></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="ownerName" placeholder="Search…" oninput="onPropColumnFilter('ownerName', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="ownerNumber" placeholder="Search…" oninput="onPropColumnFilter('ownerNumber', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="ownerAltPhone" placeholder="Search…" oninput="onPropColumnFilter('ownerAltPhone', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="ownerEmail" placeholder="Search…" oninput="onPropColumnFilter('ownerEmail', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="ownerContactTime" placeholder="Search…" oninput="onPropColumnFilter('ownerContactTime', this.value, this)"></th>
+              <th><select class="col-filter-select" data-filter-key="status" id="colFilterStatus" onchange="onPropColumnFilter('status', this.value, this)"><option value="">All</option></select></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="displayPrice" placeholder="Search…" oninput="onPropColumnFilter('displayPrice', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="deposit" placeholder="Search…" oninput="onPropColumnFilter('deposit', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="maintenance" placeholder="Search…" oninput="onPropColumnFilter('maintenance', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="negotiable" placeholder="Search…" oninput="onPropColumnFilter('negotiable', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="loc" placeholder="Search…" oninput="onPropColumnFilter('loc', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="city" placeholder="Search…" oninput="onPropColumnFilter('city', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="typeCol" placeholder="Search…" oninput="onPropColumnFilter('typeCol', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="area" placeholder="Search…" oninput="onPropColumnFilter('area', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="floor" placeholder="Search…" oninput="onPropColumnFilter('floor', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="furnishing" placeholder="Search…" oninput="onPropColumnFilter('furnishing', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="toilet" placeholder="Search…" oninput="onPropColumnFilter('toilet', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="carparking" placeholder="Search…" oninput="onPropColumnFilter('carparking', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="bikeparking" placeholder="Search…" oninput="onPropColumnFilter('bikeparking', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="facing" placeholder="Search…" oninput="onPropColumnFilter('facing', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="age" placeholder="Search…" oninput="onPropColumnFilter('age', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="pgGender" placeholder="Search…" oninput="onPropColumnFilter('pgGender', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="pgRoomType" placeholder="Search…" oninput="onPropColumnFilter('pgRoomType', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="pgMeals" placeholder="Search…" oninput="onPropColumnFilter('pgMeals', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="pgOccupancy" placeholder="Search…" oninput="onPropColumnFilter('pgOccupancy', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="pgNotice" placeholder="Search…" oninput="onPropColumnFilter('pgNotice', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="ssRoomType" placeholder="Search…" oninput="onPropColumnFilter('ssRoomType', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="ssAvailable24hrs" placeholder="Search…" oninput="onPropColumnFilter('ssAvailable24hrs', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="ssCancellation" placeholder="Search…" oninput="onPropColumnFilter('ssCancellation', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="ssCouplesAllowed" placeholder="Search…" oninput="onPropColumnFilter('ssCouplesAllowed', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="visitCount" placeholder="Search…" oninput="onPropColumnFilter('visitCount', this.value, this)"></th>
               <th></th>
               <th></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('propertyId', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('userId', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="propertyId" placeholder="Search…" oninput="onPropColumnFilter('propertyId', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="userId" placeholder="Search…" oninput="onPropColumnFilter('userId', this.value, this)"></th>
               <th><div class="col-date-range">
-                <input type="date" title="From" onchange="onPropListedOnRangeFilter('start', this.value, this)">
-                <input type="date" title="To" onchange="onPropListedOnRangeFilter('end', this.value, this)">
+                <select class="date-preset-select" onchange="applyDatePreset(this,'onPropListedOnRangeFilter')">
+                  <option value="">Presets</option>
+                  <option value="today">Today</option>
+                  <option value="week">This Week</option>
+                  <option value="month">This Month</option>
+                  <option value="last30">Last 30 Days</option>
+                </select>
+                <input type="date" data-filter-key="listedOnStart" title="From" onchange="onPropListedOnRangeFilter('start', this.value, this)">
+                <input type="date" data-filter-key="listedOnEnd" title="To" onchange="onPropListedOnRangeFilter('end', this.value, this)">
               </div></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onPropColumnFilter('remarks', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="remarks" placeholder="Search…" oninput="onPropColumnFilter('remarks', this.value, this)"></th>
               <th></th>
             </tr>
           </thead>
@@ -2026,6 +2072,12 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
       <div class="table-wrapper">
         <div class="bulk-toolbar bulk-toolbar-spaced" id="apptBulkToolbar">
           <div class="bulk-toolbar-left">
+            <span class="filter-active-badge" id="apptFilterBadge" style="display:none">
+              <i class="fas fa-filter"></i> <span id="apptFilterCount">0</span><span class="bulk-btn-label"> filters active</span>
+            </span>
+            <button class="bulk-btn bulk-btn-clear" id="apptClearFiltersBtn" style="display:none" onclick="clearApptFilters()" title="Clear all filters">
+              <i class="fas fa-filter-circle-xmark"></i> <span class="bulk-btn-label">Clear filters</span>
+            </button>
             <span class="bulk-selected-count" id="apptSelectedCount" style="display:none">
               <i class="fas fa-check-circle"></i> <span id="apptSelectedNum">0</span><span class="bulk-btn-label"> selected</span>
             </span>
@@ -2071,17 +2123,17 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
             <tr class="col-filter-row">
               <th></th>
               <th></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('visitId', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('customer', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('userId', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('mobile', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('altMobile', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('email', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('propertyName', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('propertyArea', this.value, this)"></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('propertyId', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="visitId" placeholder="Search…" oninput="onApptColumnFilter('visitId', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="customer" placeholder="Search…" oninput="onApptColumnFilter('customer', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="userId" placeholder="Search…" oninput="onApptColumnFilter('userId', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="mobile" placeholder="Search…" oninput="onApptColumnFilter('mobile', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="altMobile" placeholder="Search…" oninput="onApptColumnFilter('altMobile', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="email" placeholder="Search…" oninput="onApptColumnFilter('email', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="propertyName" placeholder="Search…" oninput="onApptColumnFilter('propertyName', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="propertyArea" placeholder="Search…" oninput="onApptColumnFilter('propertyArea', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="propertyId" placeholder="Search…" oninput="onApptColumnFilter('propertyId', this.value, this)"></th>
               <th>
-                <select class="col-filter-select" onchange="onApptColumnFilter('purpose', this.value, this)">
+                <select class="col-filter-select" data-filter-key="purpose" onchange="onApptColumnFilter('purpose', this.value, this)">
                   <option value="">All</option>
                   <option value="For Sale">For Sale</option>
                   <option value="For Rent">For Rent</option>
@@ -2091,20 +2143,27 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
                 </select>
               </th>
               <th><div class="col-date-range">
-                <input type="date" title="From" onchange="onApptDateRangeFilter('start', this.value, this)">
-                <input type="date" title="To" onchange="onApptDateRangeFilter('end', this.value, this)">
+                <select class="date-preset-select" onchange="applyDatePreset(this,'onApptDateRangeFilter')">
+                  <option value="">Presets</option>
+                  <option value="today">Today</option>
+                  <option value="week">This Week</option>
+                  <option value="month">This Month</option>
+                  <option value="last30">Last 30 Days</option>
+                </select>
+                <input type="date" data-filter-key="dateStart" title="From" onchange="onApptDateRangeFilter('start', this.value, this)">
+                <input type="date" data-filter-key="dateEnd" title="To" onchange="onApptDateRangeFilter('end', this.value, this)">
               </div></th>
               <th>
-                <select class="col-filter-select" onchange="onApptColumnFilter('timeSlot', this.value, this)">
+                <select class="col-filter-select" data-filter-key="timeSlot" onchange="onApptColumnFilter('timeSlot', this.value, this)">
                   <option value="">All</option>
                   <option value="Morning">Morning</option>
                   <option value="Afternoon">Afternoon</option>
                   <option value="Evening">Evening</option>
                 </select>
               </th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('message', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="message" placeholder="Search…" oninput="onApptColumnFilter('message', this.value, this)"></th>
               <th>
-                <select class="col-filter-select" onchange="onApptColumnFilter('status', this.value, this)">
+                <select class="col-filter-select" data-filter-key="status" onchange="onApptColumnFilter('status', this.value, this)">
                   <option value="">All</option>
                   <option value="pending">Pending</option>
                   <option value="confirmed">Confirmed</option>
@@ -2113,10 +2172,17 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
                 </select>
               </th>
               <th><div class="col-date-range">
-                <input type="date" title="From" onchange="onApptBookedOnRangeFilter('start', this.value, this)">
-                <input type="date" title="To" onchange="onApptBookedOnRangeFilter('end', this.value, this)">
+                <select class="date-preset-select" onchange="applyDatePreset(this,'onApptBookedOnRangeFilter')">
+                  <option value="">Presets</option>
+                  <option value="today">Today</option>
+                  <option value="week">This Week</option>
+                  <option value="month">This Month</option>
+                  <option value="last30">Last 30 Days</option>
+                </select>
+                <input type="date" data-filter-key="bookedOnStart" title="From" onchange="onApptBookedOnRangeFilter('start', this.value, this)">
+                <input type="date" data-filter-key="bookedOnEnd" title="To" onchange="onApptBookedOnRangeFilter('end', this.value, this)">
               </div></th>
-              <th><input type="text" class="col-filter-input" placeholder="Search…" oninput="onApptColumnFilter('remarks', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="remarks" placeholder="Search…" oninput="onApptColumnFilter('remarks', this.value, this)"></th>
               <th></th>
             </tr>
           </thead>
@@ -2947,11 +3013,102 @@ function plainPhone(row){ return row.mobile||''; }
 function plainEmail(row){ return row.email||''; }
 
 /* ── CUSTOMERS: PER-COLUMN HEADER SEARCH FILTERS ── */
+// ── SHARED FILTER INFRASTRUCTURE ──
+// Reused by all three tables (Customers, Properties, Appointments) for:
+// counting active column filters, showing/hiding a "N filters active"
+// badge + "Clear filters" button, persisting filter state across a page
+// refresh (same idea as the existing column-visibility persistence), and
+// keeping From/To date-range pairs in valid order.
+
+function countActiveFilters(filterObj){
+  return Object.values(filterObj).filter(v => v !== '' && v != null).length;
+}
+
+function updateFilterBadge(filterObj, badgeId, countId, clearBtnId){
+  const n = countActiveFilters(filterObj);
+  const badge = document.getElementById(badgeId);
+  const countEl = document.getElementById(countId);
+  const clearBtn = document.getElementById(clearBtnId);
+  if(countEl) countEl.textContent = String(n);
+  if(badge) badge.style.display = n > 0 ? '' : 'none';
+  if(clearBtn) clearBtn.style.display = n > 0 ? '' : 'none';
+}
+
+function saveFilterState(storageKey, filterObj){
+  try{ localStorage.setItem(storageKey, JSON.stringify(filterObj)); }
+  catch(e){ /* storage unavailable/full — filters just won't persist */ }
+}
+
+function loadFilterState(storageKey, filterObj){
+  try{
+    const raw = localStorage.getItem(storageKey);
+    if(!raw) return;
+    const saved = JSON.parse(raw);
+    Object.keys(filterObj).forEach(k=>{ if(typeof saved[k] === 'string') filterObj[k] = saved[k]; });
+  }catch(e){ /* corrupt or missing — just start from defaults */ }
+}
+
+// Repopulates every [data-filter-key] input/select found under the table's
+// wrapper element (covers both the "real" header and, if scrollX cloned a
+// separate scroll-head for horizontal scroll sync, that visible clone too)
+// from `filterObj`, restoring both the raw value and the gold
+// "active-col-filter" highlight. Must run AFTER the table has finished
+// initializing — restoring beforehand would only reach the original
+// (possibly-hidden) header, not whichever copy scrollX actually renders.
+function restoreFilterInputsUI(tableWrapperId, filterObj){
+  const wrap = document.getElementById(tableWrapperId);
+  if(!wrap) return;
+  wrap.querySelectorAll('[data-filter-key]').forEach(el=>{
+    const key = el.getAttribute('data-filter-key');
+    if(!Object.prototype.hasOwnProperty.call(filterObj, key)) return;
+    el.value = filterObj[key] || '';
+    el.classList.toggle('active-col-filter', !!filterObj[key]);
+  });
+}
+
+// Resets every field back to '', clears the matching DOM inputs, re-saves
+// the (now empty) state, redraws the table, and refreshes the badge.
+function clearFiltersGeneric(tableWrapperId, filterObj, table, storageKey, badgeId, countId, clearBtnId){
+  Object.keys(filterObj).forEach(k=> filterObj[k] = '');
+  restoreFilterInputsUI(tableWrapperId, filterObj);
+  saveFilterState(storageKey, filterObj);
+  if(table) table.draw();
+  updateFilterBadge(filterObj, badgeId, countId, clearBtnId);
+}
+
+// If both bounds of a date-range filter are set and From ends up after To,
+// swap them so the range stays valid instead of silently returning zero
+// rows — briefly flashes the two inputs so the correction is visible.
+function reconcileDateRange(container, filterObj, startKey, endKey){
+  if(!container) return;
+  const inputs = container.querySelectorAll('input[type="date"]');
+  if(inputs.length < 2) return;
+  const startVal = filterObj[startKey], endVal = filterObj[endKey];
+  if(startVal && endVal && startVal > endVal){
+    filterObj[startKey] = endVal;
+    filterObj[endKey] = startVal;
+    inputs[0].value = endVal;
+    inputs[1].value = startVal;
+    [inputs[0], inputs[1]].forEach(el=>{
+      el.classList.add('date-range-swapped');
+      setTimeout(()=>el.classList.remove('date-range-swapped'), 900);
+    });
+  }
+}
+
 const _custColumnFilters = { name:'', userId:'', mobile:'', email:'', accountType:'', listings:'', visits:'', registeredStart:'', registeredEnd:'', remarks:'' };
+const CUST_FILTER_STORAGE_KEY = 'rip_admin_custFilters';
+loadFilterState(CUST_FILTER_STORAGE_KEY, _custColumnFilters);
+
+window.clearCustFilters = function(){
+  clearFiltersGeneric('bookingTable_wrapper', _custColumnFilters, dataTable, CUST_FILTER_STORAGE_KEY, 'custFilterBadge', 'custFilterCount', 'custClearFiltersBtn');
+};
 
 window.onCustColumnFilter = function(field, value, inputEl){
   _custColumnFilters[field] = (value||'').trim();
   if(inputEl) inputEl.classList.toggle('active-col-filter', !!_custColumnFilters[field]);
+  saveFilterState(CUST_FILTER_STORAGE_KEY, _custColumnFilters);
+  updateFilterBadge(_custColumnFilters, 'custFilterBadge', 'custFilterCount', 'custClearFiltersBtn');
   if(dataTable) dataTable.draw();
 };
 
@@ -2962,6 +3119,9 @@ window.onCustRegisteredRangeFilter = function(which, value, inputEl){
   if(which === 'start') _custColumnFilters.registeredStart = v;
   else _custColumnFilters.registeredEnd = v;
   if(inputEl) inputEl.classList.toggle('active-col-filter', !!v);
+  reconcileDateRange(inputEl ? inputEl.closest('.col-date-range') : null, _custColumnFilters, 'registeredStart', 'registeredEnd');
+  saveFilterState(CUST_FILTER_STORAGE_KEY, _custColumnFilters);
+  updateFilterBadge(_custColumnFilters, 'custFilterBadge', 'custFilterCount', 'custClearFiltersBtn');
   if(dataTable) dataTable.draw();
 };
 
@@ -4229,40 +4389,22 @@ $(document).ready(function(){
     },
     dom:'<"top-controls"B>rt<"bottom-controls"ip>',
     buttons:[
-      /*{
-        extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV', title:'HomeLoop Leads',
-        exportOptions:{ columns:[0,1,2,3,4,5,6,7],
-          format:{ body:function(data,row,col){
-            var rd=dataTable.row(row).data(); if(!rd) return data;
-            if(col===0) return ((rd.firstName||'')+' '+(rd.lastName||'')).trim()||'—';
-            if(col===1) return rd.userId||'—';
-            if(col===2){ var ph=plainPhone(rd); return ph?'=HYPERLINK("tel:'+ph+'","'+ph+'")':'—'; }
-            if(col===3){ var em=plainEmail(rd); return em?'=HYPERLINK("mailto:'+em+'","'+em+'")':'—'; }
-            if(col===4) return String(rd.listingsCount ?? 0);
-            if(col===5) return String(rd.visitsCount ?? 0);
-            if(col===6){ if(!rd.createdAt) return '—'; const d=new Date(rd.createdAt); return d.toLocaleDateString('en-GB')+' '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}); }
-            if(col===7) return flattenRemarks(rd.remarks);
-            return data;
-          }}
+      {
+        extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV', title:'Customer_Leads_' + new Date().toLocaleDateString('en-GB'),
+        exportOptions:{
+          columns: function(idx){ return idx!==0 && idx!==10 && idx!==11 && dataTable.column(idx).visible(); },
+          orthogonal:'export', stripHtml:true,
+          format:{ body:function(data){ return typeof data === "string" ? data.replace(/<[^>]*>/g,"").trim() : data; } }
         }
       },
       {
-        extend:'excel', text:'<i class="fas fa-file-excel"></i> Excel', title:'HomeLoop Leads',
-        exportOptions:{ columns:[0,1,2,3,4,5,6,7],
-          format:{ body:function(data,row,col){
-            var rd=dataTable.row(row).data(); if(!rd) return data;
-            if(col===0) return ((rd.firstName||'')+' '+(rd.lastName||'')).trim()||'—';
-            if(col===1) return rd.userId||'—';
-            if(col===2) return rd.mobile||'—';
-            if(col===3) return rd.email||'—';
-            if(col===4) return String(rd.listingsCount ?? 0);
-            if(col===5) return String(rd.visitsCount ?? 0);
-            if(col===6){ if(!rd.createdAt) return '—'; return new Date(rd.createdAt).toLocaleString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true}); }
-            if(col===7) return flattenRemarks(rd.remarks);
-            return data;
-          }}
+        extend:'excel', text:'<i class="fas fa-file-excel"></i> Excel', title:'Customer_Leads_' + new Date().toLocaleDateString('en-GB'),
+        exportOptions:{
+          columns: function(idx){ return idx!==0 && idx!==10 && idx!==11 && dataTable.column(idx).visible(); },
+          orthogonal:'export', stripHtml:true,
+          format:{ body:function(data){ return typeof data === "string" ? data.replace(/<[^>]*>/g,"").trim() : data; } }
         }
-      }, */
+      },
       /*{
         extend:'print', text:'<i class="fas fa-print"></i> Print', title:'HomeLoop Leads',
         exportOptions:{columns:[0,1,2,3,4,5,6,7,8]},
@@ -4319,6 +4461,8 @@ $(document).ready(function(){
   $custTopControls.find('.dt-buttons').prependTo('#custBulkToolbar .bulk-toolbar-left');
   $custTopControls.remove();
   initColumnToggle('cust');
+  restoreFilterInputsUI('bookingTable_wrapper', _custColumnFilters);
+  updateFilterBadge(_custColumnFilters, 'custFilterBadge', 'custFilterCount', 'custClearFiltersBtn');
   } catch(e){ console.error('Customers table failed to initialize:', e); }
 
   /* ════════════════════════════════════
@@ -4536,6 +4680,22 @@ $(document).ready(function(){
     dom:'<"top-controls"B>rt<"bottom-controls"ip>',
     buttons:[
 	  {
+        extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV', title:'Property_Leads_' + new Date().toLocaleDateString('en-GB'),
+        exportOptions:{
+          columns: propExportColumnPredicate,
+          orthogonal:'export', stripHtml:true,
+          format:{ body:function(data){ return typeof data === "string" ? data.replace(/<[^>]*>/g,"").trim() : data; } }
+        }
+      },
+      {
+        extend:'excel', text:'<i class="fas fa-file-excel"></i> Excel', title:'Property_Leads_' + new Date().toLocaleDateString('en-GB'),
+        exportOptions:{
+          columns: propExportColumnPredicate,
+          orthogonal:'export', stripHtml:true,
+          format:{ body:function(data){ return typeof data === "string" ? data.replace(/<[^>]*>/g,"").trim() : data; } }
+        }
+      },
+	  {
         extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
         orientation:'landscape', pageSize:'A4', title:'Property_Leads_' + new Date().toLocaleDateString('en-GB'),
        exportOptions: {
@@ -4655,6 +4815,8 @@ $(document).ready(function(){
   propTable.on('column-visibility.dt', function(e, settings, column, state){
     syncPropColToggleCheckbox(column, state);
   });
+  restoreFilterInputsUI('propertyTable_wrapper', _propColumnFilters);
+  updateFilterBadge(_propColumnFilters, 'propFilterBadge', 'propFilterCount', 'propClearFiltersBtn');
   } catch(e){ console.error('Properties table failed to initialize:', e); }
 
   /* ════════════════════════════════════
@@ -4769,48 +4931,32 @@ $(document).ready(function(){
     },
     dom:'<"top-controls"B>rt<"bottom-controls"ip>',
     buttons:[
-      /*{
-        extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV', title:'HomeLoop Appointments',
-        exportOptions:{ columns:[0,1,2,3,4,5,6,7,8,9,10,11],
-          format:{ body:function(data,row,col){
+      {
+        extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV', title:'Appointment_Leads_' + new Date().toLocaleDateString('en-GB'),
+        exportOptions:{
+          columns: function(idx){ return idx!==0 && idx!==17 && idx!==18 && apptTable.column(idx).visible(); },
+          format:{ body:function(data,row,column,node){
             var rd=apptTable.row(row).data(); if(!rd) return data;
-            if(col===0) return rd.visitId||'—';
-            if(col===1) return (rd.name||((rd.firstName||'')+' '+(rd.lastName||''))).trim()||'—';
-            if(col===2) return rd.userReadableId||'—';
-            if(col===3) return (rd.mobile||'')+(rd.altMobile?' / '+rd.altMobile:'')+(rd.email?' | '+rd.email:'');
-            if(col===4) return [rd.propertyName, rd.propertyArea, rd.propertyId].filter(Boolean).join(' — ')||'—';
-            if(col===5) return rd.purpose||'—';
-            if(col===6) return rd.date||'—';
-            if(col===7) return rd.timeSlot||'—';
-            if(col===8) return rd.message||'—';
-            if(col===9) return rd.status||'—';
-            if(col===10){ if(!rd.createdAt) return '—'; const d=new Date(rd.createdAt); return d.toLocaleDateString('en-GB')+' '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}); }
-            if(col===11) return flattenRemarks(rd.remarks);
-            return data;
+            var origIdx = apptExportColumnIndices()[column];
+            if(origIdx === 3) return (rd.name||((rd.firstName||'')+' '+(rd.lastName||''))).trim();
+            if(origIdx === 15) return rd.status||'';
+            return $(node).text().trim();
           }}
         }
       },
       {
-        extend:'excel', text:'<i class="fas fa-file-excel"></i> Excel', title:'HomeLoop Appointments',
-        exportOptions:{ columns:[0,1,2,3,4,5,6,7,8,9,10,11],
-          format:{ body:function(data,row,col){
+        extend:'excel', text:'<i class="fas fa-file-excel"></i> Excel', title:'Appointment_Leads_' + new Date().toLocaleDateString('en-GB'),
+        exportOptions:{
+          columns: function(idx){ return idx!==0 && idx!==17 && idx!==18 && apptTable.column(idx).visible(); },
+          format:{ body:function(data,row,column,node){
             var rd=apptTable.row(row).data(); if(!rd) return data;
-            if(col===0) return rd.visitId||'—';
-            if(col===1) return (rd.name||((rd.firstName||'')+' '+(rd.lastName||''))).trim()||'—';
-            if(col===2) return rd.userReadableId||'—';
-            if(col===3) return (rd.mobile||'')+(rd.altMobile?' / '+rd.altMobile:'');
-            if(col===4) return [rd.propertyName, rd.propertyArea, rd.propertyId].filter(Boolean).join(' — ')||'—';
-            if(col===5) return rd.purpose||'—';
-            if(col===6) return rd.date||'—';
-            if(col===7) return rd.timeSlot||'—';
-            if(col===8) return rd.message||'—';
-            if(col===9) return rd.status||'—';
-            if(col===10){ if(!rd.createdAt) return '—'; return new Date(rd.createdAt).toLocaleString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true}); }
-            if(col===11) return flattenRemarks(rd.remarks);
-            return data;
+            var origIdx = apptExportColumnIndices()[column];
+            if(origIdx === 3) return (rd.name||((rd.firstName||'')+' '+(rd.lastName||''))).trim();
+            if(origIdx === 15) return rd.status||'';
+            return $(node).text().trim();
           }}
         }
-      },*/
+      },
       /*{
         extend:'print', text:'<i class="fas fa-print"></i> Print', title:'HomeLoop Appointments',
         exportOptions:{columns:[0,1,2,3,4,5,6,7,8,9,10,11]}
@@ -4867,6 +5013,8 @@ $(document).ready(function(){
   $apptTopControls.find('.dt-buttons').prependTo('#apptBulkToolbar .bulk-toolbar-left');
   $apptTopControls.remove();
   initColumnToggle('appt');
+  restoreFilterInputsUI('appointmentTable_wrapper', _apptColumnFilters);
+  updateFilterBadge(_apptColumnFilters, 'apptFilterBadge', 'apptFilterCount', 'apptClearFiltersBtn');
   } catch(e){ console.error('Appointments table failed to initialize:', e); }
 
   /* ════════════════════════════════════
@@ -5200,9 +5348,75 @@ const _propColumnFilters = {
   listedOnStart:'', listedOnEnd:'', promoted:'', booked:'', remarks:''
 };
 
+// ── QUICK DATE-RANGE PRESETS ──
+// Shared by every "col-date-range" filter group (Listed On, Registered,
+// Visit Date, Booked On). Formats a Date using LOCAL calendar parts (never
+// toISOString, which shifts by the UTC offset and can land on the wrong day).
+function ymdLocal(d){
+  const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+function computeDatePresetRange(preset){
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth(), d = now.getDate();
+  if(preset === 'today'){
+    const t = new Date(y,m,d);
+    return { start: ymdLocal(t), end: ymdLocal(t) };
+  }
+  if(preset === 'week'){
+    // Monday–Sunday of the current calendar week (not truncated at today,
+    // since e.g. appointment Visit Dates can legitimately be upcoming).
+    const dow = now.getDay(); // 0=Sun..6=Sat
+    const diffToMonday = (dow === 0 ? -6 : 1 - dow);
+    const monday = new Date(y,m,d + diffToMonday);
+    const sunday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6);
+    return { start: ymdLocal(monday), end: ymdLocal(sunday) };
+  }
+  if(preset === 'month'){
+    const first = new Date(y,m,1);
+    const last = new Date(y,m+1,0);
+    return { start: ymdLocal(first), end: ymdLocal(last) };
+  }
+  if(preset === 'last30'){
+    const end = new Date(y,m,d);
+    const start = new Date(y,m,d-29);
+    return { start: ymdLocal(start), end: ymdLocal(end) };
+  }
+  return null;
+}
+// Reads the chosen preset off a <select>, fills the two sibling date inputs
+// in its .col-date-range container, and re-runs the same range-filter
+// handler already wired to those inputs (passed by name) so every table's
+// existing filter logic is reused as-is.
+window.applyDatePreset = function(selectEl, handlerName){
+  const preset = selectEl.value;
+  if(!preset) return;
+  const range = computeDatePresetRange(preset);
+  if(!range) return;
+  const container = selectEl.closest('.col-date-range');
+  const inputs = container ? container.querySelectorAll('input[type="date"]') : [];
+  if(inputs.length < 2) return;
+  inputs[0].value = range.start;
+  inputs[1].value = range.end;
+  const handler = window[handlerName];
+  if(typeof handler === 'function'){
+    handler('start', range.start, inputs[0]);
+    handler('end', range.end, inputs[1]);
+  }
+};
+
+const PROP_FILTER_STORAGE_KEY = 'rip_admin_propFilters';
+loadFilterState(PROP_FILTER_STORAGE_KEY, _propColumnFilters);
+
+window.clearPropFilters = function(){
+  clearFiltersGeneric('propertyTable_wrapper', _propColumnFilters, propTable, PROP_FILTER_STORAGE_KEY, 'propFilterBadge', 'propFilterCount', 'propClearFiltersBtn');
+};
+
 window.onPropColumnFilter = function(field, value, inputEl){
   _propColumnFilters[field] = (value||'').trim();
   if(inputEl) inputEl.classList.toggle('active-col-filter', !!_propColumnFilters[field]);
+  saveFilterState(PROP_FILTER_STORAGE_KEY, _propColumnFilters);
+  updateFilterBadge(_propColumnFilters, 'propFilterBadge', 'propFilterCount', 'propClearFiltersBtn');
   if(propTable) propTable.draw();
 };
 
@@ -5214,6 +5428,9 @@ window.onPropListedOnRangeFilter = function(which, value, inputEl){
   if(which === 'start') _propColumnFilters.listedOnStart = v;
   else _propColumnFilters.listedOnEnd = v;
   if(inputEl) inputEl.classList.toggle('active-col-filter', !!v);
+  reconcileDateRange(inputEl ? inputEl.closest('.col-date-range') : null, _propColumnFilters, 'listedOnStart', 'listedOnEnd');
+  saveFilterState(PROP_FILTER_STORAGE_KEY, _propColumnFilters);
+  updateFilterBadge(_propColumnFilters, 'propFilterBadge', 'propFilterCount', 'propClearFiltersBtn');
   if(propTable) propTable.draw();
 };
 
@@ -5783,9 +6000,18 @@ const _apptColumnFilters = {
   message:'', status:'', bookedOnStart:'', bookedOnEnd:'', remarks:''
 };
 
+const APPT_FILTER_STORAGE_KEY = 'rip_admin_apptFilters';
+loadFilterState(APPT_FILTER_STORAGE_KEY, _apptColumnFilters);
+
+window.clearApptFilters = function(){
+  clearFiltersGeneric('appointmentTable_wrapper', _apptColumnFilters, apptTable, APPT_FILTER_STORAGE_KEY, 'apptFilterBadge', 'apptFilterCount', 'apptClearFiltersBtn');
+};
+
 window.onApptColumnFilter = function(field, value, inputEl){
   _apptColumnFilters[field] = (value||'').trim();
   if(inputEl) inputEl.classList.toggle('active-col-filter', !!_apptColumnFilters[field]);
+  saveFilterState(APPT_FILTER_STORAGE_KEY, _apptColumnFilters);
+  updateFilterBadge(_apptColumnFilters, 'apptFilterBadge', 'apptFilterCount', 'apptClearFiltersBtn');
   if(apptTable) apptTable.draw();
 };
 
@@ -5797,6 +6023,9 @@ window.onApptDateRangeFilter = function(which, value, inputEl){
   if(which === 'start') _apptColumnFilters.dateStart = v;
   else _apptColumnFilters.dateEnd = v;
   if(inputEl) inputEl.classList.toggle('active-col-filter', !!v);
+  reconcileDateRange(inputEl ? inputEl.closest('.col-date-range') : null, _apptColumnFilters, 'dateStart', 'dateEnd');
+  saveFilterState(APPT_FILTER_STORAGE_KEY, _apptColumnFilters);
+  updateFilterBadge(_apptColumnFilters, 'apptFilterBadge', 'apptFilterCount', 'apptClearFiltersBtn');
   if(apptTable) apptTable.draw();
 };
 
@@ -5807,6 +6036,9 @@ window.onApptBookedOnRangeFilter = function(which, value, inputEl){
   if(which === 'start') _apptColumnFilters.bookedOnStart = v;
   else _apptColumnFilters.bookedOnEnd = v;
   if(inputEl) inputEl.classList.toggle('active-col-filter', !!v);
+  reconcileDateRange(inputEl ? inputEl.closest('.col-date-range') : null, _apptColumnFilters, 'bookedOnStart', 'bookedOnEnd');
+  saveFilterState(APPT_FILTER_STORAGE_KEY, _apptColumnFilters);
+  updateFilterBadge(_apptColumnFilters, 'apptFilterBadge', 'apptFilterCount', 'apptClearFiltersBtn');
   if(apptTable) apptTable.draw();
 };
 

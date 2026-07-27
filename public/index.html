@@ -422,23 +422,6 @@ ul{list-style:none}
 }
 .results-count{display:none}
 
-/* ─── Nearby-location banner ─── */
-.nearby-banner{
-  display:none;align-items:center;gap:8px;
-  margin:0 20px 14px;padding:10px 14px;
-  background:var(--brand-light);border:1px solid var(--brand);border-radius:10px;
-  font-size:13px;font-weight:600;color:var(--brand-hover);
-}
-.nearby-banner svg{width:16px;height:16px;stroke:var(--brand);fill:none;stroke-width:2;flex-shrink:0}
-.nearby-banner-text{flex:1;min-width:0}
-.nearby-banner-clear{
-  background:none;border:none;font-size:12px;font-weight:600;color:var(--brand);
-  cursor:pointer;text-decoration:underline;flex-shrink:0;padding:0;
-}
-@media(max-width:640px){
-  .nearby-banner{margin:0 12px 12px;font-size:12.5px}
-}
-
 /* ── Ad Banner ── */
 .ad-banner{
   flex:1;min-width:0;overflow:hidden;border-radius:12px;
@@ -2941,7 +2924,11 @@ ul{list-style:none}
   .filter-dd-bar .fd-badge{flex-shrink:0}
   .filter-dd-bar .chevron{flex-shrink:0;width:10px;height:10px}
   .fd-pop{width:50vw;min-width:0;max-width:50vw}
-  .main{padding:14px 0 20px}
+  /* Bottom padding must clear the fixed .bottom-nav (56px + safe-area inset)
+     plus some breathing room — otherwise on tabs with no content below the
+     grid (Rent/Lease/PG/ShortStay), the last row of cards has nowhere left
+     to scroll to and stays stuck under the nav bar. */
+  .main{padding:14px 0 calc(56px + env(safe-area-inset-bottom) + 24px)}
   .results-header{padding:0 12px}
   .ad-banner{height:52px}
   .ad-slide{padding:0 14px;gap:10px;font-size:12.5px}
@@ -3680,12 +3667,6 @@ ul{list-style:none}
     </div>
   </div>
 
-  <div class="nearby-banner" id="nearbyBanner">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-7.5 8-13a8 8 0 1 0-16 0c0 5.5 8 13 8 13z"/><circle cx="12" cy="9" r="3"/></svg>
-    <span class="nearby-banner-text" id="nearbyBannerText">Showing properties near your current location first</span>
-    <button class="nearby-banner-clear" onclick="clearNearbySort()">Show all</button>
-  </div>
-
   <div id="recentlyViewedSection" class="recently-viewed-section" style="display:none">
     <div class="section-divider" style="position:relative">
       <div class="section-divider-inner">
@@ -4355,7 +4336,7 @@ ul{list-style:none}
     </div>
     
 
-    <input type="hidden" id="f-latitude"/><input type="hidden" id="f-longitude"/>
+    <input type="hidden" id="f-latitude"/><input type="hidden" id="f-longitude"/><input type="hidden" id="f-pincode"/>
 
     <!-- ===== 2/3. OWNER DETAILS (incl. Location) ===== -->
     <div id="ownerDetailsSection">
@@ -5702,7 +5683,10 @@ let currentTab = 'Rent'; // default tab shown on load
 const SHOW_VERIFIED_BADGE = false; // verified badge hidden on cards for now — flip to true to bring it back
 let currentSort = 'newest';
 let userCoords = null;      // {lat, lng} once geolocation succeeds, used for "Near me first" sort
-let nearbyAreaName = '';    // reverse-geocoded locality name, for the banner text only
+let nearbyAreaName = '';    // reverse-geocoded locality name — secondary fallback for
+                             // listings that have no lat/lng saved, and the banner text
+let nearbyPincode = '';     // reverse-geocoded postcode — primary fallback match for
+                             // listings that have no lat/lng saved (stronger signal than area text)
 let sortSetByUser = false;  // true once the visitor manually opens Sort and picks an option
 const SHORTLIST_KEY = 'homeloop_shortlisted_properties';
 const SHORTLIST_DATA_KEY = 'homeloop_shortlisted_properties_data';
@@ -7927,11 +7911,32 @@ function getFiltered() {
   else if (currentSort==='price-desc') list.sort((a,b)=>(b.price?.rent||0)-(a.price?.rent||0));
   else if (currentSort==='promoted') list.sort((a,b)=>(b.promoted?1:0)-(a.promoted?1:0));
   else if (currentSort==='nearby' && userCoords) {
-    // Properties without saved coordinates sort to the end rather than
-    // dropping out of the list entirely.
-    const distFor = p => (p.location?.lat != null && p.location?.lng != null)
-      ? haversineKm(userCoords.lat, userCoords.lng, p.location.lat, p.location.lng)
-      : Infinity;
+    // Three signals, strongest first:
+    //  1. Real distance — for listings with lat/lng saved.
+    //  2. Pincode match — for listings without coordinates but with a
+    //     saved postcode that matches the visitor's detected postcode.
+    //  3. Area-text match — last resort, substring match against the
+    //     free-text location.area field.
+    // Each fallback tier is treated as "about N km away" so it competes
+    // fairly against real distances — a listing that's genuinely 20km
+    // away (but has saved coordinates) should never outrank a same-
+    // pincode guess just because 20 is a smaller number than Infinity.
+    const PINCODE_MATCH_ASSUMED_KM = 1.5;
+    const AREA_MATCH_ASSUMED_KM = 3;
+    const hasCoords = p => p.location?.lat != null && p.location?.lng != null;
+    const pincodeMatches = (p) => !!nearbyPincode && !!p.location?.pincode &&
+      String(p.location.pincode).trim() === nearbyPincode.trim();
+    const areaMatches = (p) => {
+      if (!nearbyAreaName) return false;
+      const area = (p.location?.area || '').toLowerCase();
+      return area.includes(nearbyAreaName.toLowerCase());
+    };
+    const distFor = (p) => {
+      if (hasCoords(p)) return haversineKm(userCoords.lat, userCoords.lng, p.location.lat, p.location.lng);
+      if (pincodeMatches(p)) return PINCODE_MATCH_ASSUMED_KM;
+      if (areaMatches(p)) return AREA_MATCH_ASSUMED_KM;
+      return Infinity;
+    };
     list.sort((a, b) => distFor(a) - distFor(b));
   }
   else list.sort((a,b)=>String(a.id).localeCompare(String(b.id)));
@@ -7949,9 +7954,9 @@ function applyFilters(){ closeAllFd(); renderCards(); }
    NEARBY LOCATION
    Detects the visitor's current position (with permission),
    then sorts listings so the closest ones show first.
-   Falls back silently (no error shown) if geolocation is
-   unavailable, denied, or times out — the default sort just
-   stays in place.
+   Falls back silently (no error shown, no UI) if geolocation
+   is unavailable, denied, or times out — the default sort
+   just stays in place.
 ═══════════════════════════════════════════════ */
 function haversineKm(lat1, lon1, lat2, lon2) {
   const toRad = d => d * Math.PI / 180;
@@ -7961,32 +7966,6 @@ function haversineKm(lat1, lon1, lat2, lon2) {
   const a = Math.sin(dLat / 2) ** 2 +
             Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
   return 2 * R * Math.asin(Math.sqrt(a));
-}
-
-function showNearbyBanner() {
-  const el = document.getElementById('nearbyBanner');
-  const textEl = document.getElementById('nearbyBannerText');
-  if (!el) return;
-  if (!userCoords || currentSort !== 'nearby') { el.style.display = 'none'; return; }
-  if (textEl) {
-    textEl.textContent = nearbyAreaName
-      ? `Showing properties near ${nearbyAreaName} first`
-      : 'Showing properties near your current location first';
-  }
-  el.style.display = 'flex';
-}
-
-// "Show all" in the banner drops back to the default sort without
-// discarding the detected coordinates, so switching back to "Near me
-// first" from the Sort menu later still works without asking again.
-function clearNearbySort() {
-  sortSetByUser = true;
-  currentSort = 'newest';
-  document.querySelectorAll('.sort-option').forEach(o => o.classList.remove('active'));
-  const def = document.querySelector('.sort-option[data-sort="newest"]');
-  if (def) def.classList.add('active');
-  showNearbyBanner();
-  renderCards();
 }
 
 function initNearbyLocation() {
@@ -8005,16 +7984,20 @@ function initNearbyLocation() {
         if (opt) opt.classList.add('active');
       }
       if (currentSort === 'nearby') renderCards();
-      showNearbyBanner();
-      // Reverse-geocode just for the banner's area name — the actual
-      // sort above already runs on lat/lng, so this is cosmetic only
-      // and its failure/latency never blocks the sort itself.
-      fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${userCoords.lat}&longitude=${userCoords.lng}&localityLanguage=en`)
+      // Reverse-geocode via Nominatim — the same source used to capture
+      // each listing's address/pincode when it was added, so the postcode
+      // format lines up on both sides. Feeds nearbyPincode and
+      // nearbyAreaName, the fallback match signals used in getFiltered()
+      // for listings that have no lat/lng saved. Its failure/latency
+      // never blocks the distance-based sort above, which already ran.
+      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${userCoords.lat}&lon=${userCoords.lng}&format=json&accept-language=en`)
         .then(res => res.ok ? res.json() : null)
         .then(data => {
-          if (!data) return;
-          nearbyAreaName = data.locality || data.city || data.principalSubdivision || '';
-          showNearbyBanner();
+          if (!data || !data.address) return;
+          const addr = data.address;
+          nearbyPincode = addr.postcode || '';
+          nearbyAreaName = addr.suburb || addr.neighbourhood || addr.city_district || addr.city || '';
+          if (currentSort === 'nearby' && (nearbyPincode || nearbyAreaName)) renderCards();
         })
         .catch(err => console.error('reverse geocode error:', err));
     },
@@ -8039,7 +8022,6 @@ function setSort(el, val) {
   sortSetByUser = true; // don't let a late-resolving geolocation callback override a manual pick
   closeSort();
   if (val === 'nearby' && !userCoords) initNearbyLocation(); // ask now if we don't have a position yet
-  showNearbyBanner(); // shows the banner if they picked "Near me first" (and coords exist); hides it otherwise
   renderCards();
 }
 
@@ -8959,6 +8941,7 @@ function applyImportedProperty(p) {
   sv('f-location', location.area);
   sv('f-city', location.city || 'Bangalore');
   sv('f-fullAddress', location.address);
+  if (location.pincode) sv('f-pincode', location.pincode);
   if (location.lat != null) sv('f-latitude', location.lat);
   if (location.lng != null) sv('f-longitude', location.lng);
   if (location.lat != null && location.lng != null) {
@@ -10970,6 +10953,10 @@ function fCaptureLocation() {
       .then(r => r.json())
       .then(d => {
         document.getElementById('f-fullAddress').value = d.display_name || '';
+        // Structured postcode from the same lookup — used to prioritize
+        // this listing for visitors detected in the same pincode later,
+        // far more reliable than matching free-text area names.
+        document.getElementById('f-pincode').value = (d.address && d.address.postcode) || '';
         status.textContent = 'Address captured · Enter Location / Area manually';
         // Keep Owner address in sync if "Same as building live address" is checked
         const sameChk = document.getElementById('f-sameAsBuildingAddress');
@@ -10991,7 +10978,7 @@ function fCaptureLocation() {
 // ═══════════════════════════════════════════════
 const OPTIONAL_FIELD_IDS = new Set([
   'f-importFile', 'f-importText',
-  'f-latitude', 'f-longitude', 'f-latLngDisplay',
+  'f-latitude', 'f-longitude', 'f-latLngDisplay', 'f-pincode',
   'f-imgFileInput', 'f-imgCameraInput',
   'f-amenities-extra',
   'f-ownerAltPhone', 'f-videoUrl', 'f-age', 'f-area',
@@ -11150,6 +11137,7 @@ function submitListing() {
       area:    loc,
       city:    document.getElementById('f-city').value.trim() || 'Bangalore',
       address: document.getElementById('f-fullAddress').value.trim(),
+      pincode: document.getElementById('f-pincode').value.trim() || null,
       lat:     parseFloat(document.getElementById('f-latitude').value) || null,
       lng:     parseFloat(document.getElementById('f-longitude').value) || null,
       mapLink: gv('f-googleMapsLink') || null,
