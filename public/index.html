@@ -8035,6 +8035,14 @@ function getFiltered() {
       return Infinity;
     };
     list.sort((a, b) => distFor(a) - distFor(b));
+    // "Near me" means "in my area", not just "closer, however far" — once
+    // we know the visitor's own pincode (via the reverse-geocode in
+    // initNearbyLocation()), restrict the list to that same pincode only.
+    // Strict: if nothing in that exact pincode is listed, the list is
+    // empty rather than falling back to showing everything.
+    if (nearbyPincode) {
+      list = list.filter(pincodeMatches);
+    }
   }
   else list.sort((a,b)=>String(a.id).localeCompare(String(b.id)));
   return list;
