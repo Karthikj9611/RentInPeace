@@ -8009,28 +8009,35 @@ function getFiltered() {
     return true;
   });
 
+  // Location-based restriction: once we know the visitor's pincode (from
+  // their current location), only ever show listings in that same pincode —
+  // applies no matter which sort is active (Newest, Price, Promoted, Near me),
+  // not just when "Near me" is picked. Intentionally strict: if nothing in
+  // that exact pincode is listed, the list is empty rather than falling back
+  // to showing everything else.
+  if (nearbyPincode) {
+    const before = list.length;
+    list = list.filter(p => {
+      const pPin = getPropertyPincode(p);
+      return !!pPin && pPin === nearbyPincode.trim();
+    });
+    console.log('[pincode-filter] visitor pincode:', nearbyPincode,
+      '| properties before filter:', before, '| after filter:', list.length);
+  }
+
   if (currentSort==='price-asc') list.sort((a,b)=>(a.price?.rent||0)-(b.price?.rent||0));
   else if (currentSort==='price-desc') list.sort((a,b)=>(b.price?.rent||0)-(a.price?.rent||0));
   else if (currentSort==='promoted') list.sort((a,b)=>(b.promoted?1:0)-(a.promoted?1:0));
   else if (currentSort==='nearby' && userCoords) {
-    // Three signals, strongest first:
+    // Two signals, strongest first:
     //  1. Real distance — for listings with lat/lng saved.
-    //  2. Pincode match — for listings without coordinates but with a
-    //     saved postcode that matches the visitor's detected postcode.
-    //  3. Area-text match — last resort, substring match against the
+    //  2. Area-text match — fallback, substring match against the
     //     free-text location.area field.
-    // Each fallback tier is treated as "about N km away" so it competes
-    // fairly against real distances — a listing that's genuinely 20km
-    // away (but has saved coordinates) should never outrank a same-
-    // pincode guess just because 20 is a smaller number than Infinity.
-    const PINCODE_MATCH_ASSUMED_KM = 1.5;
+    // (Pincode matching is no longer needed here — every listing left in
+    // `list` at this point is already in the visitor's pincode, filtered
+    // above. This just orders that same-pincode set by distance.)
     const AREA_MATCH_ASSUMED_KM = 3;
     const hasCoords = p => p.location?.lat != null && p.location?.lng != null;
-    const pincodeMatches = (p) => {
-      if (!nearbyPincode) return false;
-      const pPin = getPropertyPincode(p);
-      return !!pPin && pPin === nearbyPincode.trim();
-    };
     const areaMatches = (p) => {
       if (!nearbyAreaName) return false;
       const area = (p.location?.area || '').toLowerCase();
@@ -8038,27 +8045,10 @@ function getFiltered() {
     };
     const distFor = (p) => {
       if (hasCoords(p)) return haversineKm(userCoords.lat, userCoords.lng, p.location.lat, p.location.lng);
-      if (pincodeMatches(p)) return PINCODE_MATCH_ASSUMED_KM;
       if (areaMatches(p)) return AREA_MATCH_ASSUMED_KM;
       return Infinity;
     };
     list.sort((a, b) => distFor(a) - distFor(b));
-    // "Near me" means "in my area", not just "closer, however far" — once
-    // we know the visitor's own pincode (via the reverse-geocode in
-    // initNearbyLocation()), restrict the list to that same pincode only.
-    // Strict: if nothing in that exact pincode is listed, the list is
-    // empty rather than falling back to showing everything.
-    if (nearbyPincode) {
-      const before = list.length;
-      list = list.filter(pincodeMatches);
-      console.log('[nearby-filter] visitor pincode:', nearbyPincode,
-        '| properties before filter:', before,
-        '| after filter:', list.length,
-        '| sample property pincodes:', PROPERTIES.slice(0, 10).map(getPropertyPincode),
-        '| sample raw locations:', PROPERTIES.slice(0, 10).map(p => p.location));
-    } else {
-      console.log('[nearby-filter] nearbyPincode not resolved yet — showing distance-sorted list, no pincode filter applied. userCoords:', userCoords);
-    }
   }
   else list.sort((a,b)=>String(a.id).localeCompare(String(b.id)));
   return list;
@@ -8134,7 +8124,7 @@ function initNearbyLocation() {
           nearbyPincode = addr.postcode || '';
           nearbyAreaName = addr.suburb || addr.neighbourhood || addr.city_district || addr.city || '';
           console.log('[nearby-location] resolved nearbyPincode:', nearbyPincode, '| nearbyAreaName:', nearbyAreaName);
-          if (currentSort === 'nearby' && (nearbyPincode || nearbyAreaName)) renderCards();
+          if (nearbyPincode || nearbyAreaName) renderCards();
         })
         .catch(err => console.error('[nearby-location] reverse geocode error:', err));
     },
