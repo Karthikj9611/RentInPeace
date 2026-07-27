@@ -584,6 +584,11 @@ const LocationSchema = new mongoose.Schema({
   area:    { type: String, required: true },
   city:    { type: String, default: 'Bangalore' },
   address: { type: String, default: '' },
+  // 6-digit Indian PIN code, captured separately from the free-text address
+  // (auto-extracted from it on the frontend, editable by the owner) so
+  // listings can be matched/filtered by postcode without regex-parsing
+  // the address string on every read.
+  pincode: { type: String, default: '' },
   lat:     { type: Number, default: null },
   lng:     { type: Number, default: null },
   mapLink: { type: String, default: '' },
@@ -1001,6 +1006,7 @@ const MAX_LENGTHS = {
   'media.desc':         5000,
   'location.area':      200,
   'location.address':   500,
+  'location.pincode':   6,
   'owner.name':         100,
   'owner.address':      300,
   'owner.contactTime':  100,
@@ -1026,6 +1032,10 @@ function validatePropertyFields(fields) {
     if (val && String(val).length > max)
       return `Field '${path}' must be at most ${max} characters.`;
   }
+  const pincode = (fields.location || {}).pincode;
+  if (pincode && String(pincode).trim() && !/^\d{6}$/.test(String(pincode).trim()))
+    return `Field 'location.pincode' must be a 6-digit PIN code.`;
+
   const email = (fields.owner || {}).email;
   if (email && String(email).trim() &&
       !/^[^\s@"'<>\\]+@[^\s@"'<>\\]+\.[^\s@"'<>\\]+$/.test(String(email).trim()))
@@ -1074,6 +1084,7 @@ function isEmptyValue(v) {
 const BASE_REQUIRED_FIELDS = [
   ['location.city',     'Location: City'],
   ['location.address',  'Location: Building live address'],
+  ['location.pincode',  'Location: Pincode'],
   ['location.mapLink',  'Location: Google Maps link'],
   ['owner.name',        'Owner name'],
   ['owner.phone',       'Owner phone number'],

@@ -4382,7 +4382,7 @@ ul{list-style:none}
     </div>
     
 
-    <input type="hidden" id="f-latitude"/><input type="hidden" id="f-longitude"/><input type="hidden" id="f-pincode"/>
+    <input type="hidden" id="f-latitude"/><input type="hidden" id="f-longitude"/>
 
     <!-- ===== 2/3. OWNER DETAILS (incl. Location) ===== -->
     <div id="ownerDetailsSection">
@@ -4400,17 +4400,22 @@ ul{list-style:none}
         <label class="form-label">City</label>
         <input class="form-input" type="text" id="f-city" value="Bangalore" />
       </div>
-      <div class="form-group" id="fullAddressGroup" style="grid-column:span 3">
+      <div class="form-group" id="fullAddressGroup" style="grid-column:span 2">
         <label class="form-label">Building Live Address</label>
         <div style="display:flex;gap:7px;align-items:flex-start">
-          <textarea class="form-input" id="f-fullAddress" rows="2" style="flex:1;min-width:0;resize:vertical;background:var(--bg-2,#f5f5f5);cursor:not-allowed" readonly></textarea>
+          <textarea class="form-input" id="f-fullAddress" rows="2" style="flex:1;min-width:0;resize:vertical;background:var(--bg-2,#f5f5f5)" oninput="onFullAddressInput(this.value)"></textarea>
           <button type="button" onclick="fCaptureLocation()"
             style="flex-shrink:0;padding:9px 12px;border-radius:9px;border:1.5px solid var(--text);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;height:40px;margin-top:1px">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg>
             <span id="f-locBtnTxt">Live</span>
           </button>
         </div>
-        <div id="f-locStatus" style="font-size:11px;color:var(--text-2);min-height:14px;margin-top:2px">Auto-filled from your current location · Tap Live to update</div>
+        <div id="f-locStatus" style="font-size:11px;color:var(--text-2);min-height:14px;margin-top:2px">Auto-filled from your current location · Tap Live to update, or edit the text directly</div>
+      </div>
+      <div class="form-group" id="pincodeGroup">
+        <label class="form-label">Pincode</label>
+        <input class="form-input" type="text" id="f-pincode" inputmode="numeric" maxlength="6" placeholder="e.g. 560034" oninput="onPincodeInput(this)"/>
+        <div style="font-size:11px;color:var(--text-2);margin-top:2px">Auto-filled from the address · edit if it's wrong</div>
       </div>
       <div class="form-group" id="latLngGroup">
         <label class="form-label">Latitude / Longitude (auto)</label>
@@ -8021,8 +8026,11 @@ function getFiltered() {
     const PINCODE_MATCH_ASSUMED_KM = 1.5;
     const AREA_MATCH_ASSUMED_KM = 3;
     const hasCoords = p => p.location?.lat != null && p.location?.lng != null;
-    const pincodeMatches = (p) => !!nearbyPincode && !!p.location?.pincode &&
-      String(p.location.pincode).trim() === nearbyPincode.trim();
+    const pincodeMatches = (p) => {
+      if (!nearbyPincode) return false;
+      const pPin = getPropertyPincode(p);
+      return !!pPin && pPin === nearbyPincode.trim();
+    };
     const areaMatches = (p) => {
       if (!nearbyAreaName) return false;
       const area = (p.location?.area || '').toLowerCase();
@@ -8041,7 +8049,15 @@ function getFiltered() {
     // Strict: if nothing in that exact pincode is listed, the list is
     // empty rather than falling back to showing everything.
     if (nearbyPincode) {
+      const before = list.length;
       list = list.filter(pincodeMatches);
+      console.log('[nearby-filter] visitor pincode:', nearbyPincode,
+        '| properties before filter:', before,
+        '| after filter:', list.length,
+        '| sample property pincodes:', PROPERTIES.slice(0, 10).map(getPropertyPincode),
+        '| sample raw locations:', PROPERTIES.slice(0, 10).map(p => p.location));
+    } else {
+      console.log('[nearby-filter] nearbyPincode not resolved yet — showing distance-sorted list, no pincode filter applied. userCoords:', userCoords);
     }
   }
   else list.sort((a,b)=>String(a.id).localeCompare(String(b.id)));
@@ -8063,6 +8079,19 @@ function applyFilters(){ closeAllFd(); renderCards(); }
    is unavailable, denied, or times out — the default sort
    just stays in place.
 ═══════════════════════════════════════════════ */
+// Many older/imported listings never got location.pincode populated
+// directly and only have the full free-text location.address (which
+// still ends with a 6-digit Indian pincode before the state/country,
+// e.g. "...Bengaluru Urban, Karnataka, 560095, India"). Prefer the
+// explicit field when present, otherwise pull the pincode out of the
+// address text so those listings can still match on pincode.
+function getPropertyPincode(p) {
+  if (p.location?.pincode) return String(p.location.pincode).trim();
+  const address = p.location?.address || '';
+  const matches = String(address).match(/\b\d{6}\b/g);
+  return matches ? matches[matches.length - 1] : '';
+}
+
 function haversineKm(lat1, lon1, lat2, lon2) {
   const toRad = d => d * Math.PI / 180;
   const R = 6371;
@@ -8074,10 +8103,11 @@ function haversineKm(lat1, lon1, lat2, lon2) {
 }
 
 function initNearbyLocation() {
-  if (!('geolocation' in navigator)) return;
+  if (!('geolocation' in navigator)) { console.log('[nearby-location] geolocation not supported on this browser/device'); return; }
   navigator.geolocation.getCurrentPosition(
     (pos) => {
       userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      console.log('[nearby-location] got coords:', userCoords);
       // Auto-switch to "Near me first" only if the visitor hasn't manually
       // picked a sort yet. But if currentSort is already 'nearby' — either
       // from that auto-switch or because they picked it manually before we
@@ -8098,15 +8128,17 @@ function initNearbyLocation() {
       fetch(`https://nominatim.openstreetmap.org/reverse?lat=${userCoords.lat}&lon=${userCoords.lng}&format=json&accept-language=en`)
         .then(res => res.ok ? res.json() : null)
         .then(data => {
-          if (!data || !data.address) return;
+          console.log('[nearby-location] reverse-geocode response:', data);
+          if (!data || !data.address) { console.log('[nearby-location] no address in response — nearbyPincode stays empty'); return; }
           const addr = data.address;
           nearbyPincode = addr.postcode || '';
           nearbyAreaName = addr.suburb || addr.neighbourhood || addr.city_district || addr.city || '';
+          console.log('[nearby-location] resolved nearbyPincode:', nearbyPincode, '| nearbyAreaName:', nearbyAreaName);
           if (currentSort === 'nearby' && (nearbyPincode || nearbyAreaName)) renderCards();
         })
-        .catch(err => console.error('reverse geocode error:', err));
+        .catch(err => console.error('[nearby-location] reverse geocode error:', err));
     },
-    (err) => console.error('geolocation error:', err.message),
+    (err) => console.error('[nearby-location] geolocation error:', err.message),
     { enableHighAccuracy: true, timeout: 12000, maximumAge: 5 * 60 * 1000 }
   );
 }
@@ -11011,6 +11043,29 @@ function onMaintenanceChange() {
   // Electricity and water charges are independent of maintenance — the
   // user picks these themselves regardless of what's entered here.
 }
+// Pulls a 6-digit Indian pincode out of a free-text address string, e.g.
+// "...Koramangala, Bengaluru, Karnataka 560034, India" -> "560034".
+function extractPincodeFromAddress(text) {
+  const m = String(text || '').match(/\b\d{6}\b/);
+  return m ? m[0] : '';
+}
+
+// True once the person has typed into the Pincode box themselves — after
+// that we stop overwriting it from the address text, so a manual correction
+// (or a pincode the address text doesn't contain) always sticks.
+let pincodeManuallyEdited = false;
+
+function onFullAddressInput(value) {
+  if (pincodeManuallyEdited) return;
+  const guess = extractPincodeFromAddress(value);
+  if (guess) document.getElementById('f-pincode').value = guess;
+}
+
+function onPincodeInput(el) {
+  el.value = el.value.replace(/\D/g, '').slice(0, 6);
+  pincodeManuallyEdited = true;
+}
+
 function fCaptureLocation() {
   const btnTxt = document.getElementById('f-locBtnTxt');
   const status = document.getElementById('f-locStatus');
@@ -11033,8 +11088,11 @@ function fCaptureLocation() {
         document.getElementById('f-fullAddress').value = d.display_name || '';
         // Structured postcode from the same lookup — used to prioritize
         // this listing for visitors detected in the same pincode later,
-        // far more reliable than matching free-text area names.
-        document.getElementById('f-pincode').value = (d.address && d.address.postcode) || '';
+        // far more reliable than matching free-text area names. Falls back
+        // to pulling a 6-digit code out of the address text itself if the
+        // geocoder didn't return a structured postcode.
+        pincodeManuallyEdited = false; // fresh capture — a prior manual edit no longer applies
+        document.getElementById('f-pincode').value = (d.address && d.address.postcode) || extractPincodeFromAddress(d.display_name);
         status.textContent = 'Address captured · Enter Location / Area manually';
         // Keep Owner address in sync if "Same as building live address" is checked
         const sameChk = document.getElementById('f-sameAsBuildingAddress');
@@ -11056,7 +11114,7 @@ function fCaptureLocation() {
 // ═══════════════════════════════════════════════
 const OPTIONAL_FIELD_IDS = new Set([
   'f-importFile', 'f-importText',
-  'f-latitude', 'f-longitude', 'f-latLngDisplay', 'f-pincode',
+  'f-latitude', 'f-longitude', 'f-latLngDisplay',
   'f-imgFileInput', 'f-imgCameraInput',
   'f-amenities-extra',
   'f-ownerAltPhone', 'f-videoUrl', 'f-age', 'f-area',
