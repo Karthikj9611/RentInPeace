@@ -3316,14 +3316,48 @@ ul{list-style:none}
       </div>
     </div>
   </div>
+
+  <!-- Pincode — options are built dynamically from whatever pincodes actually
+       exist across current listings (see fdCollectPincodes), so this list
+       always reflects real data instead of a hardcoded set of codes. -->
+  <div class="fd-btn fd-rent fd-lease fd-pg fd-shortstay" id="fdb-pincode" onclick="toggleFd('pincode',this)">
+    <span class="fd-icon">📍</span>
+    <span class="fd-label">Pincode</span> <span class="fd-badge" id="fdbc-pincode" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-pincode" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Pincode</div>
+      <div class="fd-opts" id="fdo-pincode"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('pincode')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('pincode')">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Locality — location.area (e.g. "Singasandra, AECS Layout"), options
+       built dynamically the same way as Pincode (see fdCollectLocalities).
+       Distinct from the existing "Area" filter below, which is sqft size. -->
+  <div class="fd-btn fd-rent fd-lease fd-pg fd-shortstay" id="fdb-locality" onclick="toggleFd('locality',this)">
+    <span class="fd-icon">🏘️</span>
+    <span class="fd-label">Locality</span> <span class="fd-badge" id="fdbc-locality" style="display:none"></span>
+    <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <div class="fd-pop" id="fdp-locality" onclick="event.stopPropagation()">
+      <div class="fd-pop-label">Locality / Area</div>
+      <div class="fd-opts" id="fdo-locality"></div>
+      <div class="fd-pop-footer">
+        <button class="fd-clear-btn" onclick="clearFd('locality')">Clear</button>
+        <button class="fd-apply-btn" onclick="applyFd('locality')">Apply</button>
+      </div>
+    </div>
+  </div>
   
     <!-- RENT + LEASE: Area -->
   <div class="fd-btn fd-rent fd-lease" id="fdb-area" onclick="toggleFd('area',this)">
     <span class="fd-icon">📐</span>
-    <span class="fd-label">Area</span> <span class="fd-badge" id="fdbc-area" style="display:none"></span>
+    <span class="fd-label">Sqft</span> <span class="fd-badge" id="fdbc-area" style="display:none"></span>
     <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     <div class="fd-pop" id="fdp-area" onclick="event.stopPropagation()">
-      <div class="fd-pop-label">Area (sqft)</div>
+      <div class="fd-pop-label">Sqft</div>
       <div class="fd-opts">
         <div class="fp-opt" data-filter="_areaBucket" data-val="0-500" onclick="toggleOpt(this,'area')">Under 500</div>
         <div class="fp-opt" data-filter="_areaBucket" data-val="500-1000" onclick="toggleOpt(this,'area')">500 – 1000</div>
@@ -7234,6 +7268,8 @@ function handleSearch() {
 /* Map each dropdown id → which data-filter keys live inside it */
 const FD_GROUPS = {
   type:       ['propertyType'],
+  pincode:    ['pincode'],
+  locality:   ['locality'],
   bhk:        ['bhk'],
   negotiable: ['negotiable'],
   furnishing: ['furnishing'],
@@ -7373,6 +7409,33 @@ function fdCollectMerged(fields, predicate) {
   return Array.from(set);
 }
 
+/* Collect distinct pincodes present in PROPERTIES, scoped to the active tab.
+   Uses getPropertyPincode() (defined further below) so listings that only
+   have a free-text address — no explicit location.pincode saved yet — still
+   show up, matching the same fallback logic used by the "Near me" filter. */
+function fdCollectPincodes() {
+  const set = new Set();
+  PROPERTIES.forEach(p => {
+    if (!matchesTab(p, currentTab)) return;
+    const pin = getPropertyPincode(p);
+    if (pin) set.add(pin);
+  });
+  return Array.from(set);
+}
+
+/* Collect distinct localities (location.area, e.g. "Singasandra, AECS
+   Layout") present in PROPERTIES, scoped to the active tab — same pattern
+   as fdCollectPincodes, just against the free-text area field instead. */
+function fdCollectLocalities() {
+  const set = new Set();
+  PROPERTIES.forEach(p => {
+    if (!matchesTab(p, currentTab)) return;
+    const area = (p.location?.area || '').trim();
+    if (area) set.add(area);
+  });
+  return Array.from(set);
+}
+
 /* Collect distinct amenity names, stripping quantity suffixes like " ×2".
    Also scoped to the currently active tab, same as fdCollectValues. */
 function fdCollectAmenities() {
@@ -7429,6 +7492,18 @@ function buildFilterOptions() {
   fdRenderOpts('fdo-type', 'propertyType',
     fdSortValues('propertyType', fdCollectMerged(['propertyType','pgPropertyType','ssPropertyType'])), 'type');
   restoreSel('fdo-type');
+
+  // Pincode dropdown — rebuilt from whatever's actually in PROPERTIES right
+  // now, so newly added/verified listings' pincodes appear without any
+  // hardcoded list to maintain.
+  fdRenderOpts('fdo-pincode', 'pincode', fdSortValues('pincode', fdCollectPincodes()), 'pincode');
+  restoreSel('fdo-pincode');
+
+  // Locality dropdown — same "rebuilt from live data" pattern, driven by
+  // location.area instead of pincode. Alphabetical (fdSortValues falls back
+  // to localeCompare for non-numeric values, which is what we want here).
+  fdRenderOpts('fdo-locality', 'locality', fdSortValues('locality', fdCollectLocalities()), 'locality');
+  restoreSel('fdo-locality');
 
   fdRenderOpts('fdo-bhk', 'bhk',
     fdSortValues('bhk', fdCollectValues('bhk')), 'bhk');
@@ -7895,6 +7970,12 @@ function getFiltered() {
     if (fs.propertyType) {
       const typeVal = p.property?.type ?? p.pg?.type ?? p.shortStay?.type;
       if (!fs.propertyType.includes(typeVal)) return false;
+    }
+    if (fs.pincode) {
+      if (!fs.pincode.includes(getPropertyPincode(p))) return false;
+    }
+    if (fs.locality) {
+      if (!fs.locality.includes((p.location?.area || '').trim())) return false;
     }
     if (fs.bhk) {
       const bhkVal = (p.property?.bhk||'').trim();
