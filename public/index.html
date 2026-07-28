@@ -667,7 +667,7 @@ ul{list-style:none}
   font-size:12px;font-weight:800;
   background:linear-gradient(120deg,#ff4d67,#e03a52 60%,#c72e43);
   -webkit-background-clip:text;background-clip:text;color:transparent;
-  display:flex;align-items:baseline;gap:4px;letter-spacing:-.01em;
+  display:flex;align-items:baseline;gap:0;letter-spacing:-.01em;
   min-width:0;
 }
 .prop-price-unit{font-size:12px;font-weight:600;color:var(--brand);-webkit-text-fill-color:var(--brand)}
@@ -6610,18 +6610,18 @@ function cardHTML(p, compact) {
     <div class="prop-body">
       <div class="prop-title" title="${esc(p.propertyId)}">
         <span class="prop-title-text">${esc(p.propertyId || 'Untitled listing')}</span>
-        ${(ptype && !p.promoted) ? `<span class="prop-title-buildtype" title="${esc(ptype)}">${esc(ptype)}</span>` : ''}
+        ${ptype ? `<span class="prop-title-buildtype" title="${esc(ptype)}">${esc(ptype)}</span>` : ''}
       </div>
       <div class="prop-price-row">
-        <div class="prop-price">${fmtRupee(p.price?.rent||0)}<span class="prop-price-unit">/ ${pType === 'Lease' ? (leaseDur || 'Lease') : pType === 'ShortStay' ? 'Day' : 'Month'}</span></div>
+        <div class="prop-price">${fmtRupee(p.price?.rent||0)}<span class="prop-price-unit">/${pType === 'Lease' ? (fmtLeaseDur(leaseDur) || 'Lease') : pType === 'ShortStay' ? ' Day' : 'Mo'}</span></div>
         ${pType === 'ShortStay' ? '' : pType === 'Lease'
           ? (maintenance > 0 ? `<div class="prop-deposit-inline" title="Monthly maintenance">
               <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-              <span class="prop-deposit-val">${fmtRupee(maintenance)}</span><span class="prop-deposit-lbl">Maint.</span>
+              <span class="prop-deposit-val">${fmtRupee(maintenance)}/M</span>
             </div>` : '')
           : `<div class="prop-deposit-inline" title="Security deposit">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2"/><circle cx="12" cy="12.5" r="2.5"/></svg>
-          <span class="prop-deposit-val">${fmtRupee(deposit)}</span><span class="prop-deposit-lbl">Deposit</span>
+          <span class="prop-deposit-val">${fmtRupee(deposit)}</span><span class="prop-deposit-lbl">SD</span>
         </div>`}
       </div>
       <div class="prop-loc">
@@ -6663,7 +6663,7 @@ function cardHTML(p, compact) {
         </span>` : ''}
         ${maintenance > 0 ? `<span class="prop-chip chip-maint" title="Monthly maintenance">
           <span class="chip-ico-wrap icon-maint"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
-          ${fmtRupee(maintenance)} Maint.
+          ${fmtRupee(maintenance)}/M
         </span>` : ''}
         ${availableFmt ? `<span class="prop-chip chip-avail" title="Available from">
           <span class="chip-ico-wrap icon-avail"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
@@ -6790,15 +6790,15 @@ function shortlistCardHTML(p) {
         <span class="prop-title-text">${esc(p.propertyId || 'Untitled listing')}</span>
       </div>
       <div class="prop-price-row">
-        <div class="prop-price">${fmtRupee(p.price?.rent||0)}<span class="prop-price-unit">/ ${pType === 'Lease' ? (leaseDur || 'Lease') : pType === 'ShortStay' ? 'Day' : 'Month'}</span></div>
+        <div class="prop-price">${fmtRupee(p.price?.rent||0)}<span class="prop-price-unit">/${pType === 'Lease' ? (fmtLeaseDur(leaseDur) || 'Lease') : pType === 'ShortStay' ? ' Day' : 'Mo'}</span></div>
         ${pType === 'ShortStay' ? '' : pType === 'Lease'
           ? (maintenance > 0 ? `<div class="prop-deposit-inline" title="Monthly maintenance">
               <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-              <span class="prop-deposit-val">${fmtRupee(maintenance)}</span><span class="prop-deposit-lbl">Maint.</span>
+              <span class="prop-deposit-val">${fmtRupee(maintenance)}/M</span>
             </div>` : '')
           : `<div class="prop-deposit-inline" title="Security deposit">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2"/><circle cx="12" cy="12.5" r="2.5"/></svg>
-          <span class="prop-deposit-val">${fmtRupee(deposit)}</span><span class="prop-deposit-lbl">Deposit</span>
+          <span class="prop-deposit-val">${fmtRupee(deposit)}</span><span class="prop-deposit-lbl">SD</span>
         </div>`}
       </div>
       <div class="prop-loc">
@@ -6831,7 +6831,7 @@ function shortlistCardHTML(p) {
       ${(maintenance > 0 || waterLabel || electricLabel) ? `<div class="prop-chip-row prop-chip-row-scroll">
         ${maintenance > 0 ? `<span class="prop-chip chip-maint" title="Monthly maintenance">
           <span class="chip-ico-wrap icon-maint"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
-          ${fmtRupee(maintenance)} maintenance
+          ${fmtRupee(maintenance)}/M
         </span>` : ''}
       </div>` : ''}
       ${amenityTagsHTML(p)}
@@ -7914,8 +7914,21 @@ function fmtRupee(n) {
   const trim = x => x.toFixed(2).replace(/\.?0+$/, '');
   if (n >= 10000000) return '₹' + trim(n/10000000) + 'Cr';
   if (n >= 100000)   return '₹' + trim(n/100000) + 'L';
-  if (n >= 1000)     return '₹' + trim(n/1000) + 'k';
+  if (n >= 1000)     return '₹' + trim(n/1000) + 'K';
   return '₹' + n;
+}
+
+// Abbreviates lease-duration strings for the tight "20L/2yrs" price display,
+// e.g. "2 Years" -> "2yrs", "18 Months" -> "18mo". Falls back to the raw
+// string for anything that doesn't match the expected "<N> Year(s)/Month(s)"
+// shape from the lease-duration dropdowns.
+function fmtLeaseDur(s) {
+  if (!s) return '';
+  let m = s.match(/^(\d+)\s*Year/i);
+  if (m) return m[1] + 'yrs';
+  m = s.match(/^(\d+)(\+?)\s*Month/i);
+  if (m) return m[1] + m[2] + 'mo';
+  return s;
 }
 
 /* Close dropdowns on outside click */
