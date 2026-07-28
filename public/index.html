@@ -2987,9 +2987,14 @@ ul{list-style:none}
   .fd-pop{width:50vw;min-width:0;max-width:50vw}
   /* Bottom padding must clear the fixed .bottom-nav (56px + safe-area inset)
      plus some breathing room — otherwise on tabs with no content below the
-     grid (Rent/Lease/PG/ShortStay), the last row of cards has nowhere left
-     to scroll to and stays stuck under the nav bar. */
-  .main{padding:14px 0 calc(56px + env(safe-area-inset-bottom) + 24px)}
+     grid (Rent/Lease/PG/ShortStay/Promoted), the last row of cards has
+     nowhere left to scroll to and stays stuck under the nav bar. On the
+     "All" tab, Premium Services/Reviews/etc. already follow right after
+     <main>, so this extra clearance isn't needed there — applying it
+     unconditionally left a large dead gap before "Our Premium Services".
+     The .needs-nav-clear class is toggled by updateAllOnlySections(). */
+  .main{padding:14px 0 24px}
+  .main.needs-nav-clear{padding-bottom:calc(56px + env(safe-area-inset-bottom) + 24px)}
   .results-header{padding:0 12px}
   .ad-banner{height:52px}
   .ad-slide{padding:0 14px;gap:10px;font-size:12.5px}
@@ -7221,6 +7226,10 @@ function updateAllOnlySections() {
   if (reviewsSection) reviewsSection.style.display = show ? '' : 'none';
   if (premiumServices) premiumServices.style.display = show ? '' : 'none';
   if (fabStatsInline) fabStatsInline.style.display = show ? '' : 'none';
+  // Mobile bottom-nav clearance (see .main.needs-nav-clear in CSS) is only
+  // needed when nothing follows <main> — i.e. every tab except "All".
+  const mainEl = document.getElementById('mainContent');
+  if (mainEl) mainEl.classList.toggle('needs-nav-clear', !show);
 }
 
 function switchTab(el) {
