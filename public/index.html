@@ -640,6 +640,37 @@ ul{list-style:none}
 .prop-card.prop-card-promoted .prop-icon-promoted{background:linear-gradient(135deg,#ffd166,#f4a300)}
 .prop-card.prop-card-promoted .prop-icon-promoted svg{fill:#7a4a00}
 .prop-card.prop-card-promoted .prop-icon-verified{background:linear-gradient(135deg,#5cb3ff,#0f66d6)}
+/* Views icon, relocated from the bottom action row to sit directly below
+   the shortlist heart in the floating right-badge stack (see prop-right-badges
+   above) — styled like the heart (translucent white circle) rather than the
+   colored promoted/verified badges, with the view-count as a small overlay
+   dot to match how .prop-qa-count/.prop-views-badge already look elsewhere. */
+.prop-icon-badge.prop-views-float{
+  position:relative;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(6px);
+  box-shadow:0 2px 6px rgba(20,16,17,.12);
+}
+.prop-icon-badge.prop-views-float svg{width:13px;height:13px;stroke:var(--text-2);fill:none;stroke-width:1.9}
+.prop-icon-badge.prop-views-float .prop-views-float-badge{
+  position:absolute;top:-6px;right:-6px;min-width:15px;height:15px;padding:0 3px;
+  border-radius:99px;background:var(--brand);color:#fff;font-size:8.5px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;line-height:1;box-shadow:0 0 0 1.5px var(--bg);
+}
+/* Compare toggle, relocated the same way — icon-only, floating below Views,
+   matching the heart's translucent-white look; brand-colored when checked,
+   dimmed when disabled (same states the old bottom-row 3D button had). */
+.prop-icon-badge.prop-compare-float{
+  cursor:pointer;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(6px);
+  box-shadow:0 2px 6px rgba(20,16,17,.12);
+  transition:background .12s,transform .12s;
+}
+.prop-icon-badge.prop-compare-float:hover{background:#fff;transform:scale(1.07)}
+.prop-icon-badge.prop-compare-float svg{width:13px;height:13px;fill:var(--text-2);stroke:none}
+.prop-icon-badge.prop-compare-float.checked{background:var(--brand)}
+.prop-icon-badge.prop-compare-float.checked svg{fill:#fff}
+.prop-icon-badge.prop-compare-float.disabled{opacity:.45;cursor:not-allowed}
+.prop-icon-badge.prop-compare-float.disabled:hover{background:rgba(255,255,255,.92);transform:none}
 .prop-body{padding:13px 14px 12px;flex:1;min-width:0;display:flex;flex-direction:column}
 .prop-price-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:3px;margin-bottom:4px}
 .prop-price{
@@ -6559,6 +6590,13 @@ function cardHTML(p, compact) {
           <div class="prop-heart${liked?' liked':''}" onclick="event.stopPropagation();toggleShortlist('${p.id}',this)" aria-label="${liked?'Remove from':'Add to'} shortlist">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
           </div>
+          <div class="prop-icon-badge prop-views-float" title="${getViews(p).toLocaleString('en-IN')} views">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span class="prop-views-float-badge">${formatViews(getViews(p))}</span>
+          </div>
+          <div class="prop-icon-badge prop-compare-float prop-action-compare${compared?' checked':''}${compareDisabled?' disabled':''}" onclick="event.stopPropagation();toggleCompare('${p.id}',this)" aria-label="${compared?'Remove from':'Add to'} compare" title="${compareDisabled?`You're comparing ${lockedType} properties`:(compared?'Added to compare':'Compare')}">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="8" height="16" rx="1.5"/><rect x="13" y="4" width="8" height="16" rx="1.5" opacity="0.55"/></svg>
+          </div>
           ${p.promoted ? '<div class="prop-icon-badge prop-icon-promoted" title="Promoted"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.26 6.9.8-5.1 4.7 1.4 6.84L12 17.3l-6.1 3.3 1.4-6.84-5.1-4.7 6.9-.8z"/></svg></div>' : ''}
           ${(SHOW_VERIFIED_BADGE && p.verified) ? '<div class="prop-icon-badge prop-icon-verified" title="Verified"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="#fff"/><path d="M8 12.3l2.6 2.6 5.4-5.8" stroke="#1a73e8" stroke-width="2.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' : ''}
         </div>
@@ -6656,7 +6694,7 @@ function cardHTML(p, compact) {
         </span>` : ''}
       </div>
       ${amenityTagsHTML(p)}
-      <div class="prop-footer">
+<!--<div class="prop-footer">
         <div class="prop-quick-actions">
           <button class="prop-qa-btn prop-qa-3d qa-call" onclick="event.stopPropagation();openCall('${p.id}')" aria-label="Call owner">
             <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
@@ -6688,7 +6726,7 @@ function cardHTML(p, compact) {
             <span class="prop-qa-label">Views</span>
           </span>
         </div>
-      </div>
+      </div>-->
     </div>
   </div>`;
 }
@@ -6729,6 +6767,13 @@ function shortlistCardHTML(p) {
         <div class="prop-right-badges">
           <div class="prop-heart${liked?' liked':''}" onclick="event.stopPropagation();toggleShortlist('${p.id}',this)" aria-label="${liked?'Remove from':'Add to'} shortlist">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </div>
+          <div class="prop-icon-badge prop-views-float" title="${getViews(p).toLocaleString('en-IN')} views">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span class="prop-views-float-badge">${formatViews(getViews(p))}</span>
+          </div>
+          <div class="prop-icon-badge prop-compare-float prop-action-compare${compared?' checked':''}${compareDisabled?' disabled':''}" onclick="event.stopPropagation();toggleCompare('${p.id}',this)" aria-label="${compared?'Remove from':'Add to'} compare" title="${compareDisabled?`You're comparing ${lockedType} properties`:(compared?'Added to compare':'Compare')}">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="8" height="16" rx="1.5"/><rect x="13" y="4" width="8" height="16" rx="1.5" opacity="0.55"/></svg>
           </div>
           ${p.promoted ? '<div class="prop-icon-badge prop-icon-promoted" title="Promoted"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.26 6.9.8-5.1 4.7 1.4 6.84L12 17.3l-6.1 3.3 1.4-6.84-5.1-4.7 6.9-.8z"/></svg></div>' : ''}
           ${(SHOW_VERIFIED_BADGE && p.verified) ? '<div class="prop-icon-badge prop-icon-verified" title="Verified"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="#fff"/><path d="M8 12.3l2.6 2.6 5.4-5.8" stroke="#1a73e8" stroke-width="2.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' : ''}
@@ -6805,17 +6850,6 @@ function shortlistCardHTML(p) {
             <span class="prop-qa-label">Visit</span>
             <span class="prop-qa-count" style="${(p.visitCount||0) > 0 ? '' : 'display:none'}">${p.visitCount||0}</span>
           </div>`}
-          <div class="prop-qa-icon prop-qa-3d qa-compare prop-action-compare${compared?' checked':''}${compareDisabled?' disabled':''}" onclick="event.stopPropagation();toggleCompare('${p.id}',this)" aria-label="${compared?'Remove from':'Add to'} compare" title="${compareDisabled?`You're comparing ${lockedType} properties`:'Compare'}">
-            <span class="qa-3d-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="8" height="16" rx="1.5"/><rect x="13" y="4" width="8" height="16" rx="1.5" opacity="0.55"/></svg></span>
-            <span class="prop-qa-label">${compared?'Added':'Compare'}</span>
-          </div>
-          <span class="prop-views" title="${getViews(p).toLocaleString('en-IN')} views">
-            <span class="prop-views-icon">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              <span class="prop-views-badge">${formatViews(getViews(p))}</span>
-            </span>
-            <span class="prop-qa-label">Views</span>
-          </span>
         </div>
       </div>
     </div>
