@@ -11167,45 +11167,35 @@ document.addEventListener('DOMContentLoaded', function() {
   start();
 });
 
-/* ─── Auto-slide the property-card icon/chip rows (stats + furnished/
-   maintenance/available chips) every 10s when they overflow their card
-   width. All cards flip together in lockstep — a single global phase
-   toggles between "start" and "end" each tick, so every card's row moves
-   in the same direction at the same time instead of drifting out of sync
-   with each other. Users can still drag/scroll them manually at any time.
-   Runs globally so it picks up newly rendered cards each tick. */
-/* Slowly animate a scrollable row's scrollLeft to a target position over
-   `duration` ms, using an ease-in-out curve. Native `behavior:'smooth'`
-   scrolling is quick (~300ms) and can't be slowed down directly, so we
-   drive it by hand with requestAnimationFrame instead. */
-function _slowScrollTo(row, target, duration){
-  const start = row.scrollLeft;
-  const dist = target - start;
-  if (!dist) return;
-  const prevBehavior = row.style.scrollBehavior;
-  row.style.scrollBehavior = 'auto';
-  const t0 = performance.now();
-  function ease(t){ return t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2, 2)/2; }
-  function step(now){
-    const p = Math.min((now - t0) / duration, 1);
-    row.scrollLeft = start + dist * ease(p);
-    if (p < 1) requestAnimationFrame(step);
-    else row.style.scrollBehavior = prevBehavior;
-  }
-  requestAnimationFrame(step);
-}
+/* ─── Auto-refresh the property-card icon/chip rows (stats + furnished/
+   maintenance/available chips) every 20s when they overflow their card
+   width. Rather than visibly sliding the row sideways (an obvious scrolling
+   motion) or fading fully to blank (a noticeable empty flash), we softly
+   blur + dim the row, jump the scroll position straight to the next "page"
+   while it's blurred, then sharpen back in — content stays visible the
+   whole time, it just quietly refreshes. All cards flip together in
+   lockstep — a single global phase toggles between "start" and "end" each
+   tick. Users can still drag/scroll them manually at any time. Runs
+   globally so it picks up newly rendered cards each tick. */
 let _propRowPhase = false;
 function _autoSlidePropRows(){
   _propRowPhase = !_propRowPhase;
   document.querySelectorAll('.prop-stats, .prop-chip-row-scroll').forEach(row => {
     if (row.scrollWidth <= row.clientWidth + 4) return;
+    if (row.classList.contains('is-dragging')) return; // don't fight a manual drag
     const target = _propRowPhase ? row.scrollWidth - row.clientWidth : 0;
-    // Readable, constant speed (~28px/sec) rather than a fixed total
-    // duration — longer rows (more chips) now take proportionally longer
-    // instead of racing through at the same 5s regardless of length.
-    const distance = Math.abs(target - row.scrollLeft);
-    const duration = Math.min(Math.max(distance / 28 * 1000, 4000), 16000);
-    _slowScrollTo(row, target, duration);
+    if (Math.abs(target - row.scrollLeft) < 2) return;
+    row.style.transition = 'filter .35s ease, opacity .35s ease';
+    row.style.filter = 'blur(5px)';
+    row.style.opacity = '.6';
+    setTimeout(() => {
+      const prevBehavior = row.style.scrollBehavior;
+      row.style.scrollBehavior = 'auto';
+      row.scrollLeft = target;
+      row.style.scrollBehavior = prevBehavior;
+      row.style.filter = 'none';
+      row.style.opacity = '1';
+    }, 350);
   });
 }
 /* ─── Manual drag-to-scroll for the stat/chip rows on desktop ───────────
