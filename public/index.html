@@ -707,7 +707,14 @@ ul{list-style:none}
   display:flex;align-items:center;gap:4px;
   font-size:12px;color:var(--text-3);margin-top:3px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  justify-content:space-between;
 }
+.prop-loc-area{display:flex;align-items:center;gap:4px;overflow:hidden;min-width:0}
+.prop-loc-avail{
+  display:flex;align-items:center;gap:3px;flex-shrink:0;
+  color:#a85c6e;font-weight:600;white-space:nowrap;
+}
+.prop-loc-avail svg{width:12px;height:12px;stroke:#a85c6e;fill:none;stroke-width:2;flex-shrink:0}
 .prop-loc svg{width:13px;height:13px;stroke:#a85c6e;fill:#a85c6e;fill-opacity:.12;stroke-width:2;flex-shrink:0}
 .prop-loc span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* ── Modern icon stat row (replaces verbose pill tags) ── */
@@ -6580,7 +6587,31 @@ function cardHTML(p, compact) {
     const dd = String(d.getDate()).padStart(2,'0');
     const mm = String(d.getMonth()+1).padStart(2,'0');
     const yyyy = d.getFullYear();
-    return `${dd}-${mm}-${yyyy}`;
+    const dateStr = `${dd}-${mm}-${yyyy}`;
+    // Relative phrasing ("in 2 days", "in 3 months") for anything within
+    // roughly the next 3 months — easier to scan at a glance than a raw
+    // date. Past dates and anything further out just show the plain date.
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const target = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    const dayMs = 24 * 60 * 60 * 1000;
+    const diffDays = Math.round((target - today) / dayMs);
+    if (diffDays < 0) return dateStr;
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Tomorrow';
+    if (diffDays <= 30) return `In ${diffDays} day${diffDays > 1 ? 's' : ''}`;
+    // Whole calendar months between today and the target date.
+    let months = (target.getFullYear() - today.getFullYear()) * 12 + (target.getMonth() - today.getMonth());
+    if (target.getDate() < today.getDate()) months--;
+    if (months <= 3) {
+      if (months <= 0) return `In ${diffDays} days`;
+      const afterMonths = new Date(today.getFullYear(), today.getMonth() + months, today.getDate());
+      const remDays = Math.round((target - afterMonths) / dayMs);
+      let label = `${months} Month${months > 1 ? 's' : ''}`;
+      if (remDays > 0) label += ` ${remDays} Day${remDays > 1 ? 's' : ''}`;
+      return label;
+    }
+    return dateStr;
   })() : '';
   const compactClass = compact ? ' compact' : '';
   const promotedClass = p.promoted ? ' prop-card-promoted' : '';
@@ -6625,8 +6656,14 @@ function cardHTML(p, compact) {
         </div>`}
       </div>
       <div class="prop-loc">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span>${esc(p.location?.area)}</span>
+        <span class="prop-loc-area">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>${esc(p.location?.area)}</span>
+        </span>
+        ${availableFmt ? `<span class="prop-loc-avail" title="Available from">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          ${availableFmt}
+        </span>` : ''}
       </div>
 	  
       <div class="prop-stats">
@@ -6661,13 +6698,9 @@ function cardHTML(p, compact) {
           <span class="prop-chip-icon icon-room">🛏️</span>
           ${esc(pg.room)}
         </span>` : ''}
-        ${maintenance > 0 ? `<span class="prop-chip chip-maint" title="Monthly maintenance">
+        ${(maintenance > 0 && pType !== 'Lease') ? `<span class="prop-chip chip-maint" title="Monthly maintenance">
           <span class="chip-ico-wrap icon-maint"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
           ${fmtRupee(maintenance)}/M
-        </span>` : ''}
-        ${availableFmt ? `<span class="prop-chip chip-avail" title="Available from">
-          <span class="chip-ico-wrap icon-avail"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
-          ${availableFmt}
         </span>` : ''}
         ${isPGCard && pg.gender ? `<span class="prop-chip chip-gender" title="Gender preference">
           <span class="prop-chip-icon icon-gender">🚻</span>
@@ -6763,6 +6796,35 @@ function shortlistCardHTML(p) {
   const leaseDur = p.terms?.lease || '';
   const waterLabel = p.price?.water || '';
   const electricLabel = p.price?.electricity || '';
+  const available = isPGCardSL ? (pgSL.available || '') : (p.property?.available || '');
+  const availableFmt = available ? (() => {
+    const d = new Date(available);
+    if (isNaN(d)) return available;
+    const dd = String(d.getDate()).padStart(2,'0');
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const yyyy = d.getFullYear();
+    const dateStr = `${dd}-${mm}-${yyyy}`;
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const target = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    const dayMs = 24 * 60 * 60 * 1000;
+    const diffDays = Math.round((target - today) / dayMs);
+    if (diffDays < 0) return dateStr;
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Tomorrow';
+    if (diffDays <= 30) return `In ${diffDays} day${diffDays > 1 ? 's' : ''}`;
+    let months = (target.getFullYear() - today.getFullYear()) * 12 + (target.getMonth() - today.getMonth());
+    if (target.getDate() < today.getDate()) months--;
+    if (months <= 3) {
+      if (months <= 0) return `In ${diffDays} days`;
+      const afterMonths = new Date(today.getFullYear(), today.getMonth() + months, today.getDate());
+      const remDays = Math.round((target - afterMonths) / dayMs);
+      let label = `${months} Month${months > 1 ? 's' : ''}`;
+      if (remDays > 0) label += ` ${remDays} Day${remDays > 1 ? 's' : ''}`;
+      return label;
+    }
+    return dateStr;
+  })() : '';
   return `<div class="prop-card type-${pType.toLowerCase()}" onclick="openDetail('${p.id}')">
     <div class="prop-img" style="background:${bg}" data-idx="0">
       ${buildImgSlider(p, fg, '-sl')}
@@ -6802,8 +6864,14 @@ function shortlistCardHTML(p) {
         </div>`}
       </div>
       <div class="prop-loc">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span>${esc(p.location?.area)}</span>
+        <span class="prop-loc-area">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>${esc(p.location?.area)}</span>
+        </span>
+        ${availableFmt ? `<span class="prop-loc-avail" title="Available from">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          ${availableFmt}
+        </span>` : ''}
       </div>
       <div class="prop-stats">
         <span class="prop-stat" title="Configuration">
@@ -6828,8 +6896,8 @@ function shortlistCardHTML(p) {
         </span>
         ${lift ? `<span class="prop-stat" title="Lift available"><span class="prop-stat-icon icon-lift">🛗</span></span>` : ''}
       </div>
-      ${(maintenance > 0 || waterLabel || electricLabel) ? `<div class="prop-chip-row prop-chip-row-scroll">
-        ${maintenance > 0 ? `<span class="prop-chip chip-maint" title="Monthly maintenance">
+      ${((maintenance > 0 && pType !== 'Lease') || waterLabel || electricLabel) ? `<div class="prop-chip-row prop-chip-row-scroll">
+        ${(maintenance > 0 && pType !== 'Lease') ? `<span class="prop-chip chip-maint" title="Monthly maintenance">
           <span class="chip-ico-wrap icon-maint"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
           ${fmtRupee(maintenance)}/M
         </span>` : ''}
