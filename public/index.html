@@ -3172,7 +3172,7 @@ ul{list-style:none}
   </div>
 
   <div class="nav-tabs" role="tablist">
-    <div class="nav-tab" data-tab="All" role="tab" onclick="switchTab(this)" tabindex="0">
+    <div class="nav-tab active" data-tab="All" role="tab" onclick="switchTab(this)" tabindex="0">
       <span class="nav-tab-icon">🏘️</span>
       All
     </div>
@@ -3180,7 +3180,7 @@ ul{list-style:none}
       <span class="nav-tab-icon">⭐</span>
       Promoted
     </div>
-    <div class="nav-tab active" data-tab="Rent" role="tab" onclick="switchTab(this)" tabindex="0">
+    <div class="nav-tab" data-tab="Rent" role="tab" onclick="switchTab(this)" tabindex="0">
       <span class="nav-tab-icon">🔑</span>
       Rent
     </div>
@@ -4143,7 +4143,7 @@ ul{list-style:none}
 
 <!-- ─── Mobile bottom nav ────────────────────────── -->
 <nav class="bottom-nav" aria-label="Main navigation">
-  <div class="bottom-tab" data-tab="All" onclick="switchTabMobile(this)">
+  <div class="bottom-tab active" data-tab="All" onclick="switchTabMobile(this)">
     <span class="bottom-tab-icon">🏘️</span>
     All
   </div>
@@ -4151,7 +4151,7 @@ ul{list-style:none}
     <span class="bottom-tab-icon">⭐</span>
     Promoted
   </div>
-  <div class="bottom-tab active" data-tab="Rent" onclick="switchTabMobile(this)">
+  <div class="bottom-tab" data-tab="Rent" onclick="switchTabMobile(this)">
     <span class="bottom-tab-icon">🔑</span>
     Rent
   </div>
@@ -5781,7 +5781,7 @@ function formatViews(n) {
 /* ═══════════════════════════════════════════════
    STATE
 ═══════════════════════════════════════════════ */
-let currentTab = 'Rent'; // default tab shown on load
+let currentTab = 'All'; // default tab shown on load
 const SHOW_VERIFIED_BADGE = false; // verified badge hidden on cards for now — flip to true to bring it back
 let currentSort = 'newest';
 let userCoords = null;      // {lat, lng} once geolocation succeeds, used for "Near me first" sort
@@ -6024,6 +6024,7 @@ function sectionKeyFor(p) {
 }
 
 function renderCards() {
+  saveFilterState(); // keep localStorage in sync with live filter/tab state on every render
   const empty = document.getElementById('emptyState');
   const list = getFiltered();
   document.getElementById('resultCount').textContent = list.length;
@@ -7183,7 +7184,11 @@ function toggleMenuPanel() {
 function clearFiltersHiddenByTab() {
   document.querySelectorAll('.fd-btn').forEach(btn => {
     const tabClass = 'fd-' + currentTab.toLowerCase();
-    const visible = currentTab === 'All' || btn.classList.contains(tabClass);
+    // Promoted spans all four listing types, so (per the CSS rules above)
+    // it shows the same full filter set as "All" — no button ever carries
+    // a literal "fd-promoted" class. Treat it the same as "All" here too,
+    // or every filter would look "hidden" on this tab and get wiped.
+    const visible = currentTab === 'All' || currentTab === 'Promoted' || btn.classList.contains(tabClass);
     if (visible) return;
     const id = btn.id.replace(/^fdb-/, '');
     const pop = document.getElementById('fdp-' + id);
@@ -7494,13 +7499,39 @@ function buildFilterOptions() {
     if (!prevSel[key]) prevSel[key] = new Set();
     prevSel[key].add(el.dataset.val);
   });
+  // One-shot restore after a page refresh (see restoreFilterStateBeforeBuild) —
+  // merge in on top of whatever's already live in the DOM.
+  if (pendingRestoreSel) {
+    Object.keys(pendingRestoreSel).forEach(key => {
+      if (!prevSel[key]) prevSel[key] = new Set();
+      pendingRestoreSel[key].forEach(v => prevSel[key].add(v));
+    });
+    pendingRestoreSel = null;
+  }
 
-  function restoreSel(containerId) {
+  // filterKey/fdGroupId are the same values passed to the fdRenderOpts()
+  // call just above each restoreSel() call — needed so that a value
+  // selected under a different tab (e.g. a pincode/locality/BHK that only
+  // exists among that other tab's listings) can be recreated as a pill here
+  // instead of just vanishing because this tab's live data doesn't have it.
+  function restoreSel(containerId, filterKey, fdGroupId) {
     const container = document.getElementById(containerId);
     if (!container) return;
+    const set = prevSel[filterKey];
+    if (!set) return;
+    const seen = new Set();
     container.querySelectorAll('.fp-opt').forEach(opt => {
-      const set = prevSel[opt.dataset.filter];
-      if (set && set.has(opt.dataset.val)) opt.classList.add('sel');
+      if (set.has(opt.dataset.val)) { opt.classList.add('sel'); seen.add(opt.dataset.val); }
+    });
+    set.forEach(val => {
+      if (seen.has(val)) return;
+      const opt = document.createElement('div');
+      opt.className = 'fp-opt sel';
+      opt.dataset.filter = filterKey;
+      opt.dataset.val = val;
+      opt.textContent = fdLabel(filterKey, val);
+      opt.addEventListener('click', () => toggleOpt(opt, fdGroupId));
+      container.appendChild(opt);
     });
   }
 
@@ -7508,102 +7539,102 @@ function buildFilterOptions() {
   // merge options from all listing types into one shared dropdown.
   fdRenderOpts('fdo-type', 'propertyType',
     fdSortValues('propertyType', fdCollectMerged(['propertyType','pgPropertyType','ssPropertyType'])), 'type');
-  restoreSel('fdo-type');
+  restoreSel('fdo-type', 'propertyType', 'type');
 
   // Pincode dropdown — rebuilt from whatever's actually in PROPERTIES right
   // now, so newly added/verified listings' pincodes appear without any
   // hardcoded list to maintain.
   fdRenderOpts('fdo-pincode', 'pincode', fdSortValues('pincode', fdCollectPincodes()), 'pincode');
-  restoreSel('fdo-pincode');
+  restoreSel('fdo-pincode', 'pincode', 'pincode');
   fdHighlightNearbyPincode();
 
   // Locality dropdown — same "rebuilt from live data" pattern, driven by
   // location.area instead of pincode. Alphabetical (fdSortValues falls back
   // to localeCompare for non-numeric values, which is what we want here).
   fdRenderOpts('fdo-locality', 'locality', fdSortValues('locality', fdCollectLocalities()), 'locality');
-  restoreSel('fdo-locality');
+  restoreSel('fdo-locality', 'locality', 'locality');
 
   fdRenderOpts('fdo-bhk', 'bhk',
     fdSortValues('bhk', fdCollectValues('bhk')), 'bhk');
-  restoreSel('fdo-bhk');
+  restoreSel('fdo-bhk', 'bhk', 'bhk');
 
   // Furnishing now shows on Rent/Lease, PG, and Short Stay tabs alike — merge
   // options from all listing types into one shared dropdown.
   fdRenderOpts('fdo-furnishing', 'furnishing',
     fdSortValues('furnishing', fdCollectMerged(['furnishing','pgFurnishing','ssFurnishing'])), 'furnishing');
-  restoreSel('fdo-furnishing');
+  restoreSel('fdo-furnishing', 'furnishing', 'furnishing');
 
   fdRenderOpts('fdo-tenant', 'tenant',
     fdSortValues('tenant', fdCollectValues('tenant')), 'tenant');
-  restoreSel('fdo-tenant');
+  restoreSel('fdo-tenant', 'tenant', 'tenant');
 
   fdRenderOpts('fdo-facing', 'facing',
     fdSortValues('facing', fdCollectValues('facing')), 'facing');
-  restoreSel('fdo-facing');
+  restoreSel('fdo-facing', 'facing', 'facing');
 
   // Bathrooms now shows on Rent/Lease and PG tabs alike — merge options from
   // both listing types (numeric bathroom count for Rent/Lease, Yes/Shared for PG).
   fdRenderOpts('fdo-bathrooms', 'bathrooms',
     fdSortValues('bathrooms', fdCollectMerged(['bathrooms','pgBathroom'])), 'bathrooms');
-  restoreSel('fdo-bathrooms');
+  restoreSel('fdo-bathrooms', 'bathrooms', 'bathrooms');
 
   fdRenderOpts('fdo-age', 'age',
     fdSortValues('age', fdCollectValues('age')), 'age');
-  restoreSel('fdo-age');
+  restoreSel('fdo-age', 'age', 'age');
 
   fdRenderOpts('fdo-leaseDuration', 'leaseDuration',
     fdSortValues('leaseDuration', fdCollectValues('leaseDuration', p => pTypeLabel(p) === 'Rent' || pTypeLabel(p) === 'Lease')), 'leaseDuration');
-  restoreSel('fdo-leaseDuration');
+  restoreSel('fdo-leaseDuration', 'leaseDuration', 'leaseDuration');
 
   fdRenderOpts('fdo-leaseType', 'leaseType',
     fdSortValues('leaseType', fdCollectValues('leaseType', p => pTypeLabel(p) === 'Lease')), 'leaseType');
-  restoreSel('fdo-leaseType');
+  restoreSel('fdo-leaseType', 'leaseType', 'leaseType');
 
   fdRenderOpts('fdo-lockIn', 'lockIn',
     fdSortValues('lockIn', fdCollectValues('lockIn', p => pTypeLabel(p) === 'Lease')), 'lockIn');
-  restoreSel('fdo-lockIn');
+  restoreSel('fdo-lockIn', 'lockIn', 'lockIn');
 
   fdRenderOpts('fdo-amenities', 'amenities',
     fdSortValues('amenities', fdCollectAmenities()), 'amenities');
-  restoreSel('fdo-amenities');
+  restoreSel('fdo-amenities', 'amenities', 'amenities');
 
   fdRenderOpts('fdo-pgGender', 'pgGender',
     fdSortValues('pgGender', fdCollectValues('pgGender', p => pTypeLabel(p) === 'PG')), 'pgGender');
-  restoreSel('fdo-pgGender');
+  restoreSel('fdo-pgGender', 'pgGender', 'pgGender');
 
   // Room type now shows on PG and Short Stay tabs alike — merge options from
   // both listing types (pg.room for PG, shortStay.roomType for Short Stay).
   fdRenderOpts('fdo-pgRoom', 'pgRoomType',
     fdSortValues('pgRoomType', fdCollectMerged(['pgRoomType','ssRoomType'], p => pTypeLabel(p) === 'PG' || pTypeLabel(p) === 'ShortStay')), 'pgRoom');
-  restoreSel('fdo-pgRoom');
+  restoreSel('fdo-pgRoom', 'pgRoomType', 'pgRoom');
 
   fdRenderOpts('fdo-pgMeals', 'pgMeals',
     fdSortValues('pgMeals', fdCollectValues('pgMeals', p => pTypeLabel(p) === 'PG')), 'pgMeals');
-  restoreSel('fdo-pgMeals');
+  restoreSel('fdo-pgMeals', 'pgMeals', 'pgMeals');
 
   fdRenderOpts('fdo-pgFoodType', 'pgFoodType',
     fdSortValues('pgFoodType', fdCollectValues('pgFoodType', p => pTypeLabel(p) === 'PG')), 'pgMeals');
-  restoreSel('fdo-pgFoodType');
+  restoreSel('fdo-pgFoodType', 'pgFoodType', 'pgMeals');
 
   fdRenderOpts('fdo-pgOccupancy', 'pgOccupancy',
     fdSortValues('pgOccupancy', fdCollectValues('pgOccupancy', p => pTypeLabel(p) === 'PG')), 'pgOccupancy');
-  restoreSel('fdo-pgOccupancy');
+  restoreSel('fdo-pgOccupancy', 'pgOccupancy', 'pgOccupancy');
 
   fdRenderOpts('fdo-pgGateTime', 'pgGateTime',
     fdSortValues('pgGateTime', fdCollectValues('pgGateTime', p => pTypeLabel(p) === 'PG')), 'pgGateTime');
-  restoreSel('fdo-pgGateTime');
+  restoreSel('fdo-pgGateTime', 'pgGateTime', 'pgGateTime');
 
   fdRenderOpts('fdo-pgVisitors', 'pgVisitors',
     fdSortValues('pgVisitors', fdCollectValues('pgVisitors', p => pTypeLabel(p) === 'PG')), 'pgVisitors');
-  restoreSel('fdo-pgVisitors');
+  restoreSel('fdo-pgVisitors', 'pgVisitors', 'pgVisitors');
 
   fdRenderOpts('fdo-ssCancellation', 'ssCancellation',
     fdSortValues('ssCancellation', fdCollectValues('ssCancellation', p => pTypeLabel(p) === 'ShortStay')), 'ssCancellation');
-  restoreSel('fdo-ssCancellation');
+  restoreSel('fdo-ssCancellation', 'ssCancellation', 'ssCancellation');
 
   fdRenderOpts('fdo-ssCouples', 'ssCouples',
     fdSortValues('ssCouples', fdCollectValues('ssCouples', p => pTypeLabel(p) === 'ShortStay')), 'ssCouples');
-  restoreSel('fdo-ssCouples');
+  restoreSel('fdo-ssCouples', 'ssCouples', 'ssCouples');
 
   // Refresh badges/has-sel state for every dropdown after rebuilding
   Object.keys(FD_GROUPS).forEach(id => refreshFdBtn(id));
@@ -7872,6 +7903,118 @@ window.addEventListener('resize', () => {
   if (active && active.closest('.fd-pop')) return;
   closeAllFd();
 });
+
+/* ═══════════════════════════════════════════════
+   FILTER STATE PERSISTENCE (survive a refresh, a closed
+   browser, even a different device once logged in)
+   Saved to localStorage, scoped per logged-in user (see
+   filterStateKey()) — the same account sees its filters again
+   on any browser it logs into; a guest gets a shared "guest"
+   slot that a fresh login doesn't inherit. Every renderCards()
+   call re-saves, so this always mirrors the live DOM state;
+   restoring only happens once, right before the very first
+   buildFilterOptions() call, via pendingRestoreSel (consumed
+   by buildFilterOptions/restoreSel below) so a restored
+   selection gets the same "recreate the pill even if this
+   tab's data doesn't have it" treatment as a normal tab switch
+   — see restoreSel(). */
+const FILTER_STATE_KEY = 'homeloop_filterState';
+let pendingRestoreSel = null;   // one-shot: consumed by buildFilterOptions()
+let _initialFilterRestoreDone = false;
+
+// Scopes the storage key to whoever's logged in (getLoggedInUser() is
+// declared further below but hoisted, so this is safe to call here) —
+// falls back to a shared guest key when nobody's logged in. Keeps two
+// people sharing a browser (or a guest, then an account) from seeing
+// each other's filters.
+function filterStateKey() {
+  const user = getLoggedInUser();
+  const uid = user && (user.id || user.userId || user.email);
+  return uid ? `${FILTER_STATE_KEY}:${uid}` : `${FILTER_STATE_KEY}:guest`;
+}
+
+function saveFilterState() {
+  // Guard against the pre-data-load renderCards() call at page init (see
+  // bottom-of-file INIT block): that call fires before fetchProperties()
+  // resolves and restoreFilterStateBeforeBuild() has had a chance to run,
+  // so saving here would overwrite last session's real filters with the
+  // blank/default state and make it look like filters "reset on refresh."
+  // Once the initial restore has run (_initialFilterRestoreDone), it's
+  // safe to keep localStorage mirroring the live state on every render.
+  if (!_initialFilterRestoreDone) return;
+  try {
+    localStorage.setItem(filterStateKey(), JSON.stringify({
+      tab: currentTab,
+      search: searchQuery,
+      sel: getFilterState()
+    }));
+  } catch (e) { /* storage unavailable/full — fail silently */ }
+}
+
+function restoreFilterStateBeforeBuild() {
+  let saved;
+  try { saved = JSON.parse(localStorage.getItem(filterStateKey())); } catch (e) { saved = null; }
+  if (!saved) return;
+
+  if (saved.tab) {
+    currentTab = saved.tab;
+    const desktopBtn = document.querySelector(`.nav-tab[data-tab="${saved.tab}"]`);
+    const mobileBtn = document.querySelector(`.bottom-tab[data-tab="${saved.tab}"]`);
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t === desktopBtn));
+    document.querySelectorAll('.bottom-tab').forEach(t => t.classList.toggle('active', t === mobileBtn));
+    syncFdBar();
+    updateAllOnlySections();
+  }
+
+  if (saved.search) {
+    searchQuery = saved.search;
+    const input = document.getElementById('searchInput');
+    if (input) input.value = saved.search;
+  }
+
+  const sel = saved.sel || {};
+
+  // Range filters (Price/Deposit/Maintenance) live in static, always-present
+  // number inputs — not rebuilt per tab — so they can be restored directly.
+  const RANGE_MAP = {
+    _priceMin: ['price', 'min'], _priceMax: ['price', 'max'],
+    _depositMin: ['deposit', 'min'], _depositMax: ['deposit', 'max'],
+    _maintenanceMin: ['maintenance', 'min'], _maintenanceMax: ['maintenance', 'max']
+  };
+  Object.keys(RANGE_MAP).forEach(k => {
+    const val = sel[k];
+    if (val === null || val === undefined) return;
+    const [id, which] = RANGE_MAP[k];
+    const el = document.getElementById(`fd-${id}-${which}`);
+    if (el) el.value = val;
+  });
+
+  // Everything else (.fp-opt pill filters) is handed off to buildFilterOptions
+  // via pendingRestoreSel rather than applied here directly, since the pill
+  // elements themselves don't exist yet until buildFilterOptions renders them.
+  pendingRestoreSel = {};
+  Object.keys(sel).forEach(key => {
+    if (key.startsWith('_')) return;
+    if (Array.isArray(sel[key]) && sel[key].length) pendingRestoreSel[key] = new Set(sel[key]);
+  });
+}
+
+/* Called right after login/signup/logout, once getLoggedInUser() reflects
+   the new identity — swaps whatever's currently applied for that
+   identity's own saved filters/tab (or the shared guest slot), instead of
+   leaving the previous identity's selections showing until next refresh. */
+function switchFilterIdentity() {
+  document.querySelectorAll('.fp-opt.sel').forEach(o => o.classList.remove('sel'));
+  FD_RANGE_IDS.forEach(id => {
+    const minEl = document.getElementById('fd-' + id + '-min');
+    const maxEl = document.getElementById('fd-' + id + '-max');
+    if (minEl) minEl.value = '';
+    if (maxEl) maxEl.value = '';
+  });
+  restoreFilterStateBeforeBuild();
+  buildFilterOptions();
+  renderCards();
+}
 
 /* ── Read all active filter state ── */
 function getFilterState() {
@@ -9390,6 +9533,7 @@ async function logoutUser() {
   localStorage.removeItem('homeloop_user');
   closeProfileModal();
   updateNavAuth();
+  switchFilterIdentity();
   showToast('Logged out successfully');
 }
 function handleMenuAuthClick() {
@@ -9623,6 +9767,7 @@ function finishAuthSuccess(data) {
   }));
   closeAuthModal();
   updateNavAuth();
+  switchFilterIdentity();
   showToast(data.message);
 }
 
@@ -10877,7 +11022,18 @@ async function fetchProperties() {
     console.error('Could not load properties from server:', err.message);
     const rentGrid2 = document.getElementById('rentGrid');
     if (rentGrid2) rentGrid2.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--text-2)">⚠️ Could not connect to server. Please refresh the page.</div>';
+    // Still run the one-shot restore (and let saveFilterState resume saving)
+    // even on failure — otherwise a failed fetch permanently blocks filter
+    // persistence for the rest of this page load.
+    if (!_initialFilterRestoreDone) {
+      restoreFilterStateBeforeBuild();
+      _initialFilterRestoreDone = true;
+    }
     return false;
+  }
+  if (!_initialFilterRestoreDone) {
+    restoreFilterStateBeforeBuild(); // re-apply tab/search/filters saved before this refresh
+    _initialFilterRestoreDone = true;
   }
   buildFilterOptions();
   renderCards();
@@ -10888,7 +11044,7 @@ async function fetchProperties() {
 /* ── Ad Banner ── */
 document.addEventListener('DOMContentLoaded', function() {
   syncFdBar();
-  updateAllOnlySections(); // hide UrbanAware / Reviews on initial load (default tab is Rent, not All)
+  updateAllOnlySections(); // show UrbanAware / Reviews / Premium on initial load (default tab is All)
 
   // ── Load properties from DB ──
   (async function loadPropertiesFromDB() {
