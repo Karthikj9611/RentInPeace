@@ -1270,16 +1270,21 @@ ul{list-style:none}
   flex:1;padding:13px;border-radius:11px;
   background:var(--brand);color:#fff;font-size:14px;font-weight:600;
   border:none;cursor:pointer;transition:background .12s,transform .1s;
+  display:flex;align-items:center;justify-content:center;gap:7px;
 }
 .modal-btn-primary:hover{background:var(--brand-hover)}
 .modal-btn-primary:active{transform:scale(.98)}
+.modal-btn-primary svg{width:16px;height:16px;fill:currentColor;stroke:none;flex-shrink:0}
 .modal-btn-secondary{
   flex:1;padding:13px;border-radius:11px;
   background:var(--bg);color:var(--text);font-size:14px;font-weight:600;
   border:1.5px solid var(--border-2);cursor:pointer;transition:background .12s,transform .1s;
+  display:flex;align-items:center;justify-content:center;gap:7px;
 }
 .modal-btn-secondary:hover{background:var(--bg-2)}
 .modal-btn-secondary:active{transform:scale(.98)}
+.modal-btn-secondary svg{width:16px;height:16px;stroke:var(--text-2);fill:none;stroke-width:1.8;flex-shrink:0;transition:fill .12s,stroke .12s}
+.modal-btn-secondary.liked svg{fill:var(--brand);stroke:var(--brand)}
 .modal-actions-row{display:flex;gap:10px;margin-top:10px}
 .modal-btn-whatsapp{
   flex:1;padding:13px;border-radius:11px;
@@ -2221,6 +2226,10 @@ ul{list-style:none}
   padding:16px;
 }
 .add-modal-overlay.open{display:flex}
+/* Schedule Visit can be launched from inside the property view modal (both
+   share .add-modal-overlay's z-index:350); bump it above that so it always
+   renders on top instead of behind the view modal it was opened from. */
+#scheduleModal{z-index:360}
 .add-modal{
   background:var(--bg);border-radius:var(--radius-xl);
   width:100%;max-width:520px;max-height:92vh;
@@ -4890,14 +4899,20 @@ ul{list-style:none}
          listing a property. -->
     <div class="view-actions-footer" id="viewActionsFooter" style="display:none">
       <div class="modal-actions" id="viewActionsRow">
-        <button class="modal-btn-secondary" id="modal-save-btn">♡ Save</button>
-        <button class="modal-btn-primary" id="viewCallBtn">Call</button>
-      </div>
-      <div class="modal-actions-row" id="viewActionsRow2" style="margin-top:10px">
+        <button class="modal-btn-secondary" id="modal-save-btn">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.7-4.35-9.3-8.55C1.02 9.77 1.9 6.5 4.6 5.2 6.9 4.1 9.5 4.9 12 7.4c2.5-2.5 5.1-3.3 7.4-2.2 2.7 1.3 3.58 4.57 1.9 7.25C18.7 16.65 12 21 12 21z"/></svg>
+          <span id="modal-save-btn-label">Shortlist</span>
+        </button>
         <button class="modal-btn-outline" id="viewScheduleBtn">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           Schedule visit
           <span class="modal-visit-count-badge" id="modal-visit-count" style="display:none">0</span>
+        </button>
+      </div>
+      <div class="modal-actions-row" id="viewActionsRow2" style="margin-top:10px">
+        <button class="modal-btn-primary" id="viewCallBtn">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.61 21 3 13.39 3 4a1 1 0 0 1 1-1h3.28a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.58a1 1 0 0 1-.24 1.01l-2.2 2.2z"/></svg>
+          Call
         </button>
         <button class="modal-btn-whatsapp" id="viewWhatsappBtn">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg>
@@ -6869,7 +6884,10 @@ function toggleShortlist(id, el) {
   renderShortlistPanel();
   const saveBtn = document.getElementById('modal-save-btn');
   if (saveBtn && saveBtn.dataset.propId == id) {
-    saveBtn.textContent = shortlisted.has(id) ? '♥ Saved' : '♡ Save';
+    const isLiked = shortlisted.has(id);
+    saveBtn.classList.toggle('liked', isLiked);
+    const lbl = document.getElementById('modal-save-btn-label');
+    if (lbl) lbl.textContent = isLiked ? 'Shortlisted' : 'Shortlist';
   }
 }
 
@@ -8509,7 +8527,8 @@ function openDetail(id) {
   // contact, schedule a visit, WhatsApp) onto the form's action row.
   const liked = shortlisted.has(String(p.id));
   const saveBtn = document.getElementById('modal-save-btn');
-  saveBtn.textContent = liked ? '♥ Saved' : '♡ Save';
+  saveBtn.classList.toggle('liked', liked);
+  document.getElementById('modal-save-btn-label').textContent = liked ? 'Shortlisted' : 'Shortlist';
   saveBtn.dataset.propId = String(p.id);
   saveBtn.onclick = () => toggleShortlistFromModal(String(p.id));
   document.getElementById('viewScheduleBtn').onclick = () => openScheduleModal(p.id);
@@ -8696,13 +8715,15 @@ function toggleShortlistFromModal(id) {
   if (shortlisted.has(id)) {
     shortlisted.delete(id);
     delete shortlistedData[id];
-    document.getElementById('modal-save-btn').textContent = '♡ Save';
+    document.getElementById('modal-save-btn').classList.remove('liked');
+    document.getElementById('modal-save-btn-label').textContent = 'Shortlist';
     showToast('Removed from shortlist');
   } else {
     shortlisted.add(id);
     const p = PROPERTIES.find(x => String(x.id) === id);
     if (p) shortlistedData[id] = p;
-    document.getElementById('modal-save-btn').textContent = '♥ Saved';
+    document.getElementById('modal-save-btn').classList.add('liked');
+    document.getElementById('modal-save-btn-label').textContent = 'Shortlisted';
     showToast('Added to shortlist ♥');
   }
   saveShortlist();
