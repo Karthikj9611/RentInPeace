@@ -1969,6 +1969,7 @@ app.get('/api/admin/properties', requireAdmin, async (req, res) => {
         loc:          location.area || '',
         facing:       property.facing || '',
         age:          property.age || '',
+        views:        doc.views != null ? doc.views : 0,
         visitCount:   doc.visitCount != null ? doc.visitCount : 0,
         verified:     !!doc.verified,
         promoted:     !!doc.promoted,

@@ -1993,6 +1993,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
               <th>SS Cancellation</th>
               <th>SS Couples Allowed</th>
               <th>Visits</th>
+              <th>Views</th>
               <th>Photos</th>
               <th>Amenities</th>
               <th>Property ID</th>
@@ -2039,6 +2040,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
               <th><input type="text" class="col-filter-input" data-filter-key="ssCancellation" placeholder="Search…" oninput="onPropColumnFilter('ssCancellation', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" data-filter-key="ssCouplesAllowed" placeholder="Search…" oninput="onPropColumnFilter('ssCouplesAllowed', this.value, this)"></th>
               <th><input type="text" class="col-filter-input" data-filter-key="visitCount" placeholder="Search…" oninput="onPropColumnFilter('visitCount', this.value, this)"></th>
+              <th><input type="text" class="col-filter-input" data-filter-key="views" placeholder="Search…" oninput="onPropColumnFilter('views', this.value, this)"></th>
               <th></th>
               <th></th>
               <th><input type="text" class="col-filter-input" data-filter-key="propertyId" placeholder="Search…" oninput="onPropColumnFilter('propertyId', this.value, this)"></th>
@@ -4631,11 +4633,13 @@ $(document).ready(function(){
       { data:'ssCouplesAllowed', render:(d)=> escapeHtml(d||'—') },
       /* 35 – Visits */
       { data:'visitCount', render:(d)=> (d==null?'0':escapeHtml(String(d))) },
-      /* 36 – Photos (count) */
+      /* 36 – Views (page view count) */
+      { data:'views', render:(d)=> (d==null?'0':escapeHtml(String(d))) },
+      /* 37 – Photos (count) */
       { data:null, orderable:false, visible:false, className:'dt-body-center', render:(d,t,row)=>{
           return String(Array.isArray(row.images) ? row.images.length : 0);
       }},
-      /* 37 – Amenities (list, +N more opens modal) */
+      /* 38 – Amenities (list, +N more opens modal) */
       { data:null, orderable:false, render:(d,t,row)=>{
           const list = Array.isArray(row.amenities) ? row.amenities : [];
           if(t!=='display') return list.join(' ');
@@ -4646,22 +4650,22 @@ $(document).ready(function(){
           const encoded = escapeHtml(JSON.stringify(list));
           return `<div style="white-space:normal;max-width:260px">${shown}, <a href="javascript:void(0)" class="amenities-more-link" data-list="${encoded}" onclick="openAmenitiesModal(this)">+${more} more</a></div>`;
       }},
-      /* 38 – Property ID */
+      /* 39 – Property ID */
       { data:'propertyId', render:(d)=> escapeHtml(d||'—') },
-      /* 39 – User ID */
+      /* 40 – User ID */
       { data:'userId', visible:false, render:(d)=> escapeHtml(d||'—') },
-      /* 40 – Listed On */
+      /* 41 – Listed On */
       { data:'createdAt', render:(d,t)=>{
           if(t==='display') return formatDateTime(d);
           if(t==='export') return plainDateTime(d);
           return d||'—';
       }},
-      /* 41 – Remarks */
+      /* 42 – Remarks */
       { data:'remarks', orderable:false, render:(d,t,row)=>{
           if(t==='display') return remarkCellHtml(row._id, d, 'property');
           return d||'';
       }},
-      /* 42 – Action */
+      /* 43 – Action */
       { data:null, orderable:false, render:(d,t,row)=>{
           _adminPropCache[row._id] = row;
           const bookingBtn = row.booked
@@ -4675,7 +4679,7 @@ $(document).ready(function(){
           </div>`;
       }}
     ],
-    order:[[41,'asc']], // Listed On (createdAt) — oldest to newest
+    order:[[42,'asc']], // Listed On (createdAt) — oldest to newest
     orderCellsTop:true,
     pageLength:10,
     scrollX:true,
@@ -4718,7 +4722,7 @@ $(document).ready(function(){
 				// Column 0 is the select checkbox — it has no printable
 				// value, so leave it out of the PDF entirely instead of
 				// exporting a blank column.
-				return idx !== 0 && idx !== 42 && idx !== 43 &&
+				return idx !== 0 && idx !== 43 && idx !== 44 &&
 					   propTable.column(idx).visible();
 			},
 			// Use each column's dedicated "export" text instead of stripping
@@ -5365,7 +5369,7 @@ const _propColumnFilters = {
   area:'', floor:'', furnishing:'', toilet:'', carparking:'', bikeparking:'', facing:'', age:'',
   pgGender:'', pgRoomType:'', pgMeals:'', pgOccupancy:'', pgNotice:'',
   ssRoomType:'', ssAvailable24hrs:'', ssCancellation:'', ssCouplesAllowed:'',
-  visitCount:'', propertyId:'', userId:'',
+  visitCount:'', views:'', propertyId:'', userId:'',
   listedOnStart:'', listedOnEnd:'', promoted:'', booked:'', remarks:''
 };
 
@@ -5516,9 +5520,9 @@ const PROP_COL_GROUPS = [
     {idx:34, label:'SS Cancellation'}, {idx:35, label:'SS Couples Allowed'}
   ]},
   { label:'Meta', cols:[
-    {idx:36, label:'Visits'}, {idx:37, label:'Photos'}, {idx:38, label:'Amenities'},
-    {idx:39, label:'Property ID'}, {idx:40, label:'User ID'}, {idx:41, label:'Listed On'},
-    {idx:42, label:'Remarks'}
+    {idx:36, label:'Visits'}, {idx:37, label:'Views'}, {idx:38, label:'Photos'}, {idx:39, label:'Amenities'},
+    {idx:40, label:'Property ID'}, {idx:41, label:'User ID'}, {idx:42, label:'Listed On'},
+    {idx:43, label:'Remarks'}
   ]}
 ];
 
@@ -5557,11 +5561,11 @@ function apptExportRowSelector(idx){
 }
 
 function propExportColumnPredicate(idx){
-  return idx!==0 && idx!==42 && idx!==43 && propTable.column(idx).visible();
+  return idx!==0 && idx!==43 && idx!==44 && propTable.column(idx).visible();
 }
 function propExportColumnIndices(){
   const idxs=[];
-  for(let i=0;i<=42;i++){ if(propExportColumnPredicate(i)) idxs.push(i); }
+  for(let i=0;i<=43;i++){ if(propExportColumnPredicate(i)) idxs.push(i); }
   return idxs;
 }
 
@@ -5922,6 +5926,7 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex){
   if(cf.ssCancellation && !contains(row.ssCancellation, cf.ssCancellation)) return false;
   if(cf.ssCouplesAllowed && !contains(row.ssCouplesAllowed, cf.ssCouplesAllowed)) return false;
   if(cf.visitCount && !contains(row.visitCount, cf.visitCount)) return false;
+  if(cf.views && !contains(row.views, cf.views)) return false;
   if(cf.propertyId && !contains(row.propertyId, cf.propertyId)) return false;
   if(cf.userId && !contains(row.userId, cf.userId)) return false;
   if(cf.listedOnStart || cf.listedOnEnd){
