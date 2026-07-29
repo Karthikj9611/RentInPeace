@@ -1523,6 +1523,44 @@ footer i{color:var(--gold)}
   .bulk-toolbar-below{justify-content:center}
   .bulk-btn-label{display:none}
   .bulk-btn,.btn-add-review{padding:8px 11px}
+  .col-toggle-btn{padding:8px 11px;gap:0}
+
+  /* Icon-only toolbar buttons: force a uniform circle size so CSV/Excel/PDF,
+     Columns, Reset All Views, etc. all match regardless of each icon's own
+     natural glyph width. Excludes bulk-btn-danger (the "Delete Selected (n)"
+     button), which still shows a count and needs to flex wider than a circle. */
+  .bulk-toolbar .bulk-btn:not(.bulk-btn-danger),
+  .bulk-toolbar .btn-add-review,
+  .dt-button,
+  .col-toggle-btn{
+    width:38px!important;height:38px!important;min-width:38px!important;
+    padding:0!important;gap:0!important;
+    display:inline-flex!important;align-items:center!important;justify-content:center!important;
+    border-radius:50%!important;
+  }
+  .bulk-toolbar .bulk-btn:not(.bulk-btn-danger) i,
+  .bulk-toolbar .btn-add-review i,
+  .dt-button i,
+  .col-toggle-btn i{font-size:0.85rem!important;margin:0!important}
+
+  /* Properties toolbar (#bulkToolbar) icon order: Columns, then PDF/Excel/CSV,
+     then the rest of the controls in their original relative order. Flatten
+     the left/right wrapper divs and the dt-buttons group so every icon is a
+     direct flex item of .bulk-toolbar and can be freely reordered together. */
+  #bulkToolbar .bulk-toolbar-left,
+  #bulkToolbar .bulk-toolbar-right,
+  #bulkToolbar .dt-buttons{display:contents}
+  #propColToggleWrap{order:1}
+  #bulkToolbar .buttons-pdf{order:2}
+  #bulkToolbar .buttons-excel{order:3}
+  #bulkToolbar .buttons-csv{order:4}
+  #propFilterBadge{order:5}
+  #propClearFiltersBtn{order:6}
+  #bulkSelectedCount{order:7}
+  #bulkClearBtn{order:8}
+  #bulkDeleteSelectedBtn{order:9}
+  #resetAllViewsBtn{order:10}
+  #deleteAllPropertiesBtn{order:11}
 
   /* Category sub-tab bar — single horizontal row, swipeable */
   .cat-tab-bar{
@@ -1851,7 +1889,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
             </button>
             <div class="col-toggle-wrap" id="custColToggleWrap">
               <button type="button" class="col-toggle-btn" id="custColToggleBtn" onclick="toggleColMenu('cust')">
-                <i class="fas fa-table-columns"></i> Columns
+                <i class="fas fa-table-columns"></i> <span class="bulk-btn-label">Columns</span>
               </button>
               <div class="col-toggle-menu" id="custColToggleMenu"></div>
             </div>
@@ -1954,15 +1992,15 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
             <button class="bulk-btn bulk-btn-danger" id="bulkDeleteSelectedBtn" style="display:none" onclick="deleteSelectedProperties()" title="Delete selected">
               <i class="fas fa-trash-alt"></i> <span class="bulk-btn-label">Delete Selected&nbsp;</span>(<span id="bulkDeleteCount">0</span>)
             </button>
-            <button class="bulk-btn bulk-btn-outline-danger" onclick="resetAllViews()" title="Reset every listing's view count to 0">
+            <button class="bulk-btn bulk-btn-outline-danger" id="resetAllViewsBtn" onclick="resetAllViews()" title="Reset every listing's view count to 0">
               <i class="fas fa-rotate-left"></i> <span class="bulk-btn-label">Reset All Views</span>
             </button>
-            <button class="bulk-btn bulk-btn-outline-danger" disabled title="Temporarily disabled">
+            <button class="bulk-btn bulk-btn-outline-danger" id="deleteAllPropertiesBtn" disabled title="Temporarily disabled">
               <i class="fas fa-triangle-exclamation"></i> <span class="bulk-btn-label">Delete All Properties</span>
             </button>
             <div class="col-toggle-wrap" id="propColToggleWrap">
               <button type="button" class="col-toggle-btn" id="propColToggleBtn" onclick="togglePropColMenu()">
-                <i class="fas fa-table-columns"></i> Columns
+                <i class="fas fa-table-columns"></i> <span class="bulk-btn-label">Columns</span>
               </button>
               <div class="col-toggle-menu" id="propColToggleMenu"></div>
             </div>
@@ -2108,7 +2146,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
             </button>
             <div class="col-toggle-wrap" id="apptColToggleWrap">
               <button type="button" class="col-toggle-btn" id="apptColToggleBtn" onclick="toggleColMenu('appt')">
-                <i class="fas fa-table-columns"></i> Columns
+                <i class="fas fa-table-columns"></i> <span class="bulk-btn-label">Columns</span>
               </button>
               <div class="col-toggle-menu" id="apptColToggleMenu"></div>
             </div>
@@ -2305,7 +2343,7 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
         <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
           <div class="col-toggle-wrap" id="reviewColToggleWrap">
             <button type="button" class="col-toggle-btn" id="reviewColToggleBtn" onclick="toggleColMenu('review')">
-              <i class="fas fa-table-columns"></i> Columns
+              <i class="fas fa-table-columns"></i> <span class="bulk-btn-label">Columns</span>
             </button>
             <div class="col-toggle-menu" id="reviewColToggleMenu"></div>
           </div>
@@ -4452,27 +4490,27 @@ $(document).ready(function(){
     },
     dom:'<"top-controls"B>rt<"bottom-controls"ip>',
     buttons:[
-      {
-        extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV',
-        title: function(){ return 'Customer_Leads_' + new Date().toLocaleDateString('en-GB') + (_selectedCustIds.size ? '_Selected' : ''); },
-        exportOptions:{
-          rows: custExportRowSelector,
-          columns: function(idx){ return idx!==0 && idx!==10 && idx!==11 && dataTable.column(idx).visible(); },
-          orthogonal:'export', stripHtml:true,
-          format:{ body:function(data){ return typeof data === "string" ? data.replace(/<[^>]*>/g,"").trim() : data; } }
-        }
-      },
-      {
-        extend:'excel', text:'<i class="fas fa-file-excel"></i> Excel',
-        title: function(){ return 'Customer_Leads_' + new Date().toLocaleDateString('en-GB') + (_selectedCustIds.size ? '_Selected' : ''); },
-        exportOptions:{
-          rows: custExportRowSelector,
-          columns: function(idx){ return idx!==0 && idx!==10 && idx!==11 && dataTable.column(idx).visible(); },
-          orthogonal:'export', stripHtml:true,
-          format:{ body:function(data){ return typeof data === "string" ? data.replace(/<[^>]*>/g,"").trim() : data; } }
-        }
-      },
       /*{
+        extend:'csv', text:'<i class="fas fa-file-csv"></i> <span class="bulk-btn-label">CSV</span>',
+        title: function(){ return 'Customer_Leads_' + new Date().toLocaleDateString('en-GB') + (_selectedCustIds.size ? '_Selected' : ''); },
+        exportOptions:{
+          rows: custExportRowSelector,
+          columns: function(idx){ return idx!==0 && idx!==10 && idx!==11 && dataTable.column(idx).visible(); },
+          orthogonal:'export', stripHtml:true,
+          format:{ body:function(data){ return typeof data === "string" ? data.replace(/<[^>]*>/g,"").trim() : data; } }
+        }
+      },
+      {
+        extend:'excel', text:'<i class="fas fa-file-excel"></i> <span class="bulk-btn-label">Excel</span>',
+        title: function(){ return 'Customer_Leads_' + new Date().toLocaleDateString('en-GB') + (_selectedCustIds.size ? '_Selected' : ''); },
+        exportOptions:{
+          rows: custExportRowSelector,
+          columns: function(idx){ return idx!==0 && idx!==10 && idx!==11 && dataTable.column(idx).visible(); },
+          orthogonal:'export', stripHtml:true,
+          format:{ body:function(data){ return typeof data === "string" ? data.replace(/<[^>]*>/g,"").trim() : data; } }
+        }
+      },
+      {
         extend:'print', text:'<i class="fas fa-print"></i> Print', title:'HomeLoop Leads',
         exportOptions:{columns:[0,1,2,3,4,5,6,7,8]},
         customize:function(win){
@@ -4485,7 +4523,7 @@ $(document).ready(function(){
         }
       },*/
       {
-        extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
+        extend:'pdf', text:'<i class="fas fa-file-pdf"></i> <span class="bulk-btn-label">PDF</span>',
         orientation:'landscape', pageSize:'A4',
         title: function(){ return 'Customer_Leads_' + new Date().toLocaleDateString('en-GB') + (_selectedCustIds.size ? '_Selected' : ''); },
         exportOptions:{
@@ -4758,8 +4796,8 @@ $(document).ready(function(){
     },
     dom:'<"top-controls"B>rt<"bottom-controls"ip>',
     buttons:[
-	  {
-        extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV',
+	  /*{
+        extend:'csv', text:'<i class="fas fa-file-csv"></i> <span class="bulk-btn-label">CSV</span>',
         title: function(){ return 'Property_Leads_' + new Date().toLocaleDateString('en-GB') + (_selectedPropIds.size ? '_Selected' : ''); },
         exportOptions:{
           rows: propExportRowSelector,
@@ -4769,7 +4807,7 @@ $(document).ready(function(){
         }
       },
       {
-        extend:'excel', text:'<i class="fas fa-file-excel"></i> Excel',
+        extend:'excel', text:'<i class="fas fa-file-excel"></i> <span class="bulk-btn-label">Excel</span>',
         title: function(){ return 'Property_Leads_' + new Date().toLocaleDateString('en-GB') + (_selectedPropIds.size ? '_Selected' : ''); },
         exportOptions:{
           rows: propExportRowSelector,
@@ -4777,9 +4815,9 @@ $(document).ready(function(){
           orthogonal:'export', stripHtml:true,
           format:{ body:function(data){ return typeof data === "string" ? data.replace(/<[^>]*>/g,"").trim() : data; } }
         }
-      },
+      },*/
 	  {
-        extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
+        extend:'pdf', text:'<i class="fas fa-file-pdf"></i> <span class="bulk-btn-label">PDF</span>',
         orientation:'landscape', pageSize:'A4',
         title: function(){ return 'Property_Leads_' + new Date().toLocaleDateString('en-GB') + (_selectedPropIds.size ? '_Selected' : ''); },
        exportOptions: {
@@ -5016,42 +5054,42 @@ $(document).ready(function(){
     },
     dom:'<"top-controls"B>rt<"bottom-controls"ip>',
     buttons:[
-      {
-        extend:'csv', text:'<i class="fas fa-file-csv"></i> CSV',
-        title: function(){ return 'Appointment_Leads_' + new Date().toLocaleDateString('en-GB') + (_selectedApptIds.size ? '_Selected' : ''); },
-        exportOptions:{
-          rows: apptExportRowSelector,
-          columns: function(idx){ return idx!==0 && idx!==17 && idx!==18 && apptTable.column(idx).visible(); },
-          format:{ body:function(data,row,column,node){
-            var rd=apptTable.row(row).data(); if(!rd) return data;
-            var origIdx = apptExportColumnIndices()[column];
-            if(origIdx === 3) return (rd.name||((rd.firstName||'')+' '+(rd.lastName||''))).trim();
-            if(origIdx === 15) return rd.status||'';
-            return $(node).text().trim();
-          }}
-        }
-      },
-      {
-        extend:'excel', text:'<i class="fas fa-file-excel"></i> Excel',
-        title: function(){ return 'Appointment_Leads_' + new Date().toLocaleDateString('en-GB') + (_selectedApptIds.size ? '_Selected' : ''); },
-        exportOptions:{
-          rows: apptExportRowSelector,
-          columns: function(idx){ return idx!==0 && idx!==17 && idx!==18 && apptTable.column(idx).visible(); },
-          format:{ body:function(data,row,column,node){
-            var rd=apptTable.row(row).data(); if(!rd) return data;
-            var origIdx = apptExportColumnIndices()[column];
-            if(origIdx === 3) return (rd.name||((rd.firstName||'')+' '+(rd.lastName||''))).trim();
-            if(origIdx === 15) return rd.status||'';
-            return $(node).text().trim();
-          }}
-        }
-      },
       /*{
+        extend:'csv', text:'<i class="fas fa-file-csv"></i> <span class="bulk-btn-label">CSV</span>',
+        title: function(){ return 'Appointment_Leads_' + new Date().toLocaleDateString('en-GB') + (_selectedApptIds.size ? '_Selected' : ''); },
+        exportOptions:{
+          rows: apptExportRowSelector,
+          columns: function(idx){ return idx!==0 && idx!==17 && idx!==18 && apptTable.column(idx).visible(); },
+          format:{ body:function(data,row,column,node){
+            var rd=apptTable.row(row).data(); if(!rd) return data;
+            var origIdx = apptExportColumnIndices()[column];
+            if(origIdx === 3) return (rd.name||((rd.firstName||'')+' '+(rd.lastName||''))).trim();
+            if(origIdx === 15) return rd.status||'';
+            return $(node).text().trim();
+          }}
+        }
+      },
+      {
+        extend:'excel', text:'<i class="fas fa-file-excel"></i> <span class="bulk-btn-label">Excel</span>',
+        title: function(){ return 'Appointment_Leads_' + new Date().toLocaleDateString('en-GB') + (_selectedApptIds.size ? '_Selected' : ''); },
+        exportOptions:{
+          rows: apptExportRowSelector,
+          columns: function(idx){ return idx!==0 && idx!==17 && idx!==18 && apptTable.column(idx).visible(); },
+          format:{ body:function(data,row,column,node){
+            var rd=apptTable.row(row).data(); if(!rd) return data;
+            var origIdx = apptExportColumnIndices()[column];
+            if(origIdx === 3) return (rd.name||((rd.firstName||'')+' '+(rd.lastName||''))).trim();
+            if(origIdx === 15) return rd.status||'';
+            return $(node).text().trim();
+          }}
+        }
+      },
+      {
         extend:'print', text:'<i class="fas fa-print"></i> Print', title:'HomeLoop Appointments',
         exportOptions:{columns:[0,1,2,3,4,5,6,7,8,9,10,11]}
       },*/
       {
-        extend:'pdf', text:'<i class="fas fa-file-pdf"></i> PDF',
+        extend:'pdf', text:'<i class="fas fa-file-pdf"></i> <span class="bulk-btn-label">PDF</span>',
         orientation:'landscape', pageSize:'A4',
         title: function(){ return 'Appointment_Leads_' + new Date().toLocaleDateString('en-GB') + (_selectedApptIds.size ? '_Selected' : ''); },
         exportOptions: {
