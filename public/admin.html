@@ -131,60 +131,68 @@ body{
   background:var(--gold-light);color:var(--gold-dark);
 }
 
-/* ── PROPERTY CATEGORY SUB-TABS ── */
+/* ── PROPERTY CATEGORY SUB-TABS ──
+   Sized to match .tab-bar / .tab-btn exactly so row 2 lines up with row 1. */
 .cat-tab-bar{
   display:flex;align-items:center;gap:6px;
-  background:var(--surface2);border:1px solid var(--border);
-  border-radius:calc(var(--radius) - 2px);padding:5px;
-  width:fit-content;margin-bottom:16px;flex-wrap:wrap;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:6px;
+  box-shadow:var(--shadow);
+  width:fit-content;margin-bottom:24px;flex-wrap:wrap;
 }
 .cat-tab-btn{
-  display:flex;align-items:center;gap:7px;
-  padding:7px 16px;border-radius:calc(var(--radius) - 6px);
+  display:flex;align-items:center;gap:8px;
+  padding:9px 20px;border-radius:calc(var(--radius) - 4px);
   border:none;background:transparent;cursor:pointer;
   font-family:'Plus Jakarta Sans',sans-serif;
-  font-size:0.78rem;font-weight:700;color:var(--ink3);
+  font-size:0.85rem;font-weight:700;color:var(--ink3);
   transition:all 0.2s;white-space:nowrap;
 }
-.cat-tab-btn i{font-size:0.75rem}
-.cat-tab-btn:hover{color:var(--ink);background:var(--surface)}
+.cat-tab-btn i{font-size:0.85rem}
+.cat-tab-btn:hover{color:var(--ink);background:var(--surface2)}
 .cat-tab-btn.active{
   background:var(--ink);color:#fff;
-  box-shadow:0 3px 10px rgba(12,13,16,0.16);
+  box-shadow:0 4px 14px rgba(12,13,16,0.18);
 }
 .cat-tab-btn .cat-count{
   display:inline-flex;align-items:center;justify-content:center;
-  min-width:19px;height:17px;padding:0 5px;
-  border-radius:99px;font-size:0.65rem;font-weight:700;
+  min-width:22px;height:20px;padding:0 6px;
+  border-radius:99px;font-size:0.68rem;font-weight:700;
   background:rgba(255,255,255,0.15);color:inherit;
 }
 .cat-tab-btn:not(.active) .cat-count{
-  background:rgba(12,13,16,0.08);color:var(--ink3);
+  background:var(--gold-light);color:var(--gold-dark);
 }
 
 /* Visits panel sub-tabs: only 2 items — split evenly across full width */
 #visitsCatTabs{width:100%}
 #visitsCatTabs .cat-tab-btn{flex:1;justify-content:center}
 
-/* ── BULK DELETE TOOLBAR ── */
+/* ── BULK DELETE TOOLBAR ──
+   Boxed pill container matching .tab-bar exactly (row 1), left-aligned
+   instead of a full-width bar, so row 3 lines up with rows 1 & 2. */
 .bulk-toolbar{
-  display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:20px;
-  padding:12px 20px;border-bottom:1px solid var(--border);
-  background:var(--surface2);
+  display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:6px;
+  padding:6px;border:1px solid var(--border);
+  border-radius:var(--radius);background:var(--surface);
+  box-shadow:var(--shadow);
+  width:fit-content;margin-bottom:24px;
 }
-.bulk-toolbar-left,.bulk-toolbar-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.bulk-toolbar-left,.bulk-toolbar-right{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .bulk-selected-count{
   font-size:0.82rem;font-weight:700;color:var(--gold-dark);
   display:inline-flex;align-items:center;gap:6px;
+  padding:0 6px;
 }
 .filter-active-badge{
   font-size:0.82rem;font-weight:700;color:#2563eb;
   display:inline-flex;align-items:center;gap:6px;
+  padding:0 6px;
 }
 .bulk-btn{
-  display:inline-flex;align-items:center;gap:7px;
-  padding:8px 16px;border-radius:99px;border:1.5px solid transparent;
-  font-family:'Plus Jakarta Sans',sans-serif;font-size:0.78rem;font-weight:700;
+  display:inline-flex;align-items:center;gap:8px;
+  padding:9px 20px;border-radius:calc(var(--radius) - 4px);border:1.5px solid transparent;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:0.85rem;font-weight:700;
   cursor:pointer;transition:all 0.18s;white-space:nowrap;
 }
 .bulk-btn-clear{background:transparent;color:var(--ink3);border-color:var(--border)}
@@ -196,10 +204,10 @@ body{
 .bulk-btn:disabled{opacity:0.45;cursor:not-allowed;pointer-events:none}
 .bulk-btn:disabled:hover{background:#fff;color:var(--red);box-shadow:none}
 .bulk-toolbar-below{
-  justify-content:center;border-bottom:none;border-top:1px solid var(--border);
+  justify-content:center;
 }
 .bulk-toolbar-spaced{
-  justify-content:space-between;margin-bottom:16px;
+  justify-content:flex-start;margin-bottom:24px;
   flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;
   scrollbar-width:none;-ms-overflow-style:none;
 }
@@ -1612,10 +1620,24 @@ footer i{color:var(--gold)}
   .tab-btn{padding:10px 8px;gap:4px;flex-direction:column;font-size:0.62rem;min-width:56px}
   .tab-btn i{font-size:1rem;margin-bottom:1px}
 
-  /* Category sub-tabs: match the main tab bar's icon-only, stacked look */
+  /* Category sub-tabs: match the main tab bar's icon-only, stacked look —
+     same padding/min-width/font-size as .tab-btn so all rows share one scale */
   .cat-tab-btn .cat-tab-btn-label{display:none}
-  .cat-tab-btn{padding:9px 8px;gap:3px;flex-direction:column;font-size:0.6rem;min-width:50px}
-  .cat-tab-btn i{font-size:0.95rem;margin-bottom:1px}
+  .cat-tab-btn{padding:10px 8px;gap:4px;flex-direction:column;font-size:0.62rem;min-width:56px}
+  .cat-tab-btn i{font-size:1rem;margin-bottom:1px}
+
+  /* Icon-only toolbar buttons (row 3): bump to the same footprint as
+     .tab-btn/.cat-tab-btn at this breakpoint so all three rows match */
+  .bulk-toolbar .bulk-btn:not(.bulk-btn-danger),
+  .bulk-toolbar .btn-add-review,
+  .dt-button,
+  .col-toggle-btn{
+    width:56px!important;height:56px!important;min-width:56px!important;
+  }
+  .bulk-toolbar .bulk-btn:not(.bulk-btn-danger) i,
+  .bulk-toolbar .btn-add-review i,
+  .dt-button i,
+  .col-toggle-btn i{font-size:1rem!important}
 
   /* Remark input full width */
   .remark-input{width:100%;max-width:200px}
