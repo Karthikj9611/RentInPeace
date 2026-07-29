@@ -1612,6 +1612,11 @@ footer i{color:var(--gold)}
   .tab-btn{padding:10px 8px;gap:4px;flex-direction:column;font-size:0.62rem;min-width:56px}
   .tab-btn i{font-size:1rem;margin-bottom:1px}
 
+  /* Category sub-tabs: match the main tab bar's icon-only, stacked look */
+  .cat-tab-btn .cat-tab-btn-label{display:none}
+  .cat-tab-btn{padding:9px 8px;gap:3px;flex-direction:column;font-size:0.6rem;min-width:50px}
+  .cat-tab-btn i{font-size:0.95rem;margin-bottom:1px}
+
   /* Remark input full width */
   .remark-input{width:100%;max-width:200px}
 
@@ -1949,25 +1954,25 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
     <!-- Category sub-tabs: All / Rent / Lease / PG -->
     <div class="cat-tab-bar" id="propCatTabs">
       <button class="cat-tab-btn" data-cat="all" onclick="switchPropCategory('all')">
-        <i class="fas fa-layer-group"></i><span>All</span><span class="cat-count" id="cat-count-all">—</span>
+        <i class="fas fa-layer-group"></i><span class="cat-tab-btn-label">All</span><span class="cat-count" id="cat-count-all">—</span>
       </button>
       <button class="cat-tab-btn" data-cat="Promoted" onclick="switchPropCategory('Promoted')">
-        <i class="fas fa-star"></i><span>Promoted</span><span class="cat-count" id="cat-count-Promoted">—</span>
+        <i class="fas fa-star"></i><span class="cat-tab-btn-label">Promoted</span><span class="cat-count" id="cat-count-Promoted">—</span>
       </button>
       <button class="cat-tab-btn" data-cat="Booked" onclick="switchPropCategory('Booked')">
-        <i class="fas fa-lock"></i><span>Booked</span><span class="cat-count" id="cat-count-Booked">—</span>
+        <i class="fas fa-lock"></i><span class="cat-tab-btn-label">Booked</span><span class="cat-count" id="cat-count-Booked">—</span>
       </button>
       <button class="cat-tab-btn active" data-cat="Rent" onclick="switchPropCategory('Rent')">
-        <i class="fas fa-key"></i><span>Rent</span><span class="cat-count" id="cat-count-Rent">—</span>
+        <i class="fas fa-key"></i><span class="cat-tab-btn-label">Rent</span><span class="cat-count" id="cat-count-Rent">—</span>
       </button>
       <button class="cat-tab-btn" data-cat="Lease" onclick="switchPropCategory('Lease')">
-        <i class="fas fa-file-signature"></i><span>Lease</span><span class="cat-count" id="cat-count-Lease">—</span>
+        <i class="fas fa-file-signature"></i><span class="cat-tab-btn-label">Lease</span><span class="cat-count" id="cat-count-Lease">—</span>
       </button>
       <button class="cat-tab-btn" data-cat="PG" onclick="switchPropCategory('PG')">
-        <i class="fas fa-bed"></i><span>PG</span><span class="cat-count" id="cat-count-PG">—</span>
+        <i class="fas fa-bed"></i><span class="cat-tab-btn-label">PG</span><span class="cat-count" id="cat-count-PG">—</span>
       </button>
       <button class="cat-tab-btn" data-cat="Short Stay" onclick="switchPropCategory('Short Stay')" style="display:none">
-        <i class="fas fa-suitcase-rolling"></i><span>Short Stay</span><span class="cat-count" id="cat-count-Short-Stay">—</span>
+        <i class="fas fa-suitcase-rolling"></i><span class="cat-tab-btn-label">Short Stay</span><span class="cat-count" id="cat-count-Short-Stay">—</span>
       </button>
     </div>
     <div class="card">
@@ -2254,10 +2259,10 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
     <!-- Category sub-tabs: Visits (Total + Daily combined) / Users Registered -->
     <div class="cat-tab-bar" id="visitsCatTabs">
       <button class="cat-tab-btn active" data-cat="visits" onclick="switchVisitsCategory('visits')">
-        <i class="fas fa-globe"></i><span>Visits</span><span class="cat-count" id="cat-count-visits-total">—</span>
+        <i class="fas fa-globe"></i><span class="cat-tab-btn-label">Visits</span><span class="cat-count" id="cat-count-visits-total">—</span>
       </button>
       <button class="cat-tab-btn" data-cat="users" onclick="switchVisitsCategory('users')">
-        <i class="fas fa-user-plus"></i><span>Users Registered</span><span class="cat-count" id="cat-count-visits-users">—</span>
+        <i class="fas fa-user-plus"></i><span class="cat-tab-btn-label">Users Registered</span><span class="cat-count" id="cat-count-visits-users">—</span>
       </button>
     </div>
 
