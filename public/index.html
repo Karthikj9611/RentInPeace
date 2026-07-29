@@ -5774,51 +5774,43 @@ function buildVideoEmbed(url) {
 let PROPERTIES = [];
 
 
-/* ─── View counts (persisted) ───────────────────
-   Real per-property view counts, starting at 0.
-   Stored in localStorage so a page refresh reads back
-   the same counts instead of resetting or reseeding. */
-const VIEWS_KEY = 'homeloop_property_views';
-// Ids already counted as a view *for this browser*. Checked before every
-// increment so opening the same card again (or refreshing the page and
-// reopening it) doesn't bump the count a second time — each property only
-// adds +1 the first time this browser ever opens it.
-const VIEWS_SEEN_KEY = 'homeloop_property_views_seen';
-let viewCounts = {};
+/* ─── View counts (DB-backed) ───────────────────
+   The real count lives on the property document (Property.views) so admin's
+   reset actions are reflected for every visitor, not just the browser that
+   triggered them. Each browser still keeps a local "seen" set (localStorage)
+   purely to avoid double-counting the same listing on repeat opens/refreshes
+   — it is NOT where the number itself is stored anymore. */
+const VIEWS_SEEN_KEY = 'homeloop_property_views_seen_v2'; // _v2: bumped so ids marked "seen" under the old, purely-local counter (pre-DB-backed views) don't block real increments now
 let viewedSeen = new Set();
-(function loadViewCounts() {
-  try {
-    viewCounts = JSON.parse(localStorage.getItem(VIEWS_KEY)) || {};
-  } catch (e) {
-    viewCounts = {};
-  }
+(function loadViewedSeen() {
   try {
     viewedSeen = new Set(JSON.parse(localStorage.getItem(VIEWS_SEEN_KEY)) || []);
   } catch (e) {
     viewedSeen = new Set();
   }
 })();
-function saveViewCounts() {
-  try {
-    localStorage.setItem(VIEWS_KEY, JSON.stringify(viewCounts));
-  } catch (e) { /* storage unavailable — counts still work for this session */ }
-}
 function saveViewedSeen() {
   try {
     localStorage.setItem(VIEWS_SEEN_KEY, JSON.stringify([...viewedSeen]));
-  } catch (e) { /* storage unavailable — counts still work for this session */ }
+  } catch (e) { /* storage unavailable — dedupe still works for this session */ }
 }
 function getViews(p) {
-  return viewCounts[p.id] || 0;
+  return (p && p.views) || 0;
 }
 function incrementViews(p) {
   const key = String(p.id);
   if (viewedSeen.has(key)) return getViews(p); // already counted for this browser — reopening or refreshing shouldn't bump it again
   viewedSeen.add(key);
   saveViewedSeen();
-  viewCounts[p.id] = getViews(p) + 1;
-  saveViewCounts();
-  return viewCounts[p.id];
+  // Optimistically bump the in-memory count so the card/detail view updates
+  // immediately, then confirm with the server (source of truth). If the
+  // request fails, the next fetchProperties() reload will self-correct.
+  p.views = getViews(p) + 1;
+  fetch(`/api/properties/${p.id}/view`, { method: 'POST' })
+    .then(res => res.ok ? res.json() : null)
+    .then(data => { if (data && typeof data.views === 'number') p.views = data.views; })
+    .catch(() => { /* view count will reconcile on next full reload */ });
+  return p.views;
 }
 function formatViews(n) {
   if (n >= 1000) return (n / 1000).toFixed(n >= 10000 ? 0 : 1).replace(/\.0$/, '') + 'k';

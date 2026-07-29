@@ -1355,6 +1355,35 @@ app.get('/api/properties', async (req, res) => {
   }
 });
 
+// ── POST /api/properties/:id/view (public: record one view of a listing) ──
+// Called once per browser per listing (the frontend dedupes via its own
+// "seen" set before calling this, same idea as visitedSeen for visit
+// requests) so the count reflects real, DB-backed views — this is what
+// admin's per-listing / reset-all views actions operate on.
+const viewLimiter = rateLimit({
+  windowMs: 60 * 1000, max: 60,
+  standardHeaders: true, legacyHeaders: false,
+  message: { message: 'Too many requests. Please try again later.' }
+});
+
+app.post('/api/properties/:id/view', viewLimiter, async (req, res) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid property id' });
+    }
+    let updated = null;
+    for (const M of LISTING_MODEL_LIST) {
+      updated = await M.findByIdAndUpdate(req.params.id, { $inc: { views: 1 } }, { new: true });
+      if (updated) break;
+    }
+    if (!updated) return res.status(404).json({ message: 'Property not found' });
+    res.json({ views: updated.views });
+  } catch (err) {
+    console.error('POST /api/properties/:id/view error:', err);
+    res.status(500).json({ message: 'Error recording view' });
+  }
+});
+
 // ── POST /api/visits (Schedule a Visit modal) ──
 const visitLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, max: 20,
@@ -2136,6 +2165,30 @@ app.patch('/api/properties/:id/booked', requireAdmin, async (req, res) => {
   } catch (err) {
     console.error('PATCH /api/properties/:id/booked error:', err);
     res.status(500).json({ message: 'Error updating booked status' });
+  }
+});
+
+// ── PATCH /api/properties/:id/views/reset (admin: reset one listing's view count to 0) ──
+app.patch('/api/properties/:id/views/reset', requireAdmin, async (req, res) => {
+  try {
+    const prop = await updateListingById(req.params.id, { views: 0 }, { new: true });
+    if (!prop) return res.status(404).json({ message: 'Property not found' });
+    res.json({ message: 'Views reset', views: prop.views });
+  } catch (err) {
+    console.error('PATCH /api/properties/:id/views/reset error:', err);
+    res.status(500).json({ message: 'Error resetting views' });
+  }
+});
+
+// ── POST /api/properties/views/reset-all (admin: reset every listing's view count to 0) ──
+app.post('/api/properties/views/reset-all', requireAdmin, async (req, res) => {
+  try {
+    const results = await Promise.all(LISTING_MODEL_LIST.map(M => M.updateMany({}, { $set: { views: 0 } })));
+    const modifiedCount = results.reduce((sum, r) => sum + (r.modifiedCount || 0), 0);
+    res.json({ message: 'All views reset', modifiedCount });
+  } catch (err) {
+    console.error('POST /api/properties/views/reset-all error:', err);
+    res.status(500).json({ message: 'Error resetting all views' });
   }
 });
 

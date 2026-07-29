@@ -803,6 +803,18 @@ footer i{color:var(--gold)}
 .btn-edit:hover{background:var(--gold);color:#fff;box-shadow:0 4px 12px rgba(184,144,60,0.3)}
 .btn-edit i{font-size:0.72rem}
 
+/* ── VIEWS CELL (Views column: count + per-row reset) ── */
+.views-cell{display:inline-flex;align-items:center;gap:8px}
+.views-cell-count{font-weight:600}
+.btn-reset-views{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:24px;height:24px;background:transparent;color:var(--ink3);
+  border:1px solid var(--border);border-radius:99px;cursor:pointer;
+  font-size:0.68rem;transition:all 0.18s;padding:0;
+}
+.btn-reset-views:hover{background:var(--red);color:#fff;border-color:var(--red)}
+.btn-reset-views:disabled{opacity:0.45;cursor:not-allowed}
+
 /* ── BOOKING DETAILS BUTTON (Booked tab only) ── */
 .btn-booking-details{
   display:inline-flex;align-items:center;gap:6px;
@@ -1941,6 +1953,9 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
           <div class="bulk-toolbar-right">
             <button class="bulk-btn bulk-btn-danger" id="bulkDeleteSelectedBtn" style="display:none" onclick="deleteSelectedProperties()" title="Delete selected">
               <i class="fas fa-trash-alt"></i> <span class="bulk-btn-label">Delete Selected&nbsp;</span>(<span id="bulkDeleteCount">0</span>)
+            </button>
+            <button class="bulk-btn bulk-btn-outline-danger" onclick="resetAllViews()" title="Reset every listing's view count to 0">
+              <i class="fas fa-rotate-left"></i> <span class="bulk-btn-label">Reset All Views</span>
             </button>
             <button class="bulk-btn bulk-btn-outline-danger" disabled title="Temporarily disabled">
               <i class="fas fa-triangle-exclamation"></i> <span class="bulk-btn-label">Delete All Properties</span>
@@ -3749,6 +3764,52 @@ window.togglePropFlag = async function(id, field, checkboxEl){
   }
 };
 
+/* ── PROPERTY VIEWS: INDIVIDUAL & RESET-ALL ── */
+window.resetPropertyViews = async function(id, btnEl){
+  const ok = await showConfirmModal({ title:'Reset views?', message:"This listing's view count will be set back to 0. This cannot be undone.", okText:'Reset' });
+  if(!ok) return;
+  if(btnEl) btnEl.disabled = true;
+  try{
+    const res = await fetch(`${BASE}/api/properties/${id}/views/reset`, { method:'PATCH', headers: authHeaders() });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok){ alert(data.message || 'Failed to reset views'); return; }
+    if(_adminPropCache[id]) _adminPropCache[id].views = 0;
+    propTable.rows().every(function(){
+      const rd = this.data();
+      if(rd && rd._id === id){ rd.views = 0; }
+    });
+    propTable.draw(false);
+  } catch(err){
+    alert('Failed to reset views. Please try again.');
+  } finally {
+    if(btnEl) btnEl.disabled = false;
+  }
+};
+
+window.resetAllViews = async function(){
+  const allRows = propTable.rows().data().toArray();
+  if(!allRows.length){ alert('There are no properties to reset.'); return; }
+  const ok = await showConfirmModal({
+    title: 'Reset all views?',
+    message: 'Every property listing\'s view count — Rent, Lease, PG, and Short Stay — will be set back to 0. This cannot be undone.',
+    okText: 'Reset all'
+  });
+  if(!ok) return;
+  try{
+    const res = await fetch(`${BASE}/api/properties/views/reset-all`, { method:'POST', headers: authHeaders() });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok){ alert(data.message || 'Failed to reset all views'); return; }
+    Object.keys(_adminPropCache).forEach(id => { _adminPropCache[id].views = 0; });
+    propTable.rows().every(function(){
+      const rd = this.data();
+      if(rd) rd.views = 0;
+    });
+    propTable.draw(false);
+  } catch(err){
+    alert('Failed to reset all views. Please try again.');
+  }
+};
+
 /* ── PROPERTY SELECTION & BULK DELETE ── */
 window.onPropRowCheck = function(checkboxEl, id){
   if(checkboxEl.checked) _selectedPropIds.add(id);
@@ -4634,7 +4695,12 @@ $(document).ready(function(){
       /* 35 – Visits */
       { data:'visitCount', render:(d)=> (d==null?'0':escapeHtml(String(d))) },
       /* 36 – Views (page view count) */
-      { data:'views', render:(d)=> (d==null?'0':escapeHtml(String(d))) },
+      { data:'views', orderable:true, render:(d,t,row)=>{
+          if(t!=='display') return d==null?0:d;
+          const count = d==null?'0':escapeHtml(String(d));
+          return `<span class="views-cell"><span class="views-cell-count">${count}</span>
+            <button class="btn-reset-views" title="Reset this listing's views to 0" onclick="resetPropertyViews('${row._id}', this)"><i class="fas fa-rotate-left"></i></button></span>`;
+      }},
       /* 37 – Photos (count) */
       { data:null, orderable:false, visible:false, className:'dt-body-center', render:(d,t,row)=>{
           return String(Array.isArray(row.images) ? row.images.length : 0);
