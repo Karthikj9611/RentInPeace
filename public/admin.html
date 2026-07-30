@@ -326,6 +326,17 @@ table.dataTable thead tr.col-filter-row th{
 .card-sub{font-size:0.76rem;color:var(--ink3);margin-top:2px}
 .table-wrapper{padding:16px 20px 20px;overflow-x:auto;-webkit-overflow-scrolling:touch}
 
+/* ── STICKY TABLE HEADER ──
+   scrollX clones the <thead> into a separate .dataTables_scrollHead div
+   (see the JS comments near syncPropSelectAllCheckbox) — that clone is
+   what users actually see, so it's what needs to stick, not the thead
+   inside .dataTables_scrollBody. */
+.dataTables_scrollHead{
+  position:sticky;top:0;z-index:5;
+  background:var(--surface);
+  box-shadow:0 1px 0 var(--border);
+}
+
 /* ── TABLE ── */
 table.dataTable{
   border-collapse:collapse!important;width:100%!important;
@@ -4795,7 +4806,9 @@ $(document).ready(function(){
       /* 18 – Area */
       { data:'area', render:(d,t)=>{
           if(t!=='display') return (d!=null && d!=='') ? String(d) : '';
-          return (d!=null && d!=='') ? escapeHtml(String(d))+' sqft' : '—';
+          if(d==null || d==='') return '—';
+          const num = String(d).replace(/\s*Sqft\s*$/i,'').trim();
+          return escapeHtml(num)+' sqft';
       }},
       /* 19 – Floor */
       { data:'floor', render:(d)=> escapeHtml(d!=null && d!=='' ? String(d) : '—') },
