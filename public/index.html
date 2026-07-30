@@ -1842,7 +1842,7 @@ ul{list-style:none}
 }
 
 /* ─── Reviews Section (masonry grid redesign) ──── */
-.reviews-section{padding:28px 24px 32px;background:var(--bg-2);border-top:1px solid var(--border)}
+.reviews-section{padding:28px 20px 32px;background:var(--bg-2);border-top:1px solid var(--border)}
 .reviews-head{max-width:1080px;margin:0 auto 12px}
 .reviews-title{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.4px;text-align:center}
 .reviews-title span{color:var(--brand)}
@@ -1979,7 +1979,7 @@ ul{list-style:none}
 
 /* ─── Premium Services Section ─────────────────── */
 .services-section{
-  padding:8px 24px 32px;
+  padding:8px 20px 32px;
   background:var(--bg);
   border-top:1px solid var(--border);
 }
@@ -1991,7 +1991,7 @@ ul{list-style:none}
   text-align:center;font-size:12.5px;color:var(--text-3);
   margin:18px 0 16px;font-weight:500;
 }
-.services-scroll-wrap{position:relative;max-width:1280px;margin:0 auto}
+.services-scroll-wrap{position:relative;max-width:1280px;margin:0}
 .services-scroll{
   display:flex;gap:16px;overflow-x:auto;scroll-behavior:smooth;
   padding:4px 4px 10px;-ms-overflow-style:none;scrollbar-width:none;
@@ -2001,7 +2001,7 @@ ul{list-style:none}
 .service-card{
   position:relative;flex:0 0 var(--matched-card-w, 260px);
   width:var(--matched-card-w, 260px);min-width:var(--matched-card-w, 260px);max-width:var(--matched-card-w, 260px);
-  height:390px;min-height:390px;max-height:390px;
+  height:var(--matched-card-h, 390px);min-height:var(--matched-card-h, 390px);max-height:var(--matched-card-h, 390px);
   border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;
   background:var(--bg-3);box-shadow:var(--shadow);border:1px solid var(--border);
   transition:transform .18s ease, box-shadow .18s ease;
@@ -2051,13 +2051,13 @@ ul{list-style:none}
   .service-card{
     flex:0 0 var(--matched-card-w, calc((100vw - 34px)/2));
     width:var(--matched-card-w, calc((100vw - 34px)/2));min-width:var(--matched-card-w, calc((100vw - 34px)/2));max-width:var(--matched-card-w, calc((100vw - 34px)/2));
-    height:250px;min-height:250px;max-height:250px;
+    height:var(--matched-card-h, 250px);min-height:var(--matched-card-h, 250px);max-height:var(--matched-card-h, 250px);
   }
   .services-arrow{display:none}
 }
 
 /* ─── Honest Reviews (video shorts) Section ────── */
-.hr-section{padding:8px 24px 36px;background:var(--bg);border-top:1px solid var(--border)}
+.hr-section{padding:8px 20px 36px;background:var(--bg);border-top:1px solid var(--border)}
 .hr-head{display:flex;align-items:center;justify-content:center;gap:10px;max-width:1280px;margin:0 auto 4px}
 .hr-head-icon{
   width:30px;height:30px;border-radius:9px;
@@ -2068,7 +2068,7 @@ ul{list-style:none}
 .hr-head-title{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.3px}
 .hr-head-title span{color:var(--brand)}
 .hr-sub{font-size:13px;color:var(--text-2);margin:6px 0 16px;max-width:1280px;text-align:center}
-.hr-scroll-wrap{position:relative;max-width:1280px;margin:0 auto}
+.hr-scroll-wrap{position:relative;max-width:1280px;margin:0}
 .hr-scroll{
   display:flex;gap:14px;overflow-x:auto;scroll-behavior:smooth;
   padding:4px 4px 10px;-ms-overflow-style:none;scrollbar-width:none;
@@ -2078,7 +2078,7 @@ ul{list-style:none}
 .hr-card{flex:0 0 var(--matched-card-w, 260px);width:var(--matched-card-w, 260px);min-width:var(--matched-card-w, 260px);max-width:var(--matched-card-w, 260px);cursor:pointer}
 .hr-thumb{
   position:relative;width:var(--matched-card-w, 260px);min-width:var(--matched-card-w, 260px);max-width:var(--matched-card-w, 260px);
-  height:390px;min-height:390px;max-height:390px;border-radius:var(--radius-lg);
+  height:var(--matched-card-h, 390px);min-height:var(--matched-card-h, 390px);max-height:var(--matched-card-h, 390px);border-radius:var(--radius-lg);
   overflow:hidden;background:var(--bg-3);box-shadow:var(--shadow);border:1px solid var(--border);
   transition:transform .18s ease, box-shadow .18s ease;
 }
@@ -2207,7 +2207,7 @@ ul{list-style:none}
   }
   .hr-thumb{
     width:var(--matched-card-w, calc((100vw - 34px)/2));min-width:var(--matched-card-w, calc((100vw - 34px)/2));max-width:var(--matched-card-w, calc((100vw - 34px)/2));
-    height:250px;min-height:250px;max-height:250px;
+    height:var(--matched-card-h, 250px);min-height:var(--matched-card-h, 250px);max-height:var(--matched-card-h, 250px);
   }
 }
 
@@ -3886,8 +3886,8 @@ ul{list-style:none}
   <div class="services-scroll-wrap">
     <div class="services-scroll" id="servicesScroll">
 
-      <div class="service-card" onclick="openServiceModal('KR Webcrafts','DIGITAL','💻','https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=420&q=70')">
-        <img src="https://raygun.com/blog/wp-content/uploads/2014/06/Anthony-Acosta.jpg" alt="Website and App Development" loading="lazy" />
+      <div class="service-card" onclick="openServiceModal('KR Webcrafts','DIGITAL','💻','https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1920&q=80&auto=format&fit=crop')">
+        <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1920&q=80&auto=format&fit=crop" alt="Website and App Development" loading="lazy" />
         <div class="service-card-overlay"></div>
         <div class="service-card-icon">💻</div>
         <div class="service-card-content">
@@ -3899,7 +3899,7 @@ ul{list-style:none}
 	  
 	  
       <div class="service-card" onclick="openRentReceiptTool()">
-        <img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=420&q=70" alt="Rent Receipt Generator" loading="lazy" />
+        <img src="https://images.unsplash.com/photo-1545941962-1b6654eb8072?w=1920&q=80&auto=format&fit=crop" alt="Rent Receipt Generator" loading="lazy" />
         <div class="service-card-overlay"></div>
         <div class="service-card-icon">🧾</div>
         <div class="service-card-content">
@@ -3909,8 +3909,8 @@ ul{list-style:none}
         </div>
       </div>
 
-      <div class="service-card" onclick="openServiceModal('Rental Agreement','LEGAL','📋','https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=420&q=70')">
-        <img src="https://thumbs.dreamstime.com/z/rental-agreement-form-signing-hand-keys-pen-43559993.jpg" alt="Rental Agreement drafting" loading="lazy" />
+      <div class="service-card" onclick="openServiceModal('Rental Agreement','LEGAL','📋','https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1920&q=80&auto=format&fit=crop')">
+        <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1920&q=80&auto=format&fit=crop" alt="Rental Agreement drafting" loading="lazy" />
         <div class="service-card-overlay"></div>
         <div class="service-card-icon">📋</div>
         <div class="service-card-content">
@@ -3920,8 +3920,8 @@ ul{list-style:none}
         </div>
       </div>
 
-      <div class="service-card" onclick="openServiceModal('Building Painter','HOME CARE','🎨','https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=420&q=70')">
-        <img src="https://c8.alamy.com/comp/BE355K/indian-construction-worker-painting-a-wall-in-an-industrial-plant-BE355K.jpg" alt="Building Painter at work" loading="lazy" />
+      <div class="service-card" onclick="openServiceModal('Building Painter','HOME CARE','🎨','https://images.unsplash.com/photo-1717281234297-3def5ae3eee1?w=1920&q=80&auto=format&fit=crop')">
+        <img src="https://images.unsplash.com/photo-1717281234297-3def5ae3eee1?w=1920&q=80&auto=format&fit=crop" alt="Building Painter at work" loading="lazy" />
         <div class="service-card-overlay"></div>
         <div class="service-card-icon">🎨</div>
         <div class="service-card-content">
@@ -3931,8 +3931,8 @@ ul{list-style:none}
         </div>
       </div>
 	  
-	   <div class="service-card" onclick="openServiceModal('Transportation','LOGISTICS','🚚','https://images.unsplash.com/photo-1601584115197-04ecc0da31d4?w=420&q=70')">
-        <img src="https://moveadvisor.com/move/wp-content/uploads/2023/02/loading-a-moving-truck.jpg" alt="Transportation and logistics" loading="lazy" />
+	   <div class="service-card" onclick="openServiceModal('Transportation','LOGISTICS','🚚','https://images.unsplash.com/photo-1715645948484-da40dd56bc93?w=1920&q=80&auto=format&fit=crop')">
+        <img src="https://images.unsplash.com/photo-1715645948484-da40dd56bc93?w=1920&q=80&auto=format&fit=crop" alt="Transportation and logistics" loading="lazy" />
         <div class="service-card-overlay"></div>
         <div class="service-card-icon">🚚</div>
         <div class="service-card-content">
@@ -3942,8 +3942,8 @@ ul{list-style:none}
         </div>
       </div>
 
-      <div class="service-card" onclick="openServiceModal('Plumbing','REPAIRS','🔧','https://images.unsplash.com/photo-1581094288338-2314dddb7ece?w=420&q=70')">
-        <img src="https://images.unsplash.com/photo-1581094288338-2314dddb7ece?w=420&q=70" alt="Plumbing repair work" loading="lazy" />
+      <div class="service-card" onclick="openServiceModal('Plumbing','REPAIRS','🔧','https://images.unsplash.com/photo-1676210133055-eab6ef033ce3?w=1920&q=80&auto=format&fit=crop')">
+        <img src="https://images.unsplash.com/photo-1676210133055-eab6ef033ce3?w=1920&q=80&auto=format&fit=crop" alt="Plumbing repair work" loading="lazy" />
         <div class="service-card-overlay"></div>
         <div class="service-card-icon">🔧</div>
         <div class="service-card-content">
@@ -6146,9 +6146,12 @@ function renderCards() {
 function syncScrollCardWidth() {
   const propCard = document.querySelector('.prop-card');
   if (!propCard) return;
-  const w = propCard.getBoundingClientRect().width;
-  if (w > 0) {
-    document.documentElement.style.setProperty('--matched-card-w', w + 'px');
+  const rect = propCard.getBoundingClientRect();
+  if (rect.width > 0) {
+    document.documentElement.style.setProperty('--matched-card-w', rect.width + 'px');
+  }
+  if (rect.height > 0) {
+    document.documentElement.style.setProperty('--matched-card-h', rect.height + 'px');
   }
 }
 // Re-measure on resize (debounced) so rotating a phone or resizing a
