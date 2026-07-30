@@ -251,10 +251,10 @@ table.dataTable thead tr.col-filter-row th{
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%238a6820'/></svg>");
   background-repeat:no-repeat;background-position:right 8px center;padding-right:22px;
 }
-.col-date-range{display:flex;flex-direction:column;gap:4px;min-width:126px;
+.col-date-range{display:flex;flex-direction:row;align-items:center;gap:4px;min-width:290px;
   padding:4px;border:1px solid var(--border);border-radius:9px;background:rgba(0,0,0,0.015);
 }
-.col-date-range input[type="date"]{width:100%;box-sizing:border-box;
+.col-date-range input[type="date"]{width:auto;flex:1 1 0;min-width:0;box-sizing:border-box;
   padding:4px 6px;border:1.3px solid var(--border);border-radius:7px;
   font-family:'Plus Jakarta Sans',sans-serif;font-size:0.68rem;font-weight:500;
   color:var(--ink);background:#fff;outline:none;
@@ -273,12 +273,12 @@ table.dataTable thead tr.col-filter-row th{
   0%{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,0.18);background:#eef4ff}
   100%{border-color:var(--border);box-shadow:none;background:#fff}
 }
-.date-preset-select{width:100%;box-sizing:border-box;cursor:pointer;
-  padding:4px 20px 4px 6px;border:1.3px dashed var(--border);border-radius:7px;
+.date-preset-select{width:auto;flex:0 0 68px;box-sizing:border-box;cursor:pointer;
+  padding:4px 18px 4px 6px;border:1.3px dashed var(--border);border-radius:7px;
   font-family:'Plus Jakarta Sans',sans-serif;font-size:0.64rem;font-weight:600;
   color:var(--ink3);background:#fff;outline:none;appearance:none;-webkit-appearance:none;
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='9' height='5'><path d='M0 0l4.5 5 4.5-5z' fill='%238a6820'/></svg>");
-  background-repeat:no-repeat;background-position:right 7px center;
+  background-repeat:no-repeat;background-position:right 6px center;
   transition:border-color 0.15s;
 }
 .date-preset-select:focus{border-color:var(--gold)}
@@ -3302,11 +3302,20 @@ $.fn.dataTable.ext.search.push(function(settings, data, dataIndex){
   return true;
 });
 
+function pad2(n){ return String(n).padStart(2,'0'); }
+function fmtDateDMY(d){ return `${pad2(d.getDate())}-${pad2(d.getMonth()+1)}-${d.getFullYear()}`; }
+function fmtTimeHM(d){
+  let h = d.getHours();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12; if(h === 0) h = 12;
+  return `${h}:${pad2(d.getMinutes())} ${ampm}`;
+}
+
 function formatDateTime(createdAt){
   if(!createdAt) return '—';
   const d = new Date(createdAt);
-  const date = d.toLocaleDateString('en-GB');
-  const time = d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
+  const date = fmtDateDMY(d);
+  const time = fmtTimeHM(d);
   return `<div class="date-cell">
     <div class="date-main"><i class="far fa-calendar-alt" style="color:var(--gold);margin-right:5px"></i>${date}</div>
     <span class="date-time">${time}</span>
@@ -3317,9 +3326,7 @@ function formatDateTime(createdAt){
 function plainDateTime(createdAt){
   if(!createdAt) return '—';
   const d = new Date(createdAt);
-  const date = d.toLocaleDateString('en-GB');
-  const time = d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
-  return `${date} ${time}`;
+  return `${fmtDateDMY(d)} ${fmtTimeHM(d)}`;
 }
 
 /* ── PROPERTY RENDERERS ── */
@@ -4310,7 +4317,7 @@ function remarkCellHtml(id, remark, type){
   if(entries.length){
     cardsHtml = entries.map((e, i) => {
       const dateStr = e.date
-        ? `<div class="remark-item-date"><i class="far fa-clock"></i>${new Date(e.date).toLocaleDateString('en-GB')}</div>`
+        ? `<div class="remark-item-date"><i class="far fa-clock"></i>${fmtDateDMY(new Date(e.date))}</div>`
         : '';
       return `
         <div class="remark-card">
@@ -6176,16 +6183,14 @@ function renderApptContact(row){
 function renderApptDate(dateStr){
   if(!dateStr) return '—';
   const d = new Date(dateStr+'T00:00:00');
-  const opts = {weekday:'short',day:'2-digit',month:'short',year:'numeric'};
-  const formatted = d.toLocaleDateString('en-GB', opts);
+  const formatted = fmtDateDMY(d);
   return `<div class="date-cell"><div class="date-main"><i class="far fa-calendar-alt" style="color:var(--gold);margin-right:5px"></i>${formatted}</div></div>`;
 }
 // Plain-text version of renderApptDate for CSV/Excel/PDF/Print exports.
 function plainApptDate(dateStr){
   if(!dateStr) return '—';
   const d = new Date(dateStr+'T00:00:00');
-  const opts = {weekday:'short',day:'2-digit',month:'short',year:'numeric'};
-  return d.toLocaleDateString('en-GB', opts);
+  return fmtDateDMY(d);
 }
 
 function renderTimeSlot(slot){
@@ -6406,7 +6411,7 @@ function openCustomerModal(id){
     {
       label:'Registered On',
       value:c.createdAt
-        ? new Date(c.createdAt).toLocaleString('en-GB')
+        ? fmtDateDMY(new Date(c.createdAt)) + ' ' + fmtTimeHM(new Date(c.createdAt))
         : '—'
     },
     {
@@ -6473,7 +6478,7 @@ function openApptModal(id){
     { label:'Property', value: propertyLine || '—' },
     { label:'Property Code', value: a.propertyId || '—' },
     { label:'Purpose', value: a.purpose || '—' },
-    { label:'Visit Date', value: a.date ? new Date(a.date+'T00:00:00').toLocaleDateString('en-GB', {weekday:'long', day:'2-digit', month:'long', year:'numeric'}) : '—' },
+    { label:'Visit Date', value: a.date ? fmtDateDMY(new Date(a.date+'T00:00:00')) : '—' },
     { label:'Visit Time', value: a.visitTimeDisplay || a.visitTime || '—' },
     { label:'Time Slot', value: a.timeSlot || '—' },
     { label:'Message / Note', value: a.message && a.message.trim() ? a.message.trim() : '—' },
@@ -6488,7 +6493,7 @@ function openApptModal(id){
         return '—';
       })()
     },
-    { label:'Booked On', value: a.createdAt ? new Date(a.createdAt).toLocaleString('en-GB') : '—' },
+    { label:'Booked On', value: a.createdAt ? (fmtDateDMY(new Date(a.createdAt)) + ' ' + fmtTimeHM(new Date(a.createdAt))) : '—' },
     { label:'Database ID', value: a._id || '—' }
   ];
 
@@ -6750,7 +6755,7 @@ function _setAdminListingMode(mode){
         remarkEntries = [p.remarks.trim()];
 
       const adminRows = [];
-      if (p.createdAt) adminRows.push(detailRow('Listed On', new Date(p.createdAt).toLocaleString('en-GB')));
+      if (p.createdAt) adminRows.push(detailRow('Listed On', fmtDateDMY(new Date(p.createdAt)) + ' ' + fmtTimeHM(new Date(p.createdAt))));
       if (p.propertyId) adminRows.push(detailRow('Property ID', p.propertyId));
       if (p.userId) adminRows.push(detailRow('Posted By (User ID)', p.userId));
       if (remarkEntries.length){
