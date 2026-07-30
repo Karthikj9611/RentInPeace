@@ -2425,12 +2425,14 @@ app.delete('/api/user/listings/:id', requireUser, async (req, res) => {
 });
 
 const reviewSchema = new mongoose.Schema({
-  userId:    { type: mongoose.Schema.Types.ObjectId, required: true, index: true },
-  userKey:   { type: String, required: true, index: true },
-  userName:  { type: String, required: true },
-  rating:    { type: Number, required: true, min: 1, max: 5 },
-  text:      { type: String, required: true, maxlength: 500 },
-  createdAt: { type: Date, default: Date.now }
+  userId:      { type: mongoose.Schema.Types.ObjectId, required: true, index: true },
+  userKey:     { type: String, required: true, index: true },
+  userName:    { type: String, required: true },
+  userPhoto:   { type: String, trim: true, default: '' },
+  accountType: { type: String, enum: ['customer', 'owner'], default: 'customer' },
+  rating:      { type: Number, required: true, min: 1, max: 5 },
+  text:        { type: String, required: true, maxlength: 500 },
+  createdAt:   { type: Date, default: Date.now }
 });
 
 const Review = mongoose.model('Review', reviewSchema);
@@ -2524,6 +2526,8 @@ app.post('/api/reviews', reviewLimiter, async (req, res) => {
       userId: user._id,
       userKey,
       userName: user.name || 'HomeLoop user',
+      userPhoto: user.profilePhoto || '',
+      accountType: user.accountType || 'customer',
       rating,
       text
     });

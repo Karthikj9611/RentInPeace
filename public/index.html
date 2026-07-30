@@ -1843,13 +1843,16 @@ ul{list-style:none}
 
 /* ─── Reviews Section (masonry grid redesign) ──── */
 .reviews-section{padding:28px 20px 32px;background:var(--bg-2);border-top:1px solid var(--border)}
-.reviews-head{max-width:1080px;margin:0 auto 12px}
+.reviews-body{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;align-items:stretch;gap:28px}
+.reviews-left{min-width:0;height:100%;display:flex;flex-direction:column;align-items:center;text-align:center}
+.reviews-right{min-width:0;height:100%;display:flex;flex-direction:column;align-items:center}
+.reviews-head{max-width:1080px;margin:0 auto 16px;width:auto}
 .reviews-title{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.4px;text-align:center}
 .reviews-title span{color:var(--brand)}
 .reviews-overview{
-  display:flex;align-items:stretch;gap:0;max-width:640px;margin:16px auto 0;
+  display:flex;align-items:stretch;gap:0;margin:16px 0 0;
   background:var(--bg);border:1px solid var(--border);border-radius:18px;
-  overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.04);
+  overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.04);width:100%;flex:1;
 }
 .reviews-overview-score{
   flex:0 0 120px;display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -1867,7 +1870,7 @@ ul{list-style:none}
 .reviews-bar-row span:last-child{flex:0 0 26px;text-align:right;color:var(--text-3)}
 
 .review-form-card{
-  max-width:1080px;margin:12px auto 0;padding:14px 16px;
+  margin:12px 0 0;padding:14px 16px;width:100%;
   border:1px solid var(--border);border-radius:18px;background:var(--bg-1);
   box-shadow:0 2px 14px rgba(0,0,0,.04);
   transition:box-shadow .2s;
@@ -1917,31 +1920,22 @@ ul{list-style:none}
    be smoothly scrolled by JS every 2s (see _autoSlideReviews), bouncing
    forward to the last review then back to the first, on a loop. */
 .reviews-list{
-  max-width:1080px;margin:12px auto 0;
-  display:flex;gap:12px;overflow-x:auto;scroll-behavior:smooth;
+  margin:0;width:100%;flex:1;
+  display:flex;flex-direction:column;gap:12px;
   padding:4px 4px 8px;-ms-overflow-style:none;scrollbar-width:none;
 }
 .reviews-list::-webkit-scrollbar{display:none}
-@media (min-width:641px){
-  /* Desktop: show reviews two-to-a-row, divided equally, instead of the
-     mobile one-full-width-card-at-a-time swipeable row. The auto-slide
-     JS already no-ops once content stops overflowing, so it stays safely
-     inert here without needing a separate code path. */
-  .reviews-list{
-    display:grid;grid-template-columns:1fr 1fr;
-    overflow-x:visible;
-  }
-  .review-card{width:auto}
-}
 .reviews-loading,.reviews-empty{
   text-align:center;color:var(--text-3);font-size:13.5px;padding:40px;width:100%;flex-shrink:0;
 }
 .review-card{
-  flex:0 0 auto;width:100%;display:block;
+  flex:1 0 auto;width:100%;display:none;
   border:1px solid var(--border);border-radius:16px;padding:12px 14px;background:var(--bg-1);
   box-shadow:0 1px 8px rgba(0,0,0,.03);transition:box-shadow .15s,transform .15s;
   border-left:3px solid var(--rc-accent,var(--brand));
 }
+.review-card.active{display:flex;flex-direction:column;animation:reviewCardIn .4s ease;}
+@keyframes reviewCardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .review-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.06);transform:translateY(-2px)}
 .review-card-quote{font-size:30px;line-height:1;color:var(--brand-light);font-weight:800;font-family:Georgia,serif}
 .review-card-head{display:flex;align-items:center;gap:11px;margin:2px 0 8px}
@@ -1949,12 +1943,22 @@ ul{list-style:none}
   width:36px;height:36px;border-radius:50%;
   background:linear-gradient(135deg,var(--brand-light),var(--brand));
   color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
-  box-shadow:0 2px 6px rgba(0,0,0,.08);
+  box-shadow:0 2px 6px rgba(0,0,0,.08);overflow:hidden;
 }
+.review-avatar img{width:100%;height:100%;object-fit:cover;display:block}
 .review-card-meta{flex:1;min-width:0}
+.review-card-name-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .review-card-name{font-size:13.5px;font-weight:700;color:var(--text)}
+.review-card-role-badge{
+  font-size:9.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;
+  padding:2px 7px;border-radius:99px;line-height:1.5;
+}
+.review-card-role-badge.tenant{background:var(--brand-light);color:var(--brand)}
+.review-card-role-badge.owner{background:var(--bg-3);color:var(--text-2);border:1px solid var(--border-2)}
 .review-card-date{font-size:11.5px;color:var(--text-3)}
+.review-card-stars-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:1px;flex-shrink:0}
 .review-card-stars{color:#f5a623;font-size:13px;letter-spacing:1.5px;white-space:nowrap}
+.review-card-rating-num{font-size:10.5px;font-weight:700;color:var(--text-3);white-space:nowrap}
 .review-card-text{font-size:13.5px;color:var(--text-2);line-height:1.65;word-break:break-word}
 .reviews-loadmore-btn{
   display:block;margin:16px auto 0;background:none;border:1.5px solid var(--border-2);
@@ -1963,12 +1967,15 @@ ul{list-style:none}
 }
 .reviews-loadmore-btn:hover{background:var(--bg-2);border-color:var(--brand)}
 @media (max-width:900px){
+  .reviews-body{grid-template-columns:1fr}
+  .reviews-left{width:100%;height:auto}
+  .reviews-right{width:100%;height:auto}
 }
 @media (max-width:680px){
   .reviews-section{padding:14px 12px 20px}
-  .reviews-head{margin:0 auto 10px}
+  .reviews-head{margin:0 0 10px}
   .reviews-title{font-size:17px}
-  .reviews-overview{margin:10px auto 0}
+  .reviews-overview{margin:10px 0 0}
   .reviews-overview-score{flex:0 0 90px;padding:8px 6px}
   .reviews-overview-score-num{font-size:20px}
   .reviews-overview-bars{padding:8px 10px;gap:2px}
@@ -3982,56 +3989,62 @@ ul{list-style:none}
 <section class="reviews-section" aria-label="User reviews">
   <div class="reviews-head">
     <div class="reviews-title">Add a <span>Review</span></div>
-    <div class="reviews-overview" id="reviewsSummary">
-      <div class="reviews-overview-score">
-        <div class="reviews-overview-score-num" id="reviewsAvgScore">—</div>
-        <div class="reviews-overview-stars" id="reviewsAvgStars" aria-hidden="true"></div>
-        <div class="reviews-overview-count" id="reviewsCount">No reviews yet</div>
-      </div>
-      <div class="reviews-overview-bars" id="reviewsBars">
-        <div class="reviews-bar-row"><span>5</span><div class="reviews-bar-track"><div class="reviews-bar-fill" data-star="5" style="width:0%"></div></div><span data-star-count="5">0</span></div>
-        <div class="reviews-bar-row"><span>4</span><div class="reviews-bar-track"><div class="reviews-bar-fill" data-star="4" style="width:0%"></div></div><span data-star-count="4">0</span></div>
-        <div class="reviews-bar-row"><span>3</span><div class="reviews-bar-track"><div class="reviews-bar-fill" data-star="3" style="width:0%"></div></div><span data-star-count="3">0</span></div>
-        <div class="reviews-bar-row"><span>2</span><div class="reviews-bar-track"><div class="reviews-bar-fill" data-star="2" style="width:0%"></div></div><span data-star-count="2">0</span></div>
-        <div class="reviews-bar-row"><span>1</span><div class="reviews-bar-track"><div class="reviews-bar-fill" data-star="1" style="width:0%"></div></div><span data-star-count="1">0</span></div>
-      </div>
-    </div>
   </div>
-
-  <div class="review-form-card" id="reviewFormCard">
-    <div class="review-form-logged-out" id="reviewFormLoggedOut">
-      <button class="review-login-btn" onclick="openAuthModal()">Log in to write a review</button>
-    </div>
-    <div class="review-form-logged-in" id="reviewFormLoggedIn" style="display:none">
-      <div class="review-form-row">
-        <span class="review-form-label">Your rating</span>
-        <div class="review-stars-input" id="reviewStarsInput" role="radiogroup" aria-label="Rating">
-          <span class="review-star-btn" data-val="1" onclick="setReviewRating(1)">★</span>
-          <span class="review-star-btn" data-val="2" onclick="setReviewRating(2)">★</span>
-          <span class="review-star-btn" data-val="3" onclick="setReviewRating(3)">★</span>
-          <span class="review-star-btn" data-val="4" onclick="setReviewRating(4)">★</span>
-          <span class="review-star-btn" data-val="5" onclick="setReviewRating(5)">★</span>
+  <div class="reviews-body">
+    <div class="reviews-left">
+      <div class="reviews-overview" id="reviewsSummary">
+        <div class="reviews-overview-score">
+          <div class="reviews-overview-score-num" id="reviewsAvgScore">—</div>
+          <div class="reviews-overview-stars" id="reviewsAvgStars" aria-hidden="true"></div>
+          <div class="reviews-overview-count" id="reviewsCount">No reviews yet</div>
+        </div>
+        <div class="reviews-overview-bars" id="reviewsBars">
+          <div class="reviews-bar-row"><span>5</span><div class="reviews-bar-track"><div class="reviews-bar-fill" data-star="5" style="width:0%"></div></div><span data-star-count="5">0</span></div>
+          <div class="reviews-bar-row"><span>4</span><div class="reviews-bar-track"><div class="reviews-bar-fill" data-star="4" style="width:0%"></div></div><span data-star-count="4">0</span></div>
+          <div class="reviews-bar-row"><span>3</span><div class="reviews-bar-track"><div class="reviews-bar-fill" data-star="3" style="width:0%"></div></div><span data-star-count="3">0</span></div>
+          <div class="reviews-bar-row"><span>2</span><div class="reviews-bar-track"><div class="reviews-bar-fill" data-star="2" style="width:0%"></div></div><span data-star-count="2">0</span></div>
+          <div class="reviews-bar-row"><span>1</span><div class="reviews-bar-track"><div class="reviews-bar-fill" data-star="1" style="width:0%"></div></div><span data-star-count="1">0</span></div>
         </div>
       </div>
-      <textarea class="review-form-textarea" id="reviewText" rows="3" maxlength="500"></textarea>
-      <div class="review-form-actions">
-        <span class="review-form-charcount" id="reviewCharCount">0 / 500</span>
-        <button class="review-submit-btn" id="reviewSubmitBtn" onclick="submitReview()">Post review</button>
-      </div>
-    </div>
-    <div class="review-form-done" id="reviewFormDone" style="display:none">
-      <div class="review-form-done-icon">✓</div>
-      <div class="review-form-done-text">
-        <div class="review-form-done-title">Thanks for your feedback!</div>
-        <div class="review-form-done-sub">You've already shared your review with the community.</div>
-      </div>
-    </div>
-  </div>
 
-  <div class="reviews-list" id="reviewsList">
-    <div class="reviews-loading">Loading reviews…</div>
+      <div class="review-form-card" id="reviewFormCard">
+        <div class="review-form-logged-out" id="reviewFormLoggedOut">
+          <button class="review-login-btn" onclick="openAuthModal()">Log in to write a review</button>
+        </div>
+        <div class="review-form-logged-in" id="reviewFormLoggedIn" style="display:none">
+          <div class="review-form-row">
+            <span class="review-form-label">Your rating</span>
+            <div class="review-stars-input" id="reviewStarsInput" role="radiogroup" aria-label="Rating">
+              <span class="review-star-btn" data-val="1" onclick="setReviewRating(1)">★</span>
+              <span class="review-star-btn" data-val="2" onclick="setReviewRating(2)">★</span>
+              <span class="review-star-btn" data-val="3" onclick="setReviewRating(3)">★</span>
+              <span class="review-star-btn" data-val="4" onclick="setReviewRating(4)">★</span>
+              <span class="review-star-btn" data-val="5" onclick="setReviewRating(5)">★</span>
+            </div>
+          </div>
+          <textarea class="review-form-textarea" id="reviewText" rows="3" maxlength="500"></textarea>
+          <div class="review-form-actions">
+            <span class="review-form-charcount" id="reviewCharCount">0 / 500</span>
+            <button class="review-submit-btn" id="reviewSubmitBtn" onclick="submitReview()">Post review</button>
+          </div>
+        </div>
+        <div class="review-form-done" id="reviewFormDone" style="display:none">
+          <div class="review-form-done-icon">✓</div>
+          <div class="review-form-done-text">
+            <div class="review-form-done-title">Thanks for your feedback!</div>
+            <div class="review-form-done-sub">You've already shared your review with the community.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="reviews-right">
+      <div class="reviews-list" id="reviewsList">
+        <div class="reviews-loading">Loading reviews…</div>
+      </div>
+      <button class="reviews-loadmore-btn" id="reviewsLoadMoreBtn" style="display:none" onclick="loadMoreReviews()">Show more reviews</button>
+    </div>
   </div>
-  <button class="reviews-loadmore-btn" id="reviewsLoadMoreBtn" style="display:none" onclick="loadMoreReviews()">Show more reviews</button>
 </section>
 
 <!-- ─── FAB stats, mobile inline row: same buttons as the fixed
@@ -10927,6 +10940,7 @@ async function initReviewForm() {
     loggedOut.style.display = '';
     loggedIn.style.display = 'none';
     done.style.display = 'none';
+    syncReviewsPanelHeights();
     return;
   }
 
@@ -10950,6 +10964,7 @@ async function initReviewForm() {
     // If the check fails, leave the form visible — worst case the user
     // hits the 409 on submit, which is still handled gracefully.
   }
+  syncReviewsPanelHeights();
 }
 
 function setReviewRating(val) {
@@ -11039,15 +11054,39 @@ function reviewAccentColor(rating) {
 function reviewCardHTML(rv) {
   const name = esc(rv.userName || 'HomeLoop user');
   const initial = (name[0] || 'U').toUpperCase();
+  const photoUrl = rv.userPhoto || rv.profilePhoto || rv.avatar || '';
+  const avatarInner = photoUrl
+    ? `<img src="${safeUrl(photoUrl)}" alt="${name}" onload="syncReviewsPanelHeights()"/>`
+    : initial;
+  const avatarStyle = photoUrl ? '' : ` style="background:${avatarColorFromName(name)}"`;
+
+  // Reviewer role — the backend's Review docs carry `accountType`
+  // ('customer' or 'owner'), mirroring the User model. Older reviews saved
+  // before this field existed will have neither, so no badge shows for them.
+  const rawRole = rv.accountType || rv.userType || rv.role || '';
+  const isOwner = String(rawRole).toLowerCase() === 'owner';
+  const isTenant = !isOwner && String(rawRole).toLowerCase() === 'customer';
+  const roleBadge = isOwner
+    ? `<span class="review-card-role-badge owner">Owner</span>`
+    : isTenant
+      ? `<span class="review-card-role-badge tenant">Tenant</span>`
+      : '';
+
   return `<div class="review-card" style="--rc-accent:${reviewAccentColor(rv.rating)}">
     <div class="review-card-quote">"</div>
     <div class="review-card-head">
-      <div class="review-avatar" style="background:${avatarColorFromName(name)}">${initial}</div>
+      <div class="review-avatar"${avatarStyle}>${avatarInner}</div>
       <div class="review-card-meta">
-        <div class="review-card-name">${name}</div>
+        <div class="review-card-name-row">
+          <div class="review-card-name">${name}</div>
+          ${roleBadge}
+        </div>
         <div class="review-card-date">${reviewTimeAgo(rv.createdAt)}</div>
       </div>
-      <div class="review-card-stars" aria-label="${rv.rating} out of 5 stars">${renderStarString(rv.rating)}</div>
+      <div class="review-card-stars-wrap">
+        <div class="review-card-stars" aria-label="${rv.rating} out of 5 stars">${renderStarString(rv.rating)}</div>
+        <div class="review-card-rating-num">${rv.rating}/5</div>
+      </div>
     </div>
     <div class="review-card-text">${esc(rv.text)}</div>
   </div>`;
@@ -11093,8 +11132,10 @@ async function loadReviews() {
       document.getElementById('reviewsAvgStars').textContent = renderStarString(avg);
       document.getElementById('reviewsCount').textContent = reviewsTotalCount + (reviewsTotalCount === 1 ? ' review' : ' reviews');
       renderRatingBars(data.ratingCounts || {});
+      initReviewCarousel();
     } else {
       list.insertAdjacentHTML('beforeend', reviews.map(reviewCardHTML).join(''));
+      initReviewCarousel();
     }
 
     const shown = reviewsPage * REVIEWS_PAGE_SIZE;
@@ -11298,27 +11339,67 @@ function _autoSlidePropRows(){
 })();
 setInterval(_autoSlidePropRows, 20000);
 
-/* ─── Auto-slide the reviews row every 10s ──────────────────────────
-   Bounces forward one review at a time until the last review is
-   reached, then reverses and bounces back to the first, looping
-   forever. Only runs when there's more than one review and they
-   actually overflow the visible row. */
-let _reviewsDir = 1;
-function _autoSlideReviews(){
-  const row = document.getElementById('reviewsList');
-  if (!row || row.children.length <= 1) return;
-  if (row.scrollWidth <= row.clientWidth + 4) return;
-  const maxScroll = row.scrollWidth - row.clientWidth;
-  if (_reviewsDir === 1 && row.scrollLeft >= maxScroll - 4) {
-    _reviewsDir = -1;
-  } else if (_reviewsDir === -1 && row.scrollLeft <= 4) {
-    _reviewsDir = 1;
-  }
-  const card = row.querySelector('.review-card');
-  const step = card ? (card.getBoundingClientRect().width + 16) : row.clientWidth * 0.9;
-  row.scrollTo({ left: row.scrollLeft + step * _reviewsDir, behavior: 'smooth' });
+/* ─── Reviews carousel ──────────────────────────────────────────────
+   The right-hand review panel shows one card at a time (so its height
+   matches the ratings-summary card on the left) and auto-advances to
+   the next review every 10s, looping back to the first after the last.
+   Re-run initReviewCarousel() any time #reviewsList's contents change
+   (initial load, "Show more", a fresh submission) so it always reflects
+   what's actually in the DOM. */
+let _reviewCarouselTimer = null;
+let _reviewCarouselIndex = 0;
+function initReviewCarousel(){
+  const list = document.getElementById('reviewsList');
+  if (!list) return;
+  const cards = Array.from(list.querySelectorAll('.review-card'));
+  clearInterval(_reviewCarouselTimer);
+  if (!cards.length) { syncReviewsPanelHeights(); return; }
+
+  _reviewCarouselIndex = 0;
+  cards.forEach((c, i) => c.classList.toggle('active', i === 0));
+  syncReviewsPanelHeights();
+  if (cards.length <= 1) return;
+
+  _reviewCarouselTimer = setInterval(() => {
+    const current = list.querySelectorAll('.review-card');
+    if (!current.length) return;
+    current[_reviewCarouselIndex]?.classList.remove('active');
+    _reviewCarouselIndex = (_reviewCarouselIndex + 1) % current.length;
+    current[_reviewCarouselIndex]?.classList.add('active');
+    syncReviewsPanelHeights();
+  }, 10000);
 }
-setInterval(_autoSlideReviews, 10000);
+
+/* Belt-and-suspenders height match: flex-stretch handles most cases, but
+   since the left column can hold one box (rating summary) or two (rating
+   summary + login/write-review card) while the right column always holds
+   exactly one visible review card, we also explicitly measure both sides
+   and pin them to whichever is taller. Cleared and re-measured any time
+   either side's content changes, and skipped once the layout stacks on
+   narrow screens (where matching heights doesn't make sense). */
+function syncReviewsPanelHeights(){
+  const left = document.querySelector('.reviews-left');
+  const right = document.querySelector('.reviews-right');
+  if (!left || !right) return;
+  left.style.minHeight = '';
+  right.style.minHeight = '';
+  requestAnimationFrame(() => {
+    if (window.innerWidth <= 900) return; // stacked layout — no side-by-side match needed
+    const h = Math.max(left.offsetHeight, right.offsetHeight);
+    left.style.minHeight = h + 'px';
+    right.style.minHeight = h + 'px';
+  });
+}
+window.addEventListener('resize', () => {
+  clearTimeout(window._reviewsResizeT);
+  window._reviewsResizeT = setTimeout(syncReviewsPanelHeights, 150);
+});
+// Avatar photos load asynchronously and can grow a card slightly once they
+// arrive, so re-check once everything (including images) has fully loaded,
+// plus a couple of short delayed retries to catch any late layout shift.
+window.addEventListener('load', syncReviewsPanelHeights);
+setTimeout(syncReviewsPanelHeights, 400);
+setTimeout(syncReviewsPanelHeights, 1200);
 
 document.addEventListener('click', function(e) {
   const dd = document.getElementById('amDropdown');
