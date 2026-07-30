@@ -1455,37 +1455,6 @@ ul{list-style:none}
 .fab:hover{background:var(--brand-hover);transform:scale(1.05)}
 .fab svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2}
 
-/* ─── FAB stat pills (visitor count / daily visits / registered users) ─── */
-/* Same 36px footprint and right offset as .fab, so the FAB and all three
-   stat icons sit in one straight vertical column — FAB on top, Visitors/
-   Daily/Users stacked below it. */
-.fab-stats{
-  position:fixed;right:24px;bottom:24px;z-index:150;
-  display:flex;flex-direction:column;gap:10px;
-  align-items:center;
-}
-.fab-stat-item{
-  position:relative;
-  width:36px;height:36px;
-}
-.fab-stat-icon{
-  width:36px;height:36px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  color:#fff;
-  box-shadow:var(--shadow-md);
-}
-.fab-stat-icon svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.2}
-.fab-stat-icon.visitors{background:linear-gradient(135deg,#6f9bff,#2f5fd1)}
-.fab-stat-icon.daily{background:linear-gradient(135deg,#4bc9a4,#1a7a5e)}
-.fab-stat-icon.users{background:linear-gradient(135deg,var(--brand),var(--brand-hover))}
-.fab-stat-badge{
-  position:absolute;top:-4px;right:-6px;
-  background:var(--text);color:#fff;
-  border-radius:99px;font-size:10px;font-weight:700;
-  min-width:16px;height:16px;padding:0 3px;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 0 2px var(--bg);
-}
 @media(max-width:640px){
   /* The bottom-nav has 6 equal-width tabs (flex:1); "Shortlist" is the last
      one, so its center sits at 11/12 of the viewport width. Align the FAB
@@ -1498,70 +1467,6 @@ ul{list-style:none}
     bottom:calc(56px + env(safe-area-inset-bottom) + 20px);
   }
   .fab:hover{background:var(--brand-hover);transform:translateX(-50%) scale(1.05)}
-  /* The visitor/daily/user stat icons move inline after the reviews
-     section on mobile (see .fab-stats-inline below), so hide the fixed
-     floating column. */
-  .fab-stats{display:none}
-}
-
-/* ─── FAB stats, mobile inline row (shown after Reviews section) ───
-   Same icons/badges as .fab-stats above, laid out horizontally in the
-   normal document flow instead of fixed-floating. Only shown ≤640px.
-   Each stat is a tinted "chip" (icon + count only, no separate text
-   label) — that fits comfortably at any width instead of squeezing a
-   label into shrinking flex space, which used to get clipped mid-word
-   on narrower phones. */
-.fab-stats-inline{
-  display:none;
-  align-items:center;
-  gap:8px;
-  margin:0 16px calc(56px + env(safe-area-inset-bottom) + 20px);
-  padding:10px;
-  background:linear-gradient(180deg,#ffffff,#fafafa);
-  border:1px solid var(--border-2);
-  border-radius:20px;
-  box-shadow:0 10px 28px -10px rgba(20,16,17,.16),0 2px 8px rgba(20,16,17,.05);
-}
-.fab-stats-inline .fab-stat-chip{
-  flex:1;min-width:0;display:flex;align-items:center;gap:7px;
-  padding:6px 10px 6px 6px;border-radius:999px;
-}
-.fab-stats-inline .fab-stat-chip.visitors{background:linear-gradient(135deg,rgba(111,155,255,.14),rgba(47,95,209,.06))}
-.fab-stats-inline .fab-stat-chip.daily{background:linear-gradient(135deg,rgba(75,201,164,.14),rgba(26,122,94,.06))}
-.fab-stats-inline .fab-stat-chip.users{background:linear-gradient(135deg,rgba(224,58,82,.14),rgba(190,30,55,.06))}
-.fab-stats-inline .fab-stat-icon{width:26px;height:26px;flex-shrink:0}
-.fab-stats-inline .fab-stat-icon svg{width:12px;height:12px}
-.fab-stats-inline .fab-stat-count{
-  font-size:14px;font-weight:800;color:var(--text);letter-spacing:-.2px;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-}
-.fab-stats-inline .fab-inline-add{
-  width:42px;height:42px;border-radius:50%;flex-shrink:0;
-  background:linear-gradient(135deg,var(--brand),var(--brand-hover));color:#fff;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 6px 18px -4px rgba(224,58,82,.55);
-  border:none;cursor:pointer;position:relative;
-  transition:transform .15s ease;
-}
-.fab-stats-inline .fab-inline-add:active{transform:scale(.92)}
-.fab-stats-inline .fab-inline-add::after{
-  content:'';position:absolute;inset:-5px;border-radius:50%;
-  border:2px solid var(--brand);opacity:.55;pointer-events:none;
-  animation:fabInlinePulse 2.4s ease-out infinite;
-}
-.fab-stats-inline .fab-inline-add svg{width:17px;height:17px;stroke:#fff;fill:none;stroke-width:2.3}
-@keyframes fabInlinePulse{
-  0%{transform:scale(.85);opacity:.55}
-  70%{transform:scale(1.4);opacity:0}
-  100%{opacity:0}
-}
-@media(max-width:640px){
-  .fab-stats-inline{display:flex}
-}
-@media(max-width:380px){
-  .fab-stats-inline{gap:6px;padding:8px}
-  .fab-stats-inline .fab-stat-chip{padding:6px 8px 6px 5px;gap:5px}
-  .fab-stats-inline .fab-stat-count{font-size:13px}
 }
 
 /* ─── FAB add-type picker (opens above the FAB) ─────────── */
@@ -1843,10 +1748,10 @@ ul{list-style:none}
 
 /* ─── Reviews Section (masonry grid redesign) ──── */
 .reviews-section{padding:28px 20px 32px;background:var(--bg-2);border-top:1px solid var(--border)}
-.reviews-body{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;align-items:stretch;gap:28px}
+.reviews-body{width:100%;margin:0;display:grid;grid-template-columns:1fr 1fr;align-items:stretch;gap:28px}
 .reviews-left{min-width:0;height:100%;display:flex;flex-direction:column;align-items:center;text-align:center}
 .reviews-right{min-width:0;height:100%;display:flex;flex-direction:column;align-items:center}
-.reviews-head{max-width:1080px;margin:0 auto 16px;width:auto}
+.reviews-head{width:100%;margin:0 0 16px}
 .reviews-title{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.4px;text-align:center}
 .reviews-title span{color:var(--brand)}
 .reviews-overview{
@@ -4047,34 +3952,6 @@ ul{list-style:none}
   </div>
 </section>
 
-<!-- ─── FAB stats, mobile inline row: same buttons as the fixed
-     .fab / .fab-stats column, shown horizontally after Reviews on
-     mobile instead of floating. Badges are kept in sync with the
-     floating versions by initFabStats(). ─── -->
-<div class="fab-stats-inline" id="fabStatsInline" aria-hidden="false">
-  <div class="fab-stat-chip visitors" title="Total website visitors" aria-label="Total website visitors">
-    <span class="fab-stat-icon visitors">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
-    </span>
-    <span class="fab-stat-count" id="fabStatVisitorsInline">–</span>
-  </div>
-  <div class="fab-stat-chip daily" title="Today's site visits" aria-label="Today's site visits">
-    <span class="fab-stat-icon daily">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-    </span>
-    <span class="fab-stat-count" id="fabStatDailyInline">–</span>
-  </div>
-  <div class="fab-stat-chip users" title="Total registered users" aria-label="Total registered users">
-    <span class="fab-stat-icon users">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-    </span>
-    <span class="fab-stat-count" id="fabStatUsersInline">–</span>
-  </div>
-  <button class="fab-inline-add" id="fabInlineAdd" onclick="openFabPicker()" aria-label="Add a listing" title="List your property">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-  </button>
-</div>
-
 <!-- ─── Service Request Modal ───────────────────── -->
 <div class="add-modal-overlay" id="serviceModal" role="dialog" aria-modal="true" aria-label="Request a service">
   <div class="add-modal" id="serviceModalBox" style="max-width:440px">
@@ -4117,28 +3994,6 @@ ul{list-style:none}
       </button>
     </div>
     <iframe id="rentReceiptFrame" title="Rent Receipt Generator" style="flex:1;width:100%;border:0;background:#fff"></iframe>
-  </div>
-</div>
-
-<!-- ─── FAB stats: website visitors / registered users ─── -->
-<div class="fab-stats" id="fabStats" aria-hidden="false">
-  <div class="fab-stat-item" title="Total website visitors">
-    <span class="fab-stat-icon visitors">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
-    </span>
-    <span class="fab-stat-badge" id="fabStatVisitors">–</span>
-  </div>
-  <div class="fab-stat-item" title="Today's site visits">
-    <span class="fab-stat-icon daily">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-    </span>
-    <span class="fab-stat-badge" id="fabStatDaily">–</span>
-  </div>
-  <div class="fab-stat-item" title="Total registered users">
-    <span class="fab-stat-icon users">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-    </span>
-    <span class="fab-stat-badge" id="fabStatUsers">–</span>
   </div>
 </div>
 
@@ -7339,11 +7194,9 @@ function updateAllOnlySections() {
   const urbanAware = document.getElementById('honestReviewsSection');
   const reviewsSection = document.querySelector('.reviews-section');
   const premiumServices = document.getElementById('premiumServicesSection');
-  const fabStatsInline = document.getElementById('fabStatsInline');
   if (urbanAware) urbanAware.style.display = (show && hasHonestReviews) ? '' : 'none';
   if (reviewsSection) reviewsSection.style.display = show ? '' : 'none';
   if (premiumServices) premiumServices.style.display = show ? '' : 'none';
-  if (fabStatsInline) fabStatsInline.style.display = show ? '' : 'none';
   // Mobile bottom-nav clearance (see .main.needs-nav-clear in CSS) is only
   // needed when nothing follows <main> — i.e. every tab except "All".
   const mainEl = document.getElementById('mainContent');
@@ -12104,61 +11957,9 @@ document.getElementById('aboutModal').addEventListener('click', function(e) {
 });
 
 /* ═══════════════════════════════════════════════
-   FAB STATS (website visitors / daily visits / registered users)
-═══════════════════════════════════════════════ */
-function formatStatCount(n){
-  if (typeof n !== 'number' || isNaN(n)) return '–';
-  if (n >= 1000000) return (n/1000000).toFixed(n % 1000000 === 0 ? 0 : 1) + 'M';
-  if (n >= 1000) return (n/1000).toFixed(n % 1000 === 0 ? 0 : 1) + 'k';
-  return String(n);
-}
-async function initFabStats(){
-  try{
-    // Record this visit once per browser tab session (not on every internal
-    // re-render), then always fetch the latest totals to display.
-    if (!sessionStorage.getItem('visitRecorded')) {
-      sessionStorage.setItem('visitRecorded', '1');
-      fetch('/api/stats/visit', { method: 'POST' }).catch(()=>{});
-    }
-    const res = await fetch('/api/stats');
-    if (!res.ok) return;
-    const data = await res.json();
-    document.getElementById('fabStatVisitors').textContent = formatStatCount(data.totalVisits);
-    document.getElementById('fabStatDaily').textContent = formatStatCount(data.todayVisits);
-    document.getElementById('fabStatUsers').textContent = formatStatCount(data.totalUsers);
-    const visitorsInline = document.getElementById('fabStatVisitorsInline');
-    const dailyInline = document.getElementById('fabStatDailyInline');
-    const usersInline = document.getElementById('fabStatUsersInline');
-    if (visitorsInline) visitorsInline.textContent = formatStatCount(data.totalVisits);
-    if (dailyInline) dailyInline.textContent = formatStatCount(data.todayVisits);
-    if (usersInline) usersInline.textContent = formatStatCount(data.totalUsers);
-  }catch(err){
-    console.error('initFabStats error:', err);
-  }
-}
-
-/* ═══════════════════════════════════════════════
-   MOBILE: hide the floating + FAB once its inline
-   twin (in the row after Reviews) scrolls into view,
-   so there's never two + buttons on screen at once.
-═══════════════════════════════════════════════ */
-(function(){
-  const inlineRow = document.getElementById('fabStatsInline');
-  const floatingFab = document.querySelector('.fab');
-  if (!inlineRow || !floatingFab || !('IntersectionObserver' in window)) return;
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      floatingFab.style.display = entry.isIntersecting ? 'none' : '';
-    });
-  }, { threshold: 0.15 });
-  io.observe(inlineRow);
-})();
-
-/* ═══════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════ */
 buildFilterOptions();
-initFabStats();
 syncFdBar();
 renderCards();
 updateShortlistCount();
