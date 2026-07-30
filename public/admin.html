@@ -172,37 +172,43 @@ body{
    Boxed pill container matching .tab-bar exactly (row 1), left-aligned
    instead of a full-width bar, so row 3 lines up with rows 1 & 2. */
 .bulk-toolbar{
-  display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:6px;
-  padding:6px;border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:2px;
+  padding:5px;border:1px solid var(--border);
   border-radius:var(--radius);background:var(--surface);
   box-shadow:var(--shadow);
   width:fit-content;margin-bottom:24px;
 }
-.bulk-toolbar-left,.bulk-toolbar-right{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.bulk-toolbar-left,.bulk-toolbar-right{display:flex;align-items:center;gap:2px;flex-wrap:wrap}
 .bulk-selected-count{
-  font-size:0.82rem;font-weight:700;color:var(--gold-dark);
+  font-size:0.8rem;font-weight:700;color:var(--gold-dark);
+  background:var(--gold-light);
   display:inline-flex;align-items:center;gap:6px;
-  padding:0 6px;
+  padding:8px 14px;border-radius:calc(var(--radius) - 4px);
+  margin:0 2px;
 }
 .filter-active-badge{
-  font-size:0.82rem;font-weight:700;color:#2563eb;
+  font-size:0.8rem;font-weight:700;color:#2563eb;
+  background:rgba(37,99,235,0.08);
   display:inline-flex;align-items:center;gap:6px;
-  padding:0 6px;
+  padding:8px 14px;border-radius:calc(var(--radius) - 4px);
+  margin:0 2px;
 }
 .bulk-btn{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:9px 20px;border-radius:calc(var(--radius) - 4px);border:1.5px solid transparent;
-  font-family:'Plus Jakarta Sans',sans-serif;font-size:0.85rem;font-weight:700;
-  cursor:pointer;transition:all 0.18s;white-space:nowrap;
+  display:inline-flex;align-items:center;gap:7px;
+  padding:9px 16px;border-radius:calc(var(--radius) - 4px);border:none;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:0.82rem;font-weight:600;
+  cursor:pointer;transition:background 0.15s,color 0.15s;white-space:nowrap;
+  background:transparent;color:var(--ink3);
 }
-.bulk-btn-clear{background:transparent;color:var(--ink3);border-color:var(--border)}
-.bulk-btn-clear:hover{background:var(--border);color:var(--ink)}
-.bulk-btn-danger{background:var(--red);color:#fff}
-.bulk-btn-danger:hover{background:#c73a3a;box-shadow:0 4px 14px rgba(224,68,68,0.3)}
-.bulk-btn-outline-danger{background:#fff;color:var(--red);border-color:rgba(224,68,68,0.35)}
-.bulk-btn-outline-danger:hover{background:var(--red);color:#fff;box-shadow:0 4px 14px rgba(224,68,68,0.3)}
-.bulk-btn:disabled{opacity:0.45;cursor:not-allowed;pointer-events:none}
-.bulk-btn:disabled:hover{background:#fff;color:var(--red);box-shadow:none}
+.bulk-btn:hover{background:var(--surface2);color:var(--ink)}
+.bulk-btn-clear{background:transparent;color:var(--ink3)}
+.bulk-btn-clear:hover{background:var(--surface2);color:var(--ink)}
+.bulk-btn-danger{background:var(--red);color:#fff;font-weight:700}
+.bulk-btn-danger:hover{background:#c73a3a}
+.bulk-btn-outline-danger{background:transparent;color:var(--ink3)}
+.bulk-btn-outline-danger:hover{background:var(--surface2);color:var(--ink)}
+.bulk-btn:disabled{opacity:0.4;cursor:not-allowed;pointer-events:none}
+.bulk-btn:disabled:hover{background:transparent;color:var(--ink3)}
 .bulk-toolbar-below{
   justify-content:center;
 }
@@ -761,16 +767,15 @@ table.dataTable.no-footer{border-bottom:none!important}
 .dt-buttons{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;float:none!important}
 .top-controls{clear:both;overflow:hidden}
 .dt-button{
-  display:inline-flex!important;align-items:center!important;gap:6px!important;
-  background:var(--surface)!important;color:var(--ink2)!important;
-  border:1.5px solid var(--border)!important;padding:7px 15px!important;
-  border-radius:99px!important;font-size:0.78rem!important;font-weight:600!important;
-  font-family:inherit!important;cursor:pointer!important;transition:all 0.18s!important;
+  display:inline-flex!important;align-items:center!important;gap:7px!important;
+  background:transparent!important;color:var(--ink3)!important;
+  border:none!important;padding:9px 16px!important;
+  border-radius:calc(var(--radius) - 4px)!important;font-size:0.82rem!important;font-weight:600!important;
+  font-family:inherit!important;cursor:pointer!important;transition:background 0.15s,color 0.15s!important;
   box-shadow:none!important;text-shadow:none!important;
 }
 .dt-button:hover{
-  background:var(--ink)!important;color:#fff!important;
-  border-color:var(--ink)!important;box-shadow:0 4px 14px rgba(12,13,16,0.15)!important;
+  background:var(--surface2)!important;color:var(--ink)!important;
 }
 .dt-button span{line-height:1!important}
 
@@ -1519,14 +1524,13 @@ footer i{color:var(--gold)}
   .stat-card-big-label{font-size:0.7rem}
   .stat-card-big-actions .bulk-btn{padding:6px 10px;font-size:0.68rem}
 
-  /* Bulk toolbar: single horizontal line, icons only, scroll if tight */
+  /* Bulk toolbar: wrap onto as many lines as needed so every icon stays
+     visible at once — no horizontal scroll/cut-off, matching rows 1 & 2 */
   .bulk-toolbar{
-    justify-content:flex-start;flex-wrap:nowrap;gap:10px;
-    padding:10px 12px;overflow-x:auto;-webkit-overflow-scrolling:touch;
-    scrollbar-width:none;-ms-overflow-style:none;
+    justify-content:flex-start;flex-wrap:wrap;gap:10px;
+    padding:10px 12px;overflow-x:visible;
   }
-  .bulk-toolbar::-webkit-scrollbar{display:none}
-  .bulk-toolbar-left,.bulk-toolbar-right{flex-wrap:nowrap;flex-shrink:0;gap:6px}
+  .bulk-toolbar-left,.bulk-toolbar-right{flex-wrap:wrap;gap:6px}
   .bulk-btn,.btn-add-review,.bulk-selected-count{flex-shrink:0}
   .bulk-toolbar-below{justify-content:center}
   .bulk-btn-label{display:none}
@@ -1568,7 +1572,6 @@ footer i{color:var(--gold)}
   #bulkClearBtn{order:8}
   #bulkDeleteSelectedBtn{order:9}
   #resetAllViewsBtn{order:10}
-  #deleteAllPropertiesBtn{order:11}
 
   /* Category sub-tab bar — single horizontal row, swipeable */
   .cat-tab-bar{
@@ -1981,9 +1984,6 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
       <button class="cat-tab-btn" data-cat="Promoted" onclick="switchPropCategory('Promoted')">
         <i class="fas fa-star"></i><span class="cat-tab-btn-label">Promoted</span><span class="cat-count" id="cat-count-Promoted">—</span>
       </button>
-      <button class="cat-tab-btn" data-cat="Booked" onclick="switchPropCategory('Booked')">
-        <i class="fas fa-lock"></i><span class="cat-tab-btn-label">Booked</span><span class="cat-count" id="cat-count-Booked">—</span>
-      </button>
       <button class="cat-tab-btn active" data-cat="Rent" onclick="switchPropCategory('Rent')">
         <i class="fas fa-key"></i><span class="cat-tab-btn-label">Rent</span><span class="cat-count" id="cat-count-Rent">—</span>
       </button>
@@ -1993,46 +1993,48 @@ table.dataTable thead .sorting_desc{background-image:none!important;padding-righ
       <button class="cat-tab-btn" data-cat="PG" onclick="switchPropCategory('PG')">
         <i class="fas fa-bed"></i><span class="cat-tab-btn-label">PG</span><span class="cat-count" id="cat-count-PG">—</span>
       </button>
+      <button class="cat-tab-btn" data-cat="Booked" onclick="switchPropCategory('Booked')">
+        <i class="fas fa-lock"></i><span class="cat-tab-btn-label">Booked</span><span class="cat-count" id="cat-count-Booked">—</span>
+      </button>
       <button class="cat-tab-btn" data-cat="Short Stay" onclick="switchPropCategory('Short Stay')" style="display:none">
         <i class="fas fa-suitcase-rolling"></i><span class="cat-tab-btn-label">Short Stay</span><span class="cat-count" id="cat-count-Short-Stay">—</span>
       </button>
     </div>
+    <!-- Toolbar: PDF export + selection controls + column toggle, all in one row.
+         Kept outside .card so it floats as its own pill, not embedded in the
+         table's white card. -->
+    <div class="bulk-toolbar bulk-toolbar-spaced" id="bulkToolbar">
+      <div class="bulk-toolbar-left">
+        <span class="filter-active-badge" id="propFilterBadge" style="display:none">
+          <i class="fas fa-filter"></i> <span id="propFilterCount">0</span><span class="bulk-btn-label"> filters active</span>
+        </span>
+        <button class="bulk-btn bulk-btn-clear" id="propClearFiltersBtn" style="display:none" onclick="clearPropFilters()" title="Clear all filters">
+          <i class="fas fa-filter-circle-xmark"></i> <span class="bulk-btn-label">Clear filters</span>
+        </button>
+        <span class="bulk-selected-count" id="bulkSelectedCount" style="display:none">
+          <i class="fas fa-check-circle"></i> <span id="bulkSelectedNum">0</span><span class="bulk-btn-label"> selected</span>
+        </span>
+        <button class="bulk-btn bulk-btn-clear" id="bulkClearBtn" style="display:none" onclick="clearPropSelection()" title="Clear selection">
+          <i class="fas fa-xmark"></i> <span class="bulk-btn-label">Clear selection</span>
+        </button>
+      </div>
+      <div class="bulk-toolbar-right">
+        <button class="bulk-btn bulk-btn-danger" id="bulkDeleteSelectedBtn" style="display:none" onclick="deleteSelectedProperties()" title="Delete selected">
+          <i class="fas fa-trash-alt"></i> <span class="bulk-btn-label">Delete Selected&nbsp;</span>(<span id="bulkDeleteCount">0</span>)
+        </button>
+        <button class="bulk-btn bulk-btn-outline-danger" id="resetAllViewsBtn" onclick="resetAllViews()" title="Reset every listing's view count to 0">
+          <i class="fas fa-rotate-left"></i> <span class="bulk-btn-label">Reset All Views</span>
+        </button>
+        <div class="col-toggle-wrap" id="propColToggleWrap">
+          <button type="button" class="col-toggle-btn" id="propColToggleBtn" onclick="togglePropColMenu()">
+            <i class="fas fa-table-columns"></i> <span class="bulk-btn-label">Columns</span>
+          </button>
+          <div class="col-toggle-menu" id="propColToggleMenu"></div>
+        </div>
+      </div>
+    </div>
     <div class="card">
       <div class="table-wrapper">
-        <!-- Toolbar: PDF export + selection controls + column toggle, all in one row -->
-        <div class="bulk-toolbar bulk-toolbar-spaced" id="bulkToolbar">
-          <div class="bulk-toolbar-left">
-            <span class="filter-active-badge" id="propFilterBadge" style="display:none">
-              <i class="fas fa-filter"></i> <span id="propFilterCount">0</span><span class="bulk-btn-label"> filters active</span>
-            </span>
-            <button class="bulk-btn bulk-btn-clear" id="propClearFiltersBtn" style="display:none" onclick="clearPropFilters()" title="Clear all filters">
-              <i class="fas fa-filter-circle-xmark"></i> <span class="bulk-btn-label">Clear filters</span>
-            </button>
-            <span class="bulk-selected-count" id="bulkSelectedCount" style="display:none">
-              <i class="fas fa-check-circle"></i> <span id="bulkSelectedNum">0</span><span class="bulk-btn-label"> selected</span>
-            </span>
-            <button class="bulk-btn bulk-btn-clear" id="bulkClearBtn" style="display:none" onclick="clearPropSelection()" title="Clear selection">
-              <i class="fas fa-xmark"></i> <span class="bulk-btn-label">Clear selection</span>
-            </button>
-          </div>
-          <div class="bulk-toolbar-right">
-            <button class="bulk-btn bulk-btn-danger" id="bulkDeleteSelectedBtn" style="display:none" onclick="deleteSelectedProperties()" title="Delete selected">
-              <i class="fas fa-trash-alt"></i> <span class="bulk-btn-label">Delete Selected&nbsp;</span>(<span id="bulkDeleteCount">0</span>)
-            </button>
-            <button class="bulk-btn bulk-btn-outline-danger" id="resetAllViewsBtn" onclick="resetAllViews()" title="Reset every listing's view count to 0">
-              <i class="fas fa-rotate-left"></i> <span class="bulk-btn-label">Reset All Views</span>
-            </button>
-            <button class="bulk-btn bulk-btn-outline-danger" id="deleteAllPropertiesBtn" disabled title="Temporarily disabled">
-              <i class="fas fa-triangle-exclamation"></i> <span class="bulk-btn-label">Delete All Properties</span>
-            </button>
-            <div class="col-toggle-wrap" id="propColToggleWrap">
-              <button type="button" class="col-toggle-btn" id="propColToggleBtn" onclick="togglePropColMenu()">
-                <i class="fas fa-table-columns"></i> <span class="bulk-btn-label">Columns</span>
-              </button>
-              <div class="col-toggle-menu" id="propColToggleMenu"></div>
-            </div>
-          </div>
-        </div>
         <table id="propertyTable" class="display nowrap" style="width:100%">
           <thead>
             <tr>
@@ -2998,6 +3000,69 @@ async function doLogin(){
   }
   btn.disabled = false; btn.textContent = 'Sign In';
 }
+
+// Line the main tab bar (row 1) up with the Properties category bar (row 2)
+// into clean shared columns — item 1 of row 2 sits directly under item 1 of
+// row 1, item 2 under item 2, and so on (e.g. Visits/All, Customers/Promoted).
+// Row 3 (the PDF/Reset/Delete/Columns toolbar) stays on its own normal layout.
+function alignThreeRowsAsColumns(){
+  var tabBar = document.querySelector('.tab-bar');
+  var catBar = document.getElementById('propCatTabs');
+  if(!tabBar || !catBar) return;
+
+  function visibleChildren(bar){
+    var result = [];
+    Array.from(bar.children).forEach(function(el){
+      var disp = getComputedStyle(el).display;
+      if(disp === 'contents'){
+        result = result.concat(visibleChildren(el));
+      } else if(disp !== 'none'){
+        result.push(el);
+      }
+    });
+    return result;
+  }
+
+  // Measure natural widths first (temporarily back to plain flex sizing).
+  [tabBar, catBar].forEach(function(bar){
+    bar.style.display = 'flex';
+    bar.style.gridTemplateColumns = '';
+    bar.style.width = 'fit-content';
+  });
+
+  var rows = [visibleChildren(tabBar), visibleChildren(catBar)];
+  var maxCols = Math.max.apply(null, rows.map(function(r){ return r.length; }));
+  if(maxCols === 0) return;
+
+  var colWidths = [];
+  for(var i = 0; i < maxCols; i++){
+    var w = 0;
+    rows.forEach(function(r){
+      if(r[i]) w = Math.max(w, Math.ceil(r[i].getBoundingClientRect().width));
+    });
+    colWidths.push(w);
+  }
+
+  var gapPx = 6;
+  var template = colWidths.map(function(w){ return w + 'px'; }).join(' ');
+  var totalWidth = colWidths.reduce(function(a,b){ return a+b; }, 0)
+    + gapPx * (colWidths.length - 1) + 12; // +12 for the bar's own 6px padding on each side
+
+  [tabBar, catBar].forEach(function(bar){
+    bar.style.display = 'grid';
+    bar.style.gridTemplateColumns = template;
+    bar.style.columnGap = gapPx + 'px';
+    bar.style.rowGap = gapPx + 'px';
+    bar.style.justifyItems = 'start';
+    bar.style.width = totalWidth + 'px';
+  });
+}
+window.addEventListener('load', function(){ setTimeout(alignThreeRowsAsColumns, 60); });
+window.addEventListener('resize', function(){
+  clearTimeout(window.__alignRowsTimer);
+  window.__alignRowsTimer = setTimeout(alignThreeRowsAsColumns, 150);
+});
+setTimeout(alignThreeRowsAsColumns, 400); // catch late webfont reflow
 
 function doLogout(){
   sessionStorage.removeItem('kr_admin_key');
@@ -4956,12 +5021,12 @@ $(document).ready(function(){
   // ".top-controls" instead (a plain sibling div, never cloned by scrollX,
   // and guaranteed to be a single element as a direct child of the wrapper).
   var $topControls = $('#propertyTable_wrapper > .top-controls');
-  $('#bulkToolbar').insertBefore($topControls);
   $topControls.find('.dt-buttons').prependTo('#bulkToolbar .bulk-toolbar-left');
   $topControls.remove();
   loadPropColVisibility();
   applyPropCategoryColumnVisibility(_propCategoryState);
   buildPropColumnToggle();
+  setTimeout(alignThreeRowsAsColumns, 50);
   propTable.on('column-visibility.dt', function(e, settings, column, state){
     syncPropColToggleCheckbox(column, state);
   });
