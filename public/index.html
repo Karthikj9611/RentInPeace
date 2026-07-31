@@ -1444,7 +1444,7 @@ ul{list-style:none}
 
 /* ─── FAB ──────────────────────────────────────── */
 .fab{
-  position:fixed;bottom:162px;right:24px;z-index:150;
+  position:fixed;bottom:24px;right:24px;z-index:150;
   width:36px;height:36px;border-radius:50%;
   background:var(--brand);color:#fff;
   display:flex;align-items:center;justify-content:center;
@@ -1747,7 +1747,7 @@ ul{list-style:none}
 }
 
 /* ─── Reviews Section (masonry grid redesign) ──── */
-.reviews-section{padding:28px 20px 32px;background:var(--bg-2);border-top:1px solid var(--border)}
+.reviews-section{padding:28px 20px 96px;background:var(--bg-2);border-top:1px solid var(--border)}
 .reviews-body{width:100%;margin:0;display:grid;grid-template-columns:1fr 1fr;align-items:stretch;gap:28px}
 .reviews-left{min-width:0;height:100%;display:flex;flex-direction:column;align-items:center;text-align:center}
 .reviews-right{min-width:0;height:100%;display:flex;flex-direction:column;align-items:center}
@@ -1877,7 +1877,7 @@ ul{list-style:none}
   .reviews-right{width:100%;height:auto}
 }
 @media (max-width:680px){
-  .reviews-section{padding:14px 12px 20px}
+  .reviews-section{padding:14px 12px calc(56px + env(safe-area-inset-bottom) + 76px)}
   .reviews-head{margin:0 0 10px}
   .reviews-title{font-size:17px}
   .reviews-overview{margin:10px 0 0}
@@ -3952,6 +3952,11 @@ ul{list-style:none}
   </div>
 </section>
 
+<!-- ─── FAB: Add listing ────────────────────────── -->
+<button class="fab" id="fabAdd" onclick="openFabPicker()" aria-label="Add a listing" title="List your property">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+</button>
+
 <!-- ─── Service Request Modal ───────────────────── -->
 <div class="add-modal-overlay" id="serviceModal" role="dialog" aria-modal="true" aria-label="Request a service">
   <div class="add-modal" id="serviceModalBox" style="max-width:440px">
@@ -3996,11 +4001,6 @@ ul{list-style:none}
     <iframe id="rentReceiptFrame" title="Rent Receipt Generator" style="flex:1;width:100%;border:0;background:#fff"></iframe>
   </div>
 </div>
-
-<!-- ─── FAB: Add listing ────────────────────────── -->
-<button class="fab" id="fabAdd" onclick="openFabPicker()" aria-label="Add a listing" title="List your property">
-  <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-</button>
 
 <!-- ─── Add-type picker: choose which kind of listing to create ─── -->
 <div class="fab-picker-backdrop" id="fabPickerBackdrop" onclick="closeFabPicker()"></div>
