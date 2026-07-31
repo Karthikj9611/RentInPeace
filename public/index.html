@@ -1748,14 +1748,27 @@ ul{list-style:none}
 
 /* ─── Reviews Section (masonry grid redesign) ──── */
 .reviews-section{padding:28px 20px 96px;background:var(--bg-2);border-top:1px solid var(--border)}
-.reviews-body{width:100%;margin:0;display:grid;grid-template-columns:1fr 1fr;align-items:stretch;gap:28px}
-.reviews-left{min-width:0;height:100%;display:flex;flex-direction:column;align-items:center;text-align:center}
-.reviews-right{min-width:0;height:100%;display:flex;flex-direction:column;align-items:center}
-.reviews-head{width:100%;margin:0 0 16px}
+.reviews-body{width:100%;margin:0;display:grid;grid-template-columns:1fr 1fr;align-items:stretch;gap:16px}
+.reviews-left{min-width:0;display:flex;flex-direction:column;align-items:center;text-align:center}
+.reviews-right{min-width:0;display:flex;flex-direction:column;align-items:center}
+.reviews-head{width:100%;margin:0 0 16px;text-align:center}
 .reviews-title{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.4px;text-align:center}
+.reviews-title-clickable{
+  cursor:pointer;display:inline-flex;align-items:center;gap:8px;
+  padding:9px 20px 9px 16px;border-radius:999px;
+  background:linear-gradient(135deg,var(--brand-light),var(--bg));
+  border:1px solid var(--brand-light);
+  box-shadow:0 2px 10px rgba(224,58,82,.12);
+  transition:transform .15s,box-shadow .15s;
+}
+.reviews-title-clickable:hover,.reviews-title-clickable:focus-visible{
+  transform:translateY(-1px);box-shadow:0 4px 16px rgba(224,58,82,.22);
+}
+.reviews-title-clickable:active{transform:translateY(0)}
+.reviews-title-icon{width:15px;height:15px;stroke:var(--brand);fill:none;stroke-width:2.4;flex-shrink:0}
 .reviews-title span{color:var(--brand)}
 .reviews-overview{
-  display:flex;align-items:stretch;gap:0;margin:16px 0 0;
+  display:flex;align-items:stretch;gap:0;margin:0;height:100%;box-sizing:border-box;
   background:var(--bg);border:1px solid var(--border);border-radius:18px;
   overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.04);width:100%;flex:1;
 }
@@ -1774,21 +1787,6 @@ ul{list-style:none}
 .reviews-bar-fill{height:100%;background:#f5a623;border-radius:99px;transition:width .4s ease}
 .reviews-bar-row span:last-child{flex:0 0 26px;text-align:right;color:var(--text-3)}
 
-.review-form-card{
-  margin:12px 0 0;padding:14px 16px;width:100%;
-  border:1px solid var(--border);border-radius:18px;background:var(--bg-1);
-  box-shadow:0 2px 14px rgba(0,0,0,.04);
-  transition:box-shadow .2s;
-}
-.review-form-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.06)}
-.review-form-logged-out{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
-.review-form-logged-out p{font-size:13.5px;color:var(--text-2);margin:0}
-.review-login-btn{
-  background:var(--brand);color:#fff;border:none;border-radius:10px;
-  padding:10px 18px;font-size:13.5px;font-weight:700;cursor:pointer;white-space:nowrap;
-  transition:transform .12s,box-shadow .12s;
-}
-.review-login-btn:hover{background:var(--brand-hover);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
 .review-form-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
 .review-form-label{font-size:13px;font-weight:700;color:var(--text-2)}
 .review-stars-input{display:flex;gap:4px;font-size:26px;cursor:pointer;line-height:1}
@@ -1809,25 +1807,15 @@ ul{list-style:none}
 }
 .review-submit-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
 .review-submit-btn:not(:disabled):hover{background:var(--brand-hover);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.12)}
-.review-form-done{display:flex;align-items:flex-start;gap:14px;padding:2px 2px}
-.review-form-done-icon{
-  width:40px;height:40px;border-radius:50%;flex-shrink:0;
-  background:linear-gradient(135deg,var(--brand),var(--brand-hover));
-  color:#fff;font-size:18px;font-weight:800;display:flex;align-items:center;justify-content:center;
-  box-shadow:0 4px 12px rgba(0,0,0,.12);
-  margin-top:2px;
-}
-.review-form-done-text{padding-top:1px}
-.review-form-done-title{font-size:14.5px;font-weight:700;color:var(--text);line-height:1.3}
-.review-form-done-sub{font-size:12.5px;color:var(--text-2);margin-top:3px;line-height:1.4}
 
 /* Horizontal auto-sliding row — cards are fixed-width so the container can
    be smoothly scrolled by JS every 2s (see _autoSlideReviews), bouncing
    forward to the last review then back to the first, on a loop. */
 .reviews-list{
-  margin:0;width:100%;flex:1;
+  margin:0;width:100%;flex:1;height:100%;
   display:flex;flex-direction:column;gap:12px;
-  padding:4px 4px 8px;-ms-overflow-style:none;scrollbar-width:none;
+  padding:0 4px 8px;-ms-overflow-style:none;scrollbar-width:none;
+  box-sizing:border-box;
 }
 .reviews-list::-webkit-scrollbar{display:none}
 .reviews-loading,.reviews-empty{
@@ -1835,14 +1823,11 @@ ul{list-style:none}
 }
 .review-card{
   flex:1 0 auto;width:100%;display:none;
-  border:1px solid var(--border);border-radius:16px;padding:12px 14px;background:var(--bg-1);
-  box-shadow:0 1px 8px rgba(0,0,0,.03);transition:box-shadow .15s,transform .15s;
-  border-left:3px solid var(--rc-accent,var(--brand));
+  border:1px solid var(--border);border-radius:18px;padding:14px;background:var(--bg);
+  box-shadow:0 2px 14px rgba(0,0,0,.04);
 }
 .review-card.active{display:flex;flex-direction:column;animation:reviewCardIn .4s ease;}
 @keyframes reviewCardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.review-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.06);transform:translateY(-2px)}
-.review-card-quote{font-size:30px;line-height:1;color:var(--brand-light);font-weight:800;font-family:Georgia,serif}
 .review-card-head{display:flex;align-items:center;gap:11px;margin:2px 0 8px}
 .review-avatar{
   width:36px;height:36px;border-radius:50%;
@@ -1885,8 +1870,6 @@ ul{list-style:none}
   .reviews-overview-score-num{font-size:20px}
   .reviews-overview-bars{padding:8px 10px;gap:2px}
   .reviews-bar-row{font-size:10px}
-  .review-form-logged-out{flex-direction:column;align-items:center;text-align:center}
-  .review-form-done{flex-direction:column;align-items:flex-start;text-align:left}
 }
 
 /* ─── Premium Services Section ─────────────────── */
@@ -3893,7 +3876,7 @@ ul{list-style:none}
 <!-- ─── Reviews Section ─────────────────────────── -->
 <section class="reviews-section" aria-label="User reviews">
   <div class="reviews-head">
-    <div class="reviews-title">Add a <span>Review</span></div>
+    <div class="reviews-title" id="reviewsTitle">Add a <span>Review</span></div>
   </div>
   <div class="reviews-body">
     <div class="reviews-left">
@@ -3912,35 +3895,6 @@ ul{list-style:none}
         </div>
       </div>
 
-      <div class="review-form-card" id="reviewFormCard">
-        <div class="review-form-logged-out" id="reviewFormLoggedOut">
-          <button class="review-login-btn" onclick="openAuthModal()">Log in to write a review</button>
-        </div>
-        <div class="review-form-logged-in" id="reviewFormLoggedIn" style="display:none">
-          <div class="review-form-row">
-            <span class="review-form-label">Your rating</span>
-            <div class="review-stars-input" id="reviewStarsInput" role="radiogroup" aria-label="Rating">
-              <span class="review-star-btn" data-val="1" onclick="setReviewRating(1)">★</span>
-              <span class="review-star-btn" data-val="2" onclick="setReviewRating(2)">★</span>
-              <span class="review-star-btn" data-val="3" onclick="setReviewRating(3)">★</span>
-              <span class="review-star-btn" data-val="4" onclick="setReviewRating(4)">★</span>
-              <span class="review-star-btn" data-val="5" onclick="setReviewRating(5)">★</span>
-            </div>
-          </div>
-          <textarea class="review-form-textarea" id="reviewText" rows="3" maxlength="500"></textarea>
-          <div class="review-form-actions">
-            <span class="review-form-charcount" id="reviewCharCount">0 / 500</span>
-            <button class="review-submit-btn" id="reviewSubmitBtn" onclick="submitReview()">Post review</button>
-          </div>
-        </div>
-        <div class="review-form-done" id="reviewFormDone" style="display:none">
-          <div class="review-form-done-icon">✓</div>
-          <div class="review-form-done-text">
-            <div class="review-form-done-title">Thanks for your feedback!</div>
-            <div class="review-form-done-sub">You've already shared your review with the community.</div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <div class="reviews-right">
@@ -4261,10 +4215,33 @@ ul{list-style:none}
   </div>
 </div>
 
-<!-- Honest Reviews "Manage" modal removed for now — the admin API routes
-     (/api/honest-reviews/all, POST, PUT, DELETE, and status approve/reject)
-     are still in server.js and ready to wire up to a proper admin panel
-     later. -->
+<!-- ─── Write a Review Modal ───────────────────────────────────────── -->
+<div class="add-modal-overlay" id="reviewModal" role="dialog" aria-modal="true" aria-label="Write a review">
+  <div class="add-modal" style="max-width:440px">
+    <div class="add-modal-header">
+      <div class="add-modal-title">Write a Review</div>
+      <button class="icon-btn" onclick="closeReviewModal()" aria-label="Close">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="review-form-row">
+      <span class="review-form-label">Your rating</span>
+      <div class="review-stars-input" id="reviewStarsInput" role="radiogroup" aria-label="Rating">
+        <span class="review-star-btn" data-val="1" onclick="setReviewRating(1)">★</span>
+        <span class="review-star-btn" data-val="2" onclick="setReviewRating(2)">★</span>
+        <span class="review-star-btn" data-val="3" onclick="setReviewRating(3)">★</span>
+        <span class="review-star-btn" data-val="4" onclick="setReviewRating(4)">★</span>
+        <span class="review-star-btn" data-val="5" onclick="setReviewRating(5)">★</span>
+      </div>
+    </div>
+    <textarea class="review-form-textarea" id="reviewText" rows="4" maxlength="500" placeholder="Share your experience…"></textarea>
+    <div class="review-form-actions">
+      <span class="review-form-charcount" id="reviewCharCount">0 / 500</span>
+      <button class="review-submit-btn" id="reviewSubmitBtn" onclick="submitReview()">Post review</button>
+    </div>
+  </div>
+</div>
+
 
 <!-- ─── Add Listing Modal (List Your Property) ───────────────────────── -->
 <div class="add-modal-overlay" id="addModal" role="dialog" aria-modal="true" aria-label="Add property listing">
@@ -10780,44 +10757,65 @@ let reviewsPage = 1;
 const REVIEWS_PAGE_SIZE = 10;
 let reviewsTotalCount = 0;
 
+// Small pencil icon shown next to the title whenever it's clickable, so it
+// visibly reads as a button rather than plain text a user might not think
+// to tap.
+const REVIEWS_TITLE_ICON = '<svg class="reviews-title-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+
 async function initReviewForm() {
   const user = getLoggedInUser();
-  const card = document.getElementById('reviewFormCard');
-  const loggedOut = document.getElementById('reviewFormLoggedOut');
-  const loggedIn = document.getElementById('reviewFormLoggedIn');
-  const done = document.getElementById('reviewFormDone');
-  if (!card || !loggedOut || !loggedIn || !done) return;
+  const title = document.getElementById('reviewsTitle');
+  if (!title) return;
+
+  function setTitleAction(fn) {
+    if (fn) {
+      title.classList.add('reviews-title-clickable');
+      title.onclick = fn;
+      title.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fn(); } };
+      title.setAttribute('role', 'button');
+      title.setAttribute('tabindex', '0');
+    } else {
+      title.classList.remove('reviews-title-clickable');
+      title.onclick = null;
+      title.onkeydown = null;
+      title.removeAttribute('role');
+      title.removeAttribute('tabindex');
+    }
+  }
 
   if (!user) {
-    card.style.display = '';
-    loggedOut.style.display = '';
-    loggedIn.style.display = 'none';
-    done.style.display = 'none';
-    syncReviewsPanelHeights();
+    title.innerHTML = REVIEWS_TITLE_ICON + 'Login to write a <span>Review</span>';
+    setTitleAction(() => openAuthModal());
     return;
   }
 
-  card.style.display = '';
-  loggedOut.style.display = 'none';
-  // Default to showing the form while we check; hide the card entirely if
-  // they've already reviewed (the thank-you box is only shown right after
-  // an active submit, not on every subsequent visit).
-  loggedIn.style.display = '';
-  done.style.display = 'none';
+  title.innerHTML = REVIEWS_TITLE_ICON + 'Add a <span>Review</span>';
+  // Default to clickable while we check; if they've already reviewed,
+  // drop back to a plain (non-clickable) heading below.
+  setTitleAction(() => openReviewModal());
 
   try {
     const res = await fetch('/api/reviews/mine', { headers: userAuthHeaders() });
     if (res.ok) {
       const data = await res.json();
       if (data.hasReviewed) {
-        card.style.display = 'none';
+        title.innerHTML = 'Add a <span>Review</span>';
+        setTitleAction(null);
       }
     }
   } catch (err) {
-    // If the check fails, leave the form visible — worst case the user
-    // hits the 409 on submit, which is still handled gracefully.
+    // If the check fails, leave it clickable — worst case they hit the
+    // 409 on submit, which is still handled gracefully.
   }
-  syncReviewsPanelHeights();
+}
+
+function openReviewModal() {
+  const user = getLoggedInUser();
+  if (!user) { openAuthModal(); return; }
+  document.getElementById('reviewModal').classList.add('open');
+}
+function closeReviewModal() {
+  document.getElementById('reviewModal').classList.remove('open');
 }
 
 function setReviewRating(val) {
@@ -10865,8 +10863,8 @@ async function submitReview() {
       const data = await res.json().catch(() => ({}));
       if (res.status === 409) {
         showToast(data.error || 'You have already posted a review');
-        document.getElementById('reviewFormLoggedIn').style.display = 'none';
-        document.getElementById('reviewFormDone').style.display = 'flex';
+        closeReviewModal();
+        initReviewForm();
         return;
       }
       throw new Error(data.error || ('Server returned ' + res.status));
@@ -10875,8 +10873,8 @@ async function submitReview() {
     document.getElementById('reviewCharCount').textContent = '0 / 500';
     setReviewRating(0);
     showToast('Thanks for your review!');
-    document.getElementById('reviewFormLoggedIn').style.display = 'none';
-    document.getElementById('reviewFormDone').style.display = 'flex';
+    closeReviewModal();
+    initReviewForm();
     reviewsPage = 1;
     loadReviews();
   } catch (err) {
@@ -10895,21 +10893,12 @@ function avatarColorFromName(name) {
   return `linear-gradient(135deg, hsl(${hue},70%,60%), hsl(${(hue+30)%360},70%,48%))`;
 }
 
-function reviewAccentColor(rating) {
-  // Warmer accent for higher ratings, cooler/neutral for lower ones.
-  if (rating >= 5) return '#2fa86a';
-  if (rating === 4) return '#7bb83f';
-  if (rating === 3) return '#f5a623';
-  if (rating === 2) return '#e0762f';
-  return '#e03a52';
-}
-
 function reviewCardHTML(rv) {
   const name = esc(rv.userName || 'HomeLoop user');
   const initial = (name[0] || 'U').toUpperCase();
   const photoUrl = rv.userPhoto || rv.profilePhoto || rv.avatar || '';
   const avatarInner = photoUrl
-    ? `<img src="${safeUrl(photoUrl)}" alt="${name}" onload="syncReviewsPanelHeights()"/>`
+    ? `<img src="${safeUrl(photoUrl)}" alt="${name}"/>`
     : initial;
   const avatarStyle = photoUrl ? '' : ` style="background:${avatarColorFromName(name)}"`;
 
@@ -10925,8 +10914,7 @@ function reviewCardHTML(rv) {
       ? `<span class="review-card-role-badge tenant">Tenant</span>`
       : '';
 
-  return `<div class="review-card" style="--rc-accent:${reviewAccentColor(rv.rating)}">
-    <div class="review-card-quote">"</div>
+  return `<div class="review-card">
     <div class="review-card-head">
       <div class="review-avatar"${avatarStyle}>${avatarInner}</div>
       <div class="review-card-meta">
@@ -11206,11 +11194,10 @@ function initReviewCarousel(){
   if (!list) return;
   const cards = Array.from(list.querySelectorAll('.review-card'));
   clearInterval(_reviewCarouselTimer);
-  if (!cards.length) { syncReviewsPanelHeights(); return; }
+  if (!cards.length) return;
 
   _reviewCarouselIndex = 0;
   cards.forEach((c, i) => c.classList.toggle('active', i === 0));
-  syncReviewsPanelHeights();
   if (cards.length <= 1) return;
 
   _reviewCarouselTimer = setInterval(() => {
@@ -11219,40 +11206,8 @@ function initReviewCarousel(){
     current[_reviewCarouselIndex]?.classList.remove('active');
     _reviewCarouselIndex = (_reviewCarouselIndex + 1) % current.length;
     current[_reviewCarouselIndex]?.classList.add('active');
-    syncReviewsPanelHeights();
   }, 10000);
 }
-
-/* Belt-and-suspenders height match: flex-stretch handles most cases, but
-   since the left column can hold one box (rating summary) or two (rating
-   summary + login/write-review card) while the right column always holds
-   exactly one visible review card, we also explicitly measure both sides
-   and pin them to whichever is taller. Cleared and re-measured any time
-   either side's content changes, and skipped once the layout stacks on
-   narrow screens (where matching heights doesn't make sense). */
-function syncReviewsPanelHeights(){
-  const left = document.querySelector('.reviews-left');
-  const right = document.querySelector('.reviews-right');
-  if (!left || !right) return;
-  left.style.minHeight = '';
-  right.style.minHeight = '';
-  requestAnimationFrame(() => {
-    if (window.innerWidth <= 900) return; // stacked layout — no side-by-side match needed
-    const h = Math.max(left.offsetHeight, right.offsetHeight);
-    left.style.minHeight = h + 'px';
-    right.style.minHeight = h + 'px';
-  });
-}
-window.addEventListener('resize', () => {
-  clearTimeout(window._reviewsResizeT);
-  window._reviewsResizeT = setTimeout(syncReviewsPanelHeights, 150);
-});
-// Avatar photos load asynchronously and can grow a card slightly once they
-// arrive, so re-check once everything (including images) has fully loaded,
-// plus a couple of short delayed retries to catch any late layout shift.
-window.addEventListener('load', syncReviewsPanelHeights);
-setTimeout(syncReviewsPanelHeights, 400);
-setTimeout(syncReviewsPanelHeights, 1200);
 
 document.addEventListener('click', function(e) {
   const dd = document.getElementById('amDropdown');
@@ -11954,6 +11909,9 @@ document.getElementById('helpModal').addEventListener('click', function(e) {
 });
 document.getElementById('aboutModal').addEventListener('click', function(e) {
   if (e.target === this) closeAboutModal();
+});
+document.getElementById('reviewModal').addEventListener('click', function(e) {
+  if (e.target === this) closeReviewModal();
 });
 
 /* ═══════════════════════════════════════════════
