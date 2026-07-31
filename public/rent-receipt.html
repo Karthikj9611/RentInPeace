@@ -44,10 +44,12 @@
     background:var(--canvas);
     -webkit-font-smoothing:antialiased;
   }
+  html, body{height:100%}
   .wrap{
     display:grid;
     grid-template-columns:380px 1fr;
-    min-height:100vh;
+    height:100vh;
+    overflow:hidden;
   }
 
   /* ============ FORM PANEL ============ */
@@ -139,12 +141,12 @@
     margin-left:4px;
   }
   .field label .req{color:var(--brand);font-weight:700}
-  .inline-check{
+  .field label.inline-check{
     display:flex;align-items:center;gap:6px;
     font-size:11.5px;font-weight:500;color:var(--ink-3);
     margin-top:7px;cursor:pointer;
   }
-  .inline-check input{width:13px;height:13px;margin:0;accent-color:var(--brand);cursor:pointer}
+  .field .inline-check input{width:13px;height:13px;margin:0;accent-color:var(--brand);cursor:pointer}
   .field input,
   .field select{
     width:100%;
@@ -173,7 +175,38 @@
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239aa1ac' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
     background-repeat:no-repeat; background-position:right 12px center; padding-right:30px;
   }
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .row2{display:grid;grid-template-columns:1fr;gap:10px}
+  .field textarea{
+    width:100%;
+    padding:10px 12px;
+    font-size:13px;
+    font-family:inherit;
+    border:1px solid var(--line-2);
+    border-radius:9px;
+    background:var(--tint);
+    color:var(--ink);
+    resize:vertical;
+    min-height:64px;
+    line-height:1.45;
+    transition:border-color .12s, box-shadow .12s, background .12s;
+  }
+  .field textarea::placeholder{color:#b0b5bd}
+  .field textarea:hover{border-color:#c4c9d1}
+  .field textarea:focus{
+    outline:none;
+    background:var(--paper);
+    border-color:var(--brand);
+    box-shadow:0 0 0 3px rgba(224,58,82,.10);
+  }
+  .field textarea:read-only{cursor:not-allowed;color:var(--ink-2)}
+  .field textarea:read-only:focus{box-shadow:none;border-color:var(--line-2);background:var(--tint)}
+  .phone-wrap{position:relative}
+  .phone-wrap input{padding-left:38px}
+  .phone-wrap .cc{
+    position:absolute;left:12px;top:50%;transform:translateY(-50%);
+    font-size:13px;color:var(--ink-3);
+    pointer-events:none;
+  }
   .amt-wrap{position:relative}
   .amt-wrap input{padding-left:25px}
   .amt-wrap .cur{
@@ -208,13 +241,14 @@
   .multi-fields.show{display:grid}
 
   .download-bar{
-    position:sticky;bottom:-1px;
+    position:fixed;bottom:0;left:0;width:380px;
     background:rgba(255,255,255,.92);
     backdrop-filter:blur(10px);
     -webkit-backdrop-filter:blur(10px);
     border-top:1px solid var(--line);
+    border-right:1px solid var(--line);
     padding:16px 24px;
-    margin:20px -24px -110px;
+    z-index:20;
   }
   .total-preview{
     display:flex;justify-content:space-between;align-items:baseline;
@@ -226,11 +260,12 @@
     text-transform:none;letter-spacing:0;
   }
   .btn-download{
-    width:100%;
+    flex:1;height:46px;
     background:var(--ink);
     color:#fff;border:none;border-radius:10px;
-    padding:13.5px;font-size:13.5px;font-weight:700;font-family:'Sora',sans-serif;
-    cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+    font-size:12px;font-weight:700;font-family:'Sora',sans-serif;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
     transition:background .15s, transform .1s, box-shadow .15s;
     box-shadow:0 2px 10px rgba(18,21,28,.16);
   }
@@ -238,26 +273,29 @@
   .btn-download:active{transform:scale(.99)}
   .btn-download:disabled{background:var(--ink-3);cursor:not-allowed;box-shadow:none}
   .btn-clear{
+    flex:1;height:46px;
     background:var(--tint);
     color:var(--ink-2);
     border:1px solid var(--line-2);
     border-radius:10px;
-    width:46px;
-    font-size:16px;
+    font-size:12px;font-weight:700;font-family:'Sora',sans-serif;
+    white-space:nowrap;
     cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:6px;
     transition:background .15s, color .15s, border-color .15s;
   }
   .btn-clear:hover{background:var(--brand-light);color:var(--brand);border-color:var(--brand)}
   .btn-whatsapp{
+    flex:1;height:46px;
     background:#25D366;
     color:#fff;border:none;border-radius:10px;
-    width:46px;
-    font-size:16px;
+    font-size:12px;font-weight:700;font-family:'Sora',sans-serif;
+    white-space:nowrap;
     cursor:pointer;
-    display:flex;align-items:center;justify-content:center;
+    display:flex;align-items:center;justify-content:center;gap:6px;
     transition:background .15s, transform .1s;
   }
-  .btn-whatsapp svg{width:19px;height:19px}
+  .btn-whatsapp svg{width:16px;height:16px}
   .btn-whatsapp:hover{background:#1ebe5a}
   .btn-whatsapp:active{transform:scale(.96)}
   .btn-whatsapp:disabled{background:var(--ink-3);cursor:not-allowed}
@@ -320,17 +358,19 @@
     display:flex;flex-direction:column;align-items:center;
   }
   .count-label{
-    width:100%;max-width:600px;
+    width:100%;max-width:794px;
     font-size:12px;color:var(--ink-3);margin-bottom:16px;
     display:flex;align-items:center;gap:6px;
+    flex-shrink:0;
   }
   .sheet{
-    width:100%;max-width:600px;
+    width:100%;max-width:794px;
     background:var(--paper);
     border-radius:14px;
     box-shadow:var(--shadow-lg);
     overflow:hidden;
     margin-bottom:24px;
+    flex-shrink:0;
   }
   .sheet:last-child{margin-bottom:0}
 
@@ -361,6 +401,7 @@
   .r-parties .party-box{
     border-radius:10px;padding:13px 15px;
     border-left:3px solid transparent;
+    min-width:0;
   }
   .r-parties .party-box.from{background:var(--blue-bg);border-left-color:var(--blue)}
   .r-parties .party-box.by{background:var(--amber-bg);border-left-color:var(--amber)}
@@ -368,8 +409,8 @@
     font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
     color:var(--ink-3);margin-bottom:6px;
   }
-  .r-parties .party-name{font-size:14px;font-weight:700;margin-bottom:2px}
-  .r-parties .party-detail{font-size:12px;color:var(--ink-2);line-height:1.55}
+  .r-parties .party-name{font-size:14px;font-weight:700;margin-bottom:2px;overflow-wrap:break-word}
+  .r-parties .party-detail{font-size:12px;color:var(--ink-2);line-height:1.55;overflow-wrap:break-word;word-break:break-word}
 
   .r-items{margin-bottom:0}
   .r-items table{width:100%;border-collapse:collapse}
@@ -413,15 +454,18 @@
   .sign-line .line{width:170px;border-top:1.5px solid var(--ink);margin-bottom:7px}
 
   .r-foot{
-    margin-top:20px;padding-top:12px;border-top:1px solid var(--line);
-    font-size:10px;color:var(--ink-3);text-align:center;letter-spacing:.02em;
+    margin-top:20px;padding-top:14px;border-top:1px solid var(--line);
+    font-size:10px;color:var(--ink-3);text-align:center;letter-spacing:.03em;
   }
+  .r-foot b{color:var(--ink-2);font-weight:700}
 
   @media (max-width:860px){
-    .wrap{grid-template-columns:1fr}
-    .form-panel{border-right:none;border-bottom:1px solid var(--line)}
+    .wrap{grid-template-columns:1fr;height:auto;overflow:visible}
+    .form-panel{border-right:none;border-bottom:1px solid var(--line);overflow-y:visible}
+    .preview-panel{overflow-y:visible}
     .r-inner{padding:26px 22px}
     .r-parties{grid-template-columns:1fr}
+    .download-bar{width:100%;border-right:none}
   }
 </style>
 </head>
@@ -442,8 +486,11 @@
       </div>
       <div class="row2">
         <div class="field">
-          <label>Tenant mobile</label>
-          <input id="tenantMobile" type="tel" />
+          <label>Tenant mobile <span class="req">*</span></label>
+          <div class="phone-wrap">
+            <span class="cc">+91</span>
+            <input id="tenantMobile" type="tel" inputmode="numeric" maxlength="10" required />
+          </div>
         </div>
         <div class="field">
           <label>Tenant email</label>
@@ -456,8 +503,11 @@
       </div>
       <div class="row2">
         <div class="field">
-          <label>Landlord mobile</label>
-          <input id="landlordMobile" type="tel" />
+          <label>Landlord mobile <span class="req">*</span></label>
+          <div class="phone-wrap">
+            <span class="cc">+91</span>
+            <input id="landlordMobile" type="tel" inputmode="numeric" maxlength="10" required />
+          </div>
         </div>
         <div class="field">
           <label>Landlord email</label>
@@ -465,8 +515,12 @@
         </div>
       </div>
       <div class="field">
+        <label>Landlord's building name</label>
+        <input id="landlordBuildingName" />
+      </div>
+      <div class="field">
         <label>Landlord address</label>
-        <input id="landlordAddress" />
+        <textarea id="landlordAddress" rows="3"></textarea>
       </div>
       <div class="field">
         <label>Landlord PAN <span class="hint">(needed for HRA &gt; ₹1L/yr)</span></label>
@@ -482,7 +536,7 @@
       </div>
       <div class="field">
         <label>Rented property address</label>
-        <input id="propertyAddress" />
+        <textarea id="propertyAddress" rows="3"></textarea>
         <label class="inline-check">
           <input type="checkbox" id="sameAsLandlordAddress" />
           Same as landlord address
@@ -586,11 +640,15 @@
 
       <div class="row2 multi-fields" id="multiFields">
         <div class="field">
-          <label>First period starts <span class="req">*</span></label>
-          <input id="startDate" type="date" />
+          <label>First period from <span class="req">*</span></label>
+          <input id="multiFrom" type="date" />
         </div>
         <div class="field">
-          <label>No. of months</label>
+          <label>First period to <span class="req">*</span></label>
+          <input id="multiTo" type="date" />
+        </div>
+        <div class="field">
+          <label>No. of periods</label>
           <input id="monthsCount" type="number" min="1" max="24" value="12" />
         </div>
       </div>
@@ -598,10 +656,6 @@
       <div class="field">
         <label>Date of payment</label>
         <input id="paymentDate" type="date" />
-      </div>
-      <div class="field">
-        <label>Place</label>
-        <input id="place" />
       </div>
 
     </div>
@@ -612,9 +666,9 @@
         <b id="totalPreview">₹0</b>
       </div>
       <div style="display:flex;gap:8px">
-        <button class="btn-download" id="downloadBtn" style="flex:1">⬇ Download PDF</button>
-        <button class="btn-whatsapp" id="whatsappBtn" title="Share PDF on WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.15-1.7-.85-2-.95-.27-.1-.46-.15-.66.15-.2.3-.75.95-.92 1.15-.17.2-.34.22-.63.07-.3-.15-1.24-.46-2.36-1.46-.87-.78-1.46-1.74-1.63-2.03-.17-.3-.02-.46.13-.6.13-.13.3-.34.44-.5.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.66-1.6-.91-2.18-.24-.58-.48-.5-.66-.5-.17-.01-.37-.01-.56-.01-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.06 2.87 1.21 3.07.15.2 2.09 3.2 5.08 4.48.71.31 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.08 1.7-.7 1.94-1.36.24-.67.24-1.24.17-1.36-.07-.12-.26-.2-.56-.35Z"/><path d="M12 2C6.48 2 2 6.48 2 12c0 1.86.5 3.6 1.38 5.1L2 22l5.05-1.35C8.5 21.5 10.2 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2Zm0 18.15c-1.6 0-3.1-.44-4.4-1.2l-.32-.19-3 .8.8-2.93-.2-.32A8.14 8.14 0 0 1 3.85 12c0-4.5 3.66-8.15 8.15-8.15S20.15 7.5 20.15 12 16.5 20.15 12 20.15Z"/></svg></button>
-        <button class="btn-clear" id="clearBtn" title="Clear all fields">🗑</button>
+        <button class="btn-download" id="downloadBtn">⬇ Download</button>
+        <button class="btn-whatsapp" id="whatsappBtn" title="Share PDF on WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.15-1.7-.85-2-.95-.27-.1-.46-.15-.66.15-.2.3-.75.95-.92 1.15-.17.2-.34.22-.63.07-.3-.15-1.24-.46-2.36-1.46-.87-.78-1.46-1.74-1.63-2.03-.17-.3-.02-.46.13-.6.13-.13.3-.34.44-.5.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.66-1.6-.91-2.18-.24-.58-.48-.5-.66-.5-.17-.01-.37-.01-.56-.01-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.06 2.87 1.21 3.07.15.2 2.09 3.2 5.08 4.48.71.31 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.08 1.7-.7 1.94-1.36.24-.67.24-1.24.17-1.36-.07-.12-.26-.2-.56-.35Z"/><path d="M12 2C6.48 2 2 6.48 2 12c0 1.86.5 3.6 1.38 5.1L2 22l5.05-1.35C8.5 21.5 10.2 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2Zm0 18.15c-1.6 0-3.1-.44-4.4-1.2l-.32-.19-3 .8.8-2.93-.2-.32A8.14 8.14 0 0 1 3.85 12c0-4.5 3.66-8.15 8.15-8.15S20.15 7.5 20.15 12 16.5 20.15 12 20.15Z"/></svg>Share</button>
+        <button class="btn-clear" id="clearBtn" title="Clear all fields">🗑 Clear</button>
       </div>
       <div class="share-status" id="shareStatus"></div>
       <div class="err" id="errMsg">Fill in tenant name, landlord name, rent amount and rent period to enable download.</div>
@@ -678,6 +732,12 @@
     const d = new Date(dstr + 'T00:00:00');
     return d.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
   }
+  // format a Date object as yyyy-mm-dd using its LOCAL fields (never toISOString,
+  // which converts to UTC and silently rolls the date back a day in +ve timezones like IST)
+  function toISODateLocal(d){
+    const pad2 = n => String(n).padStart(2,'0');
+    return d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate());
+  }
   // add n months to a yyyy-mm-dd date string, keeping the day-of-month where possible
   function addMonthsToDate(dstr, n){
     const d = new Date(dstr + 'T00:00:00');
@@ -686,12 +746,12 @@
     d.setMonth(d.getMonth() + n);
     const lastDay = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
     d.setDate(Math.min(day, lastDay));
-    return d.toISOString().slice(0,10);
+    return toISODateLocal(d);
   }
   function addDays(dstr, n){
     const d = new Date(dstr + 'T00:00:00');
     d.setDate(d.getDate() + n);
-    return d.toISOString().slice(0,10);
+    return toISODateLocal(d);
   }
   function periodLabel(from, to){
     if(!from || !to) return '';
@@ -716,6 +776,7 @@
       landlordName: $('landlordName').value.trim(),
       landlordMobile: $('landlordMobile').value.trim(),
       landlordEmail: $('landlordEmail').value.trim(),
+      landlordBuildingName: $('landlordBuildingName').value.trim(),
       landlordAddress: $('landlordAddress').value.trim(),
       landlordPAN: $('landlordPAN').value.trim().toUpperCase(),
       propertyAddress: $('propertyAddress').value.trim(),
@@ -730,11 +791,11 @@
       otherChargeLabel: $('otherChargeLabel').value.trim() || 'Other charges',
       paymentMode: $('paymentMode').value,
       paymentDate: $('paymentDate').value,
-      place: $('place').value.trim(),
       isMulti: $('multiToggle').checked,
       periodFrom: $('periodFrom').value,
       periodTo: $('periodTo').value,
-      startDate: $('startDate').value,
+      multiFrom: $('multiFrom').value,
+      multiTo: $('multiTo').value,
       monthsCount: Math.min(24, Math.max(1, parseInt($('monthsCount').value) || 1))
     };
   }
@@ -788,7 +849,7 @@
             <div class="party-box by">
               <div class="party-label">🏢 Received By</div>
               <div class="party-name">${d.landlordName || '—'}</div>
-              <div class="party-detail"><br>${d.landlordAddress || '—'}${landlordContact ? '<br/>' + landlordContact : ''}${d.landlordPAN ? '<br/>🪪 ' + d.landlordPAN : ''}</div>
+              <div class="party-detail">${d.landlordBuildingName ? '<b>' + d.landlordBuildingName + '</b><br/>' : '<br>'}${d.landlordAddress || '—'}${landlordContact ? '<br/>' + landlordContact : ''}${d.landlordPAN ? '<br/>🪪 ' + d.landlordPAN : ''}</div>
             </div>
           </div>
 
@@ -812,7 +873,7 @@
               Signature of Landlord
             </div>
           </div>
-          ${d.place ? `<div class="r-foot">${d.place}</div>` : ''}
+          <div class="r-foot">This is a computer-generated receipt · Rent receipt generated by <b>HomeLoop</b></div>
         </div>
       </div>
     `;
@@ -823,15 +884,18 @@
       if(!d.periodFrom || !d.periodTo) return [];
       return [{from:d.periodFrom, to:d.periodTo}];
     }
-    if(!d.startDate) return [];
+    if(!d.multiFrom || !d.multiTo) return [];
     const arr = [];
-    for(let i=0;i<d.monthsCount;i++) arr.push(monthPeriod(addMonthsToDate(d.startDate, i)));
+    for(let i=0;i<d.monthsCount;i++){
+      arr.push({from: addMonthsToDate(d.multiFrom, i), to: addMonthsToDate(d.multiTo, i)});
+    }
     return arr;
   }
 
   function validate(d){
     if(!d.tenantName || !d.landlordName || !d.rentAmount) return false;
-    if(d.isMulti){ if(!d.startDate) return false; }
+    if(!/^\d{10}$/.test(d.tenantMobile) || !/^\d{10}$/.test(d.landlordMobile)) return false;
+    if(d.isMulti){ if(!d.multiFrom || !d.multiTo) return false; }
     else { if(!d.periodFrom || !d.periodTo) return false; }
     return true;
   }
@@ -1003,10 +1067,10 @@
   }
 
   const FIELD_IDS = ['tenantName','tenantMobile','tenantEmail','landlordName','landlordMobile',
-    'landlordEmail','landlordAddress','landlordPAN','buildingName','propertyAddress','rentAmount',
+    'landlordEmail','landlordBuildingName','landlordAddress','landlordPAN','buildingName','propertyAddress','rentAmount',
     'paymentMode','electricityCharge','waterCharge','sanitaryCharge','parkingCharge','maintenanceCharge',
-    'otherChargeAmount','otherChargeLabel','periodFrom','periodTo','startDate','monthsCount',
-    'paymentDate','place'];
+    'otherChargeAmount','otherChargeLabel','periodFrom','periodTo','multiFrom','multiTo','monthsCount',
+    'paymentDate'];
   const CHECKBOX_IDS = ['multiToggle','sameAsLandlordAddress'];
   const STORAGE_KEY = 'rentReceiptFormData_v1';
 
@@ -1046,7 +1110,7 @@
     CHECKBOX_IDS.forEach(id => { $(id).checked = false; });
     $('paymentMode').value = 'Bank Transfer / NEFT';
     $('monthsCount').value = '12';
-    $('paymentDate').value = new Date().toISOString().slice(0,10);
+    $('paymentDate').value = toISODateLocal(new Date());
     $('singleFields').style.display = 'block';
     $('multiFields').classList.remove('show');
     applyAddressSync();
@@ -1054,9 +1118,15 @@
     saveForm();
   }
 
-  document.querySelectorAll('.form-panel input, .form-panel select').forEach(el=>{
+  document.querySelectorAll('.form-panel input, .form-panel select, .form-panel textarea').forEach(el=>{
     el.addEventListener('input', () => { render(); saveForm(); });
     el.addEventListener('change', () => { render(); saveForm(); });
+  });
+
+  ['tenantMobile','landlordMobile'].forEach(id=>{
+    $(id).addEventListener('input', function(){
+      this.value = this.value.replace(/\D/g,'').slice(0,10);
+    });
   });
 
   $('sameAsLandlordAddress').addEventListener('change', function(){
