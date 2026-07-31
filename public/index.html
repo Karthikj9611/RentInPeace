@@ -2731,6 +2731,28 @@ ul{list-style:none}
 .about-founder-role{font-size:11px;font-weight:600;color:var(--brand)}
 .about-founder-bio{font-size:12px;color:var(--text-2);line-height:1.55;margin-top:4px}
 .about-founder-links{display:flex;gap:14px;margin-top:8px}
+
+/* ─── About: Partners ─────────────────────────── */
+.about-partners-scroll{
+  display:flex;gap:10px;overflow-x:auto;scroll-behavior:smooth;
+  padding:2px 2px 6px;-ms-overflow-style:none;scrollbar-width:none;
+  overscroll-behavior-x:contain;
+}
+.about-partners-scroll::-webkit-scrollbar{display:none}
+.about-partner-card{
+  flex:0 0 150px;width:150px;
+  display:flex;flex-direction:column;align-items:flex-start;gap:8px;
+  padding:14px;border:1px solid var(--border);border-radius:12px;
+}
+.about-partner-avatar{
+  width:38px;height:38px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--brand),#ff6b81);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;letter-spacing:.02em;
+  box-shadow:0 3px 8px rgba(224,58,82,.25);
+}
+.about-partner-name{font-size:13px;font-weight:700;color:var(--text)}
+.about-partner-role{font-size:11px;font-weight:600;color:var(--brand);margin-top:2px}
 .about-founder-link{
   font-size:11px;font-weight:600;color:var(--text-3);
   display:flex;align-items:center;gap:4px;cursor:pointer;
@@ -5447,6 +5469,44 @@ ul{list-style:none}
               <span class="about-founder-role">COO</span>
             </div>
             <div class="about-founder-bio">BE, Mechanical Engineering.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Partners -->
+    <div class="about-section">
+      <div class="about-section-title">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-1a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Our Partners
+      </div>
+      <div class="about-partners-scroll">
+        <div class="about-partner-card">
+          <div class="about-partner-avatar">SK</div>
+          <div>
+            <div class="about-partner-name">Suresh Kumar</div>
+            <div class="about-partner-role">Legal Advisor</div>
+          </div>
+        </div>
+        <div class="about-partner-card">
+          <div class="about-partner-avatar">PN</div>
+          <div>
+            <div class="about-partner-name">Priya Nair</div>
+            <div class="about-partner-role">Marketing Partner</div>
+          </div>
+        </div>
+        <div class="about-partner-card">
+          <div class="about-partner-avatar">RI</div>
+          <div>
+            <div class="about-partner-name">Ramesh Iyer</div>
+            <div class="about-partner-role">Technology Partner</div>
+          </div>
+        </div>
+        <div class="about-partner-card">
+          <div class="about-partner-avatar">AR</div>
+          <div>
+            <div class="about-partner-name">Ananya Rao</div>
+            <div class="about-partner-role">Finance Partner</div>
           </div>
         </div>
       </div>
