@@ -97,6 +97,7 @@
     margin-bottom:12px;
     box-shadow:0 1px 2px rgba(18,21,28,.03);
     transition:border-color .15s, box-shadow .15s;
+    overflow:hidden;
   }
   .card:focus-within{
     border-color:var(--line-2);
@@ -111,15 +112,17 @@
     font-weight:700;
     text-transform:uppercase;
     letter-spacing:.06em;
-    color:var(--ink-2);
-    margin-bottom:16px;
-    padding-bottom:12px;
-    border-bottom:1px solid var(--line);
+    color:var(--ink);
+    margin:-18px -18px 16px -18px;
+    padding:14px 18px;
+    background:var(--ic-bg, var(--tint));
+    border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+    border-bottom:1px solid rgba(18,21,28,.05);
   }
   .section-label .ic{
     width:22px;height:22px;flex-shrink:0;
     display:inline-flex;align-items:center;justify-content:center;
-    background:var(--ic-bg, var(--brand-light));
+    background:rgba(255,255,255,.65);
     color:var(--ic-fg, var(--brand));
     border-radius:7px;
   }
@@ -479,63 +482,67 @@
     <div class="sub">Fill in the details below - the receipt on the right updates live, ready to download as a PDF.</div>
 
     <div class="card" style="--ic-bg:var(--blue-bg);--ic-fg:var(--blue)">
-      <div class="section-label"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.2 7-6.2s7 2.6 7 6.2"/></svg></span>Tenant &amp; landlord</div>
+      <div class="section-label"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.2 7-6.2s7 2.6 7 6.2"/></svg></span>Owner details</div>
       <div class="field">
-        <label>Tenant name <span class="req">*</span></label>
-        <input id="tenantName" />
-      </div>
-      <div class="row2">
-        <div class="field">
-          <label>Tenant mobile <span class="req">*</span></label>
-          <div class="phone-wrap">
-            <span class="cc">+91</span>
-            <input id="tenantMobile" type="tel" inputmode="numeric" maxlength="10" required />
-          </div>
-        </div>
-        <div class="field">
-          <label>Tenant email</label>
-          <input id="tenantEmail" type="email" />
-        </div>
-      </div>
-      <div class="field">
-        <label>Landlord name <span class="req">*</span></label>
+        <label>Name <span class="req">*</span></label>
         <input id="landlordName" />
       </div>
       <div class="row2">
         <div class="field">
-          <label>Landlord mobile <span class="req">*</span></label>
+          <label>Mobile <span class="req">*</span></label>
           <div class="phone-wrap">
             <span class="cc">+91</span>
             <input id="landlordMobile" type="tel" inputmode="numeric" maxlength="10" required />
           </div>
         </div>
         <div class="field">
-          <label>Landlord email</label>
+          <label>Email</label>
           <input id="landlordEmail" type="email" />
         </div>
       </div>
       <div class="field">
-        <label>Landlord's building name</label>
+        <label>Building</label>
         <input id="landlordBuildingName" />
       </div>
       <div class="field">
-        <label>Landlord address</label>
+        <label>Address</label>
         <textarea id="landlordAddress" rows="3"></textarea>
       </div>
       <div class="field">
-        <label>Landlord PAN <span class="hint">(needed for HRA &gt; ₹1L/yr)</span></label>
+        <label>PAN <span class="hint">(needed for HRA &gt; ₹1L/yr)</span></label>
         <input id="landlordPAN" maxlength="10" style="text-transform:uppercase" />
+      </div>
+    </div>
+
+    <div class="card" style="--ic-bg:var(--amber-bg);--ic-fg:var(--amber)">
+      <div class="section-label"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.2 7-6.2s7 2.6 7 6.2"/></svg></span>Tenant details</div>
+      <div class="field">
+        <label>Name <span class="req">*</span></label>
+        <input id="tenantName" />
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Mobile <span class="req">*</span></label>
+          <div class="phone-wrap">
+            <span class="cc">+91</span>
+            <input id="tenantMobile" type="tel" inputmode="numeric" maxlength="10" required />
+          </div>
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input id="tenantEmail" type="email" />
+        </div>
       </div>
     </div>
 
     <div class="card" style="--ic-bg:var(--brand-light);--ic-fg:var(--brand)">
       <div class="section-label"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-9"/><path d="M10 20v-6h4v6"/></svg></span>Property &amp; rent</div>
       <div class="field">
-        <label>Building / apartment name</label>
+        <label>Building</label>
         <input id="buildingName" />
       </div>
       <div class="field">
-        <label>Rented property address</label>
+        <label>Address</label>
         <textarea id="propertyAddress" rows="3"></textarea>
         <label class="inline-check">
           <input type="checkbox" id="sameAsLandlordAddress" />
@@ -544,14 +551,14 @@
       </div>
       <div class="row2">
         <div class="field amt-field">
-          <label>Rent amount <span class="req">*</span></label>
+          <label>Rent <span class="req">*</span></label>
           <div class="amt-wrap">
           <span class="cur">₹</span>
           <input id="rentAmount" type="number" min="0" />
           </div>
         </div>
         <div class="field">
-          <label>Payment mode</label>
+          <label>Mode</label>
           <select id="paymentMode">
             <option>Cash</option>
             <option selected>NEFT</option>
@@ -582,7 +589,7 @@
       </div>
       <div class="row2">
         <div class="field amt-field">
-          <label>Sanitary / Cleaning</label>
+          <label>Sanitary</label>
           <div class="amt-wrap">
           <span class="cur">₹</span>
           <input id="sanitaryCharge" type="number" min="0" />
@@ -605,7 +612,7 @@
           </div>
         </div>
         <div class="field amt-field">
-          <label>Other charges</label>
+          <label>Other</label>
           <div class="amt-wrap">
           <span class="cur">₹</span>
           <input id="otherChargeAmount" type="number" min="0" />
@@ -613,7 +620,7 @@
         </div>
       </div>
       <div class="field">
-        <label>Label for Other charges</label>
+        <label>Label</label>
         <input id="otherChargeLabel" />
       </div>
     </div>
@@ -628,11 +635,11 @@
       <div id="singleFields">
         <div class="row2">
           <div class="field">
-            <label>Period from <span class="req">*</span></label>
+            <label>From <span class="req">*</span></label>
             <input id="periodFrom" type="date" />
           </div>
           <div class="field">
-            <label>Period to <span class="req">*</span></label>
+            <label>To <span class="req">*</span></label>
             <input id="periodTo" type="date" />
           </div>
         </div>
@@ -640,21 +647,21 @@
 
       <div class="row2 multi-fields" id="multiFields">
         <div class="field">
-          <label>First period from <span class="req">*</span></label>
+          <label>From <span class="req">*</span></label>
           <input id="multiFrom" type="date" />
         </div>
         <div class="field">
-          <label>First period to <span class="req">*</span></label>
+          <label>To <span class="req">*</span></label>
           <input id="multiTo" type="date" />
         </div>
         <div class="field">
-          <label>No. of periods</label>
+          <label>Periods</label>
           <input id="monthsCount" type="number" min="1" max="24" value="12" />
         </div>
       </div>
 
       <div class="field">
-        <label>Date of payment</label>
+        <label>Date</label>
         <input id="paymentDate" type="date" />
       </div>
 
