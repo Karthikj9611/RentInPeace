@@ -1747,7 +1747,7 @@ ul{list-style:none}
 }
 
 /* ─── Reviews Section (masonry grid redesign) ──── */
-.reviews-section{padding:28px 20px 96px;background:var(--bg-2);border-top:1px solid var(--border)}
+.reviews-section{padding:28px 20px 32px;background:var(--bg-2);border-top:1px solid var(--border)}
 .reviews-body{width:100%;margin:0;display:grid;grid-template-columns:1fr 1fr;align-items:stretch;gap:16px}
 .reviews-left{min-width:0;display:flex;flex-direction:column;align-items:center;text-align:center}
 .reviews-right{min-width:0;display:flex;flex-direction:column;align-items:center}
@@ -3905,6 +3905,94 @@ ul{list-style:none}
     </div>
   </div>
 </section>
+
+<!-- ─── Site Footer (desktop only — mobile already has quick-menu-bar +
+     bottom-nav for this navigation, so the footer is hidden ≤640px to
+     avoid duplicating it) ───────────────────────── -->
+<style>
+  .site-footer{display:none}
+  @media (min-width:641px){
+    .site-footer{
+      display:block;background:var(--bg);border-top:1px solid var(--border);
+      padding:28px 32px 0;
+    }
+    .site-footer-grid{
+      max-width:1200px;margin:0 auto;display:grid;
+      grid-template-columns:1.4fr 1fr 1fr 1fr;gap:32px;
+    }
+    .sf-brand-desc{font-size:13px;color:var(--text-2);line-height:1.6;margin:10px 0 16px;max-width:280px}
+    .sf-contact-row{display:flex;gap:8px}
+    .sf-contact-btn{
+      display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;
+      padding:7px 12px;border-radius:8px;text-decoration:none;color:#fff;
+    }
+    .sf-col-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px}
+    .sf-links{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+    .sf-links a,.sf-links span{
+      font-size:13px;color:var(--text-2);text-decoration:none;cursor:pointer;transition:color .15s;
+    }
+    .sf-links a:hover,.sf-links span:hover{color:var(--brand)}
+    .site-footer-bottom{
+      max-width:1200px;margin:32px auto 0;padding:16px 0;border-top:1px solid var(--border);
+      display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;
+      font-size:12px;color:var(--text-3);
+    }
+  }
+</style>
+<footer class="site-footer" aria-label="Site footer">
+  <div class="site-footer-grid">
+    <div class="sf-col">
+      <span class="brandname" style="font-size:19px">Home<span class="bn-accent">Loop</span></span>
+      <p class="sf-brand-desc">Bengaluru's trusted home rental platform — find Rent, Lease, and PG listings verified for a smooth, honest search.</p>
+      <div class="sf-contact-row">
+        <a href="tel:9035205230" class="sf-contact-btn" style="background:var(--brand)">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Call
+        </a>
+        <a href="https://wa.me/919035205230" target="_blank" class="sf-contact-btn" style="background:#25d366">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4C7.4 4 3.6 7.8 3.6 12.45c0 1.6.45 3.13 1.27 4.45L4 21l4.2-1.1a8.83 8.83 0 0 0 4.07.99h.01c4.65 0 8.45-3.8 8.45-8.45a8.4 8.4 0 0 0-2.93-5.62zM12.06 19.5a7.05 7.05 0 0 1-3.6-.99l-.26-.15-2.67.7.71-2.6-.17-.27a6.99 6.99 0 0 1-1.08-3.74c0-3.86 3.15-7 7.04-7 1.88 0 3.64.73 4.97 2.06a6.96 6.96 0 0 1 2.06 4.96c0 3.87-3.16 7.03-7 7.03zm3.86-5.27c-.21-.1-1.24-.62-1.43-.68-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.81-.12.14-.24.16-.45.05-.21-.1-.87-.32-1.66-1.03-.61-.55-1.03-1.22-1.15-1.43-.12-.21-.01-.32.1-.43.1-.1.21-.26.32-.39.1-.13.14-.21.21-.36.07-.14.04-.27-.02-.38-.07-.1-.62-1.49-.85-2.04-.18-.43-.36-.37-.5-.38h-.42c-.14 0-.38.05-.58.27-.21.21-.79.77-.79 1.88 0 1.1.81 2.18.92 2.33.12.14 1.58 2.42 3.83 3.3 1.9.75 2.28.6 2.7.56.42-.04 1.36-.55 1.55-1.09.19-.53.19-.98.13-1.08-.05-.1-.21-.16-.43-.27z"/></svg>
+          WhatsApp
+        </a>
+      </div>
+    </div>
+
+    <div class="sf-col">
+      <div class="sf-col-title">Quick Links</div>
+      <ul class="sf-links">
+        <li><span onclick="document.querySelector('.nav-tab[data-tab=&quot;All&quot;]').click(); window.scrollTo({top:0,behavior:'smooth'})">All Properties</span></li>
+        <li><span onclick="document.querySelector('.nav-tab[data-tab=&quot;Promoted&quot;]').click(); window.scrollTo({top:0,behavior:'smooth'})">Promoted</span></li>
+        <li><span onclick="document.querySelector('.nav-tab[data-tab=&quot;Rent&quot;]').click(); window.scrollTo({top:0,behavior:'smooth'})">Rent</span></li>
+        <li><span onclick="document.querySelector('.nav-tab[data-tab=&quot;Lease&quot;]').click(); window.scrollTo({top:0,behavior:'smooth'})">Lease</span></li>
+        <li><span onclick="document.querySelector('.nav-tab[data-tab=&quot;PG&quot;]').click(); window.scrollTo({top:0,behavior:'smooth'})">PG</span></li>
+      </ul>
+    </div>
+
+    <div class="sf-col">
+      <div class="sf-col-title">Company</div>
+      <ul class="sf-links">
+        <li><span onclick="openAboutModal()">About Us</span></li>
+        <li><span onclick="openHelpModal()">Help &amp; Support</span></li>
+        <li><span onclick="openChargesModal()">Pricing &amp; Charges</span></li>
+        <li><span onclick="openReferModal()">Refer &amp; Earn</span></li>
+      </ul>
+    </div>
+
+    <div class="sf-col">
+      <div class="sf-col-title">Our Services</div>
+      <ul class="sf-links">
+        <li><span onclick="openRentReceiptTool()">Rent Receipt Generator</span></li>
+        <li><span onclick="openServiceModal('Rental Agreement','LEGAL','📋','https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1920&q=80&auto=format&fit=crop')">Rental Agreement</span></li>
+        <li><span onclick="openServiceModal('Building Painter','HOME CARE','🎨','https://images.unsplash.com/photo-1717281234297-3def5ae3eee1?w=1920&q=80&auto=format&fit=crop')">Home Care &amp; Repairs</span></li>
+        <li><a href="https://kr-webcrafts.onrender.com" target="_blank" rel="noopener">KR Webcrafts</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="site-footer-bottom">
+    <span>© 2026 <span class="brandname">Home<span class="bn-accent">Loop</span></span> · Bengaluru, India</span>
+    <span>v1.0</span>
+  </div>
+</footer>
 
 <!-- ─── FAB: Add listing ────────────────────────── -->
 <button class="fab" id="fabAdd" onclick="openFabPicker()" aria-label="Add a listing" title="List your property">
