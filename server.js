@@ -2749,6 +2749,114 @@ app.post('/api/honest-reviews/bulk-delete', requireAdmin, async (req, res) => {
 });
 
 
+// ── Partners (shown in the About Us modal's "Our Partners" row) ──
+const partnerSchema = new mongoose.Schema({
+  name:       { type: String, required: true, maxlength: 80 },
+  role:       { type: String, required: true, maxlength: 80 },  // e.g. "Legal Advisor"
+  phone:      { type: String, default: '', maxlength: 20 },
+  email:      { type: String, default: '', maxlength: 120 },
+  location:   { type: String, default: '', maxlength: 80 },     // e.g. "Indiranagar, Bengaluru"
+  avatarText: { type: String, default: '', maxlength: 4 },      // optional override; frontend derives initials from name if blank
+  order:      { type: Number, default: 0 },                      // lower shows first
+  active:     { type: Boolean, default: true },
+  createdAt:  { type: Date, default: Date.now }
+});
+
+const Partner = mongoose.model('Partner', partnerSchema);
+
+// GET /api/partners — public, powers the About Us modal's partners row.
+app.get('/api/partners', async (req, res) => {
+  try {
+    const partners = await Partner.find({ active: true })
+      .sort({ order: 1, createdAt: 1 })
+      .lean();
+    res.json({ partners });
+  } catch (err) {
+    console.error('GET /api/partners error:', err.message);
+    res.status(500).json({ error: 'Could not load partners' });
+  }
+});
+
+// GET /api/admin/partners — admin-only, returns every entry (active or not) for the manage UI.
+app.get('/api/admin/partners', requireAdmin, async (req, res) => {
+  try {
+    const partners = await Partner.find({}).sort({ order: 1, createdAt: 1 }).lean();
+    res.json({ partners });
+  } catch (err) {
+    console.error('GET /api/admin/partners error:', err.message);
+    res.status(500).json({ error: 'Could not load partners' });
+  }
+});
+
+// POST /api/partners — admin-only, add a new partner
+app.post('/api/partners', requireAdmin, async (req, res) => {
+  try {
+    const { name, role, phone, email, location, avatarText, order, active } = req.body;
+    if (!name || !role) {
+      return res.status(400).json({ error: 'name and role are required' });
+    }
+    const partner = await Partner.create({
+      name, role,
+      phone: phone || '',
+      email: email || '',
+      location: location || '',
+      avatarText: avatarText || '',
+      order: Number(order) || 0,
+      active: active !== false
+    });
+    res.status(201).json({ partner });
+  } catch (err) {
+    console.error('POST /api/partners error:', err.message);
+    res.status(500).json({ error: 'Could not save partner' });
+  }
+});
+
+// PUT /api/partners/:id — admin-only, edit an existing partner
+app.put('/api/partners/:id', requireAdmin, async (req, res) => {
+  try {
+    const fields = (({ name, role, phone, email, location, avatarText, order, active }) => ({ name, role, phone, email, location, avatarText, order, active }))(req.body);
+    Object.keys(fields).forEach(k => fields[k] === undefined && delete fields[k]);
+
+    const partner = await Partner.findByIdAndUpdate(req.params.id, fields, { new: true }).lean();
+    if (!partner) return res.status(404).json({ error: 'Partner not found' });
+    res.json({ partner });
+  } catch (err) {
+    console.error('PUT /api/partners/:id error:', err.message);
+    res.status(500).json({ error: 'Could not update partner' });
+  }
+});
+
+// DELETE /api/partners/:id — admin-only
+app.delete('/api/partners/:id', requireAdmin, async (req, res) => {
+  try {
+    const deleted = await Partner.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ error: 'Partner not found' });
+    res.json({ message: 'Partner deleted' });
+  } catch (err) {
+    console.error('DELETE /api/partners/:id error:', err.message);
+    res.status(500).json({ error: 'Could not delete partner' });
+  }
+});
+
+// POST /api/partners/bulk-delete — admin-only, delete several partners at once
+app.post('/api/partners/bulk-delete', requireAdmin, async (req, res) => {
+  try {
+    const { ids } = req.body || {};
+    if (!Array.isArray(ids) || !ids.length) {
+      return res.status(400).json({ error: 'ids must be a non-empty array' });
+    }
+    const validIds = ids.filter(id => mongoose.Types.ObjectId.isValid(id));
+    if (!validIds.length) return res.status(400).json({ error: 'No valid partner ids provided' });
+    const result = await Partner.deleteMany({ _id: { $in: validIds } });
+    res.json({ message: `${result.deletedCount} partner${result.deletedCount === 1 ? '' : 's'} deleted`, deletedCount: result.deletedCount });
+  } catch (err) {
+    console.error('POST /api/partners/bulk-delete error:', err.message);
+    res.status(500).json({ error: 'Could not bulk delete partners' });
+  }
+});
+
+
+
 
 // Accepts any number of images (multipart/form-data, field name 'images'), converts
 // each to WebP (max 1200px on the long edge, quality 80) via sharp, and saves

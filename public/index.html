@@ -2740,7 +2740,7 @@ ul{list-style:none}
 }
 .about-partners-scroll::-webkit-scrollbar{display:none}
 .about-partner-card{
-  flex:0 0 150px;width:150px;
+  flex:0 0 190px;width:190px;
   display:flex;flex-direction:column;align-items:flex-start;gap:8px;
   padding:14px;border:1px solid var(--border);border-radius:12px;
 }
@@ -2753,6 +2753,14 @@ ul{list-style:none}
 }
 .about-partner-name{font-size:13px;font-weight:700;color:var(--text)}
 .about-partner-role{font-size:11px;font-weight:600;color:var(--brand);margin-top:2px}
+.about-partner-contact{
+  display:flex;align-items:center;gap:5px;margin-top:6px;
+  font-size:11px;color:var(--text-2);text-decoration:none;word-break:break-all;
+}
+.about-partner-contact svg{width:11px;height:11px;flex-shrink:0;stroke:var(--text-3);fill:none;stroke-width:2.2}
+.about-partner-contact:hover{color:var(--brand)}
+.about-partner-contact:hover svg{stroke:var(--brand)}
+.about-partners-loading{color:var(--text-3);font-size:13px;padding:8px 2px}
 .about-founder-link{
   font-size:11px;font-weight:600;color:var(--text-3);
   display:flex;align-items:center;gap:4px;cursor:pointer;
@@ -5474,41 +5482,16 @@ ul{list-style:none}
       </div>
     </div>
 
-    <!-- Partners -->
+    <!-- Partners: cards loaded dynamically from GET /api/partners (MongoDB),
+         see loadPartners() in the script below. Manage via admin-only
+         POST/PUT/DELETE /api/partners/:id endpoints in server.js. -->
     <div class="about-section">
       <div class="about-section-title">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-1a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         Our Partners
       </div>
-      <div class="about-partners-scroll">
-        <div class="about-partner-card">
-          <div class="about-partner-avatar">SK</div>
-          <div>
-            <div class="about-partner-name">Suresh Kumar</div>
-            <div class="about-partner-role">Legal Advisor</div>
-          </div>
-        </div>
-        <div class="about-partner-card">
-          <div class="about-partner-avatar">PN</div>
-          <div>
-            <div class="about-partner-name">Priya Nair</div>
-            <div class="about-partner-role">Marketing Partner</div>
-          </div>
-        </div>
-        <div class="about-partner-card">
-          <div class="about-partner-avatar">RI</div>
-          <div>
-            <div class="about-partner-name">Ramesh Iyer</div>
-            <div class="about-partner-role">Technology Partner</div>
-          </div>
-        </div>
-        <div class="about-partner-card">
-          <div class="about-partner-avatar">AR</div>
-          <div>
-            <div class="about-partner-name">Ananya Rao</div>
-            <div class="about-partner-role">Finance Partner</div>
-          </div>
-        </div>
+      <div class="about-partners-scroll" id="aboutPartnersScroll">
+        <div class="about-partners-loading" id="aboutPartnersLoading">Loading partners…</div>
       </div>
     </div>
 
@@ -10745,13 +10728,63 @@ function resetFaq() {
 /* ═══════════════════════════════════════════════
    ABOUT HOMELOOP MODAL
 ═══════════════════════════════════════════════ */
+let partnersLoaded = false;
 function openAboutModal() {
   document.getElementById('aboutModal').classList.add('open');
   lockBodyScroll();
+  if (!partnersLoaded) loadPartners();
 }
 function closeAboutModal() {
   document.getElementById('aboutModal').classList.remove('open');
   unlockBodyScroll();
+}
+
+function partnerInitials(name) {
+  return (name || '').trim().split(/\s+/).slice(0, 2).map(w => w[0] || '').join('').toUpperCase();
+}
+
+function renderPartners(partners) {
+  const wrap = document.getElementById('aboutPartnersScroll');
+  if (!wrap) return;
+  if (!partners || !partners.length) {
+    wrap.innerHTML = '<div class="about-partners-loading">No partners added yet.</div>';
+    return;
+  }
+  wrap.innerHTML = partners.map(p => `
+    <div class="about-partner-card">
+      <div class="about-partner-avatar">${esc(p.avatarText || partnerInitials(p.name))}</div>
+      <div>
+        <div class="about-partner-name">${esc(p.name)}</div>
+        <div class="about-partner-role">${esc(p.role)}</div>
+        ${p.phone ? `<a class="about-partner-contact" href="tel:${esc(p.phone)}" onclick="event.stopPropagation()">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          ${esc(p.phone)}
+        </a>` : ''}
+        ${p.email ? `<a class="about-partner-contact" href="mailto:${esc(p.email)}" onclick="event.stopPropagation()">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2 4 12 13 22 4"/></svg>
+          ${esc(p.email)}
+        </a>` : ''}
+        ${p.location ? `<span class="about-partner-contact">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          ${esc(p.location)}
+        </span>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+async function loadPartners() {
+  partnersLoaded = true;
+  try {
+    const res = await fetch('/api/partners');
+    if (!res.ok) throw new Error('Request failed: ' + res.status);
+    const data = await res.json();
+    renderPartners(data.partners || []);
+  } catch (err) {
+    console.error('loadPartners error:', err);
+    partnersLoaded = false;
+    const wrap = document.getElementById('aboutPartnersScroll');
+    if (wrap) wrap.innerHTML = '<div class="about-partners-loading">Couldn\'t load partners right now.</div>';
+  }
 }
 
 /* ═══════════════════════════════════════════════
