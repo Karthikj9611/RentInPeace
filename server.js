@@ -32,7 +32,9 @@ app.set('trust proxy', 1); // we're behind Render's proxy; needed for express-ra
 // properly needs a nonce- or hash-based rework of those pages first.
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({ origin: process.env.ALLOWED_ORIGIN || '*' }));
-app.use(express.json({ limit: '10mb' })); // 10mb to allow base64 images
+app.use(express.json({
+  limit: '10mb', // 10mb to allow base64 images
+}));
 app.use(express.static('public', { maxAge: '7d', etag: true }));
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -2937,6 +2939,281 @@ app.use((err, req, res, next) => {
     return res.status(400).json({ message: err.message });
   }
   next(err);
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// ── PAYMENTS (UPI/QR/bank transfer, verified by hand) ──
+// A PaymentRequest is created the moment a user starts paying (purpose +
+// amount, optionally a propertyId). The frontend then shows our UPI ID/QR
+// code/bank details (PaymentSettings, edited by admin) along with the
+// request's reference code, which the payer is asked to include in their
+// transfer note. Once they've paid externally (their own UPI app or bank),
+// they submit a UTR + optional screenshot via /api/payments/:id/submit-proof,
+// which flips status to 'submitted'. An admin then reviews it against the
+// bank/UPI statement and calls /api/admin/payments/:id/verify or /reject.
+// ────────────────────────────────────────────────────────────────────────────
+
+// Single document (key: 'default') holding the shared payment destination,
+// editable by admin. Nothing here is more sensitive than what you'd put on
+// an invoice, since it's shown to any user about to pay.
+const PaymentSettingsSchema = new mongoose.Schema({
+  key:               { type: String, default: 'default', unique: true },
+  upiId:             { type: String, default: '', trim: true },
+  qrImageUrl:        { type: String, default: '', trim: true }, // '/uploads/<ImageAsset id>' — same pipeline as listing photos
+  bankAccountName:   { type: String, default: '', trim: true },
+  bankAccountNumber: { type: String, default: '', trim: true },
+  bankIfsc:          { type: String, default: '', trim: true },
+  paymentPhone:      { type: String, default: '', trim: true },
+  updatedAt:         { type: Date, default: Date.now },
+});
+const PaymentSettings = mongoose.model('PaymentSettings', PaymentSettingsSchema);
+
+// Public — anyone about to pay needs to see where to send money
+// (UPI ID/QR/bank details, edited by admin below).
+// TEMPORARY: until there's an admin screen to set real values (and someone
+// uses it), DUMMY_PAYMENT_DETAILS below is shown instead of nothing. These
+// are NOT real payment details — replace them with your actual UPI id/bank
+// account either via PUT /api/admin/payment-settings once that screen
+// exists, or by editing this object directly, then delete this block.
+const DUMMY_PAYMENT_DETAILS = {
+  upiId:             '9611459960@yescred', // ⚠️ placeholder — replace with your real UPI ID
+  qrImageUrl:        '',                        // left blank on purpose: a fake QR image would be scannable and misleading
+  bankAccountName:   'Your Business Name',       // ⚠️ placeholder
+  bankAccountNumber: '000123456789',             // ⚠️ placeholder
+  bankIfsc:          'HDFC0000123',              // ⚠️ placeholder
+  paymentPhone:      '9611459960',               // ⚠️ placeholder
+};
+app.get('/api/payment-settings', async (req, res) => {
+  try {
+    const settings = await PaymentSettings.findOne({ key: 'default' }).lean();
+    if (!settings) console.warn('⚠️  No PaymentSettings in DB — serving DUMMY_PAYMENT_DETAILS. Replace these before accepting real payments.');
+    res.json(settings || DUMMY_PAYMENT_DETAILS);
+  } catch (err) {
+    console.error('GET /api/payment-settings error:', err.message);
+    res.status(500).json({ message: 'Error fetching payment settings' });
+  }
+});
+
+// Admin — edit the one shared payment destination shown on every payment screen.
+app.put('/api/admin/payment-settings', requireAdmin, async (req, res) => {
+  try {
+    const { upiId, qrImageUrl, bankAccountName, bankAccountNumber, bankIfsc, paymentPhone } = req.body || {};
+    const settings = await PaymentSettings.findOneAndUpdate(
+      { key: 'default' },
+      { $set: {
+        upiId:             upiId ? String(upiId).trim() : '',
+        qrImageUrl:        qrImageUrl ? String(qrImageUrl).trim() : '',
+        bankAccountName:   bankAccountName ? String(bankAccountName).trim() : '',
+        bankAccountNumber: bankAccountNumber ? String(bankAccountNumber).trim() : '',
+        bankIfsc:          bankIfsc ? String(bankIfsc).trim() : '',
+        paymentPhone:      paymentPhone ? String(paymentPhone).trim() : '',
+        updatedAt: new Date(),
+      } },
+      { new: true, upsert: true }
+    );
+    res.json({ message: 'Payment settings updated', settings });
+  } catch (err) {
+    console.error('PUT /api/admin/payment-settings error:', err.message);
+    res.status(500).json({ message: 'Error updating payment settings' });
+  }
+});
+
+// ── Payment requests ──
+// Created the moment a user starts a payment (before they've actually paid),
+// so there's a refCode up front to put in the transfer note. Stays 'pending'
+// until they submit a UTR/screenshot (-> 'submitted'), then an admin marks it
+// 'verified' or 'rejected' by hand. razorpay* fields are kept only so old,
+// pre-existing records (from when this used Razorpay) still load correctly.
+const PaymentRequestSchema = new mongoose.Schema({
+  refCode:        { type: String, unique: true, index: true }, // e.g. PAY-000123
+  userId:         { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+  userReadableId: { type: String, default: null, index: true }, // human-readable User.userId, same pattern as VisitRequest/Property
+  purpose:        { type: String, enum: ['brokerage', 'booking', 'visit_deposit', 'promotion'], required: true },
+  // Real listing _id, when the caller has one on hand (e.g. the "Promote this
+  // listing" button on My Listings, which already knows the property's Mongo
+  // _id, or the property picker in the payment modal). Left null when the
+  // payment isn't tied to a specific listing.
+  propertyId:     { type: mongoose.Schema.Types.ObjectId, default: null, index: true },
+  // Freeform context — e.g. "HWR123 - Rent - Whitefield" from the property
+  // picker — shown alongside the payment in history/admin views.
+  note:           { type: String, default: '', trim: true, maxlength: 300 },
+  amount:         { type: Number, required: true }, // rupees
+  paymentMethod:  { type: String, enum: ['razorpay', 'manual'], default: 'manual' }, // 'razorpay' only appears on old pre-existing records
+  razorpayOrderId:     { type: String, default: '', index: true }, // legacy, pre-existing records only
+  razorpayPaymentId:   { type: String, default: '' },               // legacy, pre-existing records only
+  razorpaySignature:   { type: String, default: '' },               // legacy, pre-existing records only
+  utr:            { type: String, default: '', trim: true }, // UPI transaction ref, entered by the payer
+  screenshotUrl:  { type: String, default: '' }, // '/uploads/<ImageAsset id>'
+  status:         { type: String, enum: ['pending', 'submitted', 'verified', 'rejected'], default: 'pending', index: true },
+  adminRemark:    { type: String, default: '', trim: true, maxlength: 300 },
+  createdAt:      { type: Date, default: Date.now },
+  submittedAt:    { type: Date, default: null },
+  verifiedAt:     { type: Date, default: null },
+});
+PaymentRequestSchema.index({ createdAt: -1 });
+const PaymentRequest = mongoose.model('PaymentRequest', PaymentRequestSchema);
+
+// Applies the one purpose that has an automatic side effect on verification
+// ('promotion' → Property.promoted = true). Shared by the admin verify route
+// so it stays consistent if any other verification path is added later. Kept
+// best-effort: a failure here (e.g. the linked listing was since deleted)
+// still leaves the payment marked verified rather than blocking the caller.
+async function applyPaymentVerifiedSideEffects(request) {
+  if (request.purpose === 'promotion' && request.propertyId) {
+    try {
+      await updateListingById(request.propertyId, { promoted: true });
+    } catch (sideEffectErr) {
+      console.error('Payment verify side-effect error:', sideEffectErr.message);
+    }
+  }
+}
+
+// Mirrors the rate-limit pattern used for visits/bookings/reviews above.
+const paymentLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, max: 20,
+  standardHeaders: true, legacyHeaders: false,
+  message: { message: 'Too many payment requests. Please try again later.' }
+});
+
+// Step 1 — user starts a payment: creates the PaymentRequest with a fresh
+// refCode. The frontend follows up by showing our UPI/QR/bank details
+// (fetched separately from /api/payment-settings) alongside this refCode.
+app.post('/api/payments/request', paymentLimiter, requireUser, async (req, res) => {
+  try {
+    const { purpose, amount, note, propertyId } = req.body || {};
+    if (!['brokerage', 'booking', 'visit_deposit', 'promotion'].includes(purpose)) {
+      return res.status(400).json({ message: 'Invalid payment purpose' });
+    }
+    const amt = Number(amount);
+    if (!amt || amt <= 0) return res.status(400).json({ message: 'A valid amount is required' });
+    if (propertyId && !mongoose.Types.ObjectId.isValid(propertyId)) {
+      return res.status(400).json({ message: 'Invalid property id' });
+    }
+
+    const refCode = await nextSequenceId('PAY');
+    const request = await PaymentRequest.create({
+      refCode,
+      userId:         req.userId,
+      userReadableId: req.userReadableId,
+      purpose,
+      propertyId: propertyId || null,
+      note:       note ? String(note).trim().slice(0, 300) : '',
+      amount: amt,
+    });
+    console.log('payment request created:', { refCode, amount: amt, purpose });
+
+    res.status(201).json({ message: 'Payment request created', request });
+  } catch (err) {
+    console.error('POST /api/payments/request error:', err.message);
+    res.status(500).json({ message: 'Error creating payment request' });
+  }
+});
+
+// Step 2 — user submits proof after paying externally via UPI/bank transfer:
+// a UTR number plus a screenshot (reuses the same multer + sharp pipeline as
+// listing photo uploads, single file this time). Only the request's own
+// owner can submit for it. This is now the only confirmation path — an admin
+// reviews the submission by hand (see /api/admin/payments/:id/verify below).
+app.post('/api/payments/:id/submit-proof', paymentLimiter, requireUser, upload.single('screenshot'), async (req, res) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ message: 'Invalid payment id' });
+    const request = await PaymentRequest.findOne({ _id: req.params.id, userId: req.userId });
+    if (!request) return res.status(404).json({ message: 'Payment request not found' });
+    if (request.status === 'verified') return res.status(409).json({ message: 'This payment is already verified' });
+
+    const { utr } = req.body || {};
+    if (!utr || !String(utr).trim()) return res.status(400).json({ message: 'UTR / transaction reference number is required' });
+
+    let screenshotUrl = request.screenshotUrl;
+    if (req.file) {
+      const webpBuffer = await sharp(req.file.buffer)
+        .rotate()
+        .resize({ width: 1200, height: 1200, fit: 'inside', withoutEnlargement: true })
+        .webp({ quality: 80 })
+        .toBuffer();
+      const doc = await ImageAsset.create({ data: webpBuffer, contentType: 'image/webp' });
+      screenshotUrl = `/uploads/${doc._id}`;
+    }
+
+    request.utr = String(utr).trim();
+    request.screenshotUrl = screenshotUrl;
+    request.status = 'submitted';
+    request.submittedAt = new Date();
+    await request.save();
+
+    res.json({ message: 'Payment proof submitted — awaiting verification', request });
+  } catch (err) {
+    console.error('POST /api/payments/:id/submit-proof error:', err.message);
+    res.status(500).json({ message: 'Error submitting payment proof' });
+  }
+});
+
+// User's own payment history, newest first — powers the Payments tab in the profile modal.
+app.get('/api/user/payments', requireUser, async (req, res) => {
+  try {
+    const payments = await PaymentRequest.find({ userId: req.userId }).sort({ createdAt: -1 }).lean();
+    res.json({ payments });
+  } catch (err) {
+    console.error('GET /api/user/payments error:', err.message);
+    res.status(500).json({ message: 'Error fetching payments' });
+  }
+});
+
+// ── Admin: review queue ──
+// Optional ?status= filter, defaulting to everything (newest first) — the
+// admin tab can default its own view to 'submitted' (awaiting review) while
+// still being able to browse verified/rejected history through this same route.
+app.get('/api/admin/payments', requireAdmin, async (req, res) => {
+  try {
+    const { status } = req.query;
+    const filter = status && status !== 'all' ? { status } : {};
+    const payments = await PaymentRequest.find(filter).sort({ createdAt: -1 }).lean();
+    res.json({ payments });
+  } catch (err) {
+    console.error('GET /api/admin/payments error:', err.message);
+    res.status(500).json({ message: 'Error fetching payments' });
+  }
+});
+
+// Verifying flips status and applies the one purpose that has an automatic
+// side effect ('promotion' → Property.promoted = true). Kept best-effort: a
+// failure to apply the side effect (e.g. the linked listing was since
+// deleted) still leaves the payment marked verified rather than blocking
+// the admin's review action — brokerage/booking/visit_deposit payments are
+// pure financial records with nothing further to flip.
+app.patch('/api/admin/payments/:id/verify', requireAdmin, async (req, res) => {
+  try {
+    const request = await PaymentRequest.findById(req.params.id);
+    if (!request) return res.status(404).json({ message: 'Payment request not found' });
+
+    request.status = 'verified';
+    request.verifiedAt = new Date();
+    if (typeof (req.body && req.body.adminRemark) === 'string') request.adminRemark = req.body.adminRemark.trim().slice(0, 300);
+    await request.save();
+
+    await applyPaymentVerifiedSideEffects(request);
+
+    res.json({ message: 'Payment verified', request });
+  } catch (err) {
+    console.error('PATCH /api/admin/payments/:id/verify error:', err.message);
+    res.status(500).json({ message: 'Error verifying payment' });
+  }
+});
+
+app.patch('/api/admin/payments/:id/reject', requireAdmin, async (req, res) => {
+  try {
+    const request = await PaymentRequest.findById(req.params.id);
+    if (!request) return res.status(404).json({ message: 'Payment request not found' });
+
+    request.status = 'rejected';
+    if (typeof (req.body && req.body.adminRemark) === 'string') request.adminRemark = req.body.adminRemark.trim().slice(0, 300);
+    await request.save();
+
+    res.json({ message: 'Payment rejected', request });
+  } catch (err) {
+    console.error('PATCH /api/admin/payments/:id/reject error:', err.message);
+    res.status(500).json({ message: 'Error rejecting payment' });
+  }
 });
 
 // ────────────────────────────────────────────────────────────────────────────

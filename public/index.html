@@ -2485,6 +2485,32 @@ ul{list-style:none}
   .profile-tab svg{width:13px;height:13px}
 }
 
+/* ─── Payment Modal ─────────────────────────────── */
+.payment-ref-badge{
+  background:var(--brand-light);border-radius:14px;padding:14px 16px;text-align:center;margin-bottom:14px;
+}
+.payment-ref-label{font-size:11.5px;color:var(--text-2);margin-bottom:6px}
+.payment-ref-code-row{display:flex;align-items:center;justify-content:center;gap:8px}
+.payment-ref-code{font-size:19px;font-weight:800;color:var(--brand);letter-spacing:.4px}
+.payment-ref-amount{font-size:13px;color:var(--text-2);margin-top:4px;font-weight:700}
+.payment-details-box{
+  border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;
+}
+.payment-qr-img{display:block;width:160px;height:160px;object-fit:contain;margin:0 auto 12px;border-radius:10px;background:var(--bg-3)}
+.payment-detail-row{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:12.5px;color:var(--text-2);padding:7px 0;border-bottom:1px solid var(--border);
+}
+.payment-detail-row:last-child{border-bottom:none}
+.payment-detail-row b{color:var(--text);font-weight:700}
+.payment-detail-row.is-clickable{cursor:pointer}
+.payment-detail-row.is-clickable:hover,.payment-detail-row.is-clickable:active{background:var(--brand-light);border-radius:8px;margin:0 -8px;padding:7px 8px}
+.payment-detail-row.is-clickable b{color:var(--brand)}
+.payment-upi-pay-btn{margin-bottom:12px}
+.payment-upi-hint{font-size:11px;color:var(--text-3);text-align:center;margin:-4px 0 12px}
+.payment-stage2-note{font-size:11.5px;color:var(--text-3);text-align:center;margin-top:12px;line-height:1.5}
+.payment-admin-remark{font-size:11px;color:var(--text-3);margin-top:5px;font-style:italic}
+
 /* ─── Notifications Modal ──────────────────────── */
 #notifModalBox{
   max-width:460px;padding:0;overflow:hidden;
@@ -5046,6 +5072,10 @@ ul{list-style:none}
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
           Saved
         </div>
+        <div class="profile-tab" id="profileTabPayments" onclick="switchProfileTab('payments')">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          Payments
+        </div>
       </div>
 
       <!-- ── Tab: Profile info / edit / password ── -->
@@ -5149,11 +5179,90 @@ ul{list-style:none}
         </div>
       </div>
 
+      <!-- ── Tab: Payments ── -->
+      <div class="profile-tab-panel" id="profilePanelPayments">
+        <div class="profile-edit-row">
+          <span class="profile-section-label" style="margin:0">Your payments</span>
+          <button class="profile-link-btn" onclick="openPaymentModal('brokerage')">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New payment
+          </button>
+        </div>
+        <div id="myPaymentsContent">
+          <div class="profile-loading">Loading your payments…</div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
 
-<!-- ─── Edit Listing Modal (used from My Listings) ─── -->
+<!-- ─── Payment Modal ────────────────────────────── -->
+<div class="add-modal-overlay" id="paymentModal" role="dialog" aria-modal="true" aria-label="Make a payment">
+  <div class="add-modal" id="paymentModalBox" style="max-width:440px">
+    <div class="add-modal-header">
+      <div class="add-modal-title">Make a payment</div>
+      <button class="modal-close" onclick="closePaymentModal()" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- Stage 1: what & how much -->
+    <div id="paymentStage1">
+      <div class="form-group">
+        <label class="form-label">What's this payment for?</label>
+        <select class="form-input" id="pay-purpose">
+          <option value="brokerage">Brokerage fee</option>
+          <option value="booking">Short Stay booking advance</option>
+          <option value="visit_deposit">Visit deposit</option>
+          <option value="promotion">Promote my listing</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Amount (₹)</label>
+        <input class="form-input" type="number" id="pay-amount" min="1" placeholder="e.g. 6000" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Which property is this for? <span style="color:var(--text-3);font-weight:400">(optional)</span></label>
+        <select class="form-input" id="pay-property"></select>
+        <div class="identity-locked-hint" id="pay-property-hint" style="display:none">Auto-filled from this listing</div>
+      </div>
+      <button class="form-submit" id="paymentStage1Btn" onclick="createPaymentRequest()">Continue</button>
+    </div>
+
+    <!-- Stage 2: pay via UPI/QR/bank transfer, then submit for verification -->
+    <div id="paymentStage2" style="display:none">
+      <div id="paymentStage2Manual">
+        <div class="payment-ref-badge">
+          <div class="payment-ref-label">Reference code — add this to your UPI payment note</div>
+          <div class="payment-ref-code-row">
+            <span class="payment-ref-code" id="payRefCodeManual">—</span>
+            <button class="profile-mini-icon-btn" title="Copy" onclick="copyPaymentRef()">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+          </div>
+          <div class="payment-ref-amount" id="payRefAmountManual">₹0</div>
+        </div>
+
+        <div id="paymentDetailsBox" class="payment-details-box">
+          <div class="profile-loading">Loading payment details…</div>
+        </div>
+
+        <div class="form-group" style="margin-top:14px">
+          <label class="form-label">UTR / transaction reference number</label>
+          <input class="form-input" type="text" id="pay-utr" placeholder="From your UPI app, after paying" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Payment screenshot <span style="color:var(--text-3);font-weight:400">(optional but speeds up verification)</span></label>
+          <input class="form-input" type="file" id="pay-screenshot" accept="image/*" />
+        </div>
+        <button class="form-submit" id="paymentSubmitBtn" onclick="submitPaymentProof()">I've paid — submit for verification</button>
+        <div class="payment-stage2-note">Your payment will show as "Submitted" until an admin verifies it against the bank/UPI statement. You can close this and come back from the Payments tab any time.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ─── Notifications Modal ─────────────────────── -->
 <div class="add-modal-overlay" id="notifModal" role="dialog" aria-modal="true" aria-label="Notifications">
   <div class="add-modal notif-modal" id="notifModalBox">
@@ -5262,13 +5371,14 @@ ul{list-style:none}
       </div>
     </div>
 
-    <!-- No online payments warning -->
-    <div class="charges-warning">
+    <!-- Online payment option -->
+    <div class="charges-warning" style="background:var(--brand-light);color:var(--brand);border-color:transparent">
       <svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      <span><b>No online payments.</b> All amounts above are paid directly to our partner, in person.</span>
+      <span>You can now pay online via UPI/bank transfer too — we verify each payment manually and update your account within a few hours.</span>
     </div>
 
-        <button class="form-submit" onclick="closeChargesModal(); openHelpModal();">Got a question? Contact us</button>
+        <button class="form-submit" onclick="closeChargesModal(); openPaymentModal('brokerage');">Pay brokerage online</button>
+        <button class="profile-btn-secondary" style="width:100%;margin-top:8px" onclick="closeChargesModal(); openHelpModal();">Got a question? Contact us</button>
   </div>
 </div>
 
@@ -9959,13 +10069,16 @@ function switchProfileTab(tab) {
   document.getElementById('profileTabInfo').classList.toggle('active', tab === 'info');
   document.getElementById('profileTabListings').classList.toggle('active', tab === 'listings');
   document.getElementById('profileTabSaved').classList.toggle('active', tab === 'saved');
+  document.getElementById('profileTabPayments').classList.toggle('active', tab === 'payments');
   document.getElementById('profilePanelInfo').classList.toggle('active', tab === 'info');
   document.getElementById('profilePanelListings').classList.toggle('active', tab === 'listings');
   document.getElementById('profilePanelSaved').classList.toggle('active', tab === 'saved');
+  document.getElementById('profilePanelPayments').classList.toggle('active', tab === 'payments');
 
   if (tab === 'info') { exitProfileEditMode(); exitPasswordEditMode(); }
   if (tab === 'listings') loadMyListings();
   if (tab === 'saved') loadSavedListings();
+  if (tab === 'payments') loadMyPayments();
 }
 
 /* ═══════════════════════════════════════════════
@@ -10114,10 +10227,313 @@ function renderMyListings() {
         ${p.visitCount > 0 ? `<span class="profile-status-pill" style="background:var(--brand-light);color:var(--brand);margin-left:5px">${p.visitCount} visit${p.visitCount===1?'':'s'} requested</span>` : ''}
       </div>
       <div class="profile-mini-actions">
+        ${!p.promoted ? `<button class="profile-mini-icon-btn" title="Promote this listing" onclick="event.stopPropagation();closeProfileModal();openPaymentModal('promotion','${p.id}','${esc(p.propertyId||'')}');">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15 9 22 9.5 17 14.5 18.5 22 12 18 5.5 22 7 14.5 2 9.5 9 9"/></svg>
+        </button>` : ''}
         <button class="profile-mini-icon-btn" title="Edit" onclick="event.stopPropagation();openEditListingFull('${p.id}')">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         </button>
       </div>
+    </div>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════════════
+   PAYMENTS — UPI/QR/bank transfer with manual admin verification.
+   Stage 1 (paymentStage1) collects purpose/amount/property and creates a
+   PaymentRequest server-side. Stage 2 (paymentStage2Manual) then shows the
+   UPI ID/QR code/bank details (from /api/payment-settings) plus a reference
+   code to include in the transfer note. The user pays externally via their
+   own UPI app or bank, then submits a UTR + optional screenshot via
+   submitPaymentProof(); an admin verifies it by hand against the bank/UPI
+   statement (server.js: /api/admin/payments/:id/verify).
+═══════════════════════════════════════════════ */
+let CURRENT_PAYMENT_REQUEST = null; // { id, refCode, amount, purpose }
+let PAYMENT_SETTINGS_CACHE  = null; // UPI/QR/bank details, lazy-loaded only when needed
+let MY_PAYMENTS_CACHE = [];
+
+// Plain rupee formatting with thousands separators (fmtRupee() abbreviates to
+// K/L/Cr, which isn't right for an exact amount someone is about to pay).
+function fmtINR(n) {
+  n = Number(n) || 0;
+  return '₹' + n.toLocaleString('en-IN');
+}
+
+// Builds <option> entries for the "which property" picker out of every
+// loaded listing (PROPERTIES, already fetched site-wide on load), formatted
+// as "<propertyId> - <Type> - <Area>" e.g. "HWR123 - Rent - Whitefield".
+// Sorted by propertyId so a long list stays scannable.
+function payPropertyOptionsList() {
+  return PROPERTIES
+    .filter(p => p.propertyId)
+    .map(p => ({ id: String(p.id), label: `${p.propertyId} - ${pTypeLabel(p)} - ${p.location?.area || ''}`.trim().replace(/ - $/, '') }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+}
+
+function populatePayPropertyOptions(selectedId, selectedLabel) {
+  const sel = document.getElementById('pay-property');
+  const options = payPropertyOptionsList();
+  // If we were handed a specific listing (e.g. the Promote button on My
+  // Listings) that isn't already in shortlist/recently-viewed, add it so
+  // it's selectable and pre-selected.
+  if (selectedId && !options.some(o => o.id === String(selectedId))) {
+    options.unshift({ id: String(selectedId), label: selectedLabel ? `${selectedLabel}` : 'This listing' });
+  }
+  sel.innerHTML = '<option value="">Not specific to a property</option>' +
+    options.map(o => `<option value="${o.id}">${esc(o.label)}</option>`).join('');
+  sel.value = selectedId ? String(selectedId) : '';
+}
+
+// purpose: one of 'brokerage' | 'booking' | 'visit_deposit' | 'promotion'.
+// propertyId / propertyLabel are optional — passed by entry points that
+// already know the specific listing (e.g. the "Promote" button on My
+// Listings), in which case the picker is pre-selected and locked.
+function openPaymentModal(purpose, propertyId, propertyLabel) {
+  const user = getLoggedInUser();
+  if (!user) { openAuthModal(); return; }
+
+  CURRENT_PAYMENT_REQUEST = null;
+  document.getElementById('paymentStage1').style.display = '';
+  document.getElementById('paymentStage2').style.display = 'none';
+  document.getElementById('pay-purpose').value = purpose || 'brokerage';
+  document.getElementById('pay-amount').value = '';
+  populatePayPropertyOptions(propertyId, propertyLabel);
+  const propSel = document.getElementById('pay-property');
+  const propHint = document.getElementById('pay-property-hint');
+  propSel.disabled = !!propertyId;
+  propHint.style.display = propertyId ? '' : 'none';
+
+  document.getElementById('paymentModal').classList.add('open');
+  lockBodyScroll();
+}
+function closePaymentModal() {
+  document.getElementById('paymentModal').classList.remove('open');
+  unlockBodyScroll();
+}
+
+async function createPaymentRequest() {
+  const purpose      = document.getElementById('pay-purpose').value;
+  const propSel      = document.getElementById('pay-property');
+  const propertyId   = propSel.value || null;
+  const propertyNote = propSel.value ? propSel.options[propSel.selectedIndex].textContent : '';
+  const amount     = Number(document.getElementById('pay-amount').value);
+  const note       = propertyNote;
+
+  if (!amount || amount <= 0) { showToast('Enter a valid amount'); return; }
+
+  const btn = document.getElementById('paymentStage1Btn');
+  btn.disabled = true;
+  btn.textContent = 'Creating…';
+  try {
+    const res = await fetch('/api/payments/request', {
+      method: 'POST',
+      headers: userAuthHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ purpose, amount, note, propertyId: propertyId || undefined })
+    });
+    const data = await res.json();
+    if (!res.ok) { showToast(data.message || 'Could not start payment'); return; }
+
+    CURRENT_PAYMENT_REQUEST = {
+      id: data.request._id, refCode: data.request.refCode, amount: data.request.amount,
+      purpose: data.request.purpose,
+    };
+    document.getElementById('paymentStage1').style.display = 'none';
+    document.getElementById('paymentStage2').style.display = '';
+    document.getElementById('pay-utr').value = '';
+    const fileInput = document.getElementById('pay-screenshot');
+    if (fileInput) fileInput.value = '';
+    if (!PAYMENT_SETTINGS_CACHE) {
+      try {
+        const s = await fetch('/api/payment-settings');
+        PAYMENT_SETTINGS_CACHE = await s.json();
+      } catch (err) {
+        // renderPaymentStage2Manual() shows a "contact support" fallback if the cache is still empty
+        console.error('payment-settings fetch failed:', err);
+      }
+    }
+    renderPaymentStage2Manual();
+  } catch (err) {
+    showToast('Network error. Please try again.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Continue';
+  }
+}
+
+// Jumps straight to stage 2 for an existing pending/submitted request, e.g.
+// when the user reopens a payment from their history instead of starting a
+// new one. Any old paymentMethod:'razorpay' record that never completed is
+// resumed here too — Razorpay is gone, so this is the only path forward now.
+async function resumePaymentRequest(payment) {
+  if (!PAYMENT_SETTINGS_CACHE) {
+    try {
+      PAYMENT_SETTINGS_CACHE = await (await fetch('/api/payment-settings')).json();
+    } catch (err) {
+      console.error('payment-settings fetch failed:', err);
+    }
+  }
+
+  CURRENT_PAYMENT_REQUEST = { id: payment._id, refCode: payment.refCode, amount: payment.amount, purpose: payment.purpose };
+
+  document.getElementById('paymentModal').classList.add('open');
+  lockBodyScroll();
+  document.getElementById('paymentStage1').style.display = 'none';
+  document.getElementById('paymentStage2').style.display = '';
+  document.getElementById('pay-utr').value = payment.utr || '';
+  const fileInput = document.getElementById('pay-screenshot');
+  if (fileInput) fileInput.value = '';
+  renderPaymentStage2Manual();
+}
+
+// Renders the UPI/QR/bank details box plus the reference badge for stage 2.
+// Builds a standard UPI deep link (upi://pay?...) — tapping/opening this on a
+// phone hands off to whichever UPI apps are installed (GPay, PhonePe, Paytm,
+// BHIM, etc.) via the OS's own app chooser; we never see which app they used
+// or any payment instrument, exactly like the QR code does. `tn` (transaction
+// note) is set to our reference code so it's easy to match back to this
+// PaymentRequest when reviewing the UTR/screenshot they submit after.
+function buildUpiIntentUrl(s) {
+  if (!s?.upiId || !CURRENT_PAYMENT_REQUEST?.amount) return null;
+  const params = new URLSearchParams({
+    pa: s.upiId,
+    pn: s.bankAccountName || 'Payment',
+    am: String(CURRENT_PAYMENT_REQUEST.amount),
+    cu: 'INR',
+    tn: CURRENT_PAYMENT_REQUEST.refCode || '',
+  });
+  return `upi://pay?${params.toString()}`;
+}
+
+// Handler for the "Pay via UPI app" button and the clickable UPI ID/number
+// rows. Only works on a device with a UPI app installed (i.e. a phone) —
+// desktop browsers have nothing registered to handle the upi:// scheme, so
+// this will silently do nothing there; the QR code and manual entry remain
+// as the fallback either way.
+function payViaUpiApp() {
+  const url = buildUpiIntentUrl(PAYMENT_SETTINGS_CACHE);
+  if (!url) return;
+  window.location.href = url;
+}
+
+function renderPaymentStage2Manual() {
+  document.getElementById('payRefCodeManual').textContent = CURRENT_PAYMENT_REQUEST.refCode;
+  document.getElementById('payRefAmountManual').textContent = fmtINR(CURRENT_PAYMENT_REQUEST.amount);
+
+  const s = PAYMENT_SETTINGS_CACHE || {};
+  const box = document.getElementById('paymentDetailsBox');
+  if (!s.upiId && !s.bankAccountNumber && !s.paymentPhone) {
+    box.innerHTML = `<div class="profile-list-empty">Payment details haven't been set up yet. Please contact us via Help &amp; Support.</div>`;
+    return;
+  }
+  box.innerHTML = `
+    ${s.qrImageUrl ? `<img class="payment-qr-img" src="${safeUrl(s.qrImageUrl)}" alt="Payment QR code" />` : ''}
+    ${s.upiId ? `
+      <button type="button" class="form-submit payment-upi-pay-btn" onclick="payViaUpiApp()">Pay ${fmtINR(CURRENT_PAYMENT_REQUEST.amount)} via UPI app</button>
+      <div class="payment-upi-hint">Opens GPay, PhonePe, Paytm or any UPI app you have installed</div>
+    ` : ''}
+    ${s.upiId ? `<div class="payment-detail-row is-clickable" onclick="payViaUpiApp()" role="button" tabindex="0"><span>UPI ID</span><b>${esc(s.upiId)}</b></div>` : ''}
+    ${s.paymentPhone ? `<div class="payment-detail-row is-clickable" onclick="payViaUpiApp()" role="button" tabindex="0"><span>UPI / GPay number</span><b>${esc(s.paymentPhone)}</b></div>` : ''}
+    ${s.bankAccountName ? `<div class="payment-detail-row"><span>Account name</span><b>${esc(s.bankAccountName)}</b></div>` : ''}
+    ${s.bankAccountNumber ? `<div class="payment-detail-row"><span>Account number</span><b>${esc(s.bankAccountNumber)}</b></div>` : ''}
+    ${s.bankIfsc ? `<div class="payment-detail-row"><span>IFSC</span><b>${esc(s.bankIfsc)}</b></div>` : ''}
+  `;
+}
+
+function copyPaymentRef() {
+  if (!CURRENT_PAYMENT_REQUEST) return;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(CURRENT_PAYMENT_REQUEST.refCode).then(() => showToast('Reference code copied!'));
+  }
+}
+
+// Legacy manual-flow submit — only reachable from paymentStage2Manual.
+async function submitPaymentProof() {
+  if (!CURRENT_PAYMENT_REQUEST) return;
+  const utr = document.getElementById('pay-utr').value.trim();
+  if (!utr) { showToast('Enter the UTR / transaction reference number'); return; }
+
+  const fileInput = document.getElementById('pay-screenshot');
+  const formData = new FormData();
+  formData.append('utr', utr);
+  if (fileInput && fileInput.files[0]) formData.append('screenshot', fileInput.files[0]);
+
+  const btn = document.getElementById('paymentSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+  try {
+    const res = await fetch(`/api/payments/${CURRENT_PAYMENT_REQUEST.id}/submit-proof`, {
+      method: 'POST',
+      headers: userAuthHeaders(), // no Content-Type — the browser sets the multipart boundary itself
+      body: formData
+    });
+    const data = await res.json();
+    if (!res.ok) { showToast(data.message || 'Could not submit payment proof'); return; }
+    showToast('Payment submitted — we\'ll verify it shortly');
+    closePaymentModal();
+    loadMyPayments();
+  } catch (err) {
+    showToast('Network error. Please try again.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "I've paid — submit for verification";
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   PROFILE MODAL — MY PAYMENTS (payment history + resume pending ones)
+═══════════════════════════════════════════════ */
+const PAYMENT_PURPOSE_LABELS = {
+  brokerage: 'Brokerage fee',
+  booking: 'Short Stay booking advance',
+  visit_deposit: 'Visit deposit',
+  promotion: 'Listing promotion',
+};
+const PAYMENT_STATUS_LABELS = {
+  pending: 'Awaiting payment',
+  submitted: 'Submitted — under review',
+  verified: 'Verified',
+  rejected: 'Rejected',
+};
+
+async function loadMyPayments() {
+  const wrap = document.getElementById('myPaymentsContent');
+  wrap.innerHTML = '<div class="profile-loading">Loading your payments…</div>';
+  try {
+    const res = await fetch('/api/user/payments', { headers: userAuthHeaders() });
+    const data = await res.json();
+    if (!res.ok) { wrap.innerHTML = `<div class="profile-list-empty">${data.message || 'Could not load your payments.'}</div>`; return; }
+    MY_PAYMENTS_CACHE = data.payments || [];
+    renderMyPayments();
+  } catch (err) {
+    wrap.innerHTML = '<div class="profile-list-empty">⚠️ Could not connect to server.</div>';
+  }
+}
+
+function renderMyPayments() {
+  const wrap = document.getElementById('myPaymentsContent');
+  if (!MY_PAYMENTS_CACHE.length) {
+    wrap.innerHTML = `<div class="profile-list-empty">
+      <div class="profile-list-empty-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+      No payments yet.<br>Tap "New payment" above to pay online via UPI/bank transfer.
+    </div>`;
+    return;
+  }
+  wrap.innerHTML = MY_PAYMENTS_CACHE.map(p => {
+    const statusClass = p.status === 'verified' ? 'approved' : (p.status === 'rejected' ? 'rejected' : 'pending');
+    const canResume = p.status === 'pending' || p.status === 'submitted';
+    return `<div class="profile-mini-card" style="cursor:default">
+      <div class="profile-mini-body">
+        <div class="profile-mini-title">${esc(PAYMENT_PURPOSE_LABELS[p.purpose] || p.purpose)} · ${esc(p.refCode)}</div>
+        <div class="profile-mini-sub">${esc(p.note) || fmtINR(p.amount)}</div>
+        <div class="profile-mini-price">${fmtINR(p.amount)}</div>
+        <span class="hr-admin-badge ${statusClass}">${esc(PAYMENT_STATUS_LABELS[p.status] || p.status)}</span>
+        ${p.adminRemark ? `<div class="payment-admin-remark">Note from admin: ${esc(p.adminRemark)}</div>` : ''}
+      </div>
+      ${canResume ? `<div class="profile-mini-actions">
+        <button class="profile-mini-icon-btn" title="${p.status === 'pending' ? 'Pay & submit proof' : 'Update proof'}" onclick='resumePaymentRequest(${JSON.stringify(p).replace(/'/g, "&#39;")})'>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+      </div>` : ''}
     </div>`;
   }).join('');
 }
