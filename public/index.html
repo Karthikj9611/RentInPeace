@@ -2510,6 +2510,15 @@ ul{list-style:none}
   font-size:12px;font-weight:700;color:var(--brand);text-decoration:underline;text-underline-offset:2px;
 }
 .payment-change-btn:hover{color:var(--brand-hover)}
+.detail-value-with-copy{display:flex;align-items:center;gap:6px}
+.detail-copy-btn{
+  flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;
+  width:24px;height:24px;padding:0;background:none;border:none;cursor:pointer;
+  color:var(--text-3);border-radius:6px;
+}
+.detail-copy-btn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.detail-copy-btn:hover{color:var(--brand);background:var(--brand-light)}
+.detail-copy-btn.copied{color:var(--brand)}
 
 /* ─── Notifications Modal ──────────────────────── */
 #notifModalBox{
@@ -5270,7 +5279,7 @@ ul{list-style:none}
         </div>
         <div class="payment-detail-row" style="margin-bottom:16px">
           <span id="pay-rent-computed-label">Amount payable (30%)</span>
-          <b id="pay-rent-computed">₹0</b>
+          <span class="detail-value-with-copy"><b id="pay-rent-computed">₹0</b><button type="button" class="detail-copy-btn" title="Copy amount" onclick="copyCurrentAmount(this, event)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button></span>
         </div>
       </div>
 
@@ -5278,7 +5287,7 @@ ul{list-style:none}
       <div id="payPgFlat" style="display:none">
         <div class="payment-detail-row" style="margin-bottom:16px">
           <span>Amount payable (flat fee)</span>
-          <b>₹1,000</b>
+          <span class="detail-value-with-copy"><b>₹1,000</b><button type="button" class="detail-copy-btn" title="Copy amount" onclick="copyCurrentAmount(this, event)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button></span>
         </div>
       </div>
 
@@ -5287,6 +5296,7 @@ ul{list-style:none}
           <label class="form-label">Amount (₹)</label>
           <div class="payment-amount-row">
             <input class="form-input" type="number" id="pay-amount-inline" min="1" placeholder="e.g. 6000" onblur="handleAmountBlur()" />
+            <button type="button" class="detail-copy-btn" title="Copy amount" onclick="copyCurrentAmount(this, event)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>
             <button type="button" class="payment-change-btn" id="payAmountChangeBtn" onclick="changePaymentAmount()" style="display:none">Change</button>
           </div>
         </div>
@@ -10394,6 +10404,50 @@ async function loadPaymentDetailsBox() {
   renderPaymentDetailsBox();
 }
 
+// Shared clipboard-copy helper for the small copy icons next to UPI ID,
+// bank details, and the amount in the payment modal. event.stopPropagation()
+// is needed because some of these sit inside rows that already have their
+// own onclick (e.g. the UPI ID row also triggers payViaUpiApp()). Falls back
+// to a hidden-textarea + execCommand for non-secure contexts where
+// navigator.clipboard isn't available.
+async function copyPaymentDetail(text, btnEl, event) {
+  if (event) event.stopPropagation();
+  const value = String(text ?? '').trim();
+  if (!value) return;
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(value);
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = value;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    showToast('Copied to clipboard');
+    if (btnEl) {
+      btnEl.classList.add('copied');
+      setTimeout(() => btnEl.classList.remove('copied'), 1200);
+    }
+  } catch (err) {
+    showToast('Could not copy — please copy it manually');
+  }
+}
+
+// Copies whatever amount is currently payable, no matter which category UI
+// is showing (Rent/Lease's computed 30%/50%, PG's flat ₹1000, or the plain
+// manual field) — they all keep pay-amount-inline in sync, so this is the
+// single source of truth to read from.
+function copyCurrentAmount(btnEl, event) {
+  if (event) event.stopPropagation();
+  const val = document.getElementById('pay-amount-inline').value;
+  if (!val || Number(val) <= 0) { showToast('Enter an amount first'); return; }
+  copyPaymentDetail(val, btnEl, event);
+}
+
 function renderPaymentDetailsBox() {
   const s = PAYMENT_SETTINGS_CACHE || {};
   const box = document.getElementById('paymentDetailsBox');
@@ -10403,11 +10457,11 @@ function renderPaymentDetailsBox() {
   }
   box.innerHTML = `
     ${s.qrImageUrl ? `<img class="payment-qr-img" src="${safeUrl(s.qrImageUrl)}" alt="Payment QR code" />` : ''}
-    ${s.upiId ? `<div class="payment-detail-row is-clickable" onclick="payViaUpiApp()" role="button" tabindex="0"><span>UPI ID</span><b>${esc(s.upiId)}</b></div>` : ''}
-    ${s.paymentPhone ? `<div class="payment-detail-row is-clickable" onclick="payViaUpiApp()" role="button" tabindex="0"><span>UPI / GPay number</span><b>${esc(s.paymentPhone)}</b></div>` : ''}
+    ${s.upiId ? `<div class="payment-detail-row is-clickable" onclick="payViaUpiApp()" role="button" tabindex="0"><span>UPI ID</span><span class="detail-value-with-copy"><b>${esc(s.upiId)}</b><button type="button" class="detail-copy-btn" title="Copy UPI ID" onclick='copyPaymentDetail(${JSON.stringify(s.upiId).replace(/'/g, "&#39;")}, this, event)'><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button></span></div>` : ''}
+    ${s.paymentPhone ? `<div class="payment-detail-row is-clickable" onclick="payViaUpiApp()" role="button" tabindex="0"><span>UPI / GPay number</span><span class="detail-value-with-copy"><b>${esc(s.paymentPhone)}</b><button type="button" class="detail-copy-btn" title="Copy number" onclick='copyPaymentDetail(${JSON.stringify(s.paymentPhone).replace(/'/g, "&#39;")}, this, event)'><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button></span></div>` : ''}
     ${s.bankAccountName ? `<div class="payment-detail-row"><span>Account name</span><b>${esc(s.bankAccountName)}</b></div>` : ''}
-    ${s.bankAccountNumber ? `<div class="payment-detail-row"><span>Account number</span><b>${esc(s.bankAccountNumber)}</b></div>` : ''}
-    ${s.bankIfsc ? `<div class="payment-detail-row"><span>IFSC</span><b>${esc(s.bankIfsc)}</b></div>` : ''}
+    ${s.bankAccountNumber ? `<div class="payment-detail-row"><span>Account number</span><span class="detail-value-with-copy"><b>${esc(s.bankAccountNumber)}</b><button type="button" class="detail-copy-btn" title="Copy account number" onclick='copyPaymentDetail(${JSON.stringify(s.bankAccountNumber).replace(/'/g, "&#39;")}, this, event)'><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button></span></div>` : ''}
+    ${s.bankIfsc ? `<div class="payment-detail-row"><span>IFSC</span><span class="detail-value-with-copy"><b>${esc(s.bankIfsc)}</b><button type="button" class="detail-copy-btn" title="Copy IFSC" onclick='copyPaymentDetail(${JSON.stringify(s.bankIfsc).replace(/'/g, "&#39;")}, this, event)'><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button></span></div>` : ''}
 	${s.upiId ? `
       <button type="button" class="form-submit payment-upi-pay-btn" onclick="payViaUpiApp()">Pay via UPI app</button>
     ` : ''}
