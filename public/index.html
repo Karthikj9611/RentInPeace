@@ -2510,6 +2510,13 @@ ul{list-style:none}
 .payment-upi-hint{font-size:11px;color:var(--text-3);text-align:center;margin:-4px 0 12px}
 .payment-stage2-note{font-size:11.5px;color:var(--text-3);text-align:center;margin-top:12px;line-height:1.5}
 .payment-admin-remark{font-size:11px;color:var(--text-3);margin-top:5px;font-style:italic}
+.payment-amount-row{display:flex;align-items:center;gap:8px}
+.payment-amount-row .form-input{flex:1}
+.payment-change-btn{
+  flex-shrink:0;background:none;border:none;cursor:pointer;padding:9px 2px;
+  font-size:12px;font-weight:700;color:var(--brand);text-decoration:underline;text-underline-offset:2px;
+}
+.payment-change-btn:hover{color:var(--brand-hover)}
 
 /* ─── Notifications Modal ──────────────────────── */
 #notifModalBox{
@@ -5209,7 +5216,7 @@ ul{list-style:none}
 
     <!-- Stage 1: what & how much -->
     <div id="paymentStage1">
-      <div class="form-group">
+      <div class="form-group" id="pay-purpose-group">
         <label class="form-label">What's this payment for?</label>
         <select class="form-input" id="pay-purpose">
           <option value="brokerage">Brokerage fee</option>
@@ -5222,7 +5229,7 @@ ul{list-style:none}
         <label class="form-label">Amount (₹)</label>
         <input class="form-input" type="number" id="pay-amount" min="1" placeholder="e.g. 6000" />
       </div>
-      <div class="form-group">
+      <div class="form-group" id="pay-property-group">
         <label class="form-label">Which property is this for? <span style="color:var(--text-3);font-weight:400">(optional)</span></label>
         <select class="form-input" id="pay-property"></select>
         <div class="identity-locked-hint" id="pay-property-hint" style="display:none">Auto-filled from this listing</div>
@@ -5230,37 +5237,52 @@ ul{list-style:none}
       <button class="form-submit" id="paymentStage1Btn" onclick="createPaymentRequest()">Continue</button>
     </div>
 
-    <!-- Stage 2: pay via UPI/QR/bank transfer, then submit for verification -->
+    <!-- Stage 2: one combined screen — amount, QR/UPI/bank details, UTR,
+         screenshot, all visible together. No separate "Continue" step: the
+         PaymentRequest is created quietly in the background once a valid
+         amount is entered (see handleAmountBlur()/ensureCurrentPaymentRequest()),
+         so the reference code is ready by the time the user needs it, and
+         the single submit button below both finalizes the request (if the
+         amount changed since) and submits the UTR/screenshot proof. -->
     <div id="paymentStage2" style="display:none">
-      <div id="paymentStage2Manual">
-        <div class="payment-ref-badge">
-          <div class="payment-ref-label">Reference code — add this to your UPI payment note</div>
-          <div class="payment-ref-code-row">
-            <span class="payment-ref-code" id="payRefCodeManual">—</span>
-            <button class="profile-mini-icon-btn" title="Copy" onclick="copyPaymentRef()">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            </button>
-          </div>
-          <div class="payment-ref-amount" id="payRefAmountManual">₹0</div>
-        </div>
-
-        <div id="paymentDetailsBox" class="payment-details-box">
-          <div class="profile-loading">Loading payment details…</div>
-        </div>
-
-        <div class="form-group" style="margin-top:14px">
-          <label class="form-label">UTR / transaction reference number</label>
-          <input class="form-input" type="text" id="pay-utr" placeholder="From your UPI app, after paying" />
-        </div>
+      <div id="paymentAmountEntry">
         <div class="form-group">
-          <label class="form-label">Payment screenshot <span style="color:var(--text-3);font-weight:400">(optional but speeds up verification)</span></label>
-          <input class="form-input" type="file" id="pay-screenshot" accept="image/*" />
+          <label class="form-label">Amount (₹)</label>
+          <div class="payment-amount-row">
+            <input class="form-input" type="number" id="pay-amount-inline" min="1" placeholder="e.g. 6000" onblur="handleAmountBlur()" />
+            <button type="button" class="payment-change-btn" id="payAmountChangeBtn" onclick="changePaymentAmount()" style="display:none">Change</button>
+          </div>
         </div>
-        <button class="form-submit" id="paymentSubmitBtn" onclick="submitPaymentProof()">I've paid — submit for verification</button>
-        <div class="payment-stage2-note">Your payment will show as "Submitted" until an admin verifies it against the bank/UPI statement. You can close this and come back from the Payments tab any time.</div>
+      </div>
+
+      <div id="paymentDetailsSection">
+        <div id="paymentStage2Manual">
+          <div class="payment-ref-badge">
+            <div class="payment-ref-label">Reference code — add this to your UPI payment note</div>
+            <div class="payment-ref-code-row">
+              <span class="payment-ref-code" id="payRefCodeManual">—</span>
+              <button class="profile-mini-icon-btn" title="Copy" onclick="copyPaymentRef()">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
+            <div class="payment-ref-amount" id="payRefAmountManual">₹0</div>
+          </div>
+
+          <div id="paymentDetailsBox" class="payment-details-box">
+            <div class="profile-loading">Loading payment details…</div>
+          </div>
+
+          <div class="form-group" style="margin-top:14px">
+            <label class="form-label">UTR / transaction reference number</label>
+            <input class="form-input" type="text" id="pay-utr" placeholder="From your UPI app, after paying" />
+          </div>
+         
+        
+      </div>
       </div>
     </div>
   </div>
+
 </div>
 
 <!-- ─── Notifications Modal ─────────────────────── -->
@@ -10240,17 +10262,29 @@ function renderMyListings() {
 
 /* ═══════════════════════════════════════════════
    PAYMENTS — UPI/QR/bank transfer with manual admin verification.
-   Stage 1 (paymentStage1) collects purpose/amount/property and creates a
-   PaymentRequest server-side. Stage 2 (paymentStage2Manual) then shows the
-   UPI ID/QR code/bank details (from /api/payment-settings) plus a reference
-   code to include in the transfer note. The user pays externally via their
-   own UPI app or bank, then submits a UTR + optional screenshot via
-   submitPaymentProof(); an admin verifies it by hand against the bank/UPI
-   statement (server.js: /api/admin/payments/:id/verify).
+   One combined screen (paymentStage2): amount field, QR/UPI/bank details,
+   UTR, and screenshot are all visible together — no separate "Continue"
+   step. The QR/UPI/bank details are static settings (/api/payment-settings)
+   and render immediately on open. The PaymentRequest itself (which needs an
+   amount) is created quietly in the background once the amount field loses
+   focus (handleAmountBlur() → ensureCurrentPaymentRequest()), so the
+   reference code is ready by the time the user needs it for their transfer
+   note. Hitting "I've paid — submit for verification" (submitPaymentProof())
+   finalizes the request if the amount changed since, then submits the
+   UTR + optional screenshot; an admin verifies it by hand against the
+   bank/UPI statement (server.js: /api/admin/payments/:id/verify).
 ═══════════════════════════════════════════════ */
 let CURRENT_PAYMENT_REQUEST = null; // { id, refCode, amount, purpose }
 let PAYMENT_SETTINGS_CACHE  = null; // UPI/QR/bank details, lazy-loaded only when needed
 let MY_PAYMENTS_CACHE = [];
+// Stage 1 (purpose/amount/property picker) is skipped entirely now — every
+// entry point goes straight to stage 2's combined amount+payment-details
+// screen. Property context (when an entry point already knows the listing,
+// e.g. "Promote this listing") has nowhere left to be read from at submit
+// time, so it's stashed here by openPaymentModal() and read back when the
+// PaymentRequest is created.
+let CURRENT_PAY_PROPERTY_ID = null;
+let CURRENT_PAY_PROPERTY_NOTE = '';
 
 // Plain rupee formatting with thousands separators (fmtRupee() abbreviates to
 // K/L/Cr, which isn't right for an exact amount someone is about to pay).
@@ -10287,30 +10321,137 @@ function populatePayPropertyOptions(selectedId, selectedLabel) {
 // purpose: one of 'brokerage' | 'booking' | 'visit_deposit' | 'promotion'.
 // propertyId / propertyLabel are optional — passed by entry points that
 // already know the specific listing (e.g. the "Promote" button on My
-// Listings), in which case the picker is pre-selected and locked.
+// Listings); stashed in CURRENT_PAY_PROPERTY_ID/NOTE for whenever the
+// PaymentRequest ends up getting created, since there's no stage-1 property
+// picker left to read it from.
+// Stage 1 ("what's this for" / "which property") is skipped for every entry
+// point now — this shows the single combined stage-2 screen (amount +
+// QR/UPI/bank details + UTR + screenshot) right away. The static payment
+// details render immediately; the PaymentRequest itself waits until an
+// amount is entered (see handleAmountBlur()).
 function openPaymentModal(purpose, propertyId, propertyLabel) {
   const user = getLoggedInUser();
   if (!user) { openAuthModal(); return; }
 
   CURRENT_PAYMENT_REQUEST = null;
-  document.getElementById('paymentStage1').style.display = '';
-  document.getElementById('paymentStage2').style.display = 'none';
+  CURRENT_PAY_PROPERTY_ID = propertyId || null;
+  CURRENT_PAY_PROPERTY_NOTE = propertyLabel || '';
   document.getElementById('pay-purpose').value = purpose || 'brokerage';
-  document.getElementById('pay-amount').value = '';
-  populatePayPropertyOptions(propertyId, propertyLabel);
-  const propSel = document.getElementById('pay-property');
-  const propHint = document.getElementById('pay-property-hint');
-  propSel.disabled = !!propertyId;
-  propHint.style.display = propertyId ? '' : 'none';
+
+  document.getElementById('paymentStage1').style.display = 'none';
+  document.getElementById('paymentStage2').style.display = '';
+  document.getElementById('paymentAmountEntry').style.display = '';
+  document.getElementById('paymentDetailsSection').style.display = '';
+
+  const amtInline = document.getElementById('pay-amount-inline');
+  amtInline.value = '';
+  amtInline.readOnly = false;
+  amtInline.classList.remove('identity-locked');
+  document.getElementById('payAmountChangeBtn').style.display = 'none';
+  document.getElementById('pay-utr').value = '';
+  const fileInput = document.getElementById('pay-screenshot');
+  if (fileInput) fileInput.value = '';
+  updatePaymentRefBadge();
 
   document.getElementById('paymentModal').classList.add('open');
   lockBodyScroll();
+  loadPaymentDetailsBox();
 }
 function closePaymentModal() {
   document.getElementById('paymentModal').classList.remove('open');
   unlockBodyScroll();
 }
 
+// Fetches (if not already cached) and renders the static QR/UPI/bank details
+// box. These are account-level settings, not tied to a specific
+// PaymentRequest, so they can — and now do — render before any amount is
+// entered or request created.
+async function loadPaymentDetailsBox() {
+  if (!PAYMENT_SETTINGS_CACHE) {
+    try {
+      const s = await fetch('/api/payment-settings');
+      PAYMENT_SETTINGS_CACHE = await s.json();
+    } catch (err) {
+      console.error('payment-settings fetch failed:', err);
+    }
+  }
+  renderPaymentDetailsBox();
+}
+
+function renderPaymentDetailsBox() {
+  const s = PAYMENT_SETTINGS_CACHE || {};
+  const box = document.getElementById('paymentDetailsBox');
+  if (!s.upiId && !s.bankAccountNumber && !s.paymentPhone) {
+    box.innerHTML = `<div class="profile-list-empty">Payment details haven't been set up yet. Please contact us via Help &amp; Support.</div>`;
+    return;
+  }
+  box.innerHTML = `
+    ${s.qrImageUrl ? `<img class="payment-qr-img" src="${safeUrl(s.qrImageUrl)}" alt="Payment QR code" />` : ''}
+    ${s.upiId ? `<div class="payment-detail-row is-clickable" onclick="payViaUpiApp()" role="button" tabindex="0"><span>UPI ID</span><b>${esc(s.upiId)}</b></div>` : ''}
+    ${s.paymentPhone ? `<div class="payment-detail-row is-clickable" onclick="payViaUpiApp()" role="button" tabindex="0"><span>UPI / GPay number</span><b>${esc(s.paymentPhone)}</b></div>` : ''}
+    ${s.bankAccountName ? `<div class="payment-detail-row"><span>Account name</span><b>${esc(s.bankAccountName)}</b></div>` : ''}
+    ${s.bankAccountNumber ? `<div class="payment-detail-row"><span>Account number</span><b>${esc(s.bankAccountNumber)}</b></div>` : ''}
+    ${s.bankIfsc ? `<div class="payment-detail-row"><span>IFSC</span><b>${esc(s.bankIfsc)}</b></div>` : ''}
+	${s.upiId ? `
+      <button type="button" class="form-submit payment-upi-pay-btn" onclick="payViaUpiApp()">Pay via UPI app</button>
+    ` : ''}
+  `;
+}
+
+// Updates just the reference-code badge — split out from renderPaymentDetailsBox
+// since the badge depends on CURRENT_PAYMENT_REQUEST (may not exist yet) while
+// the details box below it doesn't.
+function updatePaymentRefBadge() {
+  document.getElementById('payRefCodeManual').textContent = CURRENT_PAYMENT_REQUEST ? CURRENT_PAYMENT_REQUEST.refCode : '—';
+  document.getElementById('payRefAmountManual').textContent = fmtINR(CURRENT_PAYMENT_REQUEST ? CURRENT_PAYMENT_REQUEST.amount : 0);
+}
+
+// Fires on the amount field losing focus: creates the PaymentRequest quietly
+// in the background (or re-creates it if the amount changed since) so the
+// reference code / "Pay via UPI app" button are ready before the user needs
+// them — no separate "Continue" click. Silently no-ops until a valid amount
+// is present; submitPaymentProof() re-checks and creates it at submit time
+// too, in case this blur handler never fired (e.g. autofill, or submitting
+// without leaving the field).
+async function handleAmountBlur() {
+  const amount = Number(document.getElementById('pay-amount-inline').value);
+  if (!amount || amount <= 0) return;
+  await ensureCurrentPaymentRequest(amount);
+}
+
+// Creates the PaymentRequest if none exists yet for this amount, or
+// re-creates it if the amount has changed since the last one was made
+// (the old in-progress request is simply abandoned, same as before).
+async function ensureCurrentPaymentRequest(amount) {
+  if (CURRENT_PAYMENT_REQUEST && CURRENT_PAYMENT_REQUEST.amount === amount) return CURRENT_PAYMENT_REQUEST;
+  const purpose = document.getElementById('pay-purpose').value;
+  return finalizePaymentRequestCreation(purpose, amount, CURRENT_PAY_PROPERTY_NOTE, CURRENT_PAY_PROPERTY_ID);
+}
+
+// Creates the PaymentRequest server-side and updates the reference badge.
+// Called both from the amount-blur auto-create path and from
+// submitPaymentProof() as a fallback. Returns the created request, or null
+// if it failed (toast already shown).
+async function finalizePaymentRequestCreation(purpose, amount, note, propertyId) {
+  const res = await fetch('/api/payments/request', {
+    method: 'POST',
+    headers: userAuthHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ purpose, amount, note, propertyId: propertyId || undefined })
+  });
+  const data = await res.json();
+  if (!res.ok) { showToast(data.message || 'Could not start payment'); return null; }
+
+  CURRENT_PAYMENT_REQUEST = {
+    id: data.request._id, refCode: data.request.refCode, amount: data.request.amount,
+    purpose: data.request.purpose,
+  };
+  updatePaymentRefBadge();
+  return CURRENT_PAYMENT_REQUEST;
+}
+
+// Dead code now that stage 1's markup is never shown (kept only in case it's
+// wanted back) — paymentStage1Btn's onclick still points here but the button
+// is unreachable since #paymentStage1 stays display:none.
 async function createPaymentRequest() {
   const purpose      = document.getElementById('pay-purpose').value;
   const propSel      = document.getElementById('pay-property');
@@ -10325,33 +10466,10 @@ async function createPaymentRequest() {
   btn.disabled = true;
   btn.textContent = 'Creating…';
   try {
-    const res = await fetch('/api/payments/request', {
-      method: 'POST',
-      headers: userAuthHeaders({ 'Content-Type': 'application/json' }),
-      body: JSON.stringify({ purpose, amount, note, propertyId: propertyId || undefined })
-    });
-    const data = await res.json();
-    if (!res.ok) { showToast(data.message || 'Could not start payment'); return; }
-
-    CURRENT_PAYMENT_REQUEST = {
-      id: data.request._id, refCode: data.request.refCode, amount: data.request.amount,
-      purpose: data.request.purpose,
-    };
+    const request = await finalizePaymentRequestCreation(purpose, amount, note, propertyId);
+    if (!request) return;
     document.getElementById('paymentStage1').style.display = 'none';
     document.getElementById('paymentStage2').style.display = '';
-    document.getElementById('pay-utr').value = '';
-    const fileInput = document.getElementById('pay-screenshot');
-    if (fileInput) fileInput.value = '';
-    if (!PAYMENT_SETTINGS_CACHE) {
-      try {
-        const s = await fetch('/api/payment-settings');
-        PAYMENT_SETTINGS_CACHE = await s.json();
-      } catch (err) {
-        // renderPaymentStage2Manual() shows a "contact support" fallback if the cache is still empty
-        console.error('payment-settings fetch failed:', err);
-      }
-    }
-    renderPaymentStage2Manual();
   } catch (err) {
     showToast('Network error. Please try again.');
   } finally {
@@ -10360,6 +10478,24 @@ async function createPaymentRequest() {
   }
 }
 
+// Lets the user unlock and re-enter the amount after payment details have
+// already been generated for it (e.g. they mistyped it). The in-progress
+// PaymentRequest is simply abandoned -- hitting Continue again creates a
+// fresh one with the corrected amount.
+// Lets the user unlock and re-enter the amount after a request has already
+// been created for it (e.g. resuming a pending payment, or they mistyped
+// it). The in-progress PaymentRequest is simply abandoned — losing focus on
+// the field again (or hitting submit) creates a fresh one with the
+// corrected amount.
+function changePaymentAmount() {
+  CURRENT_PAYMENT_REQUEST = null;
+  const amountInput = document.getElementById('pay-amount-inline');
+  amountInput.readOnly = false;
+  amountInput.classList.remove('identity-locked');
+  amountInput.focus();
+  document.getElementById('payAmountChangeBtn').style.display = 'none';
+  updatePaymentRefBadge();
+}
 // Jumps straight to stage 2 for an existing pending/submitted request, e.g.
 // when the user reopens a payment from their history instead of starting a
 // new one. Any old paymentMethod:'razorpay' record that never completed is
@@ -10374,16 +10510,27 @@ async function resumePaymentRequest(payment) {
   }
 
   CURRENT_PAYMENT_REQUEST = { id: payment._id, refCode: payment.refCode, amount: payment.amount, purpose: payment.purpose };
+  CURRENT_PAY_PROPERTY_ID = null;
+  CURRENT_PAY_PROPERTY_NOTE = '';
 
   document.getElementById('paymentModal').classList.add('open');
   lockBodyScroll();
   document.getElementById('paymentStage1').style.display = 'none';
   document.getElementById('paymentStage2').style.display = '';
+  document.getElementById('paymentAmountEntry').style.display = '';
+  document.getElementById('paymentDetailsSection').style.display = '';
+  const amtInline = document.getElementById('pay-amount-inline');
+  amtInline.value = payment.amount;
+  amtInline.readOnly = true; // resuming an existing request — amount is fixed unless they hit Change
+  amtInline.classList.add('identity-locked');
+  document.getElementById('payAmountChangeBtn').style.display = '';
   document.getElementById('pay-utr').value = payment.utr || '';
   const fileInput = document.getElementById('pay-screenshot');
   if (fileInput) fileInput.value = '';
-  renderPaymentStage2Manual();
+  renderPaymentDetailsBox();
+  updatePaymentRefBadge();
 }
+
 
 // Renders the UPI/QR/bank details box plus the reference badge for stage 2.
 // Builds a standard UPI deep link (upi://pay?...) — tapping/opening this on a
@@ -10411,32 +10558,8 @@ function buildUpiIntentUrl(s) {
 // as the fallback either way.
 function payViaUpiApp() {
   const url = buildUpiIntentUrl(PAYMENT_SETTINGS_CACHE);
-  if (!url) return;
+  if (!url) { showToast('Enter an amount first'); return; }
   window.location.href = url;
-}
-
-function renderPaymentStage2Manual() {
-  document.getElementById('payRefCodeManual').textContent = CURRENT_PAYMENT_REQUEST.refCode;
-  document.getElementById('payRefAmountManual').textContent = fmtINR(CURRENT_PAYMENT_REQUEST.amount);
-
-  const s = PAYMENT_SETTINGS_CACHE || {};
-  const box = document.getElementById('paymentDetailsBox');
-  if (!s.upiId && !s.bankAccountNumber && !s.paymentPhone) {
-    box.innerHTML = `<div class="profile-list-empty">Payment details haven't been set up yet. Please contact us via Help &amp; Support.</div>`;
-    return;
-  }
-  box.innerHTML = `
-    ${s.qrImageUrl ? `<img class="payment-qr-img" src="${safeUrl(s.qrImageUrl)}" alt="Payment QR code" />` : ''}
-    ${s.upiId ? `
-      <button type="button" class="form-submit payment-upi-pay-btn" onclick="payViaUpiApp()">Pay ${fmtINR(CURRENT_PAYMENT_REQUEST.amount)} via UPI app</button>
-      <div class="payment-upi-hint">Opens GPay, PhonePe, Paytm or any UPI app you have installed</div>
-    ` : ''}
-    ${s.upiId ? `<div class="payment-detail-row is-clickable" onclick="payViaUpiApp()" role="button" tabindex="0"><span>UPI ID</span><b>${esc(s.upiId)}</b></div>` : ''}
-    ${s.paymentPhone ? `<div class="payment-detail-row is-clickable" onclick="payViaUpiApp()" role="button" tabindex="0"><span>UPI / GPay number</span><b>${esc(s.paymentPhone)}</b></div>` : ''}
-    ${s.bankAccountName ? `<div class="payment-detail-row"><span>Account name</span><b>${esc(s.bankAccountName)}</b></div>` : ''}
-    ${s.bankAccountNumber ? `<div class="payment-detail-row"><span>Account number</span><b>${esc(s.bankAccountNumber)}</b></div>` : ''}
-    ${s.bankIfsc ? `<div class="payment-detail-row"><span>IFSC</span><b>${esc(s.bankIfsc)}</b></div>` : ''}
-  `;
 }
 
 function copyPaymentRef() {
@@ -10446,9 +10569,14 @@ function copyPaymentRef() {
   }
 }
 
-// Legacy manual-flow submit — only reachable from paymentStage2Manual.
+// Combined submit: makes sure a PaymentRequest exists for the current amount
+// (normally already created quietly by handleAmountBlur() when the amount
+// field lost focus — this is the fallback for e.g. autofill, or hitting
+// submit without ever leaving the field), then submits the UTR/screenshot
+// proof against it.
 async function submitPaymentProof() {
-  if (!CURRENT_PAYMENT_REQUEST) return;
+  const amount = Number(document.getElementById('pay-amount-inline').value);
+  if (!amount || amount <= 0) { showToast('Enter a valid amount'); return; }
   const utr = document.getElementById('pay-utr').value.trim();
   if (!utr) { showToast('Enter the UTR / transaction reference number'); return; }
 
@@ -10461,7 +10589,9 @@ async function submitPaymentProof() {
   btn.disabled = true;
   btn.textContent = 'Submitting…';
   try {
-    const res = await fetch(`/api/payments/${CURRENT_PAYMENT_REQUEST.id}/submit-proof`, {
+    const request = await ensureCurrentPaymentRequest(amount);
+    if (!request) return;
+    const res = await fetch(`/api/payments/${request.id}/submit-proof`, {
       method: 'POST',
       headers: userAuthHeaders(), // no Content-Type — the browser sets the multipart boundary itself
       body: formData

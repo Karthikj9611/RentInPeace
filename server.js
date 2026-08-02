@@ -2978,9 +2978,9 @@ const PaymentSettings = mongoose.model('PaymentSettings', PaymentSettingsSchema)
 const DUMMY_PAYMENT_DETAILS = {
   upiId:             '9611459960@yescred', // ⚠️ placeholder — replace with your real UPI ID
   qrImageUrl:        '',                        // left blank on purpose: a fake QR image would be scannable and misleading
-  bankAccountName:   'Your Business Name',       // ⚠️ placeholder
-  bankAccountNumber: '000123456789',             // ⚠️ placeholder
-  bankIfsc:          'HDFC0000123',              // ⚠️ placeholder
+  bankAccountName:   'HomeLoop',       // ⚠️ placeholder
+  bankAccountNumber: '50100537331106',             // ⚠️ placeholder
+  bankIfsc:          'HDFC0000133',              // ⚠️ placeholder
   paymentPhone:      '9611459960',               // ⚠️ placeholder
 };
 app.get('/api/payment-settings', async (req, res) => {
