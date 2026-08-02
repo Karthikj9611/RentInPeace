@@ -2945,12 +2945,13 @@ app.use((err, req, res, next) => {
 // ── PAYMENTS (UPI/QR/bank transfer, verified by hand) ──
 // A PaymentRequest is created the moment a user starts paying (purpose +
 // amount, optionally a propertyId). The frontend then shows our UPI ID/QR
-// code/bank details (PaymentSettings, edited by admin) along with the
-// request's reference code, which the payer is asked to include in their
-// transfer note. Once they've paid externally (their own UPI app or bank),
-// they submit a UTR + optional screenshot via /api/payments/:id/submit-proof,
-// which flips status to 'submitted'. An admin then reviews it against the
-// bank/UPI statement and calls /api/admin/payments/:id/verify or /reject.
+// code/bank details (PaymentSettings, edited by admin); the request's
+// reference code is embedded automatically as the transfer note when paying
+// via the in-app UPI deep link. Once they've paid externally (their own UPI
+// app or bank), they submit an optional screenshot via
+// /api/payments/:id/submit-proof, which flips status to 'submitted'. An
+// admin then reviews it against the bank/UPI statement and calls
+// /api/admin/payments/:id/verify or /reject.
 // ────────────────────────────────────────────────────────────────────────────
 
 // Single document (key: 'default') holding the shared payment destination,
@@ -3021,7 +3022,7 @@ app.put('/api/admin/payment-settings', requireAdmin, async (req, res) => {
 // ── Payment requests ──
 // Created the moment a user starts a payment (before they've actually paid),
 // so there's a refCode up front to put in the transfer note. Stays 'pending'
-// until they submit a UTR/screenshot (-> 'submitted'), then an admin marks it
+// until they submit a screenshot (-> 'submitted'), then an admin marks it
 // 'verified' or 'rejected' by hand. razorpay* fields are kept only so old,
 // pre-existing records (from when this used Razorpay) still load correctly.
 const PaymentRequestSchema = new mongoose.Schema({
@@ -3110,10 +3111,11 @@ app.post('/api/payments/request', paymentLimiter, requireUser, async (req, res) 
 });
 
 // Step 2 — user submits proof after paying externally via UPI/bank transfer:
-// a UTR number plus a screenshot (reuses the same multer + sharp pipeline as
-// listing photo uploads, single file this time). Only the request's own
-// owner can submit for it. This is now the only confirmation path — an admin
-// reviews the submission by hand (see /api/admin/payments/:id/verify below).
+// an optional screenshot (reuses the same multer + sharp pipeline as listing
+// photo uploads, single file this time). `utr` is accepted if sent but no
+// longer required — the frontend no longer collects it. Only the request's
+// own owner can submit for it. An admin reviews the submission by hand
+// (see /api/admin/payments/:id/verify below).
 app.post('/api/payments/:id/submit-proof', paymentLimiter, requireUser, upload.single('screenshot'), async (req, res) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ message: 'Invalid payment id' });
@@ -3122,7 +3124,6 @@ app.post('/api/payments/:id/submit-proof', paymentLimiter, requireUser, upload.s
     if (request.status === 'verified') return res.status(409).json({ message: 'This payment is already verified' });
 
     const { utr } = req.body || {};
-    if (!utr || !String(utr).trim()) return res.status(400).json({ message: 'UTR / transaction reference number is required' });
 
     let screenshotUrl = request.screenshotUrl;
     if (req.file) {
@@ -3135,7 +3136,7 @@ app.post('/api/payments/:id/submit-proof', paymentLimiter, requireUser, upload.s
       screenshotUrl = `/uploads/${doc._id}`;
     }
 
-    request.utr = String(utr).trim();
+    request.utr = utr ? String(utr).trim() : '';
     request.screenshotUrl = screenshotUrl;
     request.status = 'submitted';
     request.submittedAt = new Date();

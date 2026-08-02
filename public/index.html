@@ -2486,13 +2486,6 @@ ul{list-style:none}
 }
 
 /* ─── Payment Modal ─────────────────────────────── */
-.payment-ref-badge{
-  background:var(--brand-light);border-radius:14px;padding:14px 16px;text-align:center;margin-bottom:14px;
-}
-.payment-ref-label{font-size:11.5px;color:var(--text-2);margin-bottom:6px}
-.payment-ref-code-row{display:flex;align-items:center;justify-content:center;gap:8px}
-.payment-ref-code{font-size:19px;font-weight:800;color:var(--brand);letter-spacing:.4px}
-.payment-ref-amount{font-size:13px;color:var(--text-2);margin-top:4px;font-weight:700}
 .payment-details-box{
   border:1.5px solid var(--border);border-radius:14px;padding:14px 16px;
 }
@@ -5253,14 +5246,42 @@ ul{list-style:none}
       <button class="form-submit" id="paymentStage1Btn" onclick="createPaymentRequest()">Continue</button>
     </div>
 
-    <!-- Stage 2: one combined screen — amount, QR/UPI/bank details, UTR,
-         screenshot, all visible together. No separate "Continue" step: the
+    <!-- Stage 2: one combined screen — amount and QR/UPI/bank details,
+         all visible together. No separate "Continue" step: the
          PaymentRequest is created quietly in the background once a valid
-         amount is entered (see handleAmountBlur()/ensureCurrentPaymentRequest()),
-         so the reference code is ready by the time the user needs it, and
-         the single submit button below both finalizes the request (if the
-         amount changed since) and submits the UTR/screenshot proof. -->
+         amount is entered (see handleAmountBlur()/ensureCurrentPaymentRequest()). -->
     <div id="paymentStage2" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Payment for</label>
+        <select class="form-input" id="pay-category" onchange="handlePayCategoryChange()">
+          <option value="rent">Rent</option>
+          <option value="lease">Lease</option>
+          <option value="pg">PG</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <!-- Rent (30%) / Lease (50%): enter the monthly rent, we auto-calculate
+           the payable amount based on which category is selected. -->
+      <div id="payRentCalc">
+        <div class="form-group">
+          <label class="form-label" id="pay-rent-label">Monthly rent (₹)</label>
+          <input class="form-input" type="number" id="pay-rent-total" min="1" placeholder="e.g. 20000" oninput="updateRentComputedDisplay()" onblur="handleRentTotalBlur()" />
+        </div>
+        <div class="payment-detail-row" style="margin-bottom:16px">
+          <span id="pay-rent-computed-label">Amount payable (30%)</span>
+          <b id="pay-rent-computed">₹0</b>
+        </div>
+      </div>
+
+      <!-- PG: flat fee, no total-amount entry needed. -->
+      <div id="payPgFlat" style="display:none">
+        <div class="payment-detail-row" style="margin-bottom:16px">
+          <span>Amount payable (flat fee)</span>
+          <b>₹1,000</b>
+        </div>
+      </div>
+
       <div id="paymentAmountEntry">
         <div class="form-group">
           <label class="form-label">Amount (₹)</label>
@@ -5273,27 +5294,10 @@ ul{list-style:none}
 
       <div id="paymentDetailsSection">
         <div id="paymentStage2Manual">
-          <div class="payment-ref-badge">
-            <div class="payment-ref-label">Reference code — add this to your UPI payment note</div>
-            <div class="payment-ref-code-row">
-              <span class="payment-ref-code" id="payRefCodeManual">—</span>
-              <button class="profile-mini-icon-btn" title="Copy" onclick="copyPaymentRef()">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              </button>
-            </div>
-            <div class="payment-ref-amount" id="payRefAmountManual">₹0</div>
-          </div>
-
           <div id="paymentDetailsBox" class="payment-details-box">
             <div class="profile-loading">Loading payment details…</div>
           </div>
 
-          <div class="form-group" style="margin-top:14px">
-            <label class="form-label">UTR / transaction reference number</label>
-            <input class="form-input" type="text" id="pay-utr" placeholder="From your UPI app, after paying" />
-          </div>
-         
-        
       </div>
       </div>
     </div>
@@ -10271,16 +10275,15 @@ function renderMyListings() {
 
 /* ═══════════════════════════════════════════════
    PAYMENTS — UPI/QR/bank transfer with manual admin verification.
-   One combined screen (paymentStage2): amount field, QR/UPI/bank details,
-   UTR, and screenshot are all visible together — no separate "Continue"
-   step. The QR/UPI/bank details are static settings (/api/payment-settings)
-   and render immediately on open. The PaymentRequest itself (which needs an
+   One combined screen (paymentStage2): amount field and QR/UPI/bank details
+   are visible together — no separate "Continue" step. The QR/UPI/bank
+   details are static settings (/api/payment-settings) and render
+   immediately on open. The PaymentRequest itself (which needs an
    amount) is created quietly in the background once the amount field loses
-   focus (handleAmountBlur() → ensureCurrentPaymentRequest()), so the
-   reference code is ready by the time the user needs it for their transfer
-   note. Hitting "I've paid — submit for verification" (submitPaymentProof())
-   finalizes the request if the amount changed since, then submits the
-   UTR + optional screenshot; an admin verifies it by hand against the
+   focus (handleAmountBlur() → ensureCurrentPaymentRequest()). Hitting
+   "I've paid — submit for verification" (submitPaymentProof())
+   finalizes the request if the amount changed since, then submits an
+   optional screenshot; an admin verifies it by hand against the
    bank/UPI statement (server.js: /api/admin/payments/:id/verify).
 ═══════════════════════════════════════════════ */
 let CURRENT_PAYMENT_REQUEST = null; // { id, refCode, amount, purpose }
@@ -10335,7 +10338,7 @@ function populatePayPropertyOptions(selectedId, selectedLabel) {
 // picker left to read it from.
 // Stage 1 ("what's this for" / "which property") is skipped for every entry
 // point now — this shows the single combined stage-2 screen (amount +
-// QR/UPI/bank details + UTR + screenshot) right away. The static payment
+// QR/UPI/bank details) right away. The static payment
 // details render immediately; the PaymentRequest itself waits until an
 // amount is entered (see handleAmountBlur()).
 function openPaymentModal(purpose, propertyId, propertyLabel) {
@@ -10349,7 +10352,6 @@ function openPaymentModal(purpose, propertyId, propertyLabel) {
 
   document.getElementById('paymentStage1').style.display = 'none';
   document.getElementById('paymentStage2').style.display = '';
-  document.getElementById('paymentAmountEntry').style.display = '';
   document.getElementById('paymentDetailsSection').style.display = '';
 
   const amtInline = document.getElementById('pay-amount-inline');
@@ -10357,10 +10359,15 @@ function openPaymentModal(purpose, propertyId, propertyLabel) {
   amtInline.readOnly = false;
   amtInline.classList.remove('identity-locked');
   document.getElementById('payAmountChangeBtn').style.display = 'none';
-  document.getElementById('pay-utr').value = '';
   const fileInput = document.getElementById('pay-screenshot');
   if (fileInput) fileInput.value = '';
-  updatePaymentRefBadge();
+
+  // Reset the "Payment for" picker to Rent by default and sync the visible
+  // section (rent calc / charges redirect / manual amount) to match.
+  document.getElementById('pay-category').value = 'rent';
+  const rentTotal = document.getElementById('pay-rent-total');
+  if (rentTotal) rentTotal.value = '';
+  handlePayCategoryChange();
 
   document.getElementById('paymentModal').classList.add('open');
   lockBodyScroll();
@@ -10407,12 +10414,68 @@ function renderPaymentDetailsBox() {
   `;
 }
 
-// Updates just the reference-code badge — split out from renderPaymentDetailsBox
-// since the badge depends on CURRENT_PAYMENT_REQUEST (may not exist yet) while
-// the details box below it doesn't.
-function updatePaymentRefBadge() {
-  document.getElementById('payRefCodeManual').textContent = CURRENT_PAYMENT_REQUEST ? CURRENT_PAYMENT_REQUEST.refCode : '—';
-  document.getElementById('payRefAmountManual').textContent = fmtINR(CURRENT_PAYMENT_REQUEST ? CURRENT_PAYMENT_REQUEST.amount : 0);
+// Switches the payment modal's visible section based on the "Payment for"
+// dropdown: Rent auto-calculates 30% of the entered monthly rent, Lease
+// auto-calculates 50% (half a month's rent), PG is a flat ₹1000 fee with no
+// total-amount entry needed, and Other keeps the plain manual amount field.
+// In every case the computed figure feeds the same hidden pay-amount-inline
+// field, so the existing PaymentRequest/UPI-link plumbing needs no changes.
+function handlePayCategoryChange() {
+  const cat = document.getElementById('pay-category').value;
+  const rentBox = document.getElementById('payRentCalc');
+  const pgBox = document.getElementById('payPgFlat');
+  const amountEntry = document.getElementById('paymentAmountEntry');
+  const rentLabel = document.getElementById('pay-rent-label');
+  const computedLabel = document.getElementById('pay-rent-computed-label');
+  const amt = document.getElementById('pay-amount-inline');
+
+  rentBox.style.display = 'none';
+  pgBox.style.display = 'none';
+  amountEntry.style.display = 'none';
+
+  if (cat === 'rent' || cat === 'lease') {
+    rentBox.style.display = '';
+    rentLabel.textContent = 'Monthly rent (₹)';
+    computedLabel.textContent = cat === 'rent' ? 'Amount payable (30%)' : "Amount payable (50%)";
+    document.getElementById('pay-rent-total').value = '';
+    document.getElementById('pay-rent-computed').textContent = fmtINR(0);
+    amt.value = '';
+    amt.readOnly = true;
+    amt.classList.add('identity-locked');
+  } else if (cat === 'pg') {
+    pgBox.style.display = '';
+    amt.value = 1000;
+    amt.readOnly = true;
+    amt.classList.add('identity-locked');
+    handleAmountBlur(); // quietly create the PaymentRequest for the flat ₹1000
+  } else {
+    amountEntry.style.display = '';
+    amt.value = '';
+    amt.readOnly = false;
+    amt.classList.remove('identity-locked');
+    document.getElementById('payAmountChangeBtn').style.display = 'none';
+  }
+}
+
+// Live display only (no network calls) — keeps the computed figure and the
+// hidden amount field in sync as the user types the monthly rent. Percentage
+// depends on which category is selected: 30% for Rent, 50% for Lease.
+function updateRentComputedDisplay() {
+  const cat = document.getElementById('pay-category').value;
+  const pct = cat === 'lease' ? 0.5 : 0.3;
+  const total = Number(document.getElementById('pay-rent-total').value) || 0;
+  const amount = Math.round(total * pct);
+  document.getElementById('pay-rent-computed').textContent = fmtINR(amount);
+  document.getElementById('pay-amount-inline').value = amount > 0 ? amount : '';
+}
+
+// Fires once the rent-total field loses focus: finalizes the computed
+// display, then quietly creates/refreshes the PaymentRequest for the 30%
+// amount so the UPI link/QR are ready, same as handleAmountBlur() does for
+// the plain amount field.
+function handleRentTotalBlur() {
+  updateRentComputedDisplay();
+  handleAmountBlur();
 }
 
 // Fires on the amount field losing focus: creates the PaymentRequest quietly
@@ -10454,7 +10517,6 @@ async function finalizePaymentRequestCreation(purpose, amount, note, propertyId)
     id: data.request._id, refCode: data.request.refCode, amount: data.request.amount,
     purpose: data.request.purpose,
   };
-  updatePaymentRefBadge();
   return CURRENT_PAYMENT_REQUEST;
 }
 
@@ -10503,7 +10565,6 @@ function changePaymentAmount() {
   amountInput.classList.remove('identity-locked');
   amountInput.focus();
   document.getElementById('payAmountChangeBtn').style.display = 'none';
-  updatePaymentRefBadge();
 }
 // Jumps straight to stage 2 for an existing pending/submitted request, e.g.
 // when the user reopens a payment from their history instead of starting a
@@ -10526,28 +10587,30 @@ async function resumePaymentRequest(payment) {
   lockBodyScroll();
   document.getElementById('paymentStage1').style.display = 'none';
   document.getElementById('paymentStage2').style.display = '';
-  document.getElementById('paymentAmountEntry').style.display = '';
   document.getElementById('paymentDetailsSection').style.display = '';
+  // Resuming an existing request — the amount is already fixed, so show the
+  // plain amount field rather than the rent-calc/charges-redirect UI.
+  document.getElementById('pay-category').value = 'other';
+  document.getElementById('payRentCalc').style.display = 'none';
+  document.getElementById('payPgFlat').style.display = 'none';
+  document.getElementById('paymentAmountEntry').style.display = '';
   const amtInline = document.getElementById('pay-amount-inline');
   amtInline.value = payment.amount;
   amtInline.readOnly = true; // resuming an existing request — amount is fixed unless they hit Change
   amtInline.classList.add('identity-locked');
   document.getElementById('payAmountChangeBtn').style.display = '';
-  document.getElementById('pay-utr').value = payment.utr || '';
   const fileInput = document.getElementById('pay-screenshot');
   if (fileInput) fileInput.value = '';
   renderPaymentDetailsBox();
-  updatePaymentRefBadge();
 }
 
 
-// Renders the UPI/QR/bank details box plus the reference badge for stage 2.
 // Builds a standard UPI deep link (upi://pay?...) — tapping/opening this on a
 // phone hands off to whichever UPI apps are installed (GPay, PhonePe, Paytm,
 // BHIM, etc.) via the OS's own app chooser; we never see which app they used
 // or any payment instrument, exactly like the QR code does. `tn` (transaction
 // note) is set to our reference code so it's easy to match back to this
-// PaymentRequest when reviewing the UTR/screenshot they submit after.
+// PaymentRequest when reviewing the screenshot they submit after.
 function buildUpiIntentUrl(s) {
   if (!s?.upiId || !CURRENT_PAYMENT_REQUEST?.amount) return null;
   const params = new URLSearchParams({
@@ -10571,27 +10634,17 @@ function payViaUpiApp() {
   window.location.href = url;
 }
 
-function copyPaymentRef() {
-  if (!CURRENT_PAYMENT_REQUEST) return;
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(CURRENT_PAYMENT_REQUEST.refCode).then(() => showToast('Reference code copied!'));
-  }
-}
-
 // Combined submit: makes sure a PaymentRequest exists for the current amount
 // (normally already created quietly by handleAmountBlur() when the amount
 // field lost focus — this is the fallback for e.g. autofill, or hitting
-// submit without ever leaving the field), then submits the UTR/screenshot
+// submit without ever leaving the field), then submits the screenshot
 // proof against it.
 async function submitPaymentProof() {
   const amount = Number(document.getElementById('pay-amount-inline').value);
   if (!amount || amount <= 0) { showToast('Enter a valid amount'); return; }
-  const utr = document.getElementById('pay-utr').value.trim();
-  if (!utr) { showToast('Enter the UTR / transaction reference number'); return; }
 
   const fileInput = document.getElementById('pay-screenshot');
   const formData = new FormData();
-  formData.append('utr', utr);
   if (fileInput && fileInput.files[0]) formData.append('screenshot', fileInput.files[0]);
 
   const btn = document.getElementById('paymentSubmitBtn');
@@ -11311,14 +11364,6 @@ function renderPartners(partners) {
       <div>
         <div class="about-partner-name">${esc(p.name)}</div>
         <div class="about-partner-role">${esc(p.role)}</div>
-        ${p.phone ? `<a class="about-partner-contact" href="tel:${esc(p.phone)}" onclick="event.stopPropagation()">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-          ${esc(p.phone)}
-        </a>` : ''}
-        ${p.email ? `<a class="about-partner-contact" href="mailto:${esc(p.email)}" onclick="event.stopPropagation()">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2 4 12 13 22 4"/></svg>
-          ${esc(p.email)}
-        </a>` : ''}
         ${p.location ? `<span class="about-partner-contact">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
           ${esc(p.location)}
